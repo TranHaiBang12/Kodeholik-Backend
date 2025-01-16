@@ -1,0 +1,17 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/kodeholik?stringtype=unspecified
+    username: postgres
+    password: haibang20042003
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    ddl-auto: update  
+    show-sql: false  
+  sql:
+    init:
+      mode: always
+  application:
+    name: Kodeholik
+    url: ${APPLICATION_URL_BASE:http://localhost:8080}
