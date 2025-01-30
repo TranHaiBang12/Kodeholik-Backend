@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -23,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
@@ -60,6 +63,7 @@ public class ProblemServiceImplTest {
 
     // test truong hop create problem thanh cong
     @Test
+    @DisplayName("Should create new problem successfully")
     void testCanCreateProblemSuccess() {
         // given
         ProblemRequestDto problemRequest = new ProblemRequestDto();
@@ -105,6 +109,7 @@ public class ProblemServiceImplTest {
 
     // test truong hop create problem nhung ma k tim thay id user
     @Test
+    @DisplayName("Should create new problem failed because user not found")
     void testCreateProblemUserNotFound() {
         // given
         ProblemRequestDto problemRequest = new ProblemRequestDto();
@@ -131,10 +136,14 @@ public class ProblemServiceImplTest {
                 () -> underTest.createProblem(problemRequest));
 
         assertEquals("User not found", exception.getMessage());
+
+        // kbh goi ham save cua problem repository
+        verify(problemRepository, never()).save(any());
     }
 
     // test truong hop xoa problem thanh cong
     @Test
+    @DisplayName("Should delete problem successfully")
     void testDeleteProblemSuccess() {
         // given
         Problem mockProblem = new Problem();
@@ -153,6 +162,7 @@ public class ProblemServiceImplTest {
 
     // test truong hop xoa problem ma id problem k ton tai
     @Test
+    @DisplayName("Should delete problem failed because problem not found")
     void testDeleteProblemButIdNotFound() {
         // given
         Problem mockProblem = new Problem();
@@ -168,10 +178,14 @@ public class ProblemServiceImplTest {
                 () -> underTest.deleteProblem(mockProblem.getId()));
 
         assertEquals("Problem not found", exception.getMessage());
+
+        // kbh goi ham save cua problem repository
+        verify(problemRepository, never()).save(any());
     }
 
     // test lay danh sach problem
     @Test
+    @DisplayName("Should get a list of problem successfully")
     void testGetAllProblems() {
         // when
         underTest.getAllProblems();
@@ -182,6 +196,7 @@ public class ProblemServiceImplTest {
 
     // test truong hop lay id cua problem thanh cong
     @Test
+    @DisplayName("Should get a problem by id successfully")
     void testGetProblemByIdSuccess() {
         // given
         Problem mockProblem = new Problem();
@@ -218,6 +233,7 @@ public class ProblemServiceImplTest {
 
     // test truong hop lay id cua problem k ton tai
     @Test
+    @DisplayName("Should get problem by id failed because id not existed")
     void testGetProblemByIdNotFound() {
         // given
         Problem mockProblem = new Problem();
@@ -233,10 +249,12 @@ public class ProblemServiceImplTest {
                 () -> underTest.getProblemById(mockProblem.getId()));
 
         assertEquals("Problem not found", exception.getMessage());
+
     }
 
     // test truong hop cap nhat problem thanh cong
     @Test
+    @DisplayName("Should update problem successfully")
     void testUpdateProblemSuccess() {
         Problem mockProblem = new Problem();
         mockProblem.setId(1L);
@@ -289,6 +307,7 @@ public class ProblemServiceImplTest {
 
     // test truong hop cap nhat problem ma id problem k ton tai
     @Test
+    @DisplayName("Should update problem failed because problem not found")
     void testUpdateProblemProblemNotFound() {
         // given
         Problem mockProblem = new Problem();
@@ -309,6 +328,7 @@ public class ProblemServiceImplTest {
 
     // test truong hop cap nhat problem ma id user k ton tai
     @Test
+    @DisplayName("Should update problem failed because user not found")
     void testUpdateProblemUserNotFound() {
         // given
         Problem mockProblem = new Problem();

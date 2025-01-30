@@ -5,7 +5,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemTestCaseResponseDto;
 import com.g44.kodeholik.service.problem.ProblemService;
+import com.g44.kodeholik.service.problem.ProblemTestCaseService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,10 +27,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/api/v1/problem")
 public class ProblemController {
     private final ProblemService problemService;
+    private final ProblemTestCaseService problemTestCaseService;
 
     @GetMapping("/list")
     public ResponseEntity<List<ProblemResponseDto>> getProblems() {
         return ResponseEntity.ok(problemService.getAllProblems());
+    }
+
+    @GetMapping("/sample-test-case/{id}")
+    public ResponseEntity<List<ProblemTestCaseResponseDto>> getProblemSampleTestCaseById(@PathVariable Long id) {
+        return ResponseEntity.ok(problemTestCaseService.getProblemSampleTestCaseById(id));
     }
 
     @GetMapping("/{id}")

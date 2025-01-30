@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.catalina.mapper.Mapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -40,9 +39,6 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public List<ProblemResponseDto> getAllProblems() {
         List<Problem> problems = problemRepository.findAll();
-        for (int i = 0; i < problems.size(); i++) {
-            log.info(problems.get(i).getTitle());
-        }
         return problems.stream()
                 .map(problemResponseMapper::mapFrom)
                 .collect(Collectors.toList());

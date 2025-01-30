@@ -69,6 +69,20 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+        	<groupId>com.amazonaws</groupId>
+        	<artifactId>aws-java-sdk-lambda</artifactId>
+        	<version>1.12.200</version>
+    	</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency>
+    		<groupId>org.apache.commons</groupId>
+    		<artifactId>commons-text</artifactId>
+    		<version>1.10.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
