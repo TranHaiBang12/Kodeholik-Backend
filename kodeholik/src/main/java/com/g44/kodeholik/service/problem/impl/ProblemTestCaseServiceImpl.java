@@ -1,36 +1,64 @@
 package com.g44.kodeholik.service.problem.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-
-import com.g44.kodeholik.exception.NotFoundException;
-import com.g44.kodeholik.model.dto.response.problem.ProblemTestCaseResponseDto;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
+import com.g44.kodeholik.model.dto.request.lambda.TestCase;
+import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
-import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemTestCaseRepository;
+import com.g44.kodeholik.service.problem.ProblemService;
+import com.g44.kodeholik.service.problem.ProblemTemplateService;
 import com.g44.kodeholik.service.problem.ProblemTestCaseService;
-import com.g44.kodeholik.util.mapper.response.problem.ProblemTestCaseResponseMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private final ProblemTestCaseRepository problemTestCaseRepository;
-    private final ProblemRepository problemRepository;
-    private final ProblemTestCaseResponseMapper problemTestCaseResponseMapper;
+    private final ProblemService problemService;
+    private final ProblemTemplateService problemTemplateService;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public List<ProblemTestCaseResponseDto> getProblemSampleTestCaseById(Long problemId) {
-        Problem problem = problemRepository.findById(problemId)
-                .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
-        List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblemAndIsSample(problem, true);
-        return problemTestCase.stream()
-                .map(problemTestCaseResponseMapper::mapFrom)
-                .collect(Collectors.toList());
+    public ProblemCompileResponseDto getProblemCompileInformationById(Long problemId, String languageName) {
+        ProblemCompileResponseDto problemCompileResponseDto = new ProblemCompileResponseDto();
+        Problem problem = problemService.getProblemById(problemId);
+        problemCompileResponseDto
+                .setTemplate(problemTemplateService.findByProblemAndLanguage(problem, languageName).getTemplateCode());
+        List<TestCase> testCases = getTestCaseByProblemId(problemId);
+        problemCompileResponseDto.setTestCases(testCases);
+        return problemCompileResponseDto;
+    }
+
+    @Override
+    public List<TestCase> getTestCaseByProblemId(Long problemId) {
+        Problem problem = problemService.getProblemById(problemId);
+        List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblem(problem);
+        List<TestCase> testCases = new ArrayList<>();
+        for (int i = 0; i < problemTestCase.size(); i++) {
+            List<InputVariable> inputs = new ArrayList<>();
+            try {
+                inputs = objectMapper.readValue(
+                        problemTestCase.get(i).getInput(),
+                        new TypeReference<List<InputVariable>>() {
+                        });
+            } catch (Exception e) {
+                log.info(e.getMessage());
+            }
+
+            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+        }
+        return testCases;
     }
 
 }

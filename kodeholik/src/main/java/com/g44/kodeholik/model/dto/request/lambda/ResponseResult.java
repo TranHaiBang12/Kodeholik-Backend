@@ -12,7 +12,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseResult {
+    private boolean isAccepted;
     private List<TestResult> results;
     private String time;
-
+    private float memoryUsage;
+    private int noSuccessTestcase;
+    private TestResult inputWrong;
 }

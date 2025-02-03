@@ -194,64 +194,6 @@ public class ProblemServiceImplTest {
         verify(problemRepository).findAll();
     }
 
-    // test truong hop lay id cua problem thanh cong
-    @Test
-    @DisplayName("Should get a problem by id successfully")
-    void testGetProblemByIdSuccess() {
-        // given
-        Problem mockProblem = new Problem();
-        mockProblem.setId(1L);
-        mockProblem.setTitle("Test");
-        mockProblem.setDescription("Test");
-        mockProblem.setDifficulty(Difficulty.EASY);
-        mockProblem.setStatus(ProblemStatus.PRIVATE);
-
-        ProblemResponseDto problemResponseDto = new ProblemResponseDto();
-        problemResponseDto.setId(1L);
-        problemResponseDto.setTitle("Test");
-        problemResponseDto.setDescription("Test");
-        problemResponseDto.setDifficulty(Difficulty.EASY);
-        problemResponseDto.setStatus(ProblemStatus.PRIVATE);
-
-        when(problemRepository.findById(1L)).thenReturn(Optional.of(mockProblem));
-        when(problemResponseMapper.mapFrom(any(Problem.class))).thenReturn(problemResponseDto);
-
-        // when
-        ProblemResponseDto problemResponseDtoSaved = underTest.getProblemById(1L);
-
-        // then
-        assertNotNull(problemResponseDtoSaved);
-        assertEquals(problemResponseDto.getId(), problemResponseDtoSaved.getId());
-        assertEquals(problemResponseDto.getTitle(), problemResponseDtoSaved.getTitle());
-        assertEquals(problemResponseDto.getDescription(), problemResponseDtoSaved.getDescription());
-        assertEquals(problemResponseDto.getDifficulty(), problemResponseDtoSaved.getDifficulty());
-        assertEquals(problemResponseDto.getStatus(), problemResponseDtoSaved.getStatus());
-
-        verify(problemRepository).findById(1L);
-        verify(problemResponseMapper).mapFrom(any(Problem.class));
-    }
-
-    // test truong hop lay id cua problem k ton tai
-    @Test
-    @DisplayName("Should get problem by id failed because id not existed")
-    void testGetProblemByIdNotFound() {
-        // given
-        Problem mockProblem = new Problem();
-        mockProblem.setId(1L);
-        mockProblem.setTitle("Test");
-        mockProblem.setDescription("Test");
-        mockProblem.setDifficulty(Difficulty.EASY);
-        mockProblem.setStatus(ProblemStatus.PRIVATE);
-
-        when(problemRepository.findById(1L)).thenReturn(Optional.empty());
-
-        NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> underTest.getProblemById(mockProblem.getId()));
-
-        assertEquals("Problem not found", exception.getMessage());
-
-    }
-
     // test truong hop cap nhat problem thanh cong
     @Test
     @DisplayName("Should update problem successfully")

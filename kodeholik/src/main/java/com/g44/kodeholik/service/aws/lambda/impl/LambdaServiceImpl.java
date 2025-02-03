@@ -9,10 +9,8 @@ import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.model.InvokeRequest;
 import com.amazonaws.services.lambda.model.InvokeResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.g44.kodeholik.model.dto.request.lambda.CodeRequest;
-import com.g44.kodeholik.model.dto.request.lambda.ResponseResult;
+import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
-import com.google.gson.Gson;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -20,7 +18,6 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class LambdaServiceImpl implements LambdaService {
 
-    private static Gson gson = new Gson();
     private final AWSLambda awsLambda;
 
     @Value("${aws.lambda.arn}")
@@ -34,7 +31,7 @@ public class LambdaServiceImpl implements LambdaService {
     }
 
     @Override
-    public String invokeLambdaFunction(CodeRequest codeRequest) {
+    public String invokeLambdaFunction(LambdaRequest codeRequest) {
         try {
 
             // Chuyen du lieu request thanh JSON
@@ -50,8 +47,6 @@ public class LambdaServiceImpl implements LambdaService {
             result = result.replace("\\", "");
             result = result.replace("\"\"", "\"");
             result = result.substring(1, result.length() - 1);
-            // log.info(result);
-            ResponseResult response = gson.fromJson(result, ResponseResult.class);
             return result;
         } catch (Exception e) {
             log.info(e.getMessage());

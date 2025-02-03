@@ -1,11 +1,13 @@
 package com.g44.kodeholik.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
-import com.g44.kodeholik.model.dto.response.problem.ProblemTestCaseResponseDto;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemTestCaseService;
 
@@ -34,14 +36,21 @@ public class ProblemController {
         return ResponseEntity.ok(problemService.getAllProblems());
     }
 
-    @GetMapping("/sample-test-case/{id}")
-    public ResponseEntity<List<ProblemTestCaseResponseDto>> getProblemSampleTestCaseById(@PathVariable Long id) {
-        return ResponseEntity.ok(problemTestCaseService.getProblemSampleTestCaseById(id));
+    @GetMapping("/compile-information/{id}")
+    public ResponseEntity<ProblemCompileResponseDto> getProblemCompileInformationById(
+            @PathVariable Long id,
+            @RequestParam String languageName) {
+        return ResponseEntity.ok(problemTestCaseService.getProblemCompileInformationById(id, languageName));
+    }
+
+    @GetMapping("/description/{id}")
+    public ResponseEntity<ProblemDescriptionResponseDto> getProblemDescriptionById(@PathVariable Long id) {
+        return ResponseEntity.ok(problemService.getProblemDescriptionById(id));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProblemResponseDto> getProblemById(@PathVariable Long id) {
-        return ResponseEntity.ok(problemService.getProblemById(id));
+    public ResponseEntity<ProblemResponseDto> getProblemResponseDtoById(@PathVariable Long id) {
+        return ResponseEntity.ok(problemService.getProblemResponseDtoById(id));
     }
 
     @PostMapping("/create")

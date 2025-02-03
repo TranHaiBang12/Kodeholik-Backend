@@ -1,10 +1,12 @@
 package com.g44.kodeholik.model.dto.request.lambda;
 
-import com.g44.kodeholik.model.enums.problem.InputType;
-
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Builder
 public class InputVariable {

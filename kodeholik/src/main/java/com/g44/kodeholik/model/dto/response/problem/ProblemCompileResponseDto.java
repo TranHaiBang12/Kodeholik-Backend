@@ -4,12 +4,17 @@ import java.util.List;
 
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Builder
 public class ProblemCompileResponseDto {
-    public String template;
-    public List<TestCase> testCases;
+    private String template;
+    private List<TestCase> testCases;
+
 }

@@ -10,4 +10,5 @@ import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
 public interface ProblemTestCaseRepository extends JpaRepository<ProblemTestCase, Long> {
     List<ProblemTestCase> findByProblemAndIsSample(Problem problem, boolean isSample);
 
+    List<ProblemTestCase> findByProblem(Problem problem);
 }

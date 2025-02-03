@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.g44.kodeholik.model.dto.request.lambda.CodeRequest;
+import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class LambdaController {
     private final LambdaService lambdaService;
 
     @PostMapping("/compile")
-    public String compileCode(@RequestBody CodeRequest codeRequest) {
+    public String compileCode(@RequestBody LambdaRequest codeRequest) {
         return lambdaService.invokeLambdaFunction(codeRequest);
     }
 
