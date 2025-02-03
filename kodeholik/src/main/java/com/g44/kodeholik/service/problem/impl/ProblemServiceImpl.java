@@ -14,6 +14,7 @@ import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
+import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
@@ -90,24 +91,27 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public ProblemDescriptionResponseDto getProblemDescriptionById(Long id) {
-        // TODO Auto-generated method stub
         ProblemDescriptionResponseDto problemDescriptionResponseDto = new ProblemDescriptionResponseDto();
         Problem problem = getProblemById(id);
         List<String> topics = new ArrayList<>();
         for (Topic topic : problem.getTopics()) {
             topics.add(topic.getName());
         }
+
+        List<String> skills = new ArrayList<>();
+        for (Skill skill : problem.getSkills()) {
+            skills.add(skill.getName());
+        }
         problemDescriptionResponseDto = problemDescriptionMapper.mapFrom(problem);
         problemDescriptionResponseDto.setTopicList(topics);
+        problemDescriptionResponseDto.setSkillList(skills);
         return problemDescriptionResponseDto;
     }
 
     @Override
     public Problem getProblemById(Long id) {
-        // TODO Auto-generated method stub
-        Problem problem = problemRepository.findById(id)
+        return problemRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
-        return problem;
     }
 
 }

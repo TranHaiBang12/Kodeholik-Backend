@@ -29,4 +29,6 @@ public class ProblemDescriptionResponseDto {
     private int noAccepted;
 
     private List<String> topicList;
+
+    private List<String> skillList;
 }
