@@ -1,9 +1,10 @@
-package com.g44.kodeholik.model.dto.response.problem.submission;
+package com.g44.kodeholik.model.dto.response.problem.submission.submit;
 
 import java.sql.Timestamp;
 
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.lambda.TestResult;
+import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 
 public class FailedSubmissionResponseDto extends SubmissionResponseDto {
     private int noSuccessTestcase;

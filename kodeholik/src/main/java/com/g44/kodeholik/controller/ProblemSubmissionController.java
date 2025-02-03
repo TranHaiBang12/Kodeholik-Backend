@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,12 @@ public class ProblemSubmissionController {
     public SubmissionResponseDto submit(@PathVariable Long id,
             @RequestBody ProblemCompileRequestDto problemCompileRequestDto) {
         return problemSubmissionService.submitProblem(id, problemCompileRequestDto);
+    }
+
+    @PostMapping("/run/{id}")
+    public RunProblemResponseDto run(@PathVariable Long id,
+            @RequestBody ProblemCompileRequestDto problemCompileRequestDto) {
+        return problemSubmissionService.run(id, problemCompileRequestDto);
     }
 
 }

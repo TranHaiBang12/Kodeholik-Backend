@@ -1,6 +1,8 @@
-package com.g44.kodeholik.model.dto.response.problem.submission;
+package com.g44.kodeholik.model.dto.response.problem.submission.submit;
 
 import java.sql.Timestamp;
+
+import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 
 public class AcceptedSubmissionResponseDto extends SubmissionResponseDto {
     private String executionTime;
