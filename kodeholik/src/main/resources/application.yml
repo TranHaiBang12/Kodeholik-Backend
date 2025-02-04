@@ -16,6 +16,13 @@ spring:
     name: Kodeholik
     url: ${APPLICATION_URL_BASE:http://localhost:8080}
     fe-url: http://localhost:5174
+  data:
+    elasticsearch:
+      repositories:
+        enabled: 
+          true
+  elasticsearch:
+    uris: http://localhost:9200
 aws:
   lambda:
     arn: arn:aws:lambda:ap-southeast-1:490004628975:function:compiler-code

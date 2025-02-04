@@ -1,6 +1,9 @@
 package com.g44.kodeholik.service.problem.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.List;
 
@@ -16,6 +19,7 @@ import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
 import com.g44.kodeholik.model.enums.problem.InputType;
+import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
 import com.g44.kodeholik.service.problem.ProblemService;
@@ -51,6 +55,8 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     private final UserService userService;
 
     private final LanguageService languageService;
+
+    private final ProblemRepository problemRepository;
 
     private Gson gson = new Gson();
 
@@ -128,6 +134,12 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
             problemSubmission.setExecutionTime(0);
         problemSubmission.setMemoryUsage(responseResult.getMemoryUsage());
         problemSubmissionRepository.save(problemSubmission);
+        problem.setNoSubmission(problem.getNoSubmission() + 1);
+        double acceptanceRate = ((double) getNumberAcceptedSubmission(problemId) / (double) problem.getNoSubmission())
+                * 100;
+        BigDecimal roundAcceptanceRate = new BigDecimal(acceptanceRate).setScale(2, RoundingMode.HALF_UP);
+        problem.setAcceptanceRate(roundAcceptanceRate.floatValue());
+        problemRepository.save(problem);
         return submissionResponseDto;
     }
 
@@ -169,5 +181,11 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                 break;
         }
         return runProblemResponseDto;
+    }
+
+    @Override
+    public long getNumberAcceptedSubmission(Long problemId) {
+        Problem problem = problemService.getProblemById(problemId);
+        return problemSubmissionRepository.countByIsAcceptedAndProblem(true, problem);
     }
 }

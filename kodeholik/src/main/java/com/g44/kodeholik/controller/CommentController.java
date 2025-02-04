@@ -1,7 +1,6 @@
 package com.g44.kodeholik.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +21,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/problem/{id}")
-    public ResponseEntity<List<CommentResponseDto>> getProblems(
+    public ResponseEntity<Page<CommentResponseDto>> getProblems(
             @PathVariable Long id,
             @RequestParam int page,
             @RequestParam String sortBy,

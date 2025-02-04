@@ -8,4 +8,6 @@ public interface ProblemSubmissionService {
     public SubmissionResponseDto submitProblem(Long problemId, ProblemCompileRequestDto problemCompileRequestDto);
 
     public RunProblemResponseDto run(Long problemId, ProblemCompileRequestDto problemCompileRequestDto);
+
+    public long getNumberAcceptedSubmission(Long problemId);
 }
