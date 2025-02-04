@@ -81,7 +81,7 @@ public class ProblemServiceImpl implements ProblemService {
                 .map(problem -> ProblemElasticsearch.builder()
                         .id(problem.getId())
                         .title(problem.getTitle())
-                        .titleSort(problem.getTitle())
+                        .titleSearchAndSort(problem.getTitle())
                         .difficulty(problem.getDifficulty().toString())
                         .acceptanceRate(problem.getAcceptanceRate())
                         .noSubmission(problem.getNoSubmission())
@@ -166,6 +166,7 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public Page<ProblemElasticsearch> searchProblems(SearchProblemRequestDto searchProblemRequestDto, int page,
             int size, String sortBy, Boolean ascending) {
+        syncProblemsToElasticsearch();
         Pageable pageable;
         if (sortBy != null && !sortBy.equals("")) {
             Sort sort = ascending.booleanValue() ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -173,8 +174,6 @@ public class ProblemServiceImpl implements ProblemService {
         } else {
             pageable = PageRequest.of(page, size);
         }
-        syncProblemsToElasticsearch();
-
         try {
             SearchRequest searchRequest = SearchRequest.of(s -> s
                     .index("problems") // Tên index của bạn
@@ -249,6 +248,41 @@ public class ProblemServiceImpl implements ProblemService {
             throw new RuntimeException("Error querying Elasticsearch", e);
         }
 
+    }
+
+    @Override
+    public List<String> getAutocompleteSuggestionsForProblemTitle(String searchText) {
+        try {
+            syncProblemsToElasticsearch();
+            if (searchText != null) {
+                SearchRequest searchRequest = SearchRequest.of(s -> s
+                        .index("problems") // Tên index của bạn
+                        .size(10) // Giới hạn kết quả trả về chỉ 5 gợi ý
+                        .sort(k -> k
+                                .field(f -> f
+                                        .field("_score")
+                                        .order(SortOrder.Desc)))
+                        .query(q -> q
+                                .bool(b -> b
+                                        .must(m -> m
+                                                .prefix(p -> p
+                                                        .field("titleSearchAndSort")
+                                                        .value(searchText) // Từ tìm kiếm từ người dùng
+                                                )))));
+
+                // Thực hiện truy vấn Elasticsearch
+                SearchResponse<ProblemElasticsearch> searchResponse = elasticsearchClient.search(searchRequest,
+                        ProblemElasticsearch.class);
+
+                // Lấy các gợi ý từ kết quả trả về
+                return searchResponse.hits().hits().stream()
+                        .map(hit -> hit.source().getTitle()) // Lấy title từ kết quả
+                        .collect(Collectors.toList());
+            }
+            return new ArrayList<>();
+        } catch (Exception e) {
+            throw new RuntimeException("Error querying Elasticsearch", e);
+        }
     }
 
 }

@@ -49,6 +49,11 @@ public class ProblemController {
         return ResponseEntity.ok(problemService.searchProblems(searchProblemRequestDto, page, size, sortBy, ascending));
     }
 
+    @GetMapping("/suggest")
+    public ResponseEntity<List<String>> getProblemSuggestions(@RequestParam String searchText) {
+        return ResponseEntity.ok(problemService.getAutocompleteSuggestionsForProblemTitle(searchText));
+    }
+
     @GetMapping("/compile-information/{id}")
     public ResponseEntity<ProblemCompileResponseDto> getProblemCompileInformationById(
             @PathVariable Long id,

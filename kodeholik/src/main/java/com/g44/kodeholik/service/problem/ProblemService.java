@@ -1,10 +1,8 @@
 package com.g44.kodeholik.service.problem;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.SearchProblemRequestDto;
@@ -30,4 +28,6 @@ public interface ProblemService {
 
     public Page<ProblemElasticsearch> searchProblems(SearchProblemRequestDto searchProblemRequestDto, int page,
             int size, String sortBy, Boolean ascending);
+
+    public List<String> getAutocompleteSuggestionsForProblemTitle(String searchText);
 }

@@ -31,10 +31,7 @@ public class ProblemElasticsearch {
     private String title;
 
     @Field(type = FieldType.Keyword)
-    private String titleSort;
-
-    @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
-    private String titleAutocomplete;
+    private String titleSearchAndSort;
 
     @Field(type = FieldType.Text)
     private String difficulty;
