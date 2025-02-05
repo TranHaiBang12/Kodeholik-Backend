@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.g44.kodeholik.model.entity.problem.Problem;
-import com.g44.kodeholik.model.entity.user.User;
+import com.g44.kodeholik.model.entity.user.Users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,18 +45,18 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
-    private User createdBy;
+    private Users createdBy;
 
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
-    private User updatedBy;
+    private Users updatedBy;
 
     @ManyToOne
     @JoinColumn(name = "comment_reply", referencedColumnName = "id")
-    private User commentReply;
+    private Users commentReply;
 
     @ManyToMany
     @JoinTable(name = "problem_comment", schema = "schema_problem", joinColumns = @JoinColumn(name = "comment_id"), inverseJoinColumns = @JoinColumn(name = "problem_id"))

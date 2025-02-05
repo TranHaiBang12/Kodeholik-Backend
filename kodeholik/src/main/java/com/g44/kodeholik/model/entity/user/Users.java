@@ -31,7 +31,7 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @Builder
 @Data
-public class User {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

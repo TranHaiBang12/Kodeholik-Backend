@@ -4,7 +4,7 @@ import java.security.Timestamp;
 
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.setting.Language;
-import com.g44.kodeholik.model.entity.user.User;
+import com.g44.kodeholik.model.entity.user.Users;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class ProblemSubmissionRequestDto {
     private Long id;
 
-    private User user;
+    private Users user;
 
     private Problem problem;
 

@@ -3,7 +3,7 @@ package com.g44.kodeholik.model.entity.problem;
 import java.sql.Timestamp;
 
 import com.g44.kodeholik.model.entity.setting.Language;
-import com.g44.kodeholik.model.entity.user.User;
+import com.g44.kodeholik.model.entity.user.Users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +37,7 @@ public class ProblemSubmission {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    private Users user;
 
     private String code;
 

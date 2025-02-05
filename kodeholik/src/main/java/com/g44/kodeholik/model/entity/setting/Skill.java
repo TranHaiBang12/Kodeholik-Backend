@@ -2,7 +2,7 @@ package com.g44.kodeholik.model.entity.setting;
 
 import java.sql.Timestamp;
 
-import com.g44.kodeholik.model.entity.user.User;
+import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.setting.Level;
 
 import jakarta.persistence.Column;
@@ -44,12 +44,12 @@ public class Skill {
 
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
-    private User createdBy;
+    private Users createdBy;
 
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
-    private User updatedBy;
+    private Users updatedBy;
 }

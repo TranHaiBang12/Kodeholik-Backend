@@ -7,7 +7,7 @@ import java.util.Set;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.setting.Topic;
-import com.g44.kodeholik.model.entity.user.User;
+import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 
@@ -64,14 +64,14 @@ public class Problem {
 
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
-    private User createdBy;
+    private Users createdBy;
 
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
-    private User updatedBy;
+    private Users updatedBy;
 
     @ManyToMany
     @JoinTable(name = "problem_topic", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "topic_id"))

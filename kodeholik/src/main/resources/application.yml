@@ -23,6 +23,14 @@ spring:
           true
   elasticsearch:
     uris: http://localhost:9200
+  jwt:
+    secret-key: d2f21asdabkocxz213123ADSAKDOACZXCMZKADKASODKWOEMKQMKCMAKDMASKDAKDMAKDASM
+    access-token:
+      expiry-time:
+        30000 #seconds
+    refresh-token:
+      expiry-time:
+        86400000 #seconds
 aws:
   lambda:
     arn: arn:aws:lambda:ap-southeast-1:490004628975:function:compiler-code

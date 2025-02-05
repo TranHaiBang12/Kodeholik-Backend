@@ -31,7 +31,7 @@ import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
-import com.g44.kodeholik.model.entity.user.User;
+import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
@@ -78,7 +78,7 @@ public class ProblemServiceImplTest {
         mappedProblem.setDifficulty(Difficulty.EASY);
         mappedProblem.setStatus(ProblemStatus.PRIVATE);
 
-        User mockUser = new User();
+        Users mockUser = new Users();
         mockUser.setId(1L);
         mockUser.setUsername("TestUser");
 
@@ -218,7 +218,7 @@ public class ProblemServiceImplTest {
         problemResponseDto.setDifficulty(Difficulty.EASY);
         problemResponseDto.setStatus(ProblemStatus.PRIVATE);
 
-        User mockUser = new User();
+        Users mockUser = new Users();
         mockUser.setId(1L);
         mockUser.setUsername("TestUser");
 
@@ -293,7 +293,7 @@ public class ProblemServiceImplTest {
         problemResponseDto.setDifficulty(Difficulty.EASY);
         problemResponseDto.setStatus(ProblemStatus.PRIVATE);
 
-        User mockUser = new User();
+        Users mockUser = new Users();
         mockUser.setId(1L);
         mockUser.setUsername("TestUser");
 

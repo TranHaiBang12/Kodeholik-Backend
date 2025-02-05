@@ -1,7 +1,13 @@
 package com.g44.kodeholik.service.user;
 
-import com.g44.kodeholik.model.entity.user.User;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.g44.kodeholik.model.entity.user.Users;
 
 public interface UserService {
-    public User getUserById(Long userId);
+    public Users getUserById(Long userId);
+
+    public UserDetails getCurrentUserDetails();
+
+    public Users getCurrentUser();
 }
