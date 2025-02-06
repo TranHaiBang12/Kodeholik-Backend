@@ -14,6 +14,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.g44.kodeholik.exception.ForbiddenException;
+import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.token.TokenService;
 
 import jakarta.servlet.FilterChain;
@@ -33,10 +35,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
 
+    private final UserRepository userRepository;
+
     private final JwtAuthenticationFailureHandler authenticationFailureHandler;
 
     private static List<String> skipFilterUrls = Arrays.asList(
             "/api/v1/auth/login",
+            "/api/v1/auth/reset-password-init",
+            "/api/v1/auth/reset-password-check",
+            "/api/v1/auth/reset-password-finish",
             "/api/v1/auth/rotate-token",
             "/api/v1/problem/search/**",
             "/api/v1/problem/description/**",
@@ -65,6 +72,10 @@ public class JwtFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 if (tokenService.validateToken(accessToken, userDetails)) {
+                    if (userRepository.isUserNotAllowed(username)) {
+                        throw new ForbiddenException("This account is not allowed to do this action",
+                                "This account is not allowed to do this action");
+                    }
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

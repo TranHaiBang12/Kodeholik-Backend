@@ -33,6 +33,9 @@ public class SecurityConfig {
 
     private final String[] publicUrls = {
             "/api/v1/auth/login",
+            "/api/v1/auth/reset-password-init",
+            "/api/v1/auth/reset-password-check",
+            "/api/v1/auth/reset-password-finish",
             "/api/v1/auth/rotate-token",
             "/api/v1/problem/search/**",
             "/api/v1/problem/description/**",

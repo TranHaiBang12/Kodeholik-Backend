@@ -1,6 +1,7 @@
 package com.g44.kodeholik.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.user.LoginRequestDto;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,6 +43,27 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body("Refresh token is missing");
 
         }
+    }
+
+    @PostMapping("/reset-password-init")
+    public ResponseEntity<?> resetPasswordInit(@RequestParam String username) {
+        authService.resetPasswordInit(username);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/reset-password-check")
+    public ResponseEntity<?> resetPasswordCheckToken(@RequestParam String token) {
+        if (authService.checkValidForgotPasswordToken(token)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body("Invalid token");
+        }
+    }
+
+    @PostMapping("/reset-password-finish")
+    public ResponseEntity<?> resetPasswordFinish(@RequestParam String token, @RequestBody String newPassword) {
+        authService.resetPasswordFinish(token, newPassword);
+        return ResponseEntity.noContent().build();
     }
 
 }

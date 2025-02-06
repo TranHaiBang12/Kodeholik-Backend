@@ -18,7 +18,6 @@ import com.g44.kodeholik.exception.MalformedJwtException;
 import com.g44.kodeholik.model.enums.token.TokenType;
 import com.g44.kodeholik.service.redis.RedisService;
 import com.g44.kodeholik.service.token.TokenService;
-import com.g44.kodeholik.service.user.UserService;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -43,9 +42,10 @@ public class TokenServiceImpl implements TokenService {
     @Value("${spring.jwt.refresh-token.expiry-time}")
     private int refreshTokenExpiryTime;
 
-    private final UserDetailsService userDetailsService;
+    @Value("${spring.jwt.forgot-token.expiry-time}")
+    private int forgotTokenExpiryTime;
 
-    private final UserService userService;
+    private final UserDetailsService userDetailsService;
 
     private final RedisService redisService;
 
@@ -87,7 +87,7 @@ public class TokenServiceImpl implements TokenService {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (Exception e) {
-            throw new MalformedJwtException("Wrong format jwt", "Wrong format jwt");
+            throw new MalformedJwtException("Invalid or expired token", "Invalid or expired token");
         }
     }
 
@@ -159,15 +159,30 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void saveRefreshToken(String refreshToken, String username) {
-        redisService.saveRefreshToken(username, refreshToken, refreshTokenExpiryTime);
+        redisService.saveToken(username, refreshToken, refreshTokenExpiryTime, TokenType.REFRESH);
     }
 
     @Override
     public boolean checkRefreshToken(String refreshToken, String username) {
-        if (refreshToken.equals(redisService.getRefreshToken(username).trim())) {
+        String savedToken = redisService.getToken(username, TokenType.REFRESH);
+        if (savedToken != null && refreshToken.equals(savedToken.trim())) {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public String generateForgotPasswordToken(String username) {
+        Map<String, Object> claims = new HashMap<>();
+        return Jwts.builder()
+                .claims()
+                .add(claims)
+                .subject(username)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + forgotTokenExpiryTime))
+                .and()
+                .signWith(getKey())
+                .compact();
     }
 
 }

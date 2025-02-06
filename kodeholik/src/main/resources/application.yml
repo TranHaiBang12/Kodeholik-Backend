@@ -1,6 +1,16 @@
 server:
   port: 8080
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kodeholik@gmail.com
+    password: kgul yngx pzap extk
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
   datasource:
     url: jdbc:postgresql://localhost:5433/kodeholik?stringtype=unspecified
     username: postgres
@@ -40,6 +50,9 @@ spring:
     refresh-token:
       expiry-time:
         86400000 #seconds
+    forgot-token:
+      expiry-time:
+        900000
 aws:
   lambda:
     arn: arn:aws:lambda:ap-southeast-1:490004628975:function:compiler-code
