@@ -5,7 +5,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
-import com.g44.kodeholik.model.dto.request.problem.SearchProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
@@ -26,8 +27,8 @@ public interface ProblemService {
 
     public void deleteProblem(Long id);
 
-    public Page<ProblemElasticsearch> searchProblems(SearchProblemRequestDto searchProblemRequestDto, int page,
-            int size, String sortBy, Boolean ascending);
+    public Page<ProblemElasticsearch> searchProblems(SearchProblemRequestDto searchProblemRequestDto, Integer page,
+            Integer size, ProblemSortField sortBy, Boolean ascending);
 
     public List<String> getAutocompleteSuggestionsForProblemTitle(String searchText);
 }

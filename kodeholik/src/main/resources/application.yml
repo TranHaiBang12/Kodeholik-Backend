@@ -21,13 +21,22 @@ spring:
       repositories:
         enabled: 
           true
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 2
   elasticsearch:
     uris: http://localhost:9200
   jwt:
     secret-key: d2f21asdabkocxz213123ADSAKDOACZXCMZKADKASODKWOEMKQMKCMAKDMASKDAKDMAKDASM
     access-token:
       expiry-time:
-        30000 #seconds
+        15000 #seconds
     refresh-token:
       expiry-time:
         86400000 #seconds

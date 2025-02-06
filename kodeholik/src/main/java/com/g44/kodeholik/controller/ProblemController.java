@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
-import com.g44.kodeholik.model.dto.request.problem.SearchProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
+import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
@@ -41,9 +42,9 @@ public class ProblemController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<ProblemElasticsearch>> searchProblem(
-            @RequestParam int page,
-            @RequestParam int size,
-            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) ProblemSortField sortBy,
             @RequestParam(required = false) Boolean ascending,
             @RequestBody SearchProblemRequestDto searchProblemRequestDto) {
         return ResponseEntity.ok(problemService.searchProblems(searchProblemRequestDto, page, size, sortBy, ascending));

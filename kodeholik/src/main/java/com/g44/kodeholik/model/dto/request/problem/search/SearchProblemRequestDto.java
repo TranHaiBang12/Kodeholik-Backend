@@ -1,4 +1,4 @@
-package com.g44.kodeholik.model.dto.request.problem;
+package com.g44.kodeholik.model.dto.request.problem.search;
 
 import java.util.List;
 

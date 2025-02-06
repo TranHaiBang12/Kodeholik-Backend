@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.g44.kodeholik.filter.JwtFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -32,7 +33,11 @@ public class SecurityConfig {
 
     private final String[] publicUrls = {
             "/api/v1/auth/login",
-            "/api/v1/auth/rotate-token"
+            "/api/v1/auth/rotate-token",
+            "/api/v1/problem/search/**",
+            "/api/v1/problem/description/**",
+            "/api/v1/problem/compile-information/**",
+            "/api/v1/comment/problem/**"
     };
 
     private final JwtFilter jwtFilter;

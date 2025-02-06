@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,16 +25,19 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
-import com.g44.kodeholik.model.dto.request.problem.SearchProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
+import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
+import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.setting.TagService;
@@ -49,6 +53,7 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.util.ObjectBuilder;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -70,6 +75,8 @@ public class ProblemServiceImpl implements ProblemService {
     private final UserRepository userRepository;
 
     private final ProblemElasticsearchRepository problemElasticsearchRepository;
+
+    private final ProblemSubmissionRepository problemSubmissionRepository;
 
     private final TagService tagService;
 
@@ -151,8 +158,12 @@ public class ProblemServiceImpl implements ProblemService {
         for (Skill skill : problem.getSkills()) {
             skills.add(skill.getName());
         }
+
         problemDescriptionResponseDto = problemDescriptionMapper.mapFrom(problem);
+        problemDescriptionResponseDto.setNoComment(problem.getComments().size());
         problemDescriptionResponseDto.setTopicList(topics);
+        problemDescriptionResponseDto
+                .setNoAccepted(problemSubmissionRepository.countByIsAcceptedAndProblem(true, problem));
         problemDescriptionResponseDto.setSkillList(skills);
         return problemDescriptionResponseDto;
     }
@@ -164,15 +175,29 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public Page<ProblemElasticsearch> searchProblems(SearchProblemRequestDto searchProblemRequestDto, int page,
-            int size, String sortBy, Boolean ascending) {
+    public Page<ProblemElasticsearch> searchProblems(SearchProblemRequestDto searchProblemRequestDto, Integer page,
+            Integer size, ProblemSortField sortBy, Boolean ascending) {
+        int pageN;
+        if (page == null) {
+            pageN = 0;
+        } else {
+            pageN = page.intValue();
+        }
+
+        int sizeN;
+        if (size == null) {
+            sizeN = 5;
+        } else {
+            sizeN = size.intValue();
+        }
         syncProblemsToElasticsearch();
         Pageable pageable;
         if (sortBy != null && !sortBy.equals("")) {
-            Sort sort = ascending.booleanValue() ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-            pageable = PageRequest.of(page, size, sort);
+            Sort sort = ascending.booleanValue() ? Sort.by(sortBy.toString()).ascending()
+                    : Sort.by(sortBy.toString()).descending();
+            pageable = PageRequest.of(pageN, sizeN, sort);
         } else {
-            pageable = PageRequest.of(page, size);
+            pageable = PageRequest.of(pageN, sizeN);
         }
         try {
             SearchRequest searchRequest = SearchRequest.of(s -> s
@@ -185,7 +210,7 @@ public class ProblemServiceImpl implements ProblemService {
                                     .order(SortOrder.Desc));
                         } else {
                             return k.field(f -> f
-                                    .field(sortBy) // Sắp xếp theo điểm số
+                                    .field(sortBy.toString()) // Sắp xếp theo điểm số
                                     .order(ascending.booleanValue() ? SortOrder.Asc : SortOrder.Desc));
                         }
                     })

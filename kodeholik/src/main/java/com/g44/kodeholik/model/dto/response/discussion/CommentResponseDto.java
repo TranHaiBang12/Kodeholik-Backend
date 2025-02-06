@@ -1,6 +1,6 @@
 package com.g44.kodeholik.model.dto.response.discussion;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 

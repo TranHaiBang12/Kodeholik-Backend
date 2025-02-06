@@ -7,6 +7,11 @@ import com.g44.kodeholik.model.enums.token.TokenType;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface TokenService {
+
+    public void saveRefreshToken(String refreshToken, String username);
+
+    public boolean checkRefreshToken(String refreshToken, String username);
+
     public String generateAccessToken(String username);
 
     public String generateRefreshToken(String username);

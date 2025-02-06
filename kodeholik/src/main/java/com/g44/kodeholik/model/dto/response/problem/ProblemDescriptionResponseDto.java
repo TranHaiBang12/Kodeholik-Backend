@@ -26,7 +26,9 @@ public class ProblemDescriptionResponseDto {
 
     private int noSubmission;
 
-    private int noAccepted;
+    private Long noAccepted;
+
+    private int noComment;
 
     private List<String> topicList;
 

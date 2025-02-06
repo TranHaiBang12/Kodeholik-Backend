@@ -8,13 +8,15 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import com.g44.kodeholik.model.dto.request.user.LoginRequestDto;
+import com.g44.kodeholik.exception.MalformedJwtException;
 import com.g44.kodeholik.model.enums.token.TokenType;
+import com.g44.kodeholik.service.redis.RedisService;
 import com.g44.kodeholik.service.token.TokenService;
 import com.g44.kodeholik.service.user.UserService;
 
@@ -25,7 +27,9 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
@@ -40,6 +44,10 @@ public class TokenServiceImpl implements TokenService {
     private int refreshTokenExpiryTime;
 
     private final UserDetailsService userDetailsService;
+
+    private final UserService userService;
+
+    private final RedisService redisService;
 
     @Override
     public String generateAccessToken(String username) {
@@ -72,11 +80,15 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith((SecretKey) getKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts.parser()
+                    .verifyWith((SecretKey) getKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (Exception e) {
+            throw new MalformedJwtException("Wrong format jwt", "Wrong format jwt");
+        }
     }
 
     @Override
@@ -96,7 +108,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String generateRefreshToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        return Jwts.builder()
+        String refreshToken = Jwts.builder()
                 .claims()
                 .add(claims)
                 .subject(username)
@@ -105,6 +117,8 @@ public class TokenServiceImpl implements TokenService {
                 .and()
                 .signWith(getKey())
                 .compact();
+        saveRefreshToken(refreshToken, username);
+        return refreshToken;
     }
 
     @Override
@@ -129,13 +143,28 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public boolean rotateToken(String refreshToken, HttpServletResponse response) {
-        String username = extractUsername(refreshToken);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        if (refreshToken != null && validateToken(refreshToken, userDetails)) {
-            String accessToken = generateAccessToken(username);
-            refreshToken = generateRefreshToken(username);
-            addTokenToCookie(accessToken, response, TokenType.ACCESS);
-            addTokenToCookie(refreshToken, response, TokenType.REFRESH);
+        if (refreshToken != null && !refreshToken.equals("")) {
+            String username = extractUsername(refreshToken);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (validateToken(refreshToken, userDetails) && checkRefreshToken(refreshToken, username)) {
+                String accessToken = generateAccessToken(username);
+                refreshToken = generateRefreshToken(username);
+                addTokenToCookie(accessToken, response, TokenType.ACCESS);
+                addTokenToCookie(refreshToken, response, TokenType.REFRESH);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void saveRefreshToken(String refreshToken, String username) {
+        redisService.saveRefreshToken(username, refreshToken, refreshTokenExpiryTime);
+    }
+
+    @Override
+    public boolean checkRefreshToken(String refreshToken, String username) {
+        if (refreshToken.equals(redisService.getRefreshToken(username).trim())) {
             return true;
         }
         return false;

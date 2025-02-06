@@ -2,11 +2,13 @@ package com.g44.kodeholik.service.discussion.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,14 +23,17 @@ import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.util.mapper.response.discussion.CommentResponseMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
-    private final ProblemService problemService;
+    @Autowired
+    private ProblemService problemService;
 
     private final CommentResponseMapper commentResponseMapper;
 
@@ -36,9 +41,30 @@ public class CommentServiceImpl implements CommentService {
     public Page<CommentResponseDto> getCommentsByProblemId(Long problemId, int page, String sortBy, boolean ascending) {
         Problem problem = problemService.getProblemById(problemId);
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, 5, sort);
-        Page<Comment> comments = commentRepository.findByProblemListContaining(problem, pageable);
-        return comments.map(commentResponseMapper::mapFrom);
+        Set<Comment> comments = problem.getComments();
+        for (Comment comment : comments) {
+            log.info(comment.getCreatedAt().toString());
+        }
+
+        Page<Comment> commentPage = getCommentsPage(comments, page, 5, sort);
+        // commentRepository.findByProblemListContaining(problem, pageable);
+        return commentPage.map(commentResponseMapper::mapFrom);
+    }
+
+    public Page<Comment> getCommentsPage(Set<Comment> comments, int page, int size, Sort sort) {
+        // Chuyển Set thành List
+        List<Comment> commentList = comments.stream().collect(Collectors.toList());
+
+        // Tạo Pageable
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Tính toán giới hạn trang (pagination)
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), commentList.size());
+        List<Comment> pagedComments = commentList.subList(start, end);
+
+        // Trả về Page<Comment> sử dụng PageImpl
+        return new PageImpl<>(pagedComments, pageable, commentList.size());
     }
 
 }

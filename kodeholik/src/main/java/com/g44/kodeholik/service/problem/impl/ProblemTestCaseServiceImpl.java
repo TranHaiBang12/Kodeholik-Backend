@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +26,7 @@ import lombok.extern.log4j.Log4j2;
 @Service
 public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private final ProblemTestCaseRepository problemTestCaseRepository;
+    @Autowired
     private final ProblemService problemService;
     private final ProblemTemplateService problemTemplateService;
     ObjectMapper objectMapper = new ObjectMapper();

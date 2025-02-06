@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
@@ -50,7 +51,8 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
 
     private final ProblemTemplateService problemTemplateService;
 
-    private final ProblemService problemService;
+    @Autowired
+    private ProblemService problemService;
 
     private final UserService userService;
 
