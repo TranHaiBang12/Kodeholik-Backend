@@ -25,4 +25,6 @@ public interface TokenService {
     public boolean rotateToken(String refreshToken, HttpServletResponse response);
 
     public String generateForgotPasswordToken(String username);
+
+    public void deleteCookieFromResponse(HttpServletResponse response, TokenType tokenType);
 }

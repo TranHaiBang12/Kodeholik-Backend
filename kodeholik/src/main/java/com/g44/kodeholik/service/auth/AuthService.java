@@ -18,4 +18,6 @@ public interface AuthService {
     public boolean checkValidForgotPasswordToken(String token);
 
     public void resetPasswordFinish(String token, String password);
+
+    public void logout(HttpServletResponse response);
 }

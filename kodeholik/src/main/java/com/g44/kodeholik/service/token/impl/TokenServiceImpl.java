@@ -185,4 +185,19 @@ public class TokenServiceImpl implements TokenService {
                 .compact();
     }
 
+    @Override
+    public void deleteCookieFromResponse(HttpServletResponse response, TokenType tokenType) {
+        String cookieName = "";
+        if (tokenType == TokenType.ACCESS) {
+            cookieName = "access_token";
+        } else {
+            cookieName = "refresh_token";
+        }
+        Cookie cookie = new Cookie(cookieName, "");
+        cookie.setHttpOnly(true);
+        cookie.setPath("/"); // Đảm bảo cùng path với cookie ban đầu
+        cookie.setMaxAge(0); // Đặt thời gian sống về 0 để trình duyệt xóa cookie
+        response.addCookie(cookie);
+    }
+
 }

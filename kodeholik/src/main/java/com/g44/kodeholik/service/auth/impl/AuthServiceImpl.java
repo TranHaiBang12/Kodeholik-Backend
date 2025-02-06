@@ -20,6 +20,7 @@ import com.g44.kodeholik.service.auth.AuthService;
 import com.g44.kodeholik.service.email.EmailService;
 import com.g44.kodeholik.service.redis.RedisService;
 import com.g44.kodeholik.service.token.TokenService;
+import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.encoder.PasswordEncoder;
 import com.g44.kodeholik.util.validation.Validation;
 
@@ -43,6 +44,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserDetailsService userDetailsService;
 
     private final RedisService redisService;
+
+    private final UserService userService;
 
     @Value("${spring.jwt.forgot-token.expiry-time}")
     private int forgotTokenExpiryTime;
@@ -130,6 +133,18 @@ public class AuthServiceImpl implements AuthService {
             redisService.deleteToken(username, TokenType.FORGOT);
         } else {
             throw new UnauthorizedException("Invalid or expired token", "Invalid or expired token");
+        }
+    }
+
+    @Override
+    public void logout(HttpServletResponse response) {
+        Users user = userService.getCurrentUser();
+        if (user != null) {
+            redisService.deleteToken(user.getUsername(), TokenType.REFRESH);
+            tokenService.deleteCookieFromResponse(response, TokenType.ACCESS);
+            tokenService.deleteCookieFromResponse(response, TokenType.REFRESH);
+        } else {
+            throw new UnauthorizedException("User not logged in", "User not logged in");
         }
     }
 
