@@ -1,0 +1,64 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kodeholik@gmail.com
+    password: kgul yngx pzap extk
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
+  datasource:
+    url: jdbc:postgresql://localhost:5433/kodeholik?stringtype=unspecified
+    username: postgres
+    password: haibang20042003
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    ddl-auto: update  
+    show-sql: false  
+  sql:
+    init:
+      mode: always
+  application:
+    name: Kodeholik
+    url: ${APPLICATION_URL_BASE:http://localhost:8080}
+    fe-url: http://localhost:5174
+  data:
+    elasticsearch:
+      repositories:
+        enabled: 
+          true
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 2
+  elasticsearch:
+    uris: http://localhost:9200
+  jwt:
+    secret-key: d2f21asdabkocxz213123ADSAKDOACZXCMZKADKASODKWOEMKQMKCMAKDMASKDAKDMAKDASM
+    access-token:
+      expiry-time:
+        150000 #seconds
+    refresh-token:
+      expiry-time:
+        86400000 #seconds
+    forgot-token:
+      expiry-time:
+        900000
+aws:
+  s3:
+    region: ap-southeast-1
+    bucket-name: kodeholik
+    presigned-duration: 10 #minutes
+  lambda:
+    arn: arn:aws:lambda:ap-southeast-1:490004628975:function:compiler-code

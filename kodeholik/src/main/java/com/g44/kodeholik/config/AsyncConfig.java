@@ -10,13 +10,24 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 @EnableAsync
 public class AsyncConfig {
-    @Bean(name = "taskExecutor")
-    public Executor taskExecutor() {
+    @Bean(name = "emailTaskExecutor")
+    public Executor emailTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(1000);
+        executor.setThreadNamePrefix("EmailAsyncThread-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean(name = "s3TaskExecutor")
+    public Executor s3TaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
         executor.setMaxPoolSize(10);
         executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("AsyncThread-");
+        executor.setThreadNamePrefix("S3AsyncThread-");
         executor.initialize();
         return executor;
     }

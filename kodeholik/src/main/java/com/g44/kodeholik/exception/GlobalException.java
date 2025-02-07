@@ -2,11 +2,14 @@ package com.g44.kodeholik.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import com.g44.kodeholik.model.dto.exception.ErrorResponse;
 
@@ -38,6 +41,34 @@ public class GlobalException {
     public ResponseEntity<ErrorResponse> handleMalformedJwtException(MalformedJwtException ex) {
         return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
                 HttpStatus.UNAUTHORIZED);
+    }
+
+    // handle thieu request param
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handlerMissingRequestParamException(
+            MissingServletRequestParameterException ex) {
+        return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    // handle thieu request part
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handlerMissingRequestPartException(MissingServletRequestPartException ex) {
+        return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    // handle thieu request part
+    @ExceptionHandler(MultipartException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handlerMultiparttException(MultipartException ex) {
+        return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                HttpStatus.BAD_REQUEST);
     }
 
     // handle loi gui email
@@ -74,5 +105,14 @@ public class GlobalException {
     public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException ex) {
         return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
                 HttpStatus.FORBIDDEN);
+    }
+
+    // handle cac loi forbidden
+    @ExceptionHandler(S3Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleS3Exception(S3Exception ex) {
+        return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

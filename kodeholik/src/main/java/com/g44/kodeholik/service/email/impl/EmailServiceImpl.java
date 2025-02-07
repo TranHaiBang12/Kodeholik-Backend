@@ -21,7 +21,7 @@ public class EmailServiceImpl implements EmailService {
 
     private final TemplateEngine templateEngine;
 
-    @Async("taskExecutor")
+    @Async("emailTaskExecutor")
     @Override
     public void sendEmailResetPassword(String to, String subject, String username, String link) {
         Context context = new Context();
