@@ -18,7 +18,6 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void saveToken(String username, String refreshToken, long expirationTime, TokenType tokenType) {
-        log.info(username);
         redisTemplate.opsForValue().set(
                 tokenType == TokenType.REFRESH ? "refresh_token_" + username : "forgot_token_" + username, refreshToken,
                 expirationTime);

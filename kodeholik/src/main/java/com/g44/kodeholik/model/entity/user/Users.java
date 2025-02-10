@@ -46,10 +46,6 @@ public class Users {
 
     private String email;
 
-    private float balance;
-
-    private int point;
-
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
@@ -59,9 +55,4 @@ public class Users {
     @Column(name = "created_date")
     private Date createdDate;
 
-    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Problem> problemsCreated;
-
-    @OneToMany(mappedBy = "updatedBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Problem> problemsUpdated;
 }

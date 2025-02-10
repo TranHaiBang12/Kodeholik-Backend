@@ -42,9 +42,6 @@ public class CommentServiceImpl implements CommentService {
         Problem problem = problemService.getProblemById(problemId);
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Set<Comment> comments = problem.getComments();
-        for (Comment comment : comments) {
-            log.info(comment.getCreatedAt().toString());
-        }
 
         Page<Comment> commentPage = getCommentsPage(comments, page, 5, sort);
         // commentRepository.findByProblemListContaining(problem, pageable);

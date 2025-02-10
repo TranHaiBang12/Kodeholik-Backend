@@ -5,7 +5,7 @@
 -- Dumped from database version 17.2
 -- Dumped by pg_dump version 17.2
 
--- Started on 2025-02-08 16:52:33
+-- Started on 2025-02-10 19:13:10
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1011,8 +1011,6 @@ CREATE TABLE schema_user.users (
     fullname character varying(50) NOT NULL,
     password text NOT NULL,
     email character varying(200) NOT NULL,
-    balance double precision NOT NULL,
-    point integer NOT NULL,
     role schema_user.user_role NOT NULL,
     status schema_user.user_status NOT NULL,
     created_date date NOT NULL,
@@ -1645,12 +1643,12 @@ INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, 
 -- Data for Name: users; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
 
-INSERT INTO schema_user.users (id, username, fullname, password, email, balance, point, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (2, 'Phong', 'Pham Duy Phong', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'phongk72tp@gmail.com', 0, 0, 'STUDENT', 'ACTIVATED', '2024-05-01', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, balance, point, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (3, 'Thai', 'Pham Hong Thai', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thaiph@gmail.com', 0, 0, 'STUDENT', 'ACTIVATED', '2024-06-02', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, balance, point, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (4, 'Duy', 'Dang Nguyen Quang Duy', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'duydnq123@gmail.com', 0, 0, 'STUDENT', 'ACTIVATED', '2024-07-03', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, balance, point, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (5, 'HngThng', 'Dang Hong Thang', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thangdh1557@gmail.com', 0, 0, 'STUDENT', 'ACTIVATED', '2024-09-06', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, balance, point, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (6, 'Jasmine Milk', 'Vu Tuan Hung', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'hungvt321@gmail.com', 0, 0, 'STUDENT', 'BANNED', '2024-10-12', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, balance, point, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$YZsm4SExFhjsPlVDh4GUeuuttruxU51taR3kYaSElO4bhhbfxjc/G', 'tranhaibang665@gmail.com', 0, 0, 'STUDENT', 'ACTIVATED', '2024-03-20', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (2, 'Phong', 'Pham Duy Phong', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'phongk72tp@gmail.com', 'STUDENT', 'ACTIVATED', '2024-05-01', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (3, 'Thai', 'Pham Hong Thai', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thaiph@gmail.com', 'STUDENT', 'ACTIVATED', '2024-06-02', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (4, 'Duy', 'Dang Nguyen Quang Duy', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'duydnq123@gmail.com', 'STUDENT', 'ACTIVATED', '2024-07-03', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (5, 'HngThng', 'Dang Hong Thang', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thangdh1557@gmail.com', 'STUDENT', 'ACTIVATED', '2024-09-06', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (6, 'Jasmine Milk', 'Vu Tuan Hung', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'hungvt321@gmail.com', 'STUDENT', 'BANNED', '2024-10-12', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$YZsm4SExFhjsPlVDh4GUeuuttruxU51taR3kYaSElO4bhhbfxjc/G', 'tranhaibang665@gmail.com', 'STUDENT', 'ACTIVATED', '2024-03-20', NULL);
 
 
 --
@@ -2672,7 +2670,7 @@ ALTER TABLE ONLY schema_user.transaction
     ADD CONSTRAINT transaction_user_id_fkey FOREIGN KEY (user_id) REFERENCES schema_user.users(id);
 
 
--- Completed on 2025-02-08 16:52:33
+-- Completed on 2025-02-10 19:13:10
 
 --
 -- PostgreSQL database dump complete

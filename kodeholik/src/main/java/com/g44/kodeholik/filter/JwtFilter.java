@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.g44.kodeholik.exception.ForbiddenException;
+import com.g44.kodeholik.handler.JwtAuthenticationFailureHandler;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.token.TokenService;
 
@@ -40,22 +41,23 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtAuthenticationFailureHandler authenticationFailureHandler;
 
     private static List<String> skipFilterUrls = Arrays.asList(
+            "/login/**",
             "/api/v1/auth/login",
+            "/api/v1/auth/login/**",
             "/api/v1/auth/reset-password-init",
             "/api/v1/auth/reset-password-check",
             "/api/v1/auth/reset-password-finish",
             "/api/v1/auth/rotate-token",
             "/api/v1/problem/search/**",
+            "/api/v1/problem/suggest/**",
             "/api/v1/problem/description/**",
-            "/api/v1/problem/compile-information/**",
-            "/api/v1/comment/problem/**");
+            "/api/v1/problem/compile-information/**");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String accessToken = null;
         String username = null;
-
         // Lấy token từ Cookie
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
