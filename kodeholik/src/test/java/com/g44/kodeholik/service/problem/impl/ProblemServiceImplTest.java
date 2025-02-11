@@ -11,7 +11,12 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,15 +34,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
+import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.util.mapper.request.problem.ProblemRequestMapper;
+import com.g44.kodeholik.util.mapper.response.problem.ProblemDescriptionMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemResponseMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,6 +66,12 @@ public class ProblemServiceImplTest {
 
     @Mock
     private ProblemResponseMapper problemResponseMapper;
+
+    @Mock
+    private ProblemDescriptionMapper problemDescriptionMapper;
+
+    @Mock
+    private ProblemSubmissionRepository problemSubmissionRepository;
 
     @InjectMocks
     private ProblemServiceImpl underTest;
@@ -305,5 +320,35 @@ public class ProblemServiceImplTest {
 
         assertEquals("User not found", exception.getMessage());
         verifyNoMoreInteractions(problemRepository);
+    }
+
+    @Test
+    void testGetProblemDescriptionById() {
+        long problemId = 1L;
+        Problem problem = new Problem();
+        problem.setId(problemId);
+
+        Set<Comment> comments = new HashSet<>(Arrays.asList(new Comment(), new Comment(), new Comment()));
+        problem.setComments(comments);
+
+        ProblemDescriptionResponseDto dto = new ProblemDescriptionResponseDto();
+        dto.setId(problemId);
+        dto.setNoAccepted(5L);
+        dto.setNoComment(comments.size());
+
+        when(problemRepository.findById(problemId)).thenReturn(Optional.of(problem));
+        when(problemDescriptionMapper.mapFrom(any(Problem.class))).thenReturn(dto);
+        when(problemSubmissionRepository.countByIsAcceptedAndProblem(true, problem)).thenReturn(5L);
+
+        ProblemDescriptionResponseDto responseDto = underTest.getProblemDescriptionById(problemId);
+
+        assertNotNull(responseDto);
+        assertEquals(problemId, responseDto.getId());
+        assertEquals(comments.size(), responseDto.getNoComment());
+        assertEquals(5L, responseDto.getNoAccepted());
+
+        verify(problemRepository).findById(problemId);
+        verify(problemDescriptionMapper).mapFrom(problem);
+        verify(problemSubmissionRepository).countByIsAcceptedAndProblem(true, problem);
     }
 }

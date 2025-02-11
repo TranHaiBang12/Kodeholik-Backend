@@ -61,7 +61,7 @@ public class AuthenticationController {
             return ResponseEntity.noContent().build();
 
         } else {
-            return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body("Refresh token is missing");
+            return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body("Refresh token is invalid");
 
         }
     }

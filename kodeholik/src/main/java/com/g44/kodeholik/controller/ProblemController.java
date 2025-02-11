@@ -44,7 +44,7 @@ public class ProblemController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<ProblemElasticsearch>> searchProblem(
-            @RequestParam(required = false) Integer page,
+            @RequestParam Integer page,
             @RequestParam(required = false) Integer size,
             @RequestParam(required = false) ProblemSortField sortBy,
             @RequestParam(required = false) Boolean ascending,

@@ -64,6 +64,9 @@ public class AuthServiceImpl implements AuthService {
     @Value("${spring.jwt.forgot-token.expiry-time}")
     private int forgotTokenExpiryTime;
 
+    @Value("${spring.jwt.forgot-token.fe-link}")
+    private String feLink;
+
     @Override
     public boolean verify(LoginRequestDto loginRequest) {
         Authentication authentication = authenticationManager
@@ -106,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
             redisService.saveToken(username, token, forgotTokenExpiryTime, TokenType.FORGOT);
             log.info(token);
             emailService.sendEmailResetPassword(user.getEmail(), "[KODEHOLIK] Reset Password", user.getUsername(),
-                    token);
+                    feLink + token);
         } else {
             throw new BadRequestException("Username or email not existed", "Username or email not existed");
         }
@@ -133,8 +136,11 @@ public class AuthServiceImpl implements AuthService {
         }
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if (userDetails != null) {
+            log.info("23");
             String savedToken = redisService.getToken(username, TokenType.FORGOT);
             if (savedToken != null) {
+                log.info(token);
+                log.info(savedToken.trim());
                 if (tokenService.validateToken(token, userDetails) &&
                         token.equals(savedToken.trim())) {
                     return true;

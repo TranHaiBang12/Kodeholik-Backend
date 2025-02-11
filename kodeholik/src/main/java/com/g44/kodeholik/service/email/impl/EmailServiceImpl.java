@@ -40,6 +40,7 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Async("emailTaskExecutor")
     @Override
     public void sendEmailResetPassword(String to, String subject, String username, String link) {
         Context context = new Context();

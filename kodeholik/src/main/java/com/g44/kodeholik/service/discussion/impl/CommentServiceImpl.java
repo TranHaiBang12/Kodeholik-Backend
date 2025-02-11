@@ -32,19 +32,21 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
-    @Autowired
-    private ProblemService problemService;
+    private final ProblemService problemService;
 
     private final CommentResponseMapper commentResponseMapper;
 
     @Override
-    public Page<CommentResponseDto> getCommentsByProblemId(Long problemId, int page, String sortBy, boolean ascending) {
+    public Page<CommentResponseDto> getCommentsByProblemId(Long problemId, int page, String sortBy, Boolean ascending) {
         Problem problem = problemService.getProblemById(problemId);
-        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Set<Comment> comments = problem.getComments();
-
-        Page<Comment> commentPage = getCommentsPage(comments, page, 5, sort);
-        // commentRepository.findByProblemListContaining(problem, pageable);
+        Page<Comment> commentPage;
+        if (sortBy != null && ascending != null) {
+            Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+            commentPage = getCommentsPage(comments, page, 5, sort);
+        } else {
+            commentPage = getCommentsPage(comments, page, 5, null);
+        }
         return commentPage.map(commentResponseMapper::mapFrom);
     }
 
@@ -53,8 +55,12 @@ public class CommentServiceImpl implements CommentService {
         List<Comment> commentList = comments.stream().collect(Collectors.toList());
 
         // Tạo Pageable
-        Pageable pageable = PageRequest.of(page, size, sort);
-
+        Pageable pageable;
+        if (sort != null) {
+            pageable = PageRequest.of(page, size, sort);
+        } else {
+            pageable = PageRequest.of(page, size);
+        }
         // Tính toán giới hạn trang (pagination)
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), commentList.size());

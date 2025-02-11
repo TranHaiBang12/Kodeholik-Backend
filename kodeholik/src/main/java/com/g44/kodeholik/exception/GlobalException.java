@@ -2,6 +2,7 @@ package com.g44.kodeholik.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,6 +39,14 @@ public class GlobalException {
     @ExceptionHandler(MalformedJwtException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
+    public ResponseEntity<ErrorResponse> handleMalformedJwtThrowException(MalformedJwtException ex) {
+        return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(io.jsonwebtoken.MalformedJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
     public ResponseEntity<ErrorResponse> handleMalformedJwtException(MalformedJwtException ex) {
         return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
                 HttpStatus.UNAUTHORIZED);
@@ -66,7 +75,15 @@ public class GlobalException {
     @ExceptionHandler(MultipartException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResponseEntity<ErrorResponse> handlerMultiparttException(MultipartException ex) {
+    public ResponseEntity<ErrorResponse> handlerMultipartException(MultipartException ex) {
+        return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handlerMessageNotReadableException(HttpMessageNotReadableException ex) {
         return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
                 HttpStatus.BAD_REQUEST);
     }

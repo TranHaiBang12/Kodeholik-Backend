@@ -26,8 +26,8 @@ public class CommentController {
     public ResponseEntity<Page<CommentResponseDto>> getProblems(
             @PathVariable Long id,
             @RequestParam int page,
-            @RequestParam String sortBy,
-            @RequestParam boolean ascending) {
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) Boolean ascending) {
         return ResponseEntity.ok(commentService.getCommentsByProblemId(id, page, sortBy, ascending));
     }
 }
