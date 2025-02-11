@@ -37,6 +37,12 @@ public class ProblemInputParameter {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "input_type")
+    @Column(name = "type")
     private InputType type;
+
+    public ProblemInputParameter(Problem problem, String name, InputType type) {
+        this.problem = problem;
+        this.name = name;
+        this.type = type;
+    }
 }

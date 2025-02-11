@@ -63,4 +63,18 @@ public class ProblemSubmission {
 
     @Column(name = "input_wrong")
     private String inputWrong;
+
+    public ProblemSubmission(Problem problem, Users user, String code, Language language, boolean isAccepted,
+            double executionTime, double memoryUsage, Timestamp createdAt, String status, String inputWrong) {
+        this.problem = problem;
+        this.user = user;
+        this.code = code;
+        this.language = language;
+        this.isAccepted = isAccepted;
+        this.executionTime = executionTime;
+        this.memoryUsage = memoryUsage;
+        this.createdAt = createdAt;
+        this.status = status;
+        this.inputWrong = inputWrong;
+    }
 }

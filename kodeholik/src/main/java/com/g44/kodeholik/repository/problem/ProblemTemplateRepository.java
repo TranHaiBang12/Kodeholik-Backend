@@ -10,6 +10,4 @@ import com.g44.kodeholik.model.entity.setting.Language;
 
 public interface ProblemTemplateRepository extends JpaRepository<ProblemTemplate, Long> {
     public Optional<ProblemTemplate> findByProblemAndLanguage(Problem problem, Language language);
-
-    public Optional<ProblemTemplate> findByProblem(Problem problem);
 }

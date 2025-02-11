@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.setting.Skill;
@@ -15,12 +13,10 @@ import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -91,4 +87,16 @@ public class Problem {
     @ManyToMany
     @JoinTable(name = "problem_skill", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<Skill> skills = new HashSet<>();
+
+    public Problem(String title, String description, Difficulty difficulty, float acceptanceRate, int noSubmission,
+            ProblemStatus problemStatus, Timestamp createdAt, Users createdBy) {
+        this.title = title;
+        this.description = description;
+        this.difficulty = difficulty;
+        this.acceptanceRate = acceptanceRate;
+        this.noSubmission = noSubmission;
+        this.status = problemStatus;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+    }
 }

@@ -49,4 +49,10 @@ public class Topic {
     @ManyToOne
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
     private Users updatedBy;
+
+    public Topic(String name, Timestamp createdAt, Users createdBy) {
+        this.name = name;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+    }
 }

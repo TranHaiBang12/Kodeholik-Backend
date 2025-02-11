@@ -8,7 +8,6 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

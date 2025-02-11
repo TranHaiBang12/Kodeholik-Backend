@@ -15,7 +15,6 @@ import com.g44.kodeholik.service.discussion.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/comment")
@@ -29,8 +28,6 @@ public class CommentController {
             @RequestParam int page,
             @RequestParam String sortBy,
             @RequestParam boolean ascending) {
-        log.info(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-
         return ResponseEntity.ok(commentService.getCommentsByProblemId(id, page, sortBy, ascending));
     }
 }

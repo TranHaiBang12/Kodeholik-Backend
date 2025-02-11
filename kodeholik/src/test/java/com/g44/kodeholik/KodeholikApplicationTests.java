@@ -4,9 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
-class KodeholikApplicationTests {
+@EnableElasticsearchRepositories
+@TestPropertySource(locations = "classpath:application-test.yml")
+
+public class KodeholikApplicationTests {
 
 	@Test
 	void itShouldAddNumbers() {

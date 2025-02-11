@@ -48,4 +48,14 @@ public class ProblemTemplate {
     @Enumerated(EnumType.STRING)
     @Column(name = "return_type")
     private InputType returnType;
+
+    public ProblemTemplate(Problem problem, Language language, String templateCode, String functionSignature,
+            InputType returnType) {
+        this.problem = problem;
+        this.language = language;
+        this.templateCode = templateCode;
+        this.functionSignature = functionSignature;
+        this.returnType = returnType;
+
+    }
 }

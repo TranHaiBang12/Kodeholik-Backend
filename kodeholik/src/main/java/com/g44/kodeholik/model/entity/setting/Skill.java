@@ -52,4 +52,11 @@ public class Skill {
     @ManyToOne
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
     private Users updatedBy;
+
+    public Skill(String name, Level level, Timestamp createdAt, Users createdBy) {
+        this.name = name;
+        this.level = level;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+    }
 }

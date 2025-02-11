@@ -55,4 +55,16 @@ public class Users {
     @Column(name = "created_date")
     private Date createdDate;
 
+    public Users(String avatar, String username, String fullname, String password, String email, UserStatus status,
+            UserRole role) {
+        this.avatar = avatar;
+        this.username = username;
+        this.fullname = fullname;
+        this.password = password;
+        this.email = email;
+        this.status = status;
+        this.role = role;
+        this.createdDate = new Date(System.currentTimeMillis());
+    }
+
 }
