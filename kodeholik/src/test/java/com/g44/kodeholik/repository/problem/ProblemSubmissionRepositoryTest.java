@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,38 @@ public class ProblemSubmissionRepositoryTest {
 
         assertEquals(1, underTest.countByIsAcceptedAndProblem(true, problem));
         assertEquals(0, underTest.countByIsAcceptedAndProblem(false, problem));
+
+        underTest.delete(problemSubmission);
+        problemRepository.delete(problem);
+        languageRepository.delete(language);
+    }
+
+    @Test
+    void testCountByUserAndIsAcceptedAndProblemIn() {
+        Users user = new Users();
+        user.setId(1L);
+
+        Language language = new Language();
+        language.setName("J");
+        language.setCreatedAt(Timestamp.from(Instant.now()));
+        language.setCreatedBy(user);
+
+        // add language
+        language = languageRepository.save(language);
+
+        Problem problem = new Problem("test", "", Difficulty.EASY, 0, 0, ProblemStatus.PUBLIC,
+                Timestamp.from(Instant.now()), user);
+        problem = problemRepository.save(problem);
+        List<Problem> problemList = new ArrayList();
+        problemList.add(problem);
+
+        ProblemSubmission problemSubmission = new ProblemSubmission(problem, user, "test", language, true, 0, 0,
+                Timestamp.from(Instant.now()), "test", "test");
+        problemSubmission = underTest.save(problemSubmission);
+
+        long count = underTest.countByUserAndIsAcceptedAndProblemIn(user, true, problemList);
+
+        assertEquals(1, count);
 
         underTest.delete(problemSubmission);
         problemRepository.delete(problem);
