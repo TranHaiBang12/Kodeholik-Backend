@@ -87,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new NotFoundException("User not found", "User not found"));
         String accessToken = tokenService.generateAccessToken(user.getUsername());
         tokenService.addTokenToCookie(accessToken, response, TokenType.ACCESS);
-        String refreshToken = tokenService.generateRefreshToken(user.getUsername());
+        String refreshToken = tokenService.generateRefreshToken(user.getUsername(), new Date());
         tokenService.addTokenToCookie(refreshToken, response, TokenType.REFRESH);
     }
 
@@ -224,7 +224,7 @@ public class AuthServiceImpl implements AuthService {
         // generate token
         String accessToken = tokenService.generateAccessToken(username);
         tokenService.addTokenToCookie(accessToken, response, TokenType.ACCESS);
-        String refreshToken = tokenService.generateRefreshToken(username);
+        String refreshToken = tokenService.generateRefreshToken(username, new Date());
         tokenService.addTokenToCookie(refreshToken, response, TokenType.REFRESH);
 
     }

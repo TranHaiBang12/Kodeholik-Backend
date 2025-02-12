@@ -105,14 +105,14 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String generateRefreshToken(String username) {
+    public String generateRefreshToken(String username, Date expiryDate) {
         Map<String, Object> claims = new HashMap<>();
         String refreshToken = Jwts.builder()
                 .claims()
                 .add(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiryTime))
+                .expiration(new Date(expiryDate.getTime() + refreshTokenExpiryTime))
                 .and()
                 .signWith(getKey())
                 .compact();
@@ -129,7 +129,7 @@ public class TokenServiceImpl implements TokenService {
             expiryTime = accessTokenExpiryTime;
         } else {
             cookieName = "refresh_token";
-            expiryTime = refreshTokenExpiryTime;
+            expiryTime = (int) extractExpiration(token).getTime();
         }
         Cookie tokenCookie = new Cookie(cookieName, token);
         tokenCookie.setHttpOnly(true);
@@ -147,7 +147,7 @@ public class TokenServiceImpl implements TokenService {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (validateToken(refreshToken, userDetails) && checkRefreshToken(refreshToken, username)) {
                 String accessToken = generateAccessToken(username);
-                refreshToken = generateRefreshToken(username);
+                refreshToken = generateRefreshToken(username, extractExpiration(refreshToken));
                 addTokenToCookie(accessToken, response, TokenType.ACCESS);
                 addTokenToCookie(refreshToken, response, TokenType.REFRESH);
                 return true;

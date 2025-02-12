@@ -102,29 +102,31 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         Cookie[] cookies = request.getCookies();
-        String accessToken = "";
-        String username = "";
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("access_token")) {
-                    accessToken = cookie.getValue();
-                    username = tokenService.extractUsername(accessToken);
+        if (!request.getRequestURI().equals("/api/v1/auth/login/oauth2/google")) {
+            String accessToken = "";
+            String username = "";
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals("access_token")) {
+                        accessToken = cookie.getValue();
+                        username = tokenService.extractUsername(accessToken);
+                    }
                 }
             }
-        }
-        if (accessToken != null && !accessToken.equals("")) {
-            if ((username != null && !username.equals("")) &&
-                    SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (tokenService.validateToken(accessToken, userDetails)) {
-                    if (userRepository.isUserNotAllowed(username)) {
-                        throw new ForbiddenException("This account is not allowed to do this action",
-                                "This account is not allowed to do this action");
+            if (accessToken != null && !accessToken.equals("")) {
+                if ((username != null && !username.equals("")) &&
+                        SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    if (tokenService.validateToken(accessToken, userDetails)) {
+                        if (userRepository.isUserNotAllowed(username)) {
+                            throw new ForbiddenException("This account is not allowed to do this action",
+                                    "This account is not allowed to do this action");
+                        }
+                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     }
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
         }

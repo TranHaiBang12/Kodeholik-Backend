@@ -35,6 +35,7 @@ import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
+import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
@@ -88,7 +89,7 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Scheduled(fixedRate = 600000)
     public void syncProblemsToElasticsearch() {
-        List<ProblemElasticsearch> problems = problemRepository.findAll().stream()
+        List<ProblemElasticsearch> problems = problemRepository.findByStatus(ProblemStatus.PUBLIC).stream()
                 .map(problem -> ProblemElasticsearch.builder()
                         .id(problem.getId())
                         .title(problem.getTitle())

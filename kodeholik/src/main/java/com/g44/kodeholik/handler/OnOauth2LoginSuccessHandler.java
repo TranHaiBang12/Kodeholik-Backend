@@ -1,6 +1,7 @@
 package com.g44.kodeholik.handler;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -21,6 +23,7 @@ import com.g44.kodeholik.model.enums.token.TokenType;
 import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.auth.AuthService;
+import com.g44.kodeholik.service.github.GithubService;
 import com.g44.kodeholik.service.token.TokenService;
 import com.g44.kodeholik.service.user.UserService;
 
@@ -42,28 +45,45 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
 
     private final UserService userService;
 
+    private final GithubService githubService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
-        log.info("sa");
         OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
-        log.info(oauthUser);
-        String email = oauthUser.getAttribute("email");
-
         if (oauthUser == null) {
             throw new UnauthorizedException("Wrong credentials", "Wrong credentials");
         }
+        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
+        String registrationId = oauthToken.getAuthorizedClientRegistrationId();
+        String name = "";
+        String picture = "";
+        String email = "";
+
+        if ("google".equals(registrationId)) {
+            email = oauthUser.getAttribute("email");
+            name = oauthUser.getAttribute("name");
+            picture = oauthUser.getAttribute("picture");
+        } else {
+            email = githubService.getUserEmail(oauthToken);
+            name = oauthUser.getAttribute("login");
+            picture = oauthUser.getAttribute("avatar_url");
+        }
+        log.info(email + " " + name + " " + picture);
+        // OAuth2AuthenticationToken authenticationToken = new
+        // OAuth2AuthenticationToken(
+        // oauthUser, oauthUser.getAuthorities(), registrationId);
+        oauthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(oauthToken);
 
         // if (!EmailUtils.isFptEduEmail(email)) {
         // throw new ForbiddenException("This account is not allowed to do this action",
         // "This account is not allowed to do this action");
         // }
+
         String username = "";
         Optional<Users> optionalUser = userRepository.existsByUsernameOrEmail(email);
         if (!optionalUser.isPresent()) {
-            // get data
-            String name = oauthUser.getAttribute("name");
-            String picture = oauthUser.getAttribute("picture");
             AddUserRequestDto addUserRequestDto = new AddUserRequestDto();
             addUserRequestDto.setUsername(name);
             addUserRequestDto.setFullname(name);
@@ -81,21 +101,21 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
             }
             username = optionalUser.get().getUsername();
         }
-        log.info("sá");
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         if (userRepository.isUserNotAllowed(email)) {
             throw new ForbiddenException("This account is not allowed to do this action",
                     "This account is not allowed to do this action");
         }
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        // UsernamePasswordAuthenticationToken authenticationToken = new
+        // UsernamePasswordAuthenticationToken(
+        // userDetails, null, userDetails.getAuthorities());
+        // authenticationToken.setDetails(new
+        // WebAuthenticationDetailsSource().buildDetails(request));
 
         // generate token
         String accessToken = tokenService.generateAccessToken(username);
         tokenService.addTokenToCookie(accessToken, response, TokenType.ACCESS);
-        String refreshToken = tokenService.generateRefreshToken(username);
+        String refreshToken = tokenService.generateRefreshToken(username, new Date());
         tokenService.addTokenToCookie(refreshToken, response, TokenType.REFRESH);
 
         response.sendRedirect("/api/v1/auth/login/oauth2/google");

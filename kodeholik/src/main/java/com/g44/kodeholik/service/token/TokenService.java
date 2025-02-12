@@ -1,5 +1,7 @@
 package com.g44.kodeholik.service.token;
 
+import java.util.Date;
+
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.g44.kodeholik.model.enums.token.TokenType;
@@ -14,7 +16,7 @@ public interface TokenService {
 
     public String generateAccessToken(String username);
 
-    public String generateRefreshToken(String username);
+    public String generateRefreshToken(String username, Date expiryDate);
 
     public String extractUsername(String token);
 
