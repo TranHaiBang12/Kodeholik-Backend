@@ -5,7 +5,32 @@
 -- Dumped from database version 17.2
 -- Dumped by pg_dump version 17.2
 
--- Started on 2025-02-10 19:13:10
+-- Started on 2025-02-12 15:49:08
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+DROP DATABASE IF EXISTS kodeholik;
+--
+-- TOC entry 5203 (class 1262 OID 16517)
+-- Name: kodeholik; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE kodeholik WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Vietnamese_Vietnam.1258';
+
+
+ALTER DATABASE kodeholik OWNER TO postgres;
+
+\connect kodeholik
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1136,6 +1161,7 @@ INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_
 -- Data for Name: problem; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (25, 'Two Sum', 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.', 'MEDIUM', 51.72, 29, 'PUBLIC', '2025-01-23 22:00:00', 1, '2025-01-24 10:11:02.232449', 1);
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (6, 'Two Sum II - Input Array Is Sorted', 'Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number. Let these two numbers be numbers[index1] and numbers[index2] where 1 <= index1 < index2 <= numbers.length.
 
 Return the indices of the two numbers, index1 and index2, added by one as an integer array [index1, index2] of length 2.
@@ -1186,7 +1212,6 @@ INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptan
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (40, 'Power of Two', 'Given an integer n, return true if it is a power of two. Otherwise, return false.
 
 An integer n is a power of two, if there exists an integer x such that n == 2x.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL);
-INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (25, 'Two Sum', 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.', 'MEDIUM', 52.63, 19, 'PUBLIC', '2025-01-23 22:00:00', 1, '2025-01-24 10:11:02.232449', 1);
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (31, 'Find Minimum Diameter After Merging Two Trees', 'There exist two undirected trees with n and m nodes, numbered from 0 to n - 1 and from 0 to m - 1, respectively. You are given two 2D integer arrays edges1 and edges2 of lengths n - 1 and m - 1, respectively, where edges1[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the first tree and edges2[i] = [ui, vi] indicates that there is an edge between nodes ui and vi in the second tree.
 
 You must connect one node from the first tree with another node from the second tree with an edge.
@@ -1373,7 +1398,6 @@ INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (25, 5);
 -- Data for Name: problem_submission; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (27, 1, 25, 'public static int[] twoSum(int[] nums, int target) {int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 4, '2025-02-04 16:29:20.072421', true, NULL, NULL);
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (28, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
  int a = 5 / 0 ; 
 int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.79, 4, '2025-02-04 16:30:00.313059', false, NULL, '{"id":1,"inputs":[{"name":"nums","type":"ARR_INT","value":[3.0,2.0,4.0]},{"name":"target","type":"INT","value":6.0}],"expectedOutput":"[1,2]","status":"Failed","actualOutput":"java.lang.ArithmeticException: / by zero. Error at line: 129. Faulty code: int a \u003d 5 / 0 ;"}');
@@ -1394,27 +1418,15 @@ int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; 
     ^
 2 errors
 ', NULL);
-INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (32, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
- 
-int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 5, '2025-02-04 16:33:33.928312', true, NULL, NULL);
-INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (33, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
- 
-int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 5, '2025-02-04 16:34:44.260842', true, NULL, NULL);
-INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (34, 2, 25, 'public static int[] twoSum(int[] nums, int target) {
- 
-int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 6, '2025-02-04 16:35:31.124888', true, NULL, NULL);
-INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (35, 2, 25, 'public static int[] twoSum(int[] nums, int target) {
- 
-int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 6, '2025-02-04 16:35:45.338065', true, NULL, NULL);
-INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (36, 3, 25, 'public static int[] twoSum(int[] nums, int target) {
- 
-int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 6, '2025-02-04 16:37:20.596617', true, NULL, NULL);
-INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (37, 4, 25, 'public static int[] twoSum(int[] nums, int target) {
- 
-int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.26, 6, '2025-02-04 16:37:36.669806', true, NULL, NULL);
-INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (38, 5, 25, 'public static int[] twoSum(int[] nums, int target) {
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (38, 1, 50, 'public static int[] twoSum(int[] nums, int target) {
  
 int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.26, 7, '2025-02-04 16:40:05.203941', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (34, 1, 30, 'public static int[] twoSum(int[] nums, int target) {
+ 
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 6, '2025-02-04 16:35:31.124888', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (36, 1, 31, 'public static int[] twoSum(int[] nums, int target) {
+ 
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 6, '2025-02-04 16:37:20.596617', true, NULL, NULL);
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (39, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
  
 int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 5, '2025-02-05 20:11:38.34506', true, NULL, NULL);
@@ -1440,6 +1452,10 @@ INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, la
  int a = 0;
  while(a < 5){} 
 int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.33, 5, '2025-02-06 16:26:14.92512', false, NULL, '{"id":1,"inputs":[{"name":"nums","type":"ARR_INT","value":[3.0,2.0,4.0]},{"name":"target","type":"INT","value":6.0}],"expectedOutput":"[1,2]","status":"Failed","actualOutput":"Timeout"}');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (27, 1, 27, 'public static int[] twoSum(int[] nums, int target) {int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 4, '2025-02-04 16:29:20.072421', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (37, 1, 49, 'public static int[] twoSum(int[] nums, int target) {
+ 
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.26, 6, '2025-02-04 16:37:36.669806', true, NULL, NULL);
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (44, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
  
  while(a < 5){} 
@@ -1455,6 +1471,68 @@ INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, la
  
   
 int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 5, '2025-02-06 16:26:49.171475', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (48, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
+ int a = 5 / 0; 
+  
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.79, 5, '2025-02-12 14:10:16.132029', false, NULL, '{"id":1,"inputs":[{"name":"nums","type":"ARR_INT","value":[3.0,2.0,4.0]},{"name":"target","type":"INT","value":6.0}],"expectedOutput":"[1,2]","status":"Failed","actualOutput":"java.lang.ArithmeticException: / by zero. Error at line: 129. Faulty code: int a \u003d 5 / 0;"}');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (49, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
+ 
+  
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{0,1}; }', 1, NULL, 0.52, 5, '2025-02-12 14:11:10.639121', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (50, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
+ 
+  
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{0,1}; }', 1, NULL, 0.52, 5, '2025-02-12 14:12:48.523053', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (51, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
+ 
+  
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{0, 1};}}}return new int[]{0,1}; }', 1, NULL, 0.39, 6, '2025-02-12 14:13:29.550824', false, NULL, '{"id":1,"inputs":[{"name":"nums","type":"ARR_INT","value":[3.0,2.0,4.0]},{"name":"target","type":"INT","value":6.0}],"expectedOutput":"[1,2]","status":"Failed","actualOutput":"[0,1]"}');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (52, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
+ while(true){} 
+  
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0, 0, '2025-02-12 14:14:24.720866', false, 'Compilation Error:
+Main.java:131: error: unreachable statement
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }
+    ^
+1 error
+', NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (53, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
+ int a = 0; while(true){a < 5} 
+  
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0, 0, '2025-02-12 14:15:06.292512', false, 'Compilation Error:
+Main.java:129: error: illegal start of type
+ int a = 0; while(true){a < 5} 
+                            ^
+Main.java:129: error: not a statement
+ int a = 0; while(true){a < 5} 
+                          ^
+2 errors
+', NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (54, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
+ int a = 0; while(a < 5){} 
+  
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.39, 6, '2025-02-12 14:15:22.272091', false, NULL, '{"id":1,"inputs":[{"name":"nums","type":"ARR_INT","value":[3.0,2.0,4.0]},{"name":"target","type":"INT","value":6.0}],"expectedOutput":"[1,2]","status":"Failed","actualOutput":"Timeout"}');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (55, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
+ 
+  
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 4, '2025-02-12 14:48:48.26606', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (32, 1, 40, 'public static int[] twoSum(int[] nums, int target) {
+ 
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 5, '2025-02-04 16:33:33.928312', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (33, 1, 41, 'public static int[] twoSum(int[] nums, int target) {
+ 
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 5, '2025-02-04 16:34:44.260842', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (35, 2, 27, 'public static int[] twoSum(int[] nums, int target) {
+ 
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 6, '2025-02-04 16:35:45.338065', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (46, 1, 6, 'public static int[] twoSum(int[] nums, int target) {
+ 
+  
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 4, '2025-02-11 23:50:16.606352', true, NULL, NULL);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong) OVERRIDING SYSTEM VALUE VALUES (47, 1, 13, 'public static int[] twoSum(int[] nums, int target) {
+ 
+  
+int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 5, '2025-02-12 14:09:19.409465', true, NULL, NULL);
 
 
 --
@@ -1643,16 +1721,17 @@ INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, 
 -- Data for Name: users; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
 
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (22, '27 - Trần Hải Bằng', '27 - Trần Hải Bằng', '$2a$10$VS.SuPBGxhmF6LMckxvnauCcZeRYQ/Jzf4WOuhJM9KS.myVT2oY.C', 'bangthhe170871@fpt.edu.vn', 'STUDENT', 'ACTIVATED', '2025-02-10', 'https://lh3.googleusercontent.com/a/ACg8ocLUGVSI7vY8J1U-dedYf6BNl_pub8sHys0YFcbHGUSToW5ihw=s96-c');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (2, 'Phong', 'Pham Duy Phong', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'phongk72tp@gmail.com', 'STUDENT', 'ACTIVATED', '2024-05-01', NULL);
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (3, 'Thai', 'Pham Hong Thai', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thaiph@gmail.com', 'STUDENT', 'ACTIVATED', '2024-06-02', NULL);
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (4, 'Duy', 'Dang Nguyen Quang Duy', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'duydnq123@gmail.com', 'STUDENT', 'ACTIVATED', '2024-07-03', NULL);
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (5, 'HngThng', 'Dang Hong Thang', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thangdh1557@gmail.com', 'STUDENT', 'ACTIVATED', '2024-09-06', NULL);
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (6, 'Jasmine Milk', 'Vu Tuan Hung', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'hungvt321@gmail.com', 'STUDENT', 'BANNED', '2024-10-12', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$YZsm4SExFhjsPlVDh4GUeuuttruxU51taR3kYaSElO4bhhbfxjc/G', 'tranhaibang665@gmail.com', 'STUDENT', 'ACTIVATED', '2024-03-20', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$tdcB/Z64SSN3U5rlz.Daa.oWs53G/XysvtLntJ3SPWBJJOKqfliG6', 'tranhaibang665@gmail.com', 'STUDENT', 'ACTIVATED', '2024-03-20', NULL);
 
 
 --
--- TOC entry 5203 (class 0 OID 0)
+-- TOC entry 5204 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: contest_id_seq; Type: SEQUENCE SET; Schema: schema_contest; Owner: postgres
 --
@@ -1661,7 +1740,7 @@ SELECT pg_catalog.setval('schema_contest.contest_id_seq', 1, false);
 
 
 --
--- TOC entry 5204 (class 0 OID 0)
+-- TOC entry 5205 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: chapter_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -1670,7 +1749,7 @@ SELECT pg_catalog.setval('schema_course.chapter_id_seq', 1, false);
 
 
 --
--- TOC entry 5205 (class 0 OID 0)
+-- TOC entry 5206 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: course_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -1679,7 +1758,7 @@ SELECT pg_catalog.setval('schema_course.course_id_seq', 1, false);
 
 
 --
--- TOC entry 5206 (class 0 OID 0)
+-- TOC entry 5207 (class 0 OID 0)
 -- Dependencies: 255
 -- Name: lesson_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -1688,7 +1767,7 @@ SELECT pg_catalog.setval('schema_course.lesson_id_seq', 1, false);
 
 
 --
--- TOC entry 5207 (class 0 OID 0)
+-- TOC entry 5208 (class 0 OID 0)
 -- Dependencies: 249
 -- Name: discussion_id_seq; Type: SEQUENCE SET; Schema: schema_discussion; Owner: postgres
 --
@@ -1697,7 +1776,7 @@ SELECT pg_catalog.setval('schema_discussion.discussion_id_seq', 7, true);
 
 
 --
--- TOC entry 5208 (class 0 OID 0)
+-- TOC entry 5209 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: problem_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -1706,7 +1785,7 @@ SELECT pg_catalog.setval('schema_problem.problem_id_seq', 51, true);
 
 
 --
--- TOC entry 5209 (class 0 OID 0)
+-- TOC entry 5210 (class 0 OID 0)
 -- Dependencies: 266
 -- Name: problem_input_parameter_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -1715,16 +1794,16 @@ SELECT pg_catalog.setval('schema_problem.problem_input_parameter_id_seq', 2, tru
 
 
 --
--- TOC entry 5210 (class 0 OID 0)
+-- TOC entry 5211 (class 0 OID 0)
 -- Dependencies: 245
 -- Name: problem_submission_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_problem.problem_submission_id_seq', 45, true);
+SELECT pg_catalog.setval('schema_problem.problem_submission_id_seq', 55, true);
 
 
 --
--- TOC entry 5211 (class 0 OID 0)
+-- TOC entry 5212 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: problemsolution_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -1733,7 +1812,7 @@ SELECT pg_catalog.setval('schema_problem.problemsolution_id_seq', 1, false);
 
 
 --
--- TOC entry 5212 (class 0 OID 0)
+-- TOC entry 5213 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: problemtemplate_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -1742,7 +1821,7 @@ SELECT pg_catalog.setval('schema_problem.problemtemplate_id_seq', 3, true);
 
 
 --
--- TOC entry 5213 (class 0 OID 0)
+-- TOC entry 5214 (class 0 OID 0)
 -- Dependencies: 243
 -- Name: testcase_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -1751,34 +1830,34 @@ SELECT pg_catalog.setval('schema_problem.testcase_id_seq', 5, true);
 
 
 --
--- TOC entry 5214 (class 0 OID 0)
+-- TOC entry 5215 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: language_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_setting.language_id_seq', 2, true);
-
-
---
--- TOC entry 5215 (class 0 OID 0)
--- Dependencies: 225
--- Name: skill_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
---
-
-SELECT pg_catalog.setval('schema_setting.skill_id_seq', 16, true);
+SELECT pg_catalog.setval('schema_setting.language_id_seq', 19, true);
 
 
 --
 -- TOC entry 5216 (class 0 OID 0)
--- Dependencies: 227
--- Name: topic_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
+-- Dependencies: 225
+-- Name: skill_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_setting.topic_id_seq', 9, true);
+SELECT pg_catalog.setval('schema_setting.skill_id_seq', 28, true);
 
 
 --
 -- TOC entry 5217 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: topic_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
+--
+
+SELECT pg_catalog.setval('schema_setting.topic_id_seq', 15, true);
+
+
+--
+-- TOC entry 5218 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: notification_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
@@ -1787,7 +1866,7 @@ SELECT pg_catalog.setval('schema_user.notification_id_seq', 1, false);
 
 
 --
--- TOC entry 5218 (class 0 OID 0)
+-- TOC entry 5219 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: transaction_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
@@ -1796,12 +1875,12 @@ SELECT pg_catalog.setval('schema_user.transaction_id_seq', 1, false);
 
 
 --
--- TOC entry 5219 (class 0 OID 0)
+-- TOC entry 5220 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_user.users_id_seq', 6, true);
+SELECT pg_catalog.setval('schema_user.users_id_seq', 66, true);
 
 
 SET default_tablespace = '';
@@ -2670,7 +2749,7 @@ ALTER TABLE ONLY schema_user.transaction
     ADD CONSTRAINT transaction_user_id_fkey FOREIGN KEY (user_id) REFERENCES schema_user.users(id);
 
 
--- Completed on 2025-02-10 19:13:10
+-- Completed on 2025-02-12 15:49:08
 
 --
 -- PostgreSQL database dump complete

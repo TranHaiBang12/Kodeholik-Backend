@@ -40,6 +40,8 @@ public class ProblemElasticsearch {
 
     private int noSubmission;
 
+    private boolean solved;
+
     @Field(type = FieldType.Keyword)
     private List<String> topics;
 

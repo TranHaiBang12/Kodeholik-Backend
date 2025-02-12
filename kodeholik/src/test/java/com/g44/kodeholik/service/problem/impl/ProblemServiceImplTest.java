@@ -9,18 +9,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
@@ -44,7 +35,7 @@ import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
-import com.g44.kodeholik.service.problem.ProblemService;
+import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 import com.g44.kodeholik.util.mapper.request.problem.ProblemRequestMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemDescriptionMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemResponseMapper;
@@ -72,6 +63,9 @@ public class ProblemServiceImplTest {
 
     @Mock
     private ProblemSubmissionRepository problemSubmissionRepository;
+
+    @Mock
+    private ProblemSubmissionService problemSubmissionService;
 
     @InjectMocks
     private ProblemServiceImpl underTest;
@@ -338,7 +332,7 @@ public class ProblemServiceImplTest {
 
         when(problemRepository.findById(problemId)).thenReturn(Optional.of(problem));
         when(problemDescriptionMapper.mapFrom(any(Problem.class))).thenReturn(dto);
-        when(problemSubmissionRepository.countByIsAcceptedAndProblem(true, problem)).thenReturn(5L);
+        when(problemSubmissionService.countByIsAcceptedAndProblem(true, problem)).thenReturn(5L);
 
         ProblemDescriptionResponseDto responseDto = underTest.getProblemDescriptionById(problemId);
 
@@ -349,6 +343,6 @@ public class ProblemServiceImplTest {
 
         verify(problemRepository).findById(problemId);
         verify(problemDescriptionMapper).mapFrom(problem);
-        verify(problemSubmissionRepository).countByIsAcceptedAndProblem(true, problem);
+        verify(problemSubmissionService).countByIsAcceptedAndProblem(true, problem);
     }
 }

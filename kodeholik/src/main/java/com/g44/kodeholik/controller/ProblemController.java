@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
+import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
@@ -35,11 +36,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/api/v1/problem")
 public class ProblemController {
     private final ProblemService problemService;
-    private final ProblemTestCaseService problemTestCaseService;
 
     @GetMapping("/list")
     public ResponseEntity<List<ProblemResponseDto>> getProblems() {
         return ResponseEntity.ok(problemService.getAllProblems());
+    }
+
+    @GetMapping("/no-achieved-info")
+    public ResponseEntity<List<NoAchivedInformationResponseDto>> getNoAchievedInfo() {
+        return ResponseEntity.ok(problemService.getListNoAchievedInformationByCurrentUser());
     }
 
     @GetMapping("/search")
@@ -61,7 +66,7 @@ public class ProblemController {
     public ResponseEntity<ProblemCompileResponseDto> getProblemCompileInformationById(
             @PathVariable Long id,
             @RequestParam String languageName) {
-        return ResponseEntity.ok(problemTestCaseService.getProblemCompileInformationById(id, languageName));
+        return ResponseEntity.ok(problemService.getProblemCompileInformationById(id, languageName));
     }
 
     @GetMapping("/description/{id}")

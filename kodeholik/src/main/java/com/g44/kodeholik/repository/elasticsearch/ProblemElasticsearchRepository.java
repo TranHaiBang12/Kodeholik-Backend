@@ -9,30 +9,26 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import org.springframework.stereotype.Repository;
 
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
-import com.g44.kodeholik.model.enums.problem.Difficulty;
-
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import lombok.RequiredArgsConstructor;
 
 @Repository
 public interface ProblemElasticsearchRepository extends ElasticsearchRepository<ProblemElasticsearch, Long> {
 
-    @Query("""
-            {
-              "bool": {
-                "must": [
-                  { "match": { "title": { "query": "?0", "fuzziness": "AUTO" } } },
-                  { "term": { "difficulty": "?1" } }
-                ]
-              }
-            }
-            """)
+  @Query("""
+      {
+        "bool": {
+          "must": [
+            { "match": { "title": { "query": "?0", "fuzziness": "AUTO" } } },
+            { "term": { "difficulty": "?1" } }
+          ]
+        }
+      }
+      """)
 
-    List<ProblemElasticsearch> searchProblems(
-            String title,
-            String difficulty,
-            Set<String> topics,
-            Set<String> skills,
-            Pageable pageable);
+  List<ProblemElasticsearch> searchProblems(
+      String title,
+      String difficulty,
+      Set<String> topics,
+      Set<String> skills,
+      Pageable pageable);
 
 }

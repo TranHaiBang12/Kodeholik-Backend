@@ -31,6 +31,7 @@ public class SecurityConfig {
             "/login/**",
             "/api/v1/auth/login",
             "/api/v1/auth/login/**",
+            "/api/v1/problem/no-achieved-info",
             "/api/v1/auth/reset-password-init",
             "/api/v1/auth/reset-password-check",
             "/api/v1/auth/reset-password-finish",

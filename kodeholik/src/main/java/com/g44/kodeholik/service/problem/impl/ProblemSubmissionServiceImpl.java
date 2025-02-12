@@ -19,6 +19,7 @@ import com.g44.kodeholik.model.dto.response.problem.submission.submit.FailedSubm
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
+import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.InputType;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
@@ -30,7 +31,8 @@ import com.g44.kodeholik.service.problem.ProblemTestCaseService;
 import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.user.UserService;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.g44.kodeholik.exception.BadRequestException;
+import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
 import com.g44.kodeholik.model.dto.request.lambda.ResponseResult;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
@@ -47,13 +49,6 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
 
     private final LambdaService lambdaService;
 
-    private final ProblemTestCaseService problemTestCaseService;
-
-    private final ProblemTemplateService problemTemplateService;
-
-    @Autowired
-    private ProblemService problemService;
-
     private final UserService userService;
 
     private final LanguageService languageService;
@@ -63,11 +58,12 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     private Gson gson = new Gson();
 
     @Override
-    public SubmissionResponseDto submitProblem(Long problemId, ProblemCompileRequestDto problemCompileRequestDto) {
-        Problem problem = problemService.getProblemById(problemId);
-        List<TestCase> testCases = problemTestCaseService.getTestCaseByProblemId(problemId);
+    public SubmissionResponseDto submitProblem(Problem problem, ProblemCompileRequestDto problemCompileRequestDto,
+            List<TestCase> testCases, ProblemTemplate problemTemplate) {
+        if (problemCompileRequestDto.getCode().isEmpty()) {
+            throw new BadRequestException("Code is required", "Code is required");
+        }
         String languageName = problemCompileRequestDto.getLanguageName();
-        ProblemTemplate problemTemplate = problemTemplateService.findByProblemAndLanguage(problem, languageName);
         String functionSignature = problemTemplate.getFunctionSignature();
         InputType inputType = problemTemplate.getReturnType();
         LambdaRequest lambdaRequest = new LambdaRequest(
@@ -137,7 +133,8 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         problemSubmission.setMemoryUsage(responseResult.getMemoryUsage());
         problemSubmissionRepository.save(problemSubmission);
         problem.setNoSubmission(problem.getNoSubmission() + 1);
-        double acceptanceRate = ((double) getNumberAcceptedSubmission(problemId) / (double) problem.getNoSubmission())
+        double acceptanceRate = ((double) getNumberAcceptedSubmission(problem)
+                / (double) problem.getNoSubmission())
                 * 100;
         BigDecimal roundAcceptanceRate = new BigDecimal(acceptanceRate).setScale(2, RoundingMode.HALF_UP);
         problem.setAcceptanceRate(roundAcceptanceRate.floatValue());
@@ -146,11 +143,12 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     }
 
     @Override
-    public RunProblemResponseDto run(Long problemId, ProblemCompileRequestDto problemCompileRequestDto) {
-        Problem problem = problemService.getProblemById(problemId);
-        List<TestCase> testCases = problemTestCaseService.getSampleTestCaseByProblemId(problemId);
+    public RunProblemResponseDto run(Problem problem, ProblemCompileRequestDto problemCompileRequestDto,
+            List<TestCase> testCases, ProblemTemplate problemTemplate) {
+        if (problemCompileRequestDto.getCode().isEmpty()) {
+            throw new BadRequestException("Code is required", "Code is required");
+        }
         String languageName = problemCompileRequestDto.getLanguageName();
-        ProblemTemplate problemTemplate = problemTemplateService.findByProblemAndLanguage(problem, languageName);
         String functionSignature = problemTemplate.getFunctionSignature();
         InputType inputType = problemTemplate.getReturnType();
         LambdaRequest lambdaRequest = new LambdaRequest(
@@ -186,8 +184,25 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     }
 
     @Override
-    public long getNumberAcceptedSubmission(Long problemId) {
-        Problem problem = problemService.getProblemById(problemId);
+    public long getNumberAcceptedSubmission(Problem problem) {
         return problemSubmissionRepository.countByIsAcceptedAndProblem(true, problem);
+    }
+
+    @Override
+    public boolean checkIsCurrentUserSolvedProblem(Problem problem) {
+        Users currentUser = userService.getCurrentUser();
+        log.info(
+                !(problemSubmissionRepository.findByUserAndProblemAndIsAccepted(currentUser, problem, true).isEmpty()));
+        return !(problemSubmissionRepository.findByUserAndProblemAndIsAccepted(currentUser, problem, true).isEmpty());
+    }
+
+    @Override
+    public Long countByIsAcceptedAndProblem(boolean isAccepted, Problem problem) {
+        return problemSubmissionRepository.countByIsAcceptedAndProblem(isAccepted, problem);
+    }
+
+    @Override
+    public long countByUserAndIsAcceptedAndProblemIn(Users user, boolean isAccepted, List<Problem> problems) {
+        return problemSubmissionRepository.countByUserAndIsAcceptedAndProblemIn(user, isAccepted, problems);
     }
 }

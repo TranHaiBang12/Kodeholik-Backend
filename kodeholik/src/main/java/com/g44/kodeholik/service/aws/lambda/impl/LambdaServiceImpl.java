@@ -4,6 +4,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.AWSLambda;
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.model.InvokeRequest;
@@ -23,10 +24,16 @@ public class LambdaServiceImpl implements LambdaService {
     @Value("${aws.lambda.arn}")
     private String arn;
 
+    @Value("${aws.s3.region}")
+    private String region;
+
     private final ObjectMapper objectMapper;
 
     public LambdaServiceImpl() {
-        awsLambda = AWSLambdaClientBuilder.defaultClient();
+        awsLambda = AWSLambdaClientBuilder
+                .standard()
+                .withRegion(Regions.AP_SOUTHEAST_1)
+                .defaultClient();
         objectMapper = new ObjectMapper();
     }
 
@@ -47,6 +54,7 @@ public class LambdaServiceImpl implements LambdaService {
             result = result.replace("\\", "");
             result = result.replace("\"\"", "\"");
             result = result.substring(1, result.length() - 1);
+            log.info(result);
             return result;
         } catch (Exception e) {
             log.info(e.getMessage());

@@ -26,25 +26,21 @@ import lombok.extern.log4j.Log4j2;
 @Service
 public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private final ProblemTestCaseRepository problemTestCaseRepository;
-    @Autowired
-    private final ProblemService problemService;
     private final ProblemTemplateService problemTemplateService;
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public ProblemCompileResponseDto getProblemCompileInformationById(Long problemId, String languageName) {
+    public ProblemCompileResponseDto getProblemCompileInformationByProblem(Problem problem, String languageName) {
         ProblemCompileResponseDto problemCompileResponseDto = new ProblemCompileResponseDto();
-        Problem problem = problemService.getProblemById(problemId);
         problemCompileResponseDto
                 .setTemplate(problemTemplateService.findByProblemAndLanguage(problem, languageName).getTemplateCode());
-        List<TestCase> testCases = getSampleTestCaseByProblemId(problemId);
+        List<TestCase> testCases = getSampleTestCaseByProblem(problem);
         problemCompileResponseDto.setTestCases(testCases);
         return problemCompileResponseDto;
     }
 
     @Override
-    public List<TestCase> getTestCaseByProblemId(Long problemId) {
-        Problem problem = problemService.getProblemById(problemId);
+    public List<TestCase> getTestCaseByProblem(Problem problem) {
         List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblem(problem);
         List<TestCase> testCases = new ArrayList<>();
         for (int i = 0; i < problemTestCase.size(); i++) {
@@ -63,8 +59,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public List<TestCase> getSampleTestCaseByProblemId(Long problemId) {
-        Problem problem = problemService.getProblemById(problemId);
+    public List<TestCase> getSampleTestCaseByProblem(Problem problem) {
         List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblemAndIsSample(problem, true);
         List<TestCase> testCases = new ArrayList<>();
         for (int i = 0; i < problemTestCase.size(); i++) {
