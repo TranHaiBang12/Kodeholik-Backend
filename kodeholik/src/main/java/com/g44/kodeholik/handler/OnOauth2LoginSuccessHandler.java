@@ -69,7 +69,6 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
             name = oauthUser.getAttribute("login");
             picture = oauthUser.getAttribute("avatar_url");
         }
-        log.info(email + " " + name + " " + picture);
         // OAuth2AuthenticationToken authenticationToken = new
         // OAuth2AuthenticationToken(
         // oauthUser, oauthUser.getAuthorities(), registrationId);
@@ -91,7 +90,7 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
             addUserRequestDto.setAvatar(picture);
             addUserRequestDto.setRole(UserRole.STUDENT);
 
-            userService.addUser(addUserRequestDto);
+            userService.addUserAfterLoginGoogle(addUserRequestDto);
             username = name;
 
         } else {

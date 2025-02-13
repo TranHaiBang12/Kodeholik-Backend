@@ -50,14 +50,25 @@ public class EmailServiceImpl implements EmailService {
 
     }
 
+    @Async("emailTaskExecutor")
+
+    @Override
+    public void sendEmailLoginGoogle(String to, String subject, String username, String password) {
+        Context context = new Context();
+        context.setVariable("username", username);
+        context.setVariable("password", password);
+        sendEmail(to, subject, context, "login-google");
+
+    }
+
+    @Async("emailTaskExecutor")
+
     @Override
     public void sendEmailAddUser(String to, String subject, String username, String password) {
         Context context = new Context();
         context.setVariable("username", username);
         context.setVariable("password", password);
-        log.info(to + " " + subject + " " + username + " " + password);
         sendEmail(to, subject, context, "add-user");
-
     }
 
 }

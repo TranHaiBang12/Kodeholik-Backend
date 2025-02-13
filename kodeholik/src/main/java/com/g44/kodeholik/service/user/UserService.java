@@ -14,5 +14,11 @@ public interface UserService {
 
     public Users getCurrentUser();
 
-    public Users addUser(AddUserRequestDto addUserRequestDto);
+    public Users addUserAfterLoginGoogle(AddUserRequestDto addUserRequestDto);
+
+    public Users addUserByAdmin(AddUserRequestDto addUserRequestDto);
+
+    public void activateUser(Long userId);
+
+    public void deactivateUser(Long userId);
 }

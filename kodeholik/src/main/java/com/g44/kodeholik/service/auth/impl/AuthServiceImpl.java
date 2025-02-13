@@ -208,7 +208,7 @@ public class AuthServiceImpl implements AuthService {
             addUserRequestDto.setAvatar(picture);
             addUserRequestDto.setRole(UserRole.STUDENT);
 
-            userService.addUser(addUserRequestDto);
+            userService.addUserAfterLoginGoogle(addUserRequestDto);
             username = name;
 
         } else {
