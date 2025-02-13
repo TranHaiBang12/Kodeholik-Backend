@@ -18,6 +18,7 @@ import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemTemplateService;
 import com.g44.kodeholik.service.problem.ProblemTestCaseService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -75,6 +76,17 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
         }
         return testCases;
+    }
+
+    @Override
+    public void saveListTestCase(List<ProblemTestCase> problemTestCases) {
+        problemTestCaseRepository.saveAll(problemTestCases);
+    }
+
+    @Transactional
+    @Override
+    public void removeTestCaseByProblem(Problem problem) {
+        problemTestCaseRepository.deleteAllByProblem(problem);
     }
 
 }

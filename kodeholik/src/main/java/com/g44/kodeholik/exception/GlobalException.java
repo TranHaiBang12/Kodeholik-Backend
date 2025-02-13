@@ -3,6 +3,7 @@ package com.g44.kodeholik.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -131,5 +132,13 @@ public class GlobalException {
     public ResponseEntity<ErrorResponse> handleS3Exception(S3Exception ex) {
         return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleMethodNotAllowedException(HttpRequestMethodNotSupportedException ex) {
+        return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                HttpStatus.METHOD_NOT_ALLOWED);
     }
 }

@@ -5,8 +5,10 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,6 +22,15 @@ import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.add.EditorialDto;
+import com.g44.kodeholik.model.dto.request.problem.add.InputParameterDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
+import com.g44.kodeholik.model.dto.request.problem.add.SolutionCodeDto;
+import com.g44.kodeholik.model.dto.request.problem.add.TemplateCode;
+import com.g44.kodeholik.model.dto.request.problem.add.TestCaseDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
@@ -30,7 +41,13 @@ import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionRespons
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.problem.Problem;
+import com.g44.kodeholik.model.entity.problem.ProblemInputParameter;
+import com.g44.kodeholik.model.entity.problem.ProblemSolution;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
+import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
+import com.g44.kodeholik.model.entity.problem.SolutionCode;
+import com.g44.kodeholik.model.entity.problem.SolutionLanguageId;
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
@@ -40,10 +57,14 @@ import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
+import com.g44.kodeholik.service.problem.ProblemInputParameterService;
 import com.g44.kodeholik.service.problem.ProblemService;
+import com.g44.kodeholik.service.problem.ProblemSolutionService;
 import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 import com.g44.kodeholik.service.problem.ProblemTemplateService;
 import com.g44.kodeholik.service.problem.ProblemTestCaseService;
+import com.g44.kodeholik.service.problem.SolutionCodeService;
+import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.setting.TagService;
 import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.request.problem.ProblemRequestMapper;
@@ -55,6 +76,7 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.security.User;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -85,11 +107,22 @@ public class ProblemServiceImpl implements ProblemService {
 
     private final ProblemTestCaseService problemTestCaseService;
 
+    private final ProblemInputParameterService problemInputParameterService;
+
     private final UserService userService;
+
+    private final TagService tagService;
+
+    private final LanguageService languageService;
+
+    private final ProblemSolutionService problemSolutionService;
+
+    private final SolutionCodeService solutionCodeService;
 
     @Scheduled(fixedRate = 600000)
     public void syncProblemsToElasticsearch() {
-        List<ProblemElasticsearch> problems = problemRepository.findByStatus(ProblemStatus.PUBLIC).stream()
+        List<ProblemElasticsearch> problems = problemRepository.findByStatusAndIsActive(ProblemStatus.PUBLIC, true)
+                .stream()
                 .map(problem -> ProblemElasticsearch.builder()
                         .id(problem.getId())
                         .title(problem.getTitle())
@@ -154,7 +187,7 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public ProblemDescriptionResponseDto getProblemDescriptionById(Long id) {
         ProblemDescriptionResponseDto problemDescriptionResponseDto = new ProblemDescriptionResponseDto();
-        Problem problem = getProblemById(id);
+        Problem problem = getPublicProblemById(id);
         List<String> topics = new ArrayList<>();
         for (Topic topic : problem.getTopics()) {
             topics.add(topic.getName());
@@ -177,6 +210,11 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public Problem getProblemById(Long id) {
         return problemRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
+    }
+
+    private Problem getPublicProblemById(Long id) {
+        return problemRepository.findByIdAndStatusAndIsActive(id, ProblemStatus.PUBLIC, true)
                 .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
     }
 
@@ -377,8 +415,187 @@ public class ProblemServiceImpl implements ProblemService {
     private NoAchivedInformationResponseDto getNoAchieved(Users user, Difficulty difficulty) {
         List<Problem> problems = problemRepository.findByDifficulty(difficulty);
         long solvedProblems = problemSubmissionService.countByUserAndIsAcceptedAndProblemIn(user, true, problems);
-        log.info(difficulty + " " + solvedProblems);
         return new NoAchivedInformationResponseDto(difficulty.toString(), solvedProblems, problems.size());
+    }
+
+    @Override
+    public void addProblem(ProblemBasicAddDto problemBasicAddDto, ProblemEditorialDto problemEditorialDto,
+            ProblemInputParameterDto problemInputParameterDto, ProblemTestCaseDto problemTestCaseDto) {
+        Problem problem = addProblemBasic(problemBasicAddDto);
+        addProblemTemplate(problemInputParameterDto, problem);
+        addProblemInputParameter(problemInputParameterDto, problem);
+        addProblemEditorial(problemEditorialDto, problem);
+        addProblemTestCase(problemTestCaseDto, problem);
+    }
+
+    private Problem addProblemBasic(ProblemBasicAddDto problemBasicAddDto) {
+        Users currentUsers = userService.getCurrentUser();
+
+        Problem problem = new Problem();
+        problem.setTitle(problemBasicAddDto.getTitle());
+        problem.setDifficulty(problemBasicAddDto.getDifficulty());
+        problem.setDescription(problemBasicAddDto.getDescription());
+        problem.setAcceptanceRate(0);
+        problem.setNoSubmission(0);
+        problem.setCreatedAt(Timestamp.from(Instant.now()));
+        problem.setCreatedBy(currentUsers);
+        problem.setStatus(problemBasicAddDto.getStatus());
+        problem.setActive(problemBasicAddDto.getIsActive().booleanValue());
+        Set<Topic> topics = tagService.getTopicsByNameList(problemBasicAddDto.getTopics());
+        Set<Skill> skills = tagService.getSkillsByNameList(problemBasicAddDto.getSkills());
+
+        problem.setTopics(topics);
+        problem.setSkills(skills);
+
+        return problemRepository.save(problem);
+    }
+
+    private Problem editProblemBasic(ProblemBasicAddDto problemBasicAddDto, Problem problem) {
+        Users currentUsers = userService.getCurrentUser();
+
+        problem.setTitle(problemBasicAddDto.getTitle());
+        problem.setDifficulty(problemBasicAddDto.getDifficulty());
+        problem.setDescription(problemBasicAddDto.getDescription());
+        problem.setAcceptanceRate(0);
+        problem.setNoSubmission(0);
+        problem.setUpdatedAt(Timestamp.from(Instant.now()));
+        problem.setUpdatedBy(currentUsers);
+        problem.setStatus(problemBasicAddDto.getStatus());
+        problem.setActive(problemBasicAddDto.getIsActive().booleanValue());
+
+        Set<Topic> topics = tagService.getTopicsByNameList(problemBasicAddDto.getTopics());
+        Set<Skill> skills = tagService.getSkillsByNameList(problemBasicAddDto.getSkills());
+
+        problem.setTopics(topics);
+        problem.setSkills(skills);
+
+        return problemRepository.save(problem);
+    }
+
+    private void addProblemTemplate(ProblemInputParameterDto problemInputParameterDto, Problem problem) {
+        List<ProblemTemplate> templates = new ArrayList();
+        List<TemplateCode> templateCodes = problemInputParameterDto.getTemplateCodes();
+        for (int i = 0; i < templateCodes.size(); i++) {
+            ProblemTemplate template = new ProblemTemplate();
+            template.setProblem(problem);
+            template.setLanguage(languageService.findByName(templateCodes.get(i).getLanguage()));
+            template.setTemplateCode(templateCodes.get(i).getCode());
+            template.setFunctionSignature(problemInputParameterDto.getFunctionSignature());
+            template.setReturnType(problemInputParameterDto.getReturnType());
+            templates.add(template);
+        }
+        problemTemplateService.addListTemplate(templates);
+    }
+
+    private void addProblemInputParameter(ProblemInputParameterDto problemInputParameterDto, Problem problem) {
+        List<ProblemInputParameter> problemInputParameters = new ArrayList();
+        List<InputParameterDto> inputParameters = problemInputParameterDto.getParameters();
+        for (int i = 0; i < inputParameters.size(); i++) {
+            ProblemInputParameter problemInputParameter = new ProblemInputParameter();
+            problemInputParameter.setProblem(problem);
+            problemInputParameter.setName(inputParameters.get(i).getName());
+            problemInputParameter.setType(inputParameters.get(i).getType());
+            problemInputParameters.add(problemInputParameter);
+        }
+        problemInputParameterService.addListInputParameters(problemInputParameters);
+    }
+
+    public List<ProblemSolution> addProblemEditorial(ProblemEditorialDto problemEditorialDto, Problem problem) {
+        List<ProblemSolution> problemSolutions = new ArrayList();
+        List<EditorialDto> editorialDtos = problemEditorialDto.getEditorialDtos();
+        for (int i = 0; i < editorialDtos.size(); i++) {
+            ProblemSolution problemSolution = new ProblemSolution();
+            problemSolution.setProblem(problem);
+            problemSolution.setTitle(editorialDtos.get(i).getTitle());
+            problemSolution.setTextSolution(editorialDtos.get(i).getTextSolution());
+            problemSolution.setSkills(tagService.getSkillsByNameList(editorialDtos.get(i).getSkills()));
+            problemSolution.setProblemImplementation(true);
+            problemSolutions.add(problemSolution);
+            problemSolutionService.save(problemSolution);
+            addProblemEditorialCode(editorialDtos.get(i), problemSolution);
+        }
+        return problemSolutions;
+    }
+
+    public void addProblemEditorialCode(EditorialDto editorialDto, ProblemSolution problemSolution) {
+        List<SolutionCodeDto> solutionCodeDtos = editorialDto.getSolutionCodes();
+        List<SolutionCode> solutionCodes = new ArrayList();
+        for (int i = 0; i < solutionCodeDtos.size(); i++) {
+            SolutionCode solutionCode = new SolutionCode();
+            solutionCode.setCode(solutionCodeDtos.get(i).getCode());
+            Language language = languageService.findByName(solutionCodeDtos.get(i).getLanguage());
+            solutionCode.setLanguage(language);
+            solutionCode.setProblem(problemSolution.getProblem());
+            solutionCode.setId(new SolutionLanguageId(problemSolution.getId(), language.getId()));
+            solutionCode.setSolutionId(problemSolution);
+            solutionCodes.add(solutionCode);
+
+        }
+        solutionCodeService.saveAll(solutionCodes);
+    }
+
+    public void addProblemTestCase(ProblemTestCaseDto problemTestCaseDto, Problem problem) {
+        List<TestCaseDto> testCaseDtos = problemTestCaseDto.getTestCases();
+        List<ProblemTestCase> problemTestCases = new ArrayList<>();
+        for (int i = 0; i < testCaseDtos.size(); i++) {
+            ProblemTestCase problemTestCase = new ProblemTestCase();
+            problemTestCase.setInput(testCaseDtos.get(i).getInput());
+            problemTestCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
+            problemTestCase.setProblem(problem);
+            problemTestCase.setSample(testCaseDtos.get(i).getIsSample().booleanValue());
+            problemTestCases.add(problemTestCase);
+        }
+        problemTestCaseService.saveListTestCase(problemTestCases);
+    }
+
+    @Override
+    public void editProblem(Long problemId, ProblemBasicAddDto problemBasicAddDto,
+            ProblemEditorialDto problemEditorialDto,
+            ProblemInputParameterDto problemInputParameterDto, ProblemTestCaseDto problemTestCaseDto) {
+        Problem problem = getProblemById(problemId);
+        deleteProblemDependency(problem);
+        editProblemBasic(problemBasicAddDto, problem);
+        addProblemTemplate(problemInputParameterDto, problem);
+        addProblemInputParameter(problemInputParameterDto, problem);
+        addProblemEditorial(problemEditorialDto, problem);
+        addProblemTestCase(problemTestCaseDto, problem);
+    }
+
+    @Transactional
+    private void deleteProblemDependency(Problem problem) {
+        solutionCodeService.deleteByProblem(problem);
+        problemSolutionService.deleteByProblem(problem);
+        problemTemplateService.deleteTemplatesByProblem(problem);
+        problemInputParameterService.deleteProblemInputParameters(problem);
+        problemTestCaseService.removeTestCaseByProblem(problem);
+    }
+
+    @Override
+    public void activateProblem(Long problemId) {
+        Users currentUser = userService.getCurrentUser();
+        Problem problem = getProblemById(problemId);
+        if (problem.isActive()) {
+            throw new com.g44.kodeholik.exception.BadRequestException("Problem is already active",
+                    "Problem is already active");
+        }
+        problem.setActive(true);
+        problem.setUpdatedAt(Timestamp.from(Instant.now()));
+        problem.setUpdatedBy(currentUser);
+        problemRepository.save(problem);
+    }
+
+    @Override
+    public void deactivateProblem(Long problemId) {
+        Users currentUser = userService.getCurrentUser();
+        Problem problem = getProblemById(problemId);
+        if (!problem.isActive()) {
+            throw new com.g44.kodeholik.exception.BadRequestException("Problem is already active",
+                    "Problem is already active");
+        }
+        problem.setActive(false);
+        problem.setUpdatedAt(Timestamp.from(Instant.now()));
+        problem.setUpdatedBy(currentUser);
+        problemRepository.save(problem);
     }
 
 }

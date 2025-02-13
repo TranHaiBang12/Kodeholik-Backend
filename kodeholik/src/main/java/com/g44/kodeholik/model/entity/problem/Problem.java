@@ -72,6 +72,9 @@ public class Problem {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
+    @Column(name = "is_active")
+    private boolean isActive;
+
     @ManyToOne
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
     private Users updatedBy;

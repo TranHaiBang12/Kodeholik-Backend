@@ -5,6 +5,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ProblemAddRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
@@ -26,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,6 +51,41 @@ public class ProblemController {
     @GetMapping("/no-achieved-info")
     public ResponseEntity<List<NoAchivedInformationResponseDto>> getNoAchievedInfo() {
         return ResponseEntity.ok(problemService.getListNoAchievedInformationByCurrentUser());
+    }
+
+    @PostMapping("/add-problem")
+    public ResponseEntity<?> addProblem(
+            @RequestBody ProblemAddRequestDto problemRequestDto) {
+        // TODO: process POST request
+        problemService.addProblem(problemRequestDto.getProblemBasicAddDto(),
+                problemRequestDto.getProblemEditorialDto(),
+                problemRequestDto.getProblemInputParameterDto(),
+                problemRequestDto.getProblemTestCaseDto());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/edit-problem/{id}")
+    public ResponseEntity<?> editProblem(
+            @PathVariable Long id,
+            @RequestBody ProblemAddRequestDto problemRequestDto) {
+        // TODO: process POST request
+        problemService.editProblem(id, problemRequestDto.getProblemBasicAddDto(),
+                problemRequestDto.getProblemEditorialDto(),
+                problemRequestDto.getProblemInputParameterDto(),
+                problemRequestDto.getProblemTestCaseDto());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/activate-problem/{id}")
+    public ResponseEntity<?> activateProblem(@PathVariable Long id) {
+        problemService.activateProblem(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/deactivate-problem/{id}")
+    public ResponseEntity<?> deactivateProblem(@PathVariable Long id) {
+        problemService.deactivateProblem(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")
