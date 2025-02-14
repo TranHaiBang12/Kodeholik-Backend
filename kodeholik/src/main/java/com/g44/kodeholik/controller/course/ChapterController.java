@@ -1,0 +1,58 @@
+package com.g44.kodeholik.controller.course;
+
+import org.apache.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.g44.kodeholik.model.dto.request.course.ChapterRequestDto;
+import com.g44.kodeholik.model.dto.request.course.CourseRequestDto;
+import com.g44.kodeholik.model.dto.response.course.ChapterResponseDto;
+import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
+import com.g44.kodeholik.service.course.ChapterService;
+import com.g44.kodeholik.service.course.CourseService;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/chapter")
+public class ChapterController {
+    private final ChapterService chapterService;
+
+    @GetMapping("/list")
+    public ResponseEntity<Page<ChapterResponseDto>> getListChapter(Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.SC_OK).body(chapterService.getAllChapter(pageable));
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ChapterResponseDto> getChapterDetail(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.SC_OK).body(chapterService.getChapterById(id));
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<?> addChapter(@RequestBody ChapterRequestDto chapterRequestDto) {
+        chapterService.addChapter(chapterRequestDto);
+        return ResponseEntity.status(HttpStatus.SC_CREATED).build();
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateChapter(@PathVariable Long id, @RequestBody ChapterRequestDto chapterRequestDto) {
+        chapterService.editChapter(id, chapterRequestDto);
+        return ResponseEntity.status(HttpStatus.SC_CREATED).build();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteChapter(@PathVariable Long id) {
+        chapterService.deleteChapter(id);
+        return ResponseEntity.noContent().build();
+    }
+}

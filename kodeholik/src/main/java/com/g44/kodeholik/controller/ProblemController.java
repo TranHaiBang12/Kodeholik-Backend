@@ -61,7 +61,7 @@ public class ProblemController {
                 problemRequestDto.getProblemEditorialDto(),
                 problemRequestDto.getProblemInputParameterDto(),
                 problemRequestDto.getProblemTestCaseDto());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/edit-problem/{id}")

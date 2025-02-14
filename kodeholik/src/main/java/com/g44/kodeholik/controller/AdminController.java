@@ -13,6 +13,7 @@ import com.g44.kodeholik.service.user.UserService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -51,7 +52,7 @@ public class AdminController {
     @PostMapping("/add-tag")
     public ResponseEntity<?> addTag(@RequestBody AddTagRequestDto addTagRequestDto) {
         tagService.addTag(addTagRequestDto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/edit-tag")
