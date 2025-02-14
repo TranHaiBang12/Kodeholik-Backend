@@ -16,7 +16,9 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.g44.kodeholik.filter.JwtFilter;
+import com.g44.kodeholik.handler.CustomAccessDeniedHandler;
 import com.g44.kodeholik.handler.CustomAuthenticationEntryPoint;
+import com.g44.kodeholik.model.enums.user.UserRole;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,6 +54,7 @@ public class SecurityConfig {
                 .csrf(customizer -> customizer.disable())
                 .authorizeHttpRequests(
                         request -> request
+                                .requestMatchers("/api/v1/admin/**").hasAuthority(UserRole.ADMIN.toString())
                                 .requestMatchers(publicUrls).permitAll()
                                 .anyRequest()
                                 .authenticated())
@@ -62,7 +65,9 @@ public class SecurityConfig {
                             .successHandler(onOauth2LoginSuccessHandler);
                 })
                 .exceptionHandling(
-                        exception -> exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
+                        exception -> exception
+                                .accessDeniedHandler(new CustomAccessDeniedHandler())
+                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

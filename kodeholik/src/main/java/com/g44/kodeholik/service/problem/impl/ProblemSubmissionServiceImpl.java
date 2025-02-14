@@ -8,9 +8,12 @@ import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.ProblemSubmissionDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.AcceptedSubmissionResponseDto;
@@ -30,6 +33,7 @@ import com.g44.kodeholik.service.problem.ProblemTemplateService;
 import com.g44.kodeholik.service.problem.ProblemTestCaseService;
 import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.user.UserService;
+import com.g44.kodeholik.util.mapper.response.problem.ProblemSubmissionMapper;
 import com.google.gson.Gson;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
@@ -54,6 +58,8 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     private final LanguageService languageService;
 
     private final ProblemRepository problemRepository;
+
+    private final ProblemSubmissionMapper problemSubmissionMapper;
 
     private Gson gson = new Gson();
 
@@ -121,6 +127,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                 break;
         }
         problemSubmission.setProblem(problem);
+        problemSubmission.setNoTestCasePassed(responseResult.getNoSuccessTestcase());
         problemSubmission.setUser(userService.getUserById(1L));
         problemSubmission.setCode(problemCompileRequestDto.getCode());
         problemSubmission
@@ -204,5 +211,19 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     @Override
     public long countByUserAndIsAcceptedAndProblemIn(Users user, boolean isAccepted, List<Problem> problems) {
         return problemSubmissionRepository.countByUserAndIsAcceptedAndProblemIn(user, isAccepted, problems);
+    }
+
+    @Override
+    public ProblemSubmissionDto getSubmissionDtoById(Long submissionId) {
+        ProblemSubmission problemSubmission = problemSubmissionRepository.findById(submissionId)
+                .orElseThrow(() -> new NotFoundException("Submission not found", "Submission not found"));
+        return problemSubmissionMapper.mapFrom(problemSubmission);
+    }
+
+    @Override
+    public Page<ProblemSubmissionDto> getSubmissionDtosByProblemAndUser(Problem problem, Users user,
+            Pageable pageable) {
+        Page<ProblemSubmission> problemPage = problemSubmissionRepository.findByUserAndProblem(user, problem, pageable);
+        return problemPage.map(problemSubmissionMapper::mapFrom);
     }
 }

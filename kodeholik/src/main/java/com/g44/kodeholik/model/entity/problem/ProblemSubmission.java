@@ -64,6 +64,9 @@ public class ProblemSubmission {
     @Column(name = "input_wrong")
     private String inputWrong;
 
+    @Column(name = "no_testcase_passed")
+    private int noTestCasePassed;
+
     public ProblemSubmission(Problem problem, Users user, String code, Language language, boolean isAccepted,
             double executionTime, double memoryUsage, Timestamp createdAt, String status, String inputWrong) {
         this.problem = problem;

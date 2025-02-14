@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
@@ -68,6 +69,22 @@ public class CommentServiceImpl implements CommentService {
 
         // Trả về Page<Comment> sử dụng PageImpl
         return new PageImpl<>(pagedComments, pageable, commentList.size());
+    }
+
+    @Override
+    public Comment getCommentById(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Comment not found", "Comment not found"));
+    }
+
+    @Override
+    public void saveComment(Comment comment) {
+        commentRepository.save(comment);
+    }
+
+    @Override
+    public void deleteComment(Long commentId) {
+        commentRepository.deleteById(commentId);
     }
 
 }

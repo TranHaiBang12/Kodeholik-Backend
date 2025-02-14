@@ -28,7 +28,7 @@ public class SolutionCode {
     @ManyToOne
     @MapsId("solutionId")
     @JoinColumn(name = "solution_id", referencedColumnName = "id")
-    private ProblemSolution solutionId;
+    private ProblemSolution solution;
 
     @ManyToOne
     @JoinColumn(name = "problem_id", referencedColumnName = "id")

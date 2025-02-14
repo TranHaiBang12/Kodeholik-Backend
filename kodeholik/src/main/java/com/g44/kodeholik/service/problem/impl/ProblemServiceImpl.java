@@ -527,7 +527,7 @@ public class ProblemServiceImpl implements ProblemService {
             solutionCode.setLanguage(language);
             solutionCode.setProblem(problemSolution.getProblem());
             solutionCode.setId(new SolutionLanguageId(problemSolution.getId(), language.getId()));
-            solutionCode.setSolutionId(problemSolution);
+            solutionCode.setSolution(problemSolution);
             solutionCodes.add(solutionCode);
 
         }
@@ -563,8 +563,8 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Transactional
     private void deleteProblemDependency(Problem problem) {
-        solutionCodeService.deleteByProblem(problem);
-        problemSolutionService.deleteByProblem(problem);
+        solutionCodeService.deleteAllEditorialCodeByProblem(problem);
+        problemSolutionService.deleteEditorialByProblem(problem);
         problemTemplateService.deleteTemplatesByProblem(problem);
         problemInputParameterService.deleteProblemInputParameters(problem);
         problemTestCaseService.removeTestCaseByProblem(problem);

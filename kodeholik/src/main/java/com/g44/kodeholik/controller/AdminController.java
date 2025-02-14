@@ -54,7 +54,7 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/add-tag")
+    @PutMapping("/edit-tag")
     public ResponseEntity<?> editTag(@RequestBody EditTagRequestDto editTagRequestDto) {
         tagService.editTag(editTagRequestDto);
         return ResponseEntity.noContent().build();
