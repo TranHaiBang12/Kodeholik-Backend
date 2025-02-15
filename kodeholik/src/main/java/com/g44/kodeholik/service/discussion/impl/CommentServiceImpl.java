@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +16,6 @@ import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
-import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.service.discussion.CommentService;
 import com.g44.kodeholik.service.problem.ProblemService;

@@ -11,6 +11,8 @@ import com.g44.kodeholik.model.entity.user.Users;
 public interface UserRepository extends JpaRepository<Users, Long> {
     public Optional<Users> findByUsername(String username);
 
+    public Optional<Users> findByEmail(String email);
+
     @Query("SELECT u FROM Users u WHERE u.username = :text OR u.email = :text")
     public Optional<Users> existsByUsernameOrEmail(@Param("text") String text);
 

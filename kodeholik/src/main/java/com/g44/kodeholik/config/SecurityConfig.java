@@ -48,6 +48,8 @@ public class SecurityConfig {
 
     private final SimpleUrlAuthenticationSuccessHandler onOauth2LoginSuccessHandler;
 
+    private final MessageProperties messageProperties;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -67,7 +69,7 @@ public class SecurityConfig {
                 .exceptionHandling(
                         exception -> exception
                                 .accessDeniedHandler(new CustomAccessDeniedHandler())
-                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
+                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint(messageProperties)))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

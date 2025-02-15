@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +19,6 @@ import com.g44.kodeholik.util.file.FileConvert;
 import com.g44.kodeholik.util.uuid.UUIDGenerator;
 
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
@@ -107,10 +105,10 @@ public class S3ServiceImpl implements S3Service {
     }
 
     @Override
-    public List<String> uploadProblemFile(List<MultipartFile> multipartFiles) {
+    public List<String> uploadFileNameTypeFile(List<MultipartFile> multipartFiles, FileNameType fileNameType) {
         List<String> keys = new ArrayList();
         IntStream.range(0, multipartFiles.size()).parallel().forEach(i -> {
-            String key = generateFileName(FileNameType.PROBLEM);
+            String key = generateFileName(fileNameType);
             keys.add(key);
             uploadFileToS3(multipartFiles.get(i), key);
         });
@@ -139,9 +137,12 @@ public class S3ServiceImpl implements S3Service {
     public String generateFileName(FileNameType fileNameType) {
         if (fileNameType == FileNameType.PROBLEM) {
             return "kodeholik-problem-image-" + UUIDGenerator.generateUUID();
-        } else {
-            return "";
+        } else if (fileNameType == FileNameType.COURSE) {
+            return "kodeholik-course-image-" + UUIDGenerator.generateUUID();
+        } else if (fileNameType == FileNameType.AVATAR) {
+            return "kodeholik-avatar-image-" + UUIDGenerator.generateUUID();
         }
+        return "";
     }
 
 }

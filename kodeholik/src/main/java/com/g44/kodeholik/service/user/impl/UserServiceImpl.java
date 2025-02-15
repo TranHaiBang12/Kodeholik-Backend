@@ -2,19 +2,26 @@ package com.g44.kodeholik.service.user.impl;
 
 import java.sql.Date;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
+import com.g44.kodeholik.model.dto.request.user.AddUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
 import com.g44.kodeholik.model.entity.user.Users;
+import com.g44.kodeholik.model.enums.s3.FileNameType;
 import com.g44.kodeholik.model.enums.user.UserStatus;
 import com.g44.kodeholik.repository.user.UserRepository;
+import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.email.EmailService;
 import com.g44.kodeholik.service.user.UserService;
+import com.g44.kodeholik.util.mapper.request.user.AddUserAvatarFileMapper;
 import com.g44.kodeholik.util.mapper.request.user.AddUserRequestMapper;
 import com.g44.kodeholik.util.password.PasswordUtils;
 
@@ -30,7 +37,11 @@ public class UserServiceImpl implements UserService {
 
     private final AddUserRequestMapper addUserRequestMapper;
 
+    private final AddUserAvatarFileMapper addUserAvatarFileMapper;
+
     private final EmailService emailService;
+
+    private final S3Service s3Service;
 
     @Override
     public Users getUserById(Long userId) {
@@ -45,6 +56,18 @@ public class UserServiceImpl implements UserService {
             return userDetails;
         }
         return null;
+    }
+
+    private void checkUsernameExisted(String username) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new BadRequestException("Username already exists", "Username already exists");
+        }
+    }
+
+    private void checkEmailExisted(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new BadRequestException("Email already exists", "Email already exists");
+        }
     }
 
     @Override
@@ -68,6 +91,18 @@ public class UserServiceImpl implements UserService {
 
     private Users addUser(AddUserRequestDto addUserRequestDto, UserStatus userStatus, String password) {
         Users user = addUserRequestMapper.mapTo(addUserRequestDto);
+        checkUsernameExisted(addUserRequestDto.getUsername());
+        checkEmailExisted(addUserRequestDto.getEmail());
+        user.setCreatedDate(new java.sql.Date(Date.from(Instant.now()).getTime()));
+        user.setPassword(PasswordUtils.encodePassword(password));
+        user.setStatus(userStatus);
+        return userRepository.save(user);
+    }
+
+    private Users addUserAvatar(AddUserAvatarFileDto addUserAvatarFileDto, UserStatus userStatus, String password) {
+        Users user = addUserAvatarFileMapper.mapTo(addUserAvatarFileDto);
+        checkUsernameExisted(addUserAvatarFileDto.getUsername());
+        checkEmailExisted(addUserAvatarFileDto.getEmail());
         user.setCreatedDate(new java.sql.Date(Date.from(Instant.now()).getTime()));
         user.setPassword(PasswordUtils.encodePassword(password));
         user.setStatus(userStatus);
@@ -81,9 +116,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Users addUserByAdmin(AddUserRequestDto addUserRequestDto) {
+    public Users addUserByAdmin(AddUserAvatarFileDto addUserAvatarFileDto) {
+        List<MultipartFile> multipartFiles = new ArrayList();
+        multipartFiles.add(addUserAvatarFileDto.getAvatarFile());
+
         String password = PasswordUtils.generatePassword();
-        Users user = addUser(addUserRequestDto, UserStatus.ACTIVATED, password);
+        String avatarKey = s3Service.uploadFileNameTypeFile(multipartFiles, FileNameType.AVATAR).get(0);
+        addUserAvatarFileDto.setAvatar(avatarKey);
+        Users user = addUserAvatar(addUserAvatarFileDto, UserStatus.ACTIVATED, password);
+
         emailService.sendEmailAddUser(user.getEmail(), "[KODEHOLIK] Account Created", user.getUsername(),
                 password);
         return user;
@@ -106,6 +147,26 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("This user is already inactive", "This user is already inactive");
         }
         user.setStatus(UserStatus.NOT_ACTIVATED);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void banUser(Long userId) {
+        Users user = getUserById(userId);
+        if (user.getStatus() == UserStatus.BANNED) {
+            throw new BadRequestException("This user is already banned", "This user is already banned");
+        }
+        user.setStatus(UserStatus.BANNED);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unbanUser(Long userId) {
+        Users user = getUserById(userId);
+        if (user.getStatus() != UserStatus.BANNED) {
+            throw new BadRequestException("This user currently is not banned", "This user currently is not banned");
+        }
+        user.setStatus(UserStatus.ACTIVATED);
         userRepository.save(user);
     }
 }

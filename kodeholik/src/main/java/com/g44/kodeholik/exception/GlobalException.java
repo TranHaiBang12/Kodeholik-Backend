@@ -1,6 +1,10 @@
 package com.g44.kodeholik.exception;
 
 import java.nio.file.AccessDeniedException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +20,17 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+import com.g44.kodeholik.config.MessageProperties;
 import com.g44.kodeholik.model.dto.exception.ErrorResponse;
 
-@RestControllerAdvice
+import lombok.RequiredArgsConstructor;
 
+@RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalException {
+
+    private final MessageProperties messageProperties;
+
     // handle not found
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -62,7 +72,7 @@ public class GlobalException {
     @ResponseBody
     public ResponseEntity<ErrorResponse> handlerMissingRequestParamException(
             MissingServletRequestParameterException ex) {
-        return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+        return new ResponseEntity(new ErrorResponse(messageProperties.getMessage("MSG02"), ex.getMessage()),
                 HttpStatus.BAD_REQUEST);
     }
 
@@ -143,6 +153,18 @@ public class GlobalException {
     public ResponseEntity<ErrorResponse> handleMethodNotAllowedException(HttpRequestMethodNotSupportedException ex) {
         return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
                 HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Map<String, Object> handleMethodArgumentNotValidException(
+            org.springframework.web.bind.MethodArgumentNotValidException ex) {
+        List<Map<String, String>> errorList = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> Map.of("field", error.getField(), "message", error.getDefaultMessage()))
+                .collect(Collectors.toList());
+
+        return Map.of("message", errorList);
     }
 
     @ExceptionHandler(AccessDeniedException.class)

@@ -5,22 +5,19 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
-import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.enums.s3.FileNameType;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +28,9 @@ public class S3Controller {
 
     @PostMapping("/upload")
     public ResponseEntity<List<String>> createProblem(@RequestPart("file") MultipartFile[] multipartFiles) {
-        return new ResponseEntity<>(s3Service.uploadProblemFile(Arrays.asList(multipartFiles)), HttpStatus.OK);
+        return new ResponseEntity<>(
+                s3Service.uploadFileNameTypeFile(Arrays.asList(multipartFiles), FileNameType.PROBLEM),
+                HttpStatus.OK);
     }
 
     @GetMapping("/presigned-url")

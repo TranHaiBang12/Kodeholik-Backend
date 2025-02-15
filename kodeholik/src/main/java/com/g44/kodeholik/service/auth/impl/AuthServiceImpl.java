@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
+import com.g44.kodeholik.config.MessageProperties;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
@@ -60,6 +61,8 @@ public class AuthServiceImpl implements AuthService {
     private final RedisService redisService;
 
     private final UserService userService;
+
+    private final MessageProperties messageProperties;
 
     @Value("${spring.jwt.forgot-token.expiry-time}")
     private int forgotTokenExpiryTime;
@@ -111,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
             emailService.sendEmailResetPassword(user.getEmail(), "[KODEHOLIK] Reset Password", user.getUsername(),
                     feLink + token);
         } else {
-            throw new BadRequestException("Username or email not existed", "Username or email not existed");
+            throw new BadRequestException(messageProperties.getMessage("MSG08"), "Username or email not existed");
         }
     }
 
@@ -136,18 +139,15 @@ public class AuthServiceImpl implements AuthService {
         }
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if (userDetails != null) {
-            log.info("23");
             String savedToken = redisService.getToken(username, TokenType.FORGOT);
             if (savedToken != null) {
-                log.info(token);
-                log.info(savedToken.trim());
                 if (tokenService.validateToken(token, userDetails) &&
                         token.equals(savedToken.trim())) {
                     return true;
                 }
             }
         }
-        return false;
+        throw new UnauthorizedException(messageProperties.getMessage("MSG07"), "Invalid or expired token");
     }
 
     @Override
@@ -161,7 +161,7 @@ public class AuthServiceImpl implements AuthService {
                 user.setPassword(PasswordUtils.encodePassword(password));
             } else {
                 throw new BadRequestException(
-                        "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+                        messageProperties.getMessage("MSG06"),
                         "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character");
             }
             userRepository.save(user);
