@@ -1,5 +1,7 @@
 package com.g44.kodeholik.model.dto.request.problem.add;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +17,8 @@ public class ProblemAddRequestDto {
     private ProblemInputParameterDto problemInputParameterDto;
 
     private ProblemEditorialDto problemEditorialDto;
+
+    private MultipartFile testCaseFile;
 
     private ProblemTestCaseDto problemTestCaseDto;
 }

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,8 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.g44.kodeholik.exception.NotFoundException;
+import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
@@ -52,11 +55,13 @@ import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
+import com.g44.kodeholik.model.enums.problem.InputType;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
+import com.g44.kodeholik.service.excel.ExcelService;
 import com.g44.kodeholik.service.problem.ProblemInputParameterService;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemSolutionService;
@@ -70,6 +75,8 @@ import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.request.problem.ProblemRequestMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemDescriptionMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemResponseMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
@@ -118,6 +125,8 @@ public class ProblemServiceImpl implements ProblemService {
     private final ProblemSolutionService problemSolutionService;
 
     private final SolutionCodeService solutionCodeService;
+
+    private final ExcelService excelService;
 
     @Scheduled(fixedRate = 600000)
     public void syncProblemsToElasticsearch() {
@@ -420,12 +429,13 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public void addProblem(ProblemBasicAddDto problemBasicAddDto, ProblemEditorialDto problemEditorialDto,
-            ProblemInputParameterDto problemInputParameterDto, ProblemTestCaseDto problemTestCaseDto) {
+            ProblemInputParameterDto problemInputParameterDto, MultipartFile excelFile) {
         Problem problem = addProblemBasic(problemBasicAddDto);
         addProblemTemplate(problemInputParameterDto, problem);
-        addProblemInputParameter(problemInputParameterDto, problem);
+        List<String> inputNames = addProblemInputParameter(problemInputParameterDto, problem);
         addProblemEditorial(problemEditorialDto, problem);
-        addProblemTestCase(problemTestCaseDto, problem);
+        ProblemTestCaseDto problemTestCaseDto = excelService.readTestCaseExcel(excelFile, inputNames);
+        addProblemTestCase(problemTestCaseDto, problem, problemInputParameterDto);
     }
 
     private Problem addProblemBasic(ProblemBasicAddDto problemBasicAddDto) {
@@ -487,17 +497,21 @@ public class ProblemServiceImpl implements ProblemService {
         problemTemplateService.addListTemplate(templates);
     }
 
-    private void addProblemInputParameter(ProblemInputParameterDto problemInputParameterDto, Problem problem) {
+    private List<String> addProblemInputParameter(ProblemInputParameterDto problemInputParameterDto, Problem problem) {
         List<ProblemInputParameter> problemInputParameters = new ArrayList();
         List<InputParameterDto> inputParameters = problemInputParameterDto.getParameters();
+        List<String> inputNames = new ArrayList();
         for (int i = 0; i < inputParameters.size(); i++) {
+            inputNames.add(inputParameters.get(i).getInputName());
+
             ProblemInputParameter problemInputParameter = new ProblemInputParameter();
             problemInputParameter.setProblem(problem);
-            problemInputParameter.setName(inputParameters.get(i).getName());
-            problemInputParameter.setType(inputParameters.get(i).getType());
+            problemInputParameter.setName(inputParameters.get(i).getInputName());
+            problemInputParameter.setType(inputParameters.get(i).getInputType());
             problemInputParameters.add(problemInputParameter);
         }
         problemInputParameterService.addListInputParameters(problemInputParameters);
+        return inputNames;
     }
 
     public List<ProblemSolution> addProblemEditorial(ProblemEditorialDto problemEditorialDto, Problem problem) {
@@ -506,9 +520,9 @@ public class ProblemServiceImpl implements ProblemService {
         for (int i = 0; i < editorialDtos.size(); i++) {
             ProblemSolution problemSolution = new ProblemSolution();
             problemSolution.setProblem(problem);
-            problemSolution.setTitle(editorialDtos.get(i).getTitle());
-            problemSolution.setTextSolution(editorialDtos.get(i).getTextSolution());
-            problemSolution.setSkills(tagService.getSkillsByNameList(editorialDtos.get(i).getSkills()));
+            problemSolution.setTitle(editorialDtos.get(i).getEditorialTitle());
+            problemSolution.setTextSolution(editorialDtos.get(i).getEditorialTextSolution());
+            problemSolution.setSkills(tagService.getSkillsByNameList(editorialDtos.get(i).getEditorialSkills()));
             problemSolution.setProblemImplementation(true);
             problemSolutions.add(problemSolution);
             problemSolutionService.save(problemSolution);
@@ -522,8 +536,8 @@ public class ProblemServiceImpl implements ProblemService {
         List<SolutionCode> solutionCodes = new ArrayList();
         for (int i = 0; i < solutionCodeDtos.size(); i++) {
             SolutionCode solutionCode = new SolutionCode();
-            solutionCode.setCode(solutionCodeDtos.get(i).getCode());
-            Language language = languageService.findByName(solutionCodeDtos.get(i).getLanguage());
+            solutionCode.setCode(solutionCodeDtos.get(i).getSolutionCode());
+            Language language = languageService.findByName(solutionCodeDtos.get(i).getSolutionLanguage());
             solutionCode.setLanguage(language);
             solutionCode.setProblem(problemSolution.getProblem());
             solutionCode.setId(new SolutionLanguageId(problemSolution.getId(), language.getId()));
@@ -534,12 +548,16 @@ public class ProblemServiceImpl implements ProblemService {
         solutionCodeService.saveAll(solutionCodes);
     }
 
-    public void addProblemTestCase(ProblemTestCaseDto problemTestCaseDto, Problem problem) {
+    public void addProblemTestCase(ProblemTestCaseDto problemTestCaseDto,
+            Problem problem,
+            ProblemInputParameterDto problemInputParameterDto) {
         List<TestCaseDto> testCaseDtos = problemTestCaseDto.getTestCases();
         List<ProblemTestCase> problemTestCases = new ArrayList<>();
         for (int i = 0; i < testCaseDtos.size(); i++) {
+            log.info(testCaseDtos.get(i).getExpectedOutput());
             ProblemTestCase problemTestCase = new ProblemTestCase();
-            problemTestCase.setInput(testCaseDtos.get(i).getInput());
+            problemTestCase
+                    .setInput(generateInputJson(problemInputParameterDto.getParameters(), problemTestCaseDto, i));
             problemTestCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
             problemTestCase.setProblem(problem);
             problemTestCase.setSample(testCaseDtos.get(i).getIsSample().booleanValue());
@@ -548,17 +566,79 @@ public class ProblemServiceImpl implements ProblemService {
         problemTestCaseService.saveListTestCase(problemTestCases);
     }
 
+    private String generateInputJson(List<InputParameterDto> inputDtos, ProblemTestCaseDto problemTestCaseDto,
+            int index) {
+        Gson gson = new Gson();
+        List<InputVariable> inputs = new ArrayList<>();
+        List<TestCaseDto> testCaseDtos = problemTestCaseDto.getTestCases();
+        Map<String, String> inputName = testCaseDtos.get(index).getInput();
+
+        for (int j = 0; j < inputDtos.size(); j++) {
+            String rawValue = inputName.get(inputDtos.get(j).getInputName());
+            Object parsedValue = parseValue(rawValue, inputDtos.get(j).getInputType(), gson);
+
+            InputVariable input = new InputVariable(
+                    inputDtos.get(j).getInputName(),
+                    inputDtos.get(j).getInputType().toString(),
+                    parsedValue);
+
+            inputs.add(input);
+        }
+
+        return gson.toJson(inputs);
+
+    }
+
+    public Object parseValue(String rawValue, InputType type, Gson gson) {
+        if (rawValue == null || rawValue.equalsIgnoreCase("null")) {
+            return null;
+        }
+
+        switch (type) {
+            case ARR_INT:
+                return gson.fromJson(rawValue, new TypeToken<List<Integer>>() {
+                }.getType());
+            case ARR_DOUBLE:
+                return gson.fromJson(rawValue, new TypeToken<List<Double>>() {
+                }.getType());
+            case ARR_STRING:
+                return gson.fromJson(rawValue, new TypeToken<List<String>>() {
+                }.getType());
+            case ARR_OBJECT:
+                return gson.fromJson(rawValue, new TypeToken<List<Object>>() {
+                }.getType());
+            case MAP:
+                return gson.fromJson(rawValue, new TypeToken<Map<String, Object>>() {
+                }.getType());
+            case INT:
+                return Integer.parseInt(rawValue);
+            case LONG:
+                return Long.parseLong(rawValue);
+            case DOUBLE:
+                return Double.parseDouble(rawValue);
+            case BOOLEAN:
+                return Boolean.parseBoolean(rawValue);
+            case STRING:
+                return rawValue; // Không cần parse, giữ nguyên chuỗi
+            case OBJECT:
+                return gson.fromJson(rawValue, Object.class);
+            default:
+                throw new IllegalArgumentException("Unsupported type: " + type);
+        }
+    }
+
     @Override
     public void editProblem(Long problemId, ProblemBasicAddDto problemBasicAddDto,
             ProblemEditorialDto problemEditorialDto,
-            ProblemInputParameterDto problemInputParameterDto, ProblemTestCaseDto problemTestCaseDto) {
+            ProblemInputParameterDto problemInputParameterDto, MultipartFile excelFile) {
         Problem problem = getProblemById(problemId);
         deleteProblemDependency(problem);
         editProblemBasic(problemBasicAddDto, problem);
         addProblemTemplate(problemInputParameterDto, problem);
-        addProblemInputParameter(problemInputParameterDto, problem);
+        List<String> inputNames = addProblemInputParameter(problemInputParameterDto, problem);
         addProblemEditorial(problemEditorialDto, problem);
-        addProblemTestCase(problemTestCaseDto, problem);
+        ProblemTestCaseDto problemTestCaseDto = excelService.readTestCaseExcel(excelFile, inputNames);
+        addProblemTestCase(problemTestCaseDto, problem, problemInputParameterDto);
     }
 
     @Transactional

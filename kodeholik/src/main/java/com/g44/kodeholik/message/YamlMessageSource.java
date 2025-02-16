@@ -9,6 +9,9 @@ import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.yaml.snakeyaml.Yaml;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class YamlMessageSource extends AbstractMessageSource {
     private final Map<String, Object> messages;
 

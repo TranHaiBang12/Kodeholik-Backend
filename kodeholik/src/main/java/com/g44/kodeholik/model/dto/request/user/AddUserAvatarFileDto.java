@@ -18,16 +18,16 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class AddUserAvatarFileDto {
-    @NotBlank(message = "{MSG02}")
-    @Size(min = 1, max = 50, message = "{MSG49}")
+    @NotBlank(message = "MSG02")
+    @Size(min = 1, max = 50, message = "MSG49")
     private String fullname;
 
-    @NotBlank(message = "{MSG02}")
-    @Size(min = 1, max = 50, message = "{MSG48}")
+    @NotBlank(message = "MSG02")
+    @Size(min = 1, max = 50, message = "MSG48")
     private String username;
 
-    @NotBlank(message = "{MSG02}")
-    @Email(message = "{MSG47}")
+    @NotBlank(message = "MSG02")
+    @Email(message = "MSG47")
     private String email;
 
     private String avatar;

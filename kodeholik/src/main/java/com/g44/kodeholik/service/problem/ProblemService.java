@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.problem;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
@@ -61,14 +62,14 @@ public interface ProblemService {
                         ProblemBasicAddDto problemBasicAddDto,
                         ProblemEditorialDto problemEditorialDto,
                         ProblemInputParameterDto problemInputParameterDto,
-                        ProblemTestCaseDto problemTestCaseDto);
+                        MultipartFile excelFile);
 
         public void editProblem(
                         Long problemId,
                         ProblemBasicAddDto problemBasicAddDto,
                         ProblemEditorialDto problemEditorialDto,
                         ProblemInputParameterDto problemInputParameterDto,
-                        ProblemTestCaseDto problemTestCaseDto);
+                        MultipartFile excelFile);
 
         public void activateProblem(Long problemId);
 

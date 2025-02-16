@@ -161,7 +161,8 @@ public class GlobalException {
     public Map<String, Object> handleMethodArgumentNotValidException(
             org.springframework.web.bind.MethodArgumentNotValidException ex) {
         List<Map<String, String>> errorList = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> Map.of("field", error.getField(), "message", error.getDefaultMessage()))
+                .map(error -> Map.of("field", error.getField(), "error",
+                        messageProperties.getMessage(error.getDefaultMessage())))
                 .collect(Collectors.toList());
 
         return Map.of("message", errorList);

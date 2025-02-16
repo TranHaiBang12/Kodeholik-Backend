@@ -54,6 +54,7 @@ public class LambdaServiceImpl implements LambdaService {
 
             InvokeResult invokeResult = awsLambda.invoke(invokeRequest);
             String result = new String(invokeResult.getPayload().array());
+            log.info(result);
             result = StringEscapeUtils.unescapeJson(result);
             result = result.replace("\\", "");
             result = result.replace("\"\"", "\"");

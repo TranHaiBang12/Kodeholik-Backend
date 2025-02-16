@@ -1,15 +1,30 @@
 package com.g44.kodeholik.controller;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemAddRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
-import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
@@ -18,25 +33,12 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDt
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.service.problem.ProblemService;
-import com.g44.kodeholik.service.problem.ProblemTestCaseService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
+@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/problem")
@@ -55,24 +57,35 @@ public class ProblemController {
 
     @PostMapping("/add-problem")
     public ResponseEntity<?> addProblem(
-            @RequestBody ProblemAddRequestDto problemRequestDto) {
-        // TODO: process POST request
-        problemService.addProblem(problemRequestDto.getProblemBasicAddDto(),
-                problemRequestDto.getProblemEditorialDto(),
-                problemRequestDto.getProblemInputParameterDto(),
-                problemRequestDto.getProblemTestCaseDto());
+            @RequestPart("problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
+            @RequestPart("problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
+            @RequestPart("problemInputParameterDto") @Valid ProblemInputParameterDto problemInputParameterDto,
+            @RequestPart("excelFile") MultipartFile excelFile)
+            throws JsonMappingException, JsonProcessingException {
+        problemService.addProblem(problemBasicAddDto,
+                problemEditorialDto,
+                problemInputParameterDto,
+                excelFile);
+
+        // problemService.addProblem(problemRequestDto.getProblemBasicAddDto(),
+        // problemRequestDto.getProblemEditorialDto(),
+        // problemRequestDto.getProblemInputParameterDto(),
+        // problemRequestDto.getProblemTestCaseDto());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/edit-problem/{id}")
     public ResponseEntity<?> editProblem(
             @PathVariable Long id,
-            @RequestBody ProblemAddRequestDto problemRequestDto) {
+            @RequestPart("problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
+            @RequestPart("problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
+            @RequestPart("problemInputParameterDto") @Valid ProblemInputParameterDto problemInputParameterDto,
+            @RequestPart("excelFile") MultipartFile excelFile) {
         // TODO: process POST request
-        problemService.editProblem(id, problemRequestDto.getProblemBasicAddDto(),
-                problemRequestDto.getProblemEditorialDto(),
-                problemRequestDto.getProblemInputParameterDto(),
-                problemRequestDto.getProblemTestCaseDto());
+        problemService.editProblem(id, problemBasicAddDto,
+                problemEditorialDto,
+                problemInputParameterDto,
+                excelFile);
         return ResponseEntity.noContent().build();
     }
 
