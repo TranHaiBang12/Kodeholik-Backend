@@ -10,6 +10,8 @@ import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
 public interface ProblemTestCaseService {
     public List<TestCase> getTestCaseByProblem(Problem problem);
 
+    public List<ProblemTestCase> getProblemTestCaseByProblem(Problem problem);
+
     public List<TestCase> getSampleTestCaseByProblem(Problem problem);
 
     public ProblemCompileResponseDto getProblemCompileInformationByProblem(Problem problem, String languageName);

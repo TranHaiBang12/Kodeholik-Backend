@@ -22,7 +22,10 @@ public class SolutionCodeMapper implements Mapper<SolutionCode, SolutionCodeDto>
 
     @Override
     public SolutionCodeDto mapFrom(SolutionCode a) {
-        return mapper.map(a, SolutionCodeDto.class);
+        SolutionCodeDto result = new SolutionCodeDto();
+        result.setSolutionCode(a.getCode());
+        result.setSolutionLanguage(a.getLanguage().getName());
+        return result;
 
     }
 

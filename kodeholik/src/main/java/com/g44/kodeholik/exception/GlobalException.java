@@ -1,5 +1,6 @@
 package com.g44.kodeholik.exception;
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.List;
@@ -151,6 +152,14 @@ public class GlobalException {
                                 HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        @ExceptionHandler(IOException.class)
+        @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+        @ResponseBody
+        public ResponseEntity<ErrorResponse> handleIOException(IOException ex) {
+                return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                                HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
         @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
         @ResponseBody
@@ -171,6 +180,18 @@ public class GlobalException {
                                 .collect(Collectors.toList());
 
                 return Map.of("message", errorList);
+        }
+
+        @ExceptionHandler(TestCaseNotPassedException.class)
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
+        @ResponseBody
+        public ResponseEntity<Map<String, Object>> handleTestCaseNotPassedException(
+                        TestCaseNotPassedException ex) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("message", ex.getMessage());
+                errorResponse.put("details", ex.getDetails());
+
+                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
 
         @ExceptionHandler(AccessDeniedException.class)

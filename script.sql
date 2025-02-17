@@ -6,6 +6,7 @@
 -- Dumped by pg_dump version 17.2
 
 -- Started on 2025-02-17 17:21:41
+SET AUTOCOMMIT = ON;
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -30,7 +31,6 @@ CREATE DATABASE kodeholik WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PRO
 
 ALTER DATABASE kodeholik OWNER TO postgres;
 
-\connect kodeholik
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;

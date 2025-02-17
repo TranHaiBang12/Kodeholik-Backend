@@ -1,5 +1,8 @@
 package com.g44.kodeholik.model.entity.problem;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.g44.kodeholik.model.entity.setting.Language;
 
 import jakarta.persistence.EmbeddedId;
@@ -21,6 +24,7 @@ import lombok.experimental.FieldNameConstants;
 @AllArgsConstructor
 @Builder
 @Data
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class SolutionCode {
     @EmbeddedId
     private SolutionLanguageId id;
@@ -28,6 +32,7 @@ public class SolutionCode {
     @ManyToOne
     @MapsId("solutionId")
     @JoinColumn(name = "solution_id", referencedColumnName = "id")
+    @JsonIgnore
     private ProblemSolution solution;
 
     @ManyToOne

@@ -15,8 +15,11 @@ import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemBasicResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
@@ -76,5 +79,13 @@ public interface ProblemService {
         public void deactivateProblem(Long problemId);
 
         public boolean checkTitleExisted(String title);
+
+        public ProblemBasicResponseDto getProblemBasicResponseDto(Long id);
+
+        public ProblemEditorialResponseDto getProblemEditorialDtoList(Long problemId);
+
+        public ProblemInputParameterResponseDto getProblemInputParameterDtoList(Long problemId);
+
+        public byte[] getExcelFile(Long problemId);
 
 }

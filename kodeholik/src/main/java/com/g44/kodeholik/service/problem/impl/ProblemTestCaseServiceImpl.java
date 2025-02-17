@@ -89,4 +89,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         problemTestCaseRepository.deleteAllByProblem(problem);
     }
 
+    @Override
+    public List<ProblemTestCase> getProblemTestCaseByProblem(Problem problem) {
+        return problemTestCaseRepository.findByProblem(problem);
+    }
+
 }

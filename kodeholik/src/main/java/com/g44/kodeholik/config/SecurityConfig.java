@@ -44,6 +44,13 @@ public class SecurityConfig {
             "/api/v1/problem/compile-information/**"
     };
 
+    private final String[] teacherUrls = {
+            "/api/v1/problem/add-problem",
+            "/api/v1/problem/edit-problem/**",
+            "/api/v1/problem/activate-problem/**",
+            "/api/v1/problem/deactivate-problem/**"
+    };
+
     private final JwtFilter jwtFilter;
 
     private final SimpleUrlAuthenticationSuccessHandler onOauth2LoginSuccessHandler;
@@ -57,6 +64,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         request -> request
                                 .requestMatchers("/api/v1/admin/**").hasAuthority(UserRole.ADMIN.toString())
+                                .requestMatchers(teacherUrls).hasAuthority(UserRole.TEACHER.toString())
                                 .requestMatchers(publicUrls).permitAll()
                                 .anyRequest()
                                 .authenticated())

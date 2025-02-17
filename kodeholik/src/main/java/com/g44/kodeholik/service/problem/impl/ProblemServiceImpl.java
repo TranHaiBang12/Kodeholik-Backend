@@ -42,9 +42,13 @@ import com.g44.kodeholik.model.dto.request.problem.add.TemplateCode;
 import com.g44.kodeholik.model.dto.request.problem.add.TestCaseDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
+import com.g44.kodeholik.model.dto.response.problem.EditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemBasicResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
@@ -71,6 +75,7 @@ import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
+import com.g44.kodeholik.service.CompileService;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
 import com.g44.kodeholik.service.excel.ExcelService;
 import com.g44.kodeholik.service.problem.ProblemInputParameterService;
@@ -84,8 +89,10 @@ import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.setting.TagService;
 import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.request.problem.ProblemRequestMapper;
+import com.g44.kodeholik.util.mapper.response.problem.ProblemBasicResponseMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemDescriptionMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemResponseMapper;
+import com.g44.kodeholik.util.mapper.response.problem.SolutionCodeMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -141,7 +148,11 @@ public class ProblemServiceImpl implements ProblemService {
 
     private final LambdaService lambdaService;
 
-    private List<InputVariable> inputs = new ArrayList<>();
+    private final ProblemBasicResponseMapper problemBasicResponseMapper;
+
+    private final SolutionCodeMapper solutionCodeMapper;
+
+    private List<List<InputVariable>> inputs = new ArrayList<>();
 
     private Gson gson = new Gson();
 
@@ -511,12 +522,13 @@ public class ProblemServiceImpl implements ProblemService {
 
     private void addProblemTemplate(ProblemInputParameterDto problemInputParameterDto, Problem problem) {
         List<ProblemTemplate> templates = new ArrayList();
+        problemInputParameterDto = generateTemplate(problemInputParameterDto);
         List<TemplateCode> templateCodes = problemInputParameterDto.getTemplateCodes();
         for (int i = 0; i < templateCodes.size(); i++) {
             ProblemTemplate template = new ProblemTemplate();
+            log.info(templateCodes.get(i).getCode());
             template.setProblem(problem);
             template.setLanguage(languageService.findByName(templateCodes.get(i).getLanguage()));
-            generateTemplate(problemInputParameterDto);
             template.setTemplateCode(templateCodes.get(i).getCode());
             template.setFunctionSignature(problemInputParameterDto.getFunctionSignature());
             template.setReturnType(problemInputParameterDto.getReturnType());
@@ -592,7 +604,11 @@ public class ProblemServiceImpl implements ProblemService {
             ProblemTestCase problemTestCase = new ProblemTestCase();
             problemTestCase
                     .setInput(generateInputJson(problemInputParameterDto.getParameters(), problemTestCaseDto, i));
-            problemTestCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
+            if (problemInputParameterDto.getReturnType() == InputType.STRING) {
+                problemTestCase.setExpectedOutput("\"" + testCaseDtos.get(i).getExpectedOutput() + "\"");
+            } else {
+                problemTestCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
+            }
             problemTestCase.setProblem(problem);
             problemTestCase.setSample(testCaseDtos.get(i).getIsSample().booleanValue());
             problemTestCases.add(problemTestCase);
@@ -600,22 +616,28 @@ public class ProblemServiceImpl implements ProblemService {
         problemTestCaseService.saveListTestCase(problemTestCases);
     }
 
-    private void generateTemplate(ProblemInputParameterDto problemInputParameterDto) {
-        List<TemplateCode> templates = new ArrayList();
+    private ProblemInputParameterDto generateTemplate(ProblemInputParameterDto problemInputParameterDto) {
+        List<TemplateCode> templates = problemInputParameterDto.getTemplateCodes();
+        StringBuilder templateBuilder = new StringBuilder();
         for (int i = 0; i < templates.size(); i++) {
-            String template = templates.get(i).getCode() + "\n public static ";
-            template = getStringForInputType(problemInputParameterDto.getReturnType()) + " "
-                    + problemInputParameterDto.getFunctionSignature() + "(";
+            String template = "";
+            templateBuilder.append(templates.get(i).getCode()).append("\n public static ");
+            templateBuilder.append(getStringForInputType(problemInputParameterDto.getReturnType())).append(" ")
+                    .append(problemInputParameterDto.getFunctionSignature()).append("(");
             List<InputParameterDto> inputs = problemInputParameterDto.getParameters();
             for (int j = 0; j < inputs.size(); j++) {
-                template += getStringForInputType(inputs.get(j).getInputType()) + " " + inputs.get(j).getInputName();
+                templateBuilder.append(getStringForInputType(inputs.get(j).getInputType())).append(" ")
+                        .append(inputs.get(j).getInputName());
                 if (inputs.size() - j > 1) {
-                    template += ", ";
+                    templateBuilder.append(", ");
                 }
             }
-            template += ") {\n}";
+            templateBuilder.append(") {\n}");
+            template = templateBuilder.toString();
             templates.get(i).setCode(template);
         }
+        problemInputParameterDto.setTemplateCodes(templates);
+        return problemInputParameterDto;
     }
 
     private String getStringForInputType(InputType type) {
@@ -658,10 +680,12 @@ public class ProblemServiceImpl implements ProblemService {
             ProblemTestCaseDto problemTestCaseDto,
             ProblemInputParameterDto problemInputParameterDto) {
         inputs = new ArrayList();
+
         List<InputParameterDto> inputDtos = problemInputParameterDto.getParameters();
         List<TestCase> testCases = new ArrayList<>();
         List<TestCaseDto> testCaseDtos = problemTestCaseDto.getTestCases();
         for (int i = 0; i < testCaseDtos.size(); i++) {
+            List<InputVariable> inputVariables = new ArrayList();
             Map<String, String> inputName = testCaseDtos.get(i).getInput();
             for (int j = 0; j < inputDtos.size(); j++) {
                 String rawValue = inputName.get(inputDtos.get(j).getInputName());
@@ -672,11 +696,17 @@ public class ProblemServiceImpl implements ProblemService {
                         inputDtos.get(j).getInputType().toString(),
                         parsedValue);
 
-                inputs.add(input);
+                inputVariables.add(input);
             }
+            log.info(inputs);
             TestCase testCase = new TestCase();
-            testCase.setInput(inputs);
-            testCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
+            testCase.setInput(inputVariables);
+            inputs.add(inputVariables);
+            if (problemInputParameterDto.getReturnType() == InputType.STRING) {
+                testCase.setExpectedOutput("\"" + testCaseDtos.get(i).getExpectedOutput() + "\"");
+            } else {
+                testCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
+            }
             testCases.add(testCase);
         }
         List<EditorialDto> editorialDtos = problemEditorialDto.getEditorialDtos();
@@ -689,57 +719,66 @@ public class ProblemServiceImpl implements ProblemService {
                 lambdaRequest.setFunctionSignature(problemInputParameterDto.getFunctionSignature());
                 lambdaRequest.setReturnType(problemInputParameterDto.getReturnType().toString());
                 lambdaRequest.setTestCases(testCases);
+                log.info(lambdaRequest);
 
-                String result = lambdaService.invokeLambdaFunction(lambdaRequest);
-                String status = "";
-                ResponseResult responseResult = new ResponseResult();
-                submissionResponseDto = null;
-                try {
-                    responseResult = gson.fromJson(result, ResponseResult.class);
-                    if (responseResult.isAccepted()) {
-                        status = "ACCEPTED";
-                    } else {
-                        status = "FAILED";
-                    }
-                } catch (Exception e) {
-                    status = result;
-                }
-                switch (status) {
-                    case "ACCEPTED":
-                        submissionResponseDto = new AcceptedSubmissionResponseDto(
-                                responseResult.getTime(),
-                                responseResult.getMemoryUsage(),
-                                solutionCodes.get(j).getSolutionCode(),
-                                solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
-                                responseResult.getNoSuccessTestcase(),
-                                Timestamp.from(Instant.now()));
-                        break;
-                    case "FAILED":
-                        submissionResponseDto = new FailedSubmissionResponseDto(
-                                responseResult.getNoSuccessTestcase(),
-                                testCases.size(),
-                                responseResult.getInputWrong(),
-                                solutionCodes.get(j).getSolutionCode(),
-                                solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
-                                Timestamp.from(Instant.now()));
-                        break;
-                    default:
-                        submissionResponseDto = new CompileErrorResposneDto(
-                                status,
-                                solutionCodes.get(j).getSolutionCode(),
-                                solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
-                                Timestamp.from(Instant.now()));
-                        break;
-                }
+                // try {
+                // CompileService.compileAndRun(lambdaRequest.getCode(), testCases,
+                // lambdaRequest.getLanguage(),
+                // lambdaRequest.getFunctionSignature(),
+                // lambdaRequest.getReturnType().toString());
+                // } catch (Exception e) {
+
+                // }
+
+                // String result = lambdaService.invokeLambdaFunction(lambdaRequest);
+                // String status = "";
+                // ResponseResult responseResult = new ResponseResult();
+                // submissionResponseDto = null;
+                // try {
+                // responseResult = gson.fromJson(result, ResponseResult.class);
+                // if (responseResult.isAccepted()) {
+                // status = "ACCEPTED";
+                // } else {
+                // status = "FAILED";
+                // }
+                // } catch (Exception e) {
+                // status = result;
+                // }
+                // switch (status) {
+                // case "ACCEPTED":
+                // submissionResponseDto = new AcceptedSubmissionResponseDto(
+                // responseResult.getTime(),
+                // responseResult.getMemoryUsage(),
+                // solutionCodes.get(j).getSolutionCode(),
+                // solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
+                // responseResult.getNoSuccessTestcase(),
+                // Timestamp.from(Instant.now()));
+                // break;
+                // case "FAILED":
+                // submissionResponseDto = new FailedSubmissionResponseDto(
+                // responseResult.getNoSuccessTestcase(),
+                // testCases.size(),
+                // responseResult.getInputWrong(),
+                // solutionCodes.get(j).getSolutionCode(),
+                // solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
+                // Timestamp.from(Instant.now()));
+                // return false;
+                // default:
+                // submissionResponseDto = new CompileErrorResposneDto(
+                // status,
+                // solutionCodes.get(j).getSolutionCode(),
+                // solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
+                // Timestamp.from(Instant.now()));
+                // return false;
+                // }
             }
         }
-
         return true;
     }
 
     private String generateInputJson(List<InputParameterDto> inputDtos, ProblemTestCaseDto problemTestCaseDto,
             int index) {
-        return gson.toJson(inputs);
+        return gson.toJson(inputs.get(index));
 
     }
 
@@ -786,7 +825,7 @@ public class ProblemServiceImpl implements ProblemService {
             ProblemEditorialDto problemEditorialDto,
             ProblemInputParameterDto problemInputParameterDto, MultipartFile excelFile) {
         Problem problem = getProblemById(problemId);
-        if (checkTitleExisted(problemBasicAddDto.getTitle())) {
+        if (checkTitleExistedForUpdate(problemBasicAddDto.getTitle(), problem.getTitle())) {
             throw new BadRequestException("Title has already existed", "Title has already existed");
         }
         List<String> inputNames = getInputName(problemInputParameterDto);
@@ -801,6 +840,13 @@ public class ProblemServiceImpl implements ProblemService {
         addProblemTemplate(problemInputParameterDto, problem);
         addProblemEditorial(problemEditorialDto, problem);
         addProblemTestCase(problemTestCaseDto, problem, problemInputParameterDto);
+    }
+
+    private boolean checkTitleExistedForUpdate(String newTitle, String oldTitle) {
+        if (!oldTitle.equals(newTitle)) {
+            return problemRepository.isTitleExisted(newTitle);
+        }
+        return false;
     }
 
     @Transactional
@@ -843,6 +889,78 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public boolean checkTitleExisted(String title) {
         return problemRepository.isTitleExisted(title);
+    }
+
+    @Override
+    public ProblemBasicResponseDto getProblemBasicResponseDto(Long id) {
+        Problem problem = getProblemById(id);
+        return problemBasicResponseMapper.mapFrom(problem);
+    }
+
+    @Override
+    public ProblemEditorialResponseDto getProblemEditorialDtoList(Long problemId) {
+        Problem problem = getProblemById(problemId);
+        List<EditorialResponseDto> responseDtoList = new ArrayList();
+        ProblemEditorialResponseDto problemEditorialResponseDto = new ProblemEditorialResponseDto();
+        List<ProblemSolution> problemSolutions = problemSolutionService.findEditorialByProblem(problem);
+        for (ProblemSolution problemSolution : problemSolutions) {
+            EditorialResponseDto editorialResponseDto = new EditorialResponseDto();
+            List<String> skills = new ArrayList<>();
+            for (Skill skill : problemSolution.getSkills()) {
+                skills.add(skill.getName());
+            }
+            editorialResponseDto.setEditorialSkills(skills);
+            editorialResponseDto.setEditorialTitle(problemSolution.getTitle());
+            editorialResponseDto.setEditorialTextSolution(problemSolution.getTextSolution());
+            List<SolutionCodeDto> solutionCodeDtos = solutionCodeService.findBySolution(problemSolution);
+            editorialResponseDto.setSolutionCodes(solutionCodeDtos);
+            responseDtoList.add(editorialResponseDto);
+        }
+        problemEditorialResponseDto.setEditorialDtos(responseDtoList);
+        return problemEditorialResponseDto;
+    }
+
+    @Override
+    public ProblemInputParameterResponseDto getProblemInputParameterDtoList(Long problemId) {
+        Problem problem = getProblemById(problemId);
+        List<ProblemInputParameter> problemInputParameters = problemInputParameterService
+                .getProblemInputParameters(problem);
+        List<ProblemTemplate> problemTemplates = problemTemplateService.getAllTemplatesByProblem(problem);
+
+        ProblemInputParameterResponseDto problemInputParameterResponseDto = new ProblemInputParameterResponseDto();
+        if (problemTemplates.isEmpty()) {
+            throw new BadRequestException("This problem doesn't has template. Please input it",
+                    "This problem doesn't has template. Please input it");
+        }
+        problemInputParameterResponseDto.setFunctionSignature(problemTemplates.get(0).getFunctionSignature());
+        problemInputParameterResponseDto.setReturnType(problemTemplates.get(0).getReturnType());
+        List<TemplateCode> templateCodes = new ArrayList();
+        List<InputParameterDto> inputParameterDtoList = new ArrayList();
+
+        for (int i = 0; i < problemInputParameters.size(); i++) {
+            InputParameterDto inputParameterDto = new InputParameterDto();
+            inputParameterDto.setInputName(problemInputParameters.get(i).getName());
+            inputParameterDto.setInputType(problemInputParameters.get(i).getType());
+            inputParameterDtoList.add(inputParameterDto);
+        }
+
+        for (int i = 0; i < problemTemplates.size(); i++) {
+            TemplateCode templateCode = new TemplateCode();
+            templateCode.setCode(problemTemplates.get(i).getTemplateCode());
+            templateCode.setLanguage(problemTemplates.get(i).getLanguage().getName());
+            templateCodes.add(templateCode);
+        }
+
+        problemInputParameterResponseDto.setParameters(inputParameterDtoList);
+        problemInputParameterResponseDto.setTemplateCodes(templateCodes);
+        return problemInputParameterResponseDto;
+    }
+
+    @Override
+    public byte[] getExcelFile(Long problemId) {
+        Problem problem = getProblemById(problemId);
+        List<ProblemTestCase> problemTestCases = problemTestCaseService.getProblemTestCaseByProblem(problem);
+        return excelService.generateExcelFile(problemTestCases);
     }
 
 }

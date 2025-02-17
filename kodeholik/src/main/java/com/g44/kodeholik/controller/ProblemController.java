@@ -3,6 +3,7 @@ package com.g44.kodeholik.controller;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,8 +29,11 @@ import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemBasicResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.service.problem.ProblemService;
@@ -80,13 +84,39 @@ public class ProblemController {
             @RequestPart("problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
             @RequestPart("problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
             @RequestPart("problemInputParameterDto") @Valid ProblemInputParameterDto problemInputParameterDto,
-            @RequestPart("excelFile") MultipartFile excelFile) {
+            @RequestPart("testcaseFile") MultipartFile testcaseFile) {
         // TODO: process POST request
         problemService.editProblem(id, problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
-                excelFile);
+                testcaseFile);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/basic-for-emp/{id}")
+    public ResponseEntity<ProblemBasicResponseDto> getProblemBasicForEmployee(@PathVariable Long id) {
+        return ResponseEntity.ok(problemService.getProblemBasicResponseDto(id));
+    }
+
+    @GetMapping("/editorial-for-emp/{id}")
+    public ResponseEntity<ProblemEditorialResponseDto> getProblemEditorialForEmployee(@PathVariable Long id) {
+        return ResponseEntity.ok(problemService.getProblemEditorialDtoList(id));
+    }
+
+    @GetMapping("/template-for-emp/{id}")
+    public ResponseEntity<ProblemInputParameterResponseDto> getProblemTemplateForEmployee(@PathVariable Long id) {
+        return ResponseEntity.ok(problemService.getProblemInputParameterDtoList(id));
+    }
+
+    @GetMapping("/download-testcase/{id}")
+    public ResponseEntity<byte[]> downloadProblemTestcase(@PathVariable Long id) {
+        byte[] excelFile = problemService.getExcelFile(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=data.xlsx");
+        headers.add("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+        return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
     }
 
     @PatchMapping("/activate-problem/{id}")
