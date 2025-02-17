@@ -74,4 +74,7 @@ public interface ProblemService {
         public void activateProblem(Long problemId);
 
         public void deactivateProblem(Long problemId);
+
+        public boolean checkTitleExisted(String title);
+
 }
