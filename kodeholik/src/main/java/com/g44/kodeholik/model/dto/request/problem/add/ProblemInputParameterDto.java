@@ -22,6 +22,8 @@ public class ProblemInputParameterDto {
 
     private InputType returnType;
 
+    private String language;
+
     private List<InputParameterDto> parameters;
 
 }

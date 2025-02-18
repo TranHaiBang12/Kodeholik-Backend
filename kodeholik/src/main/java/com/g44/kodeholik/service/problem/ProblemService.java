@@ -64,14 +64,14 @@ public interface ProblemService {
         public void addProblem(
                         ProblemBasicAddDto problemBasicAddDto,
                         ProblemEditorialDto problemEditorialDto,
-                        ProblemInputParameterDto problemInputParameterDto,
+                        List<ProblemInputParameterDto> problemInputParameterDto,
                         MultipartFile excelFile);
 
         public void editProblem(
                         Long problemId,
                         ProblemBasicAddDto problemBasicAddDto,
                         ProblemEditorialDto problemEditorialDto,
-                        ProblemInputParameterDto problemInputParameterDto,
+                        List<ProblemInputParameterDto> problemInputParameterDto,
                         MultipartFile excelFile);
 
         public void activateProblem(Long problemId);

@@ -61,11 +61,10 @@ public class ProblemController {
 
     @PostMapping("/add-problem")
     public ResponseEntity<?> addProblem(
-            @RequestPart(name = "problemBasicAddDto", required = false) @Valid ProblemBasicAddDto problemBasicAddDto,
-            @RequestPart(name = "problemEditorialDto", required = false) @Valid ProblemEditorialDto problemEditorialDto,
-            @RequestPart(name = "problemInputParameterDto", required = false) @Valid ProblemInputParameterDto problemInputParameterDto,
-            @RequestPart(name = "excelFile", required = false) MultipartFile excelFile)
-            throws JsonMappingException, JsonProcessingException {
+            @RequestPart(name = "problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
+            @RequestPart(name = "problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
+            @RequestPart(name = "problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
+            @RequestPart(name = "excelFile") MultipartFile excelFile) {
         problemService.addProblem(problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
@@ -83,7 +82,7 @@ public class ProblemController {
             @PathVariable Long id,
             @RequestPart("problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
             @RequestPart("problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
-            @RequestPart("problemInputParameterDto") @Valid ProblemInputParameterDto problemInputParameterDto,
+            @RequestPart("problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
             @RequestPart("testcaseFile") MultipartFile testcaseFile) {
         // TODO: process POST request
         problemService.editProblem(id, problemBasicAddDto,
