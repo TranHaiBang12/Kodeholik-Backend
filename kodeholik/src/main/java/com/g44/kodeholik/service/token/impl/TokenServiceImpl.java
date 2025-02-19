@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.MalformedJwtException;
 import com.g44.kodeholik.model.enums.token.TokenType;
+import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.redis.RedisService;
 import com.g44.kodeholik.service.token.TokenService;
 
@@ -44,7 +45,7 @@ public class TokenServiceImpl implements TokenService {
     @Value("${spring.jwt.forgot-token.expiry-time}")
     private int forgotTokenExpiryTime;
 
-    private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
 
     private final RedisService redisService;
 
@@ -91,9 +92,9 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public boolean validateToken(String token, UserDetails userDetails) {
+    public boolean validateToken(String token) {
         final String userName = extractUsername(token);
-        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (!isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {
@@ -144,8 +145,8 @@ public class TokenServiceImpl implements TokenService {
     public boolean rotateToken(String refreshToken, HttpServletResponse response) {
         if (refreshToken != null && !refreshToken.equals("")) {
             String username = extractUsername(refreshToken);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (validateToken(refreshToken, userDetails) && checkRefreshToken(refreshToken, username)) {
+            if (userRepository.existsByUsernameOrEmail(username).isPresent()
+                    && (validateToken(refreshToken) && checkRefreshToken(refreshToken, username))) {
                 String accessToken = generateAccessToken(username);
                 refreshToken = generateRefreshToken(username, extractExpiration(refreshToken));
                 addTokenToCookie(accessToken, response, TokenType.ACCESS);

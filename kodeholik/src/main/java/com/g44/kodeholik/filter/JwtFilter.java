@@ -73,7 +73,8 @@ public class JwtFilter extends OncePerRequestFilter {
             if ((username != null && !username.equals("")) &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (tokenService.validateToken(accessToken, userDetails)) {
+                if (userRepository.existsByUsernameOrEmail(username).isPresent()
+                        && tokenService.validateToken(accessToken)) {
                     if (userRepository.isUserNotAllowed(username)) {
                         throw new ForbiddenException("This account is not allowed to do this action",
                                 "This account is not allowed to do this action");
@@ -117,7 +118,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 if ((username != null && !username.equals("")) &&
                         SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    if (tokenService.validateToken(accessToken, userDetails)) {
+                    if (userRepository.existsByUsernameOrEmail(username).isPresent()
+                            && tokenService.validateToken(accessToken)) {
                         if (userRepository.isUserNotAllowed(username)) {
                             throw new ForbiddenException("This account is not allowed to do this action",
                                     "This account is not allowed to do this action");
