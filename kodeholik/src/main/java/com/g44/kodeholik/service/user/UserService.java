@@ -5,6 +5,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.g44.kodeholik.model.dto.request.user.AddUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
+import com.g44.kodeholik.model.dto.request.user.EditProfileRequestDto;
+import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
 import com.g44.kodeholik.model.entity.user.Users;
 
 public interface UserService {
@@ -27,4 +29,8 @@ public interface UserService {
     public void banUser(Long userId);
 
     public void unbanUser(Long userId);
+
+    public ProfileResponseDto getProfileCurrentUser();
+
+    public ProfileResponseDto editProfile(EditProfileRequestDto editProfileRequestDto);
 }

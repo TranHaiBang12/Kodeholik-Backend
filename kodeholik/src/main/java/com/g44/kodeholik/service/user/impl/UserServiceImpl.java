@@ -14,6 +14,8 @@ import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.user.AddUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
+import com.g44.kodeholik.model.dto.request.user.EditProfileRequestDto;
+import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.s3.FileNameType;
 import com.g44.kodeholik.model.enums.user.UserStatus;
@@ -23,6 +25,8 @@ import com.g44.kodeholik.service.email.EmailService;
 import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.request.user.AddUserAvatarFileMapper;
 import com.g44.kodeholik.util.mapper.request.user.AddUserRequestMapper;
+import com.g44.kodeholik.util.mapper.request.user.EditProfileRequestMapper;
+import com.g44.kodeholik.util.mapper.response.user.ProfileResponseMapper;
 import com.g44.kodeholik.util.password.PasswordUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -42,6 +46,10 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
 
     private final S3Service s3Service;
+
+    private final EditProfileRequestMapper editProfileRequestMapper;
+
+    private final ProfileResponseMapper profileResponseMapper;
 
     @Override
     public Users getUserById(Long userId) {
@@ -168,5 +176,25 @@ public class UserServiceImpl implements UserService {
         }
         user.setStatus(UserStatus.ACTIVATED);
         userRepository.save(user);
+    }
+
+    @Override
+    public ProfileResponseDto editProfile(EditProfileRequestDto editProfileRequestDto) {
+        Users user = getCurrentUser();
+
+        List<MultipartFile> multipartFiles = new ArrayList();
+        multipartFiles.add(editProfileRequestDto.getAvatar());
+        String avatarKey = s3Service.uploadFileNameTypeFile(multipartFiles, FileNameType.AVATAR).get(0);
+
+        user.setAvatar(avatarKey);
+        user.setFullname(editProfileRequestDto.getFullname());
+        user.setUsername(editProfileRequestDto.getUsername());
+        return getProfileCurrentUser();
+    }
+
+    @Override
+    public ProfileResponseDto getProfileCurrentUser() {
+        Users user = getCurrentUser();
+        return profileResponseMapper.mapFrom(user);
     }
 }

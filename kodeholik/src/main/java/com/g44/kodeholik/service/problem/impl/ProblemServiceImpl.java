@@ -769,7 +769,7 @@ public class ProblemServiceImpl implements ProblemService {
 
                     inputVariables.add(input);
                 }
-                log.info(inputs);
+                // log.info(inputs);
                 TestCase testCase = new TestCase();
                 testCase.setInput(inputVariables);
                 inputs.add(inputVariables);
@@ -790,7 +790,7 @@ public class ProblemServiceImpl implements ProblemService {
                     lambdaRequest.setFunctionSignature(problemInputParameterDto.getFunctionSignature());
                     lambdaRequest.setReturnType(problemInputParameterDto.getReturnType().toString());
                     lambdaRequest.setTestCases(testCases);
-                    log.info(lambdaRequest);
+                    // log.info(lambdaRequest);
 
                     try {
                         CompileService.compileAndRun(lambdaRequest.getCode(), testCases,
@@ -968,7 +968,19 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public ProblemBasicResponseDto getProblemBasicResponseDto(Long id) {
         Problem problem = getProblemById(id);
-        return problemBasicResponseMapper.mapFrom(problem);
+        ProblemBasicResponseDto problemBasicResponseDto = problemBasicResponseMapper.mapFrom(problem);
+        List<String> skills = new ArrayList<>();
+        for (Skill skill : problem.getSkills()) {
+            skills.add(skill.getName());
+        }
+        List<String> topics = new ArrayList<>();
+
+        for (Topic topic : problem.getTopics()) {
+            topics.add(topic.getName());
+        }
+        problemBasicResponseDto.setTopics(topics);
+        problemBasicResponseDto.setSkills(skills);
+        return problemBasicResponseDto;
     }
 
     @Override

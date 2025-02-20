@@ -54,12 +54,14 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
         if (oauthUser == null) {
             throw new UnauthorizedException("Wrong credentials", "Wrong credentials");
         }
+        log.info(request.getRequestURI());
+        log.info(oauthUser);
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         String registrationId = oauthToken.getAuthorizedClientRegistrationId();
         String name = "";
         String picture = "";
         String email = "";
-
+        String apiCallbackUrl = "";
         if ("google".equals(registrationId)) {
             email = oauthUser.getAttribute("email");
             name = oauthUser.getAttribute("name");
@@ -69,6 +71,8 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
             name = oauthUser.getAttribute("login");
             picture = oauthUser.getAttribute("avatar_url");
         }
+        apiCallbackUrl = "/api/v1/auth/login/oauth2/google";
+
         // OAuth2AuthenticationToken authenticationToken = new
         // OAuth2AuthenticationToken(
         // oauthUser, oauthUser.getAuthorities(), registrationId);
@@ -117,7 +121,7 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
         String refreshToken = tokenService.generateRefreshToken(username, new Date());
         tokenService.addTokenToCookie(refreshToken, response, TokenType.REFRESH);
 
-        response.sendRedirect("/api/v1/auth/login/oauth2/google");
+        response.sendRedirect(apiCallbackUrl);
 
     }
 

@@ -1,6 +1,9 @@
 package com.g44.kodeholik.controller;
 
+import java.io.IOException;
+
 import org.apache.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -31,6 +34,12 @@ public class AuthenticationController {
 
     private final TokenService tokenService;
 
+    @Value("${spring.security.oauth2.google-url}")
+    private String googleUrl;
+
+    @Value("${spring.security.oauth2.github-url}")
+    private String githubUrl;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto loginRequestDto, HttpServletResponse response) {
         authService.loginNormal(loginRequestDto, response);
@@ -38,12 +47,12 @@ public class AuthenticationController {
     }
 
     @GetMapping("/login/oauth2/google")
-    public ResponseEntity<?> loginWithGoogle(
+    public void loginOauth2(
             OAuth2AuthenticationToken oAuth2User,
             HttpServletResponse response,
-            HttpServletRequest request) {
+            HttpServletRequest request) throws IOException {
         // authService.loginWithGoogle(oAuth2User, response, request);
-        return ResponseEntity.noContent().build();
+        response.sendRedirect(googleUrl);
     }
 
     @PostMapping("/rotate-token")
