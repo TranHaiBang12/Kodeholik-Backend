@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProblemEditorialDto {
     @NotNull(message = "MSG02")
-    private List<EditorialDto> editorialDtos;
+    private EditorialDto editorialDtos;
 }

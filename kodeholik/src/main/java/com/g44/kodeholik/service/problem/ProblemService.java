@@ -24,40 +24,41 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
+import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
 
 public interface ProblemService {
         public List<ProblemResponseDto> getAllProblems();
 
-        public ProblemResponseDto getProblemResponseDtoById(Long id);
+        public ProblemResponseDto getProblemResponseDtoById(String link);
 
         public Problem getProblemById(Long id);
 
-        public ProblemDescriptionResponseDto getProblemDescriptionById(Long id);
+        public ProblemDescriptionResponseDto getProblemDescriptionById(String link);
 
         public ProblemResponseDto createProblem(ProblemRequestDto problemRequest);
 
-        public ProblemResponseDto updateProblem(Long id, ProblemRequestDto problemRequest);
+        public ProblemResponseDto updateProblem(String link, ProblemRequestDto problemRequest);
 
-        public void deleteProblem(Long id);
+        public void deleteProblem(String link);
 
         public Page<ProblemElasticsearch> searchProblems(SearchProblemRequestDto searchProblemRequestDto, Integer page,
                         Integer size, ProblemSortField sortBy, Boolean ascending);
 
         public List<String> getAutocompleteSuggestionsForProblemTitle(String searchText);
 
-        public SubmissionResponseDto submitProblem(Long problemId, ProblemCompileRequestDto problemCompileRequestDto);
+        public SubmissionResponseDto submitProblem(String link, ProblemCompileRequestDto problemCompileRequestDto);
 
-        public RunProblemResponseDto run(Long problemId, ProblemCompileRequestDto problemCompileRequestDto);
+        public RunProblemResponseDto run(String link, ProblemCompileRequestDto problemCompileRequestDto);
 
-        public ProblemTemplate findByProblemAndLanguage(Long problemId, String languageName);
+        public ProblemTemplate findByProblemAndLanguage(String link, String languageName);
 
-        public List<TestCase> getTestCaseByProblem(Long problemId);
+        public List<TestCase> getTestCaseByProblem(String link);
 
-        public List<TestCase> getSampleTestCaseByProblem(Long problemId);
+        public List<TestCase> getSampleTestCaseByProblem(String link);
 
-        public ProblemCompileResponseDto getProblemCompileInformationById(Long problemId, String languageName);
+        public ProblemCompileResponseDto getProblemCompileInformationById(String link, String languageName);
 
         public List<NoAchivedInformationResponseDto> getListNoAchievedInformationByCurrentUser();
 
@@ -68,24 +69,28 @@ public interface ProblemService {
                         MultipartFile excelFile);
 
         public void editProblem(
-                        Long problemId,
+                        String link,
                         ProblemBasicAddDto problemBasicAddDto,
                         ProblemEditorialDto problemEditorialDto,
                         List<ProblemInputParameterDto> problemInputParameterDto,
                         MultipartFile excelFile);
 
-        public void activateProblem(Long problemId);
+        public void activateProblem(String link);
 
-        public void deactivateProblem(Long problemId);
+        public void deactivateProblem(String link);
 
         public boolean checkTitleExisted(String title);
 
-        public ProblemBasicResponseDto getProblemBasicResponseDto(Long id);
+        public ProblemBasicResponseDto getProblemBasicResponseDto(String link);
 
-        public ProblemEditorialResponseDto getProblemEditorialDtoList(Long problemId);
+        public ProblemEditorialResponseDto getProblemEditorialDtoList(String link);
 
-        public ProblemInputParameterResponseDto getProblemInputParameterDtoList(Long problemId);
+        public ProblemInputParameterResponseDto getProblemInputParameterDtoList(String link);
 
-        public byte[] getExcelFile(Long problemId);
+        public byte[] getExcelFile(String link);
+
+        public Problem getActivePublicProblemByLink(String link);
+
+        public Problem getProblemByLink(String link);
 
 }

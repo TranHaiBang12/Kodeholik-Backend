@@ -6,7 +6,10 @@ import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 
 public interface CommentService {
-    public Page<CommentResponseDto> getCommentsByProblemId(Long problemId, int page, String sortBy, Boolean ascending);
+    public Page<CommentResponseDto> getCommentsByProblemLink(String link, int page, String sortBy, Boolean ascending);
+
+    public Page<CommentResponseDto> getCommentsByProblemSolutionId(Long solutionId, int page, String sortBy,
+            Boolean ascending);
 
     public Comment getCommentById(Long commentId);
 

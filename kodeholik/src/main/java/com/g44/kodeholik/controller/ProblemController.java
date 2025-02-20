@@ -77,39 +77,44 @@ public class ProblemController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/edit-problem/{id}")
+    @PutMapping("/edit-problem/{link}")
     public ResponseEntity<?> editProblem(
-            @PathVariable Long id,
+            @PathVariable String link,
             @RequestPart("problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
             @RequestPart("problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
             @RequestPart("problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
             @RequestPart("testcaseFile") MultipartFile testcaseFile) {
         // TODO: process POST request
-        problemService.editProblem(id, problemBasicAddDto,
+        problemService.editProblem(link, problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
                 testcaseFile);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/basic-for-emp/{id}")
-    public ResponseEntity<ProblemBasicResponseDto> getProblemBasicForEmployee(@PathVariable Long id) {
-        return ResponseEntity.ok(problemService.getProblemBasicResponseDto(id));
+    @GetMapping("/basic-for-emp/{link}")
+    public ResponseEntity<ProblemBasicResponseDto> getProblemBasicForEmployee(@PathVariable String link) {
+        return ResponseEntity.ok(problemService.getProblemBasicResponseDto(link));
     }
 
-    @GetMapping("/editorial-for-emp/{id}")
-    public ResponseEntity<ProblemEditorialResponseDto> getProblemEditorialForEmployee(@PathVariable Long id) {
-        return ResponseEntity.ok(problemService.getProblemEditorialDtoList(id));
+    @GetMapping("/editorial-for-emp/{link}")
+    public ResponseEntity<ProblemEditorialResponseDto> getProblemEditorialForEmployee(@PathVariable String link) {
+        return ResponseEntity.ok(problemService.getProblemEditorialDtoList(link));
     }
 
-    @GetMapping("/template-for-emp/{id}")
-    public ResponseEntity<ProblemInputParameterResponseDto> getProblemTemplateForEmployee(@PathVariable Long id) {
-        return ResponseEntity.ok(problemService.getProblemInputParameterDtoList(id));
+    @GetMapping("/editorial/{link}")
+    public ResponseEntity<ProblemEditorialResponseDto> getProblemEditorial(@PathVariable String link) {
+        return ResponseEntity.ok(problemService.getProblemEditorialDtoList(link));
     }
 
-    @GetMapping("/download-testcase/{id}")
-    public ResponseEntity<byte[]> downloadProblemTestcase(@PathVariable Long id) {
-        byte[] excelFile = problemService.getExcelFile(id);
+    @GetMapping("/template-for-emp/{link}")
+    public ResponseEntity<ProblemInputParameterResponseDto> getProblemTemplateForEmployee(@PathVariable String link) {
+        return ResponseEntity.ok(problemService.getProblemInputParameterDtoList(link));
+    }
+
+    @GetMapping("/download-testcase/{link}")
+    public ResponseEntity<byte[]> downloadProblemTestcase(@PathVariable String link) {
+        byte[] excelFile = problemService.getExcelFile(link);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=data.xlsx");
@@ -118,15 +123,15 @@ public class ProblemController {
         return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
     }
 
-    @PatchMapping("/activate-problem/{id}")
-    public ResponseEntity<?> activateProblem(@PathVariable Long id) {
-        problemService.activateProblem(id);
+    @PatchMapping("/activate-problem/{link}")
+    public ResponseEntity<?> activateProblem(@PathVariable String link) {
+        problemService.activateProblem(link);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/deactivate-problem/{id}")
-    public ResponseEntity<?> deactivateProblem(@PathVariable Long id) {
-        problemService.deactivateProblem(id);
+    @PatchMapping("/deactivate-problem/{link}")
+    public ResponseEntity<?> deactivateProblem(@PathVariable String link) {
+        problemService.deactivateProblem(link);
         return ResponseEntity.noContent().build();
     }
 
@@ -145,21 +150,21 @@ public class ProblemController {
         return ResponseEntity.ok(problemService.getAutocompleteSuggestionsForProblemTitle(searchText));
     }
 
-    @GetMapping("/compile-information/{id}")
+    @GetMapping("/compile-information/{link}")
     public ResponseEntity<ProblemCompileResponseDto> getProblemCompileInformationById(
-            @PathVariable Long id,
+            @PathVariable String link,
             @RequestParam String languageName) {
-        return ResponseEntity.ok(problemService.getProblemCompileInformationById(id, languageName));
+        return ResponseEntity.ok(problemService.getProblemCompileInformationById(link, languageName));
     }
 
-    @GetMapping("/description/{id}")
-    public ResponseEntity<ProblemDescriptionResponseDto> getProblemDescriptionById(@PathVariable Long id) {
-        return ResponseEntity.ok(problemService.getProblemDescriptionById(id));
+    @GetMapping("/description/{link}")
+    public ResponseEntity<ProblemDescriptionResponseDto> getProblemDescriptionById(@PathVariable String link) {
+        return ResponseEntity.ok(problemService.getProblemDescriptionById(link));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProblemResponseDto> getProblemResponseDtoById(@PathVariable Long id) {
-        return ResponseEntity.ok(problemService.getProblemResponseDtoById(id));
+    @GetMapping("/{link}")
+    public ResponseEntity<ProblemResponseDto> getProblemResponseDtoById(@PathVariable String link) {
+        return ResponseEntity.ok(problemService.getProblemResponseDtoById(link));
     }
 
     @PostMapping("/create")
@@ -167,15 +172,15 @@ public class ProblemController {
         return new ResponseEntity<>(problemService.createProblem(problemRequest), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/{link}")
     public ResponseEntity<ProblemResponseDto> updateProblem(@RequestBody ProblemRequestDto problemRequest,
-            @PathVariable Long id) {
-        return new ResponseEntity<>(problemService.updateProblem(id, problemRequest), HttpStatus.OK);
+            @PathVariable String link) {
+        return new ResponseEntity<>(problemService.updateProblem(link, problemRequest), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteProblem(@PathVariable Long id) {
-        problemService.deleteProblem(id);
+    @DeleteMapping("/delete/{link}")
+    public ResponseEntity<Void> deleteProblem(@PathVariable String link) {
+        problemService.deleteProblem(link);
         return ResponseEntity.noContent().build();
     }
 }

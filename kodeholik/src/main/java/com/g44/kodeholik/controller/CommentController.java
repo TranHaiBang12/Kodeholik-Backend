@@ -22,12 +22,21 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @GetMapping("/problem/{id}")
-    public ResponseEntity<Page<CommentResponseDto>> getProblems(
+    @GetMapping("/problem/{link}")
+    public ResponseEntity<Page<CommentResponseDto>> getCommentProblem(
+            @PathVariable String link,
+            @RequestParam int page,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) Boolean ascending) {
+        return ResponseEntity.ok(commentService.getCommentsByProblemLink(link, page, sortBy, ascending));
+    }
+
+    @GetMapping("/problem-solution/{id}")
+    public ResponseEntity<Page<CommentResponseDto>> getCommentProblemSolution(
             @PathVariable Long id,
             @RequestParam int page,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) Boolean ascending) {
-        return ResponseEntity.ok(commentService.getCommentsByProblemId(id, page, sortBy, ascending));
+        return ResponseEntity.ok(commentService.getCommentsByProblemSolutionId(id, page, sortBy, ascending));
     }
 }

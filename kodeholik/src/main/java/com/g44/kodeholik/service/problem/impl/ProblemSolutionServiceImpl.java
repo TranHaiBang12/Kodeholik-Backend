@@ -59,4 +59,11 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         return problemSolutionMapper.mapFrom(solution);
     }
 
+    @Override
+    public ProblemSolution findSolutionById(Long id) {
+        ProblemSolution solution = problemSolutionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Solution not found", "Solution not found"));
+        return solution;
+    }
+
 }

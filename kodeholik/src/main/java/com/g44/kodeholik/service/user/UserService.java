@@ -1,5 +1,7 @@
 package com.g44.kodeholik.service.user;
 
+import java.util.Optional;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,6 +12,9 @@ import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
 import com.g44.kodeholik.model.entity.user.Users;
 
 public interface UserService {
+
+    public Optional<Users> isUserExistedbyUsernameOrEmail(String username);
+
     public Users getUserById(Long userId);
 
     public Users getUserByUsernameOrEmail(String username);
@@ -33,4 +38,6 @@ public interface UserService {
     public ProfileResponseDto getProfileCurrentUser();
 
     public ProfileResponseDto editProfile(EditProfileRequestDto editProfileRequestDto);
+
+    public boolean isUserNotAllowed(String username);
 }

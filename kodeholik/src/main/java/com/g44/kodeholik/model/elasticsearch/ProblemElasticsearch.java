@@ -42,6 +42,8 @@ public class ProblemElasticsearch {
 
     private boolean solved;
 
+    private String link;
+
     @Field(type = FieldType.Keyword)
     private List<String> topics;
 

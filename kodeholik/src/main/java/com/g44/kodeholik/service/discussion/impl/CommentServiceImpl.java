@@ -16,9 +16,11 @@ import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
+import com.g44.kodeholik.model.entity.problem.ProblemSolution;
 import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.service.discussion.CommentService;
 import com.g44.kodeholik.service.problem.ProblemService;
+import com.g44.kodeholik.service.problem.ProblemSolutionService;
 import com.g44.kodeholik.util.mapper.response.discussion.CommentResponseMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -35,9 +37,11 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentResponseMapper commentResponseMapper;
 
+    private final ProblemSolutionService problemSolutionService;
+
     @Override
-    public Page<CommentResponseDto> getCommentsByProblemId(Long problemId, int page, String sortBy, Boolean ascending) {
-        Problem problem = problemService.getProblemById(problemId);
+    public Page<CommentResponseDto> getCommentsByProblemLink(String link, int page, String sortBy, Boolean ascending) {
+        Problem problem = problemService.getActivePublicProblemByLink(link);
         Set<Comment> comments = problem.getComments();
         Page<Comment> commentPage;
         if (sortBy != null && ascending != null) {
@@ -83,6 +87,21 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteComment(Long commentId) {
         commentRepository.deleteById(commentId);
+    }
+
+    @Override
+    public Page<CommentResponseDto> getCommentsByProblemSolutionId(Long solutionId, int page, String sortBy,
+            Boolean ascending) {
+        ProblemSolution problemSolution = problemSolutionService.findSolutionById(solutionId);
+        Set<Comment> comments = problemSolution.getComments();
+        Page<Comment> commentPage;
+        if (sortBy != null && ascending != null) {
+            Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+            commentPage = getCommentsPage(comments, page, 5, sort);
+        } else {
+            commentPage = getCommentsPage(comments, page, 5, null);
+        }
+        return commentPage.map(commentResponseMapper::mapFrom);
     }
 
 }

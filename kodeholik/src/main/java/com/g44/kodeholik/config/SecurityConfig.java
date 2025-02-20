@@ -27,72 +27,78 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+        private final UserDetailsService userDetailsService;
 
-    private final String[] publicUrls = {
-            "/login/**",
-            "/api/v1/auth/login",
-            "/api/v1/auth/login/**",
-            "/api/v1/problem/no-achieved-info",
-            "/api/v1/auth/reset-password-init",
-            "/api/v1/auth/reset-password-check",
-            "/api/v1/auth/reset-password-finish",
-            "/api/v1/auth/rotate-token",
-            "/api/v1/problem/search/**",
-            "/api/v1/problem/suggest/**",
-            "/api/v1/problem/description/**",
-            "/api/v1/problem/compile-information/**"
-    };
+        private final String[] publicUrls = {
+                        "/login/**",
+                        "/api/v1/auth/login",
+                        "/api/v1/auth/login/**",
+                        "/api/v1/problem/no-achieved-info",
+                        "/api/v1/auth/reset-password-init",
+                        "/api/v1/auth/reset-password-check",
+                        "/api/v1/auth/reset-password-finish",
+                        "/api/v1/auth/rotate-token",
+                        "/api/v1/problem/search/**",
+                        "/api/v1/problem/suggest/**",
+                        "/api/v1/problem/description/**",
+                        "/api/v1/problem/compile-information/**"
+        };
 
-    private final String[] teacherUrls = {
-            "/api/v1/problem/add-problem",
-            "/api/v1/problem/edit-problem/**",
-            "/api/v1/problem/activate-problem/**",
-            "/api/v1/problem/deactivate-problem/**"
-    };
+        private final String[] teacherUrls = {
+                        "/api/v1/problem/add-problem",
+                        "/api/v1/problem/edit-problem/**",
+                        "/api/v1/problem/activate-problem/**",
+                        "/api/v1/problem/deactivate-problem/**"
+        };
 
-    private final JwtFilter jwtFilter;
+        private final JwtFilter jwtFilter;
 
-    private final SimpleUrlAuthenticationSuccessHandler onOauth2LoginSuccessHandler;
+        private final SimpleUrlAuthenticationSuccessHandler onOauth2LoginSuccessHandler;
 
-    private final MessageProperties messageProperties;
+        private final MessageProperties messageProperties;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-                .csrf(customizer -> customizer.disable())
-                .authorizeHttpRequests(
-                        request -> request
-                                .requestMatchers("/api/v1/admin/**").hasAuthority(UserRole.ADMIN.toString())
-                                .requestMatchers(teacherUrls).hasAuthority(UserRole.TEACHER.toString())
-                                .requestMatchers(publicUrls).permitAll()
-                                .anyRequest()
-                                .authenticated())
-                .authenticationProvider(authenticationProvider())
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+                return httpSecurity
+                                .csrf(customizer -> customizer.disable())
+                                .authorizeHttpRequests(
+                                                request -> request
+                                                                .requestMatchers("/api/v1/admin/**")
+                                                                .hasAuthority(UserRole.ADMIN.toString())
+                                                                .requestMatchers(teacherUrls)
+                                                                .hasAuthority(UserRole.TEACHER.toString())
+                                                                .requestMatchers(publicUrls).permitAll()
+                                                                .anyRequest()
+                                                                .authenticated())
+                                .authenticationProvider(authenticationProvider())
 
-                .oauth2Login(oauth2login -> {
-                    oauth2login
-                            .successHandler(onOauth2LoginSuccessHandler);
-                })
-                .exceptionHandling(
-                        exception -> exception
-                                .accessDeniedHandler(new CustomAccessDeniedHandler())
-                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint(messageProperties)))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+                                .oauth2Login(oauth2login -> {
+                                        oauth2login
+                                                        .successHandler(onOauth2LoginSuccessHandler);
+                                })
+                                .exceptionHandling(
+                                                exception -> exception
+                                                                .accessDeniedHandler(new CustomAccessDeniedHandler())
+                                                                .authenticationEntryPoint(
+                                                                                new CustomAuthenticationEntryPoint(
+                                                                                                messageProperties)))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                                .build();
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(10));
-        provider.setUserDetailsService(userDetailsService);
-        return provider;
-    }
+        }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+        @Bean
+        public AuthenticationProvider authenticationProvider() {
+                DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+                provider.setPasswordEncoder(new BCryptPasswordEncoder(10));
+                provider.setUserDetailsService(userDetailsService);
+                return provider;
+        }
+
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+                return configuration.getAuthenticationManager();
+        }
 }

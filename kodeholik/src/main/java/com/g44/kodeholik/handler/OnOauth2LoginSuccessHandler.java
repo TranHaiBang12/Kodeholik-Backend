@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -22,7 +20,6 @@ import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.token.TokenType;
 import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.repository.user.UserRepository;
-import com.g44.kodeholik.service.auth.AuthService;
 import com.g44.kodeholik.service.github.GithubService;
 import com.g44.kodeholik.service.token.TokenService;
 import com.g44.kodeholik.service.user.UserService;
@@ -37,9 +34,6 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @RequiredArgsConstructor
 public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final UserDetailsService userDetailsService;
-
-    private final UserRepository userRepository;
 
     private final TokenService tokenService;
 
@@ -85,7 +79,7 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
         // }
 
         String username = "";
-        Optional<Users> optionalUser = userRepository.existsByUsernameOrEmail(email);
+        Optional<Users> optionalUser = userService.isUserExistedbyUsernameOrEmail(email);
         if (!optionalUser.isPresent()) {
             AddUserRequestDto addUserRequestDto = new AddUserRequestDto();
             addUserRequestDto.setUsername(name);
@@ -98,13 +92,13 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
             username = name;
 
         } else {
-            if (userRepository.isUserNotAllowed(email)) {
+            if (userService.isUserNotAllowed(email)) {
                 throw new ForbiddenException("This account is not allowed to do this action",
                         "This account is not allowed to do this action");
             }
             username = optionalUser.get().getUsername();
         }
-        if (userRepository.isUserNotAllowed(email)) {
+        if (userService.isUserNotAllowed(email)) {
             throw new ForbiddenException("This account is not allowed to do this action",
                     "This account is not allowed to do this action");
         }

@@ -22,16 +22,16 @@ public class ProblemSubmissionController {
 
     private final ProblemService problemService;
 
-    @PostMapping("/submit/{id}")
-    public SubmissionResponseDto submit(@PathVariable Long id,
+    @PostMapping("/submit/{link}")
+    public SubmissionResponseDto submit(@PathVariable String link,
             @RequestBody ProblemCompileRequestDto problemCompileRequestDto) {
-        return problemService.submitProblem(id, problemCompileRequestDto);
+        return problemService.submitProblem(link, problemCompileRequestDto);
     }
 
-    @PostMapping("/run/{id}")
-    public RunProblemResponseDto run(@PathVariable Long id,
+    @PostMapping("/run/{link}")
+    public RunProblemResponseDto run(@PathVariable String link,
             @RequestBody ProblemCompileRequestDto problemCompileRequestDto) {
-        return problemService.run(id, problemCompileRequestDto);
+        return problemService.run(link, problemCompileRequestDto);
     }
 
 }

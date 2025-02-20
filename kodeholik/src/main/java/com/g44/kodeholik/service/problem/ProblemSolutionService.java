@@ -21,4 +21,6 @@ public interface ProblemSolutionService {
     public Page<ProblemSolutionDto> findListSolutionByProblem(Problem problem, Pageable pageable);
 
     public ProblemSolutionDto findSolutionDtoById(Long id);
+
+    public ProblemSolution findSolutionById(Long id);
 }

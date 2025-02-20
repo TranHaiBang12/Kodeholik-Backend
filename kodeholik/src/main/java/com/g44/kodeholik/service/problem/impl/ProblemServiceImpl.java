@@ -56,6 +56,7 @@ import com.g44.kodeholik.model.dto.response.problem.submission.submit.AcceptedSu
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.CompileErrorResposneDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.FailedSubmissionResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
+import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemInputParameter;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
@@ -88,6 +89,7 @@ import com.g44.kodeholik.service.problem.SolutionCodeService;
 import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.setting.TagService;
 import com.g44.kodeholik.service.user.UserService;
+import com.g44.kodeholik.util.string.StringUtils;
 import com.g44.kodeholik.util.mapper.request.problem.ProblemRequestMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemBasicResponseMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemDescriptionMapper;
@@ -169,6 +171,7 @@ public class ProblemServiceImpl implements ProblemService {
                         .difficulty(problem.getDifficulty().toString())
                         .acceptanceRate(problem.getAcceptanceRate())
                         .noSubmission(problem.getNoSubmission())
+                        .link(problem.getLink())
                         .topics(problem.getTopics().stream().map(Topic::getName).collect(Collectors.toList()))
                         .skills(problem.getSkills().stream().map(Skill::getName).collect(Collectors.toList()))
                         .solved(problemSubmissionService.checkIsCurrentUserSolvedProblem(problem))
@@ -186,8 +189,8 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public ProblemResponseDto getProblemResponseDtoById(Long id) {
-        Problem problem = problemRepository.findById(id)
+    public ProblemResponseDto getProblemResponseDtoById(String link) {
+        Problem problem = problemRepository.findByLink(link)
                 .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
         return problemResponseMapper.mapFrom(problem);
     }
@@ -205,8 +208,8 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public ProblemResponseDto updateProblem(Long id, ProblemRequestDto problemRequest) {
-        Problem problem = problemRepository.findById(id)
+    public ProblemResponseDto updateProblem(String link, ProblemRequestDto problemRequest) {
+        Problem problem = problemRepository.findByLink(link)
                 .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
         modelMapper.map(problemRequest, problem);
         problem.setUpdatedAt(Timestamp.from(Instant.now()));
@@ -217,16 +220,16 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void deleteProblem(Long id) {
-        Problem problem = problemRepository.findById(id)
+    public void deleteProblem(String link) {
+        Problem problem = problemRepository.findByLink(link)
                 .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
         problemRepository.delete(problem);
     }
 
     @Override
-    public ProblemDescriptionResponseDto getProblemDescriptionById(Long id) {
+    public ProblemDescriptionResponseDto getProblemDescriptionById(String link) {
         ProblemDescriptionResponseDto problemDescriptionResponseDto = new ProblemDescriptionResponseDto();
-        Problem problem = getPublicProblemById(id);
+        Problem problem = getPublicProblemById(link);
         List<String> topics = new ArrayList<>();
         for (Topic topic : problem.getTopics()) {
             topics.add(topic.getName());
@@ -252,8 +255,20 @@ public class ProblemServiceImpl implements ProblemService {
                 .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
     }
 
-    private Problem getPublicProblemById(Long id) {
-        return problemRepository.findByIdAndStatusAndIsActive(id, ProblemStatus.PUBLIC, true)
+    @Override
+    public Problem getProblemByLink(String link) {
+        return problemRepository.findByLink(link)
+                .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
+    }
+
+    @Override
+    public Problem getActivePublicProblemByLink(String link) {
+        return problemRepository.findByLinkAndStatusAndIsActive(link, ProblemStatus.PUBLIC, true)
+                .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
+    }
+
+    private Problem getPublicProblemById(String link) {
+        return problemRepository.findByLinkAndStatusAndIsActive(link, ProblemStatus.PUBLIC, true)
                 .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
     }
 
@@ -394,42 +409,42 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public SubmissionResponseDto submitProblem(Long problemId, ProblemCompileRequestDto problemCompileRequestDto) {
-        Problem problem = getProblemById(problemId);
+    public SubmissionResponseDto submitProblem(String link, ProblemCompileRequestDto problemCompileRequestDto) {
+        Problem problem = getActivePublicProblemByLink(link);
         return problemSubmissionService.submitProblem(problem, problemCompileRequestDto,
-                getTestCaseByProblem(problemId),
-                findByProblemAndLanguage(problemId, problemCompileRequestDto.getLanguageName()));
+                getTestCaseByProblem(link),
+                findByProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()));
     }
 
     @Override
-    public RunProblemResponseDto run(Long problemId, ProblemCompileRequestDto problemCompileRequestDto) {
-        Problem problem = getProblemById(problemId);
-        return problemSubmissionService.run(problem, problemCompileRequestDto, getSampleTestCaseByProblem(problemId),
-                findByProblemAndLanguage(problemId, problemCompileRequestDto.getLanguageName()));
+    public RunProblemResponseDto run(String link, ProblemCompileRequestDto problemCompileRequestDto) {
+        Problem problem = getActivePublicProblemByLink(link);
+        return problemSubmissionService.run(problem, problemCompileRequestDto, getSampleTestCaseByProblem(link),
+                findByProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()));
     }
 
     @Override
-    public ProblemTemplate findByProblemAndLanguage(Long problemId, String languageName) {
-        Problem problem = getProblemById(problemId);
+    public ProblemTemplate findByProblemAndLanguage(String link, String languageName) {
+        Problem problem = getActivePublicProblemByLink(link);
         return problemTemplateService.findByProblemAndLanguage(problem, languageName);
     }
 
     @Override
-    public List<TestCase> getTestCaseByProblem(Long problemId) {
-        Problem problem = getProblemById(problemId);
+    public List<TestCase> getTestCaseByProblem(String link) {
+        Problem problem = getActivePublicProblemByLink(link);
         return problemTestCaseService.getTestCaseByProblem(problem);
     }
 
     @Override
-    public List<TestCase> getSampleTestCaseByProblem(Long problemId) {
-        Problem problem = getProblemById(problemId);
+    public List<TestCase> getSampleTestCaseByProblem(String link) {
+        Problem problem = getActivePublicProblemByLink(link);
         return problemTestCaseService.getSampleTestCaseByProblem(problem);
 
     }
 
     @Override
-    public ProblemCompileResponseDto getProblemCompileInformationById(Long problemId, String languageName) {
-        Problem problem = getProblemById(problemId);
+    public ProblemCompileResponseDto getProblemCompileInformationById(String link, String languageName) {
+        Problem problem = getActivePublicProblemByLink(link);
         return problemTestCaseService.getProblemCompileInformationByProblem(problem, languageName);
     }
 
@@ -488,6 +503,7 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setCreatedAt(Timestamp.from(Instant.now()));
         problem.setCreatedBy(currentUsers);
         problem.setStatus(problemBasicAddDto.getStatus());
+        problem.setLink(getLinkForTitle(problemBasicAddDto.getTitle()));
         problem.setActive(problemBasicAddDto.getIsActive().booleanValue());
         Set<Topic> topics = tagService.getTopicsByNameList(problemBasicAddDto.getTopics());
         Set<Skill> skills = tagService.getSkillsByNameList(problemBasicAddDto.getSkills());
@@ -507,6 +523,7 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setAcceptanceRate(0);
         problem.setNoSubmission(0);
         problem.setUpdatedAt(Timestamp.from(Instant.now()));
+        problem.setLink(getLinkForTitle(problemBasicAddDto.getTitle()));
         problem.setUpdatedBy(currentUsers);
         problem.setStatus(problemBasicAddDto.getStatus());
         problem.setActive(problemBasicAddDto.getIsActive().booleanValue());
@@ -578,18 +595,17 @@ public class ProblemServiceImpl implements ProblemService {
 
     public List<ProblemSolution> addProblemEditorial(ProblemEditorialDto problemEditorialDto, Problem problem) {
         List<ProblemSolution> problemSolutions = new ArrayList();
-        List<EditorialDto> editorialDtos = problemEditorialDto.getEditorialDtos();
-        for (int i = 0; i < editorialDtos.size(); i++) {
-            ProblemSolution problemSolution = new ProblemSolution();
-            problemSolution.setProblem(problem);
-            problemSolution.setTitle(editorialDtos.get(i).getEditorialTitle());
-            problemSolution.setTextSolution(editorialDtos.get(i).getEditorialTextSolution());
-            problemSolution.setSkills(tagService.getSkillsByNameList(editorialDtos.get(i).getEditorialSkills()));
-            problemSolution.setProblemImplementation(true);
-            problemSolutions.add(problemSolution);
-            problemSolutionService.save(problemSolution);
-            addProblemEditorialCode(editorialDtos.get(i), problemSolution);
-        }
+        ProblemSolution problemSolution = new ProblemSolution();
+        problemSolution.setProblem(problem);
+        problemSolution.setTitle(problemEditorialDto.getEditorialDtos().getEditorialTitle());
+        problemSolution.setTextSolution(problemEditorialDto.getEditorialDtos().getEditorialTextSolution());
+        problemSolution
+                .setSkills(tagService.getSkillsByNameList(problemEditorialDto.getEditorialDtos().getEditorialSkills()));
+        problemSolution.setProblemImplementation(true);
+        problemSolutions.add(problemSolution);
+        problemSolutionService.save(problemSolution);
+        addProblemEditorialCode(problemEditorialDto.getEditorialDtos(), problemSolution);
+
         return problemSolutions;
     }
 
@@ -780,70 +796,69 @@ public class ProblemServiceImpl implements ProblemService {
                 }
                 testCases.add(testCase);
             }
-            List<EditorialDto> editorialDtos = problemEditorialDto.getEditorialDtos();
-            for (int i = 0; i < editorialDtos.size(); i++) {
-                List<SolutionCodeDto> solutionCodes = editorialDtos.get(i).getSolutionCodes();
-                for (int j = 0; j < solutionCodes.size(); j++) {
-                    LambdaRequest lambdaRequest = new LambdaRequest();
-                    lambdaRequest.setCode(solutionCodes.get(j).getSolutionCode());
-                    lambdaRequest.setLanguage(solutionCodes.get(j).getSolutionLanguage());
-                    lambdaRequest.setFunctionSignature(problemInputParameterDto.getFunctionSignature());
-                    lambdaRequest.setReturnType(problemInputParameterDto.getReturnType().toString());
-                    lambdaRequest.setTestCases(testCases);
-                    // log.info(lambdaRequest);
 
-                    try {
-                        CompileService.compileAndRun(lambdaRequest.getCode(), testCases,
-                                lambdaRequest.getLanguage(),
-                                lambdaRequest.getFunctionSignature(),
-                                lambdaRequest.getReturnType().toString());
-                    } catch (Exception e) {
+            List<SolutionCodeDto> solutionCodes = problemEditorialDto.getEditorialDtos().getSolutionCodes();
+            for (int j = 0; j < solutionCodes.size(); j++) {
+                LambdaRequest lambdaRequest = new LambdaRequest();
+                lambdaRequest.setCode(solutionCodes.get(j).getSolutionCode());
+                lambdaRequest.setLanguage(solutionCodes.get(j).getSolutionLanguage());
+                lambdaRequest.setFunctionSignature(problemInputParameterDto.getFunctionSignature());
+                lambdaRequest.setReturnType(problemInputParameterDto.getReturnType().toString());
+                lambdaRequest.setTestCases(testCases);
+                // log.info(lambdaRequest);
 
+                try {
+                    CompileService.compileAndRun(lambdaRequest.getCode(), testCases,
+                            lambdaRequest.getLanguage(),
+                            lambdaRequest.getFunctionSignature(),
+                            lambdaRequest.getReturnType().toString());
+                } catch (Exception e) {
+
+                }
+
+                String result = lambdaService.invokeLambdaFunction(lambdaRequest);
+                String status = "";
+                ResponseResult responseResult = new ResponseResult();
+                submissionResponseDto = null;
+                try {
+                    responseResult = gson.fromJson(result, ResponseResult.class);
+                    if (responseResult.isAccepted()) {
+                        status = "ACCEPTED";
+                    } else {
+                        status = "FAILED";
                     }
-
-                    // String result = lambdaService.invokeLambdaFunction(lambdaRequest);
-                    // String status = "";
-                    // ResponseResult responseResult = new ResponseResult();
-                    // submissionResponseDto = null;
-                    // try {
-                    // responseResult = gson.fromJson(result, ResponseResult.class);
-                    // if (responseResult.isAccepted()) {
-                    // status = "ACCEPTED";
-                    // } else {
-                    // status = "FAILED";
-                    // }
-                    // } catch (Exception e) {
-                    // status = result;
-                    // }
-                    // switch (status) {
-                    // case "ACCEPTED":
-                    // submissionResponseDto = new AcceptedSubmissionResponseDto(
-                    // responseResult.getTime(),
-                    // responseResult.getMemoryUsage(),
-                    // solutionCodes.get(j).getSolutionCode(),
-                    // solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
-                    // responseResult.getNoSuccessTestcase(),
-                    // Timestamp.from(Instant.now()));
-                    // break;
-                    // case "FAILED":
-                    // submissionResponseDto = new FailedSubmissionResponseDto(
-                    // responseResult.getNoSuccessTestcase(),
-                    // testCases.size(),
-                    // responseResult.getInputWrong(),
-                    // solutionCodes.get(j).getSolutionCode(),
-                    // solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
-                    // Timestamp.from(Instant.now()));
-                    // return false;
-                    // default:
-                    // submissionResponseDto = new CompileErrorResposneDto(
-                    // status,
-                    // solutionCodes.get(j).getSolutionCode(),
-                    // solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
-                    // Timestamp.from(Instant.now()));
-                    // return false;
-                    // }
+                } catch (Exception e) {
+                    status = result;
+                }
+                switch (status) {
+                    case "ACCEPTED":
+                        submissionResponseDto = new AcceptedSubmissionResponseDto(
+                                responseResult.getTime(),
+                                responseResult.getMemoryUsage(),
+                                solutionCodes.get(j).getSolutionCode(),
+                                solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
+                                responseResult.getNoSuccessTestcase(),
+                                Timestamp.from(Instant.now()));
+                        break;
+                    case "FAILED":
+                        submissionResponseDto = new FailedSubmissionResponseDto(
+                                responseResult.getNoSuccessTestcase(),
+                                testCases.size(),
+                                responseResult.getInputWrong(),
+                                solutionCodes.get(j).getSolutionCode(),
+                                solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
+                                Timestamp.from(Instant.now()));
+                        return false;
+                    default:
+                        submissionResponseDto = new CompileErrorResposneDto(
+                                status,
+                                solutionCodes.get(j).getSolutionCode(),
+                                solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
+                                Timestamp.from(Instant.now()));
+                        return false;
                 }
             }
+
         }
         return true;
     }
@@ -894,11 +909,11 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void editProblem(Long problemId, ProblemBasicAddDto problemBasicAddDto,
+    public void editProblem(String link, ProblemBasicAddDto problemBasicAddDto,
             ProblemEditorialDto problemEditorialDto,
             List<ProblemInputParameterDto> problemInputParameterDto,
             MultipartFile excelFile) {
-        Problem problem = getProblemById(problemId);
+        Problem problem = getProblemByLink(link);
         if (checkTitleExistedForUpdate(problemBasicAddDto.getTitle(), problem.getTitle())) {
             throw new BadRequestException("Title has already existed", "Title has already existed");
         }
@@ -933,9 +948,9 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void activateProblem(Long problemId) {
+    public void activateProblem(String link) {
         Users currentUser = userService.getCurrentUser();
-        Problem problem = getProblemById(problemId);
+        Problem problem = getProblemByLink(link);
         if (problem.isActive()) {
             throw new com.g44.kodeholik.exception.BadRequestException("Problem is already active",
                     "Problem is already active");
@@ -947,9 +962,9 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void deactivateProblem(Long problemId) {
+    public void deactivateProblem(String link) {
         Users currentUser = userService.getCurrentUser();
-        Problem problem = getProblemById(problemId);
+        Problem problem = getProblemByLink(link);
         if (!problem.isActive()) {
             throw new com.g44.kodeholik.exception.BadRequestException("Problem is already active",
                     "Problem is already active");
@@ -966,8 +981,8 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public ProblemBasicResponseDto getProblemBasicResponseDto(Long id) {
-        Problem problem = getProblemById(id);
+    public ProblemBasicResponseDto getProblemBasicResponseDto(String link) {
+        Problem problem = getProblemByLink(link);
         ProblemBasicResponseDto problemBasicResponseDto = problemBasicResponseMapper.mapFrom(problem);
         List<String> skills = new ArrayList<>();
         for (Skill skill : problem.getSkills()) {
@@ -983,9 +998,16 @@ public class ProblemServiceImpl implements ProblemService {
         return problemBasicResponseDto;
     }
 
+    private String getLinkForTitle(String title) {
+        String link = "";
+        title = StringUtils.removeSpecialChars(title);
+        link = title.toLowerCase().replaceAll(" ", "-");
+        return link;
+    }
+
     @Override
-    public ProblemEditorialResponseDto getProblemEditorialDtoList(Long problemId) {
-        Problem problem = getProblemById(problemId);
+    public ProblemEditorialResponseDto getProblemEditorialDtoList(String link) {
+        Problem problem = getActivePublicProblemByLink(link);
         List<EditorialResponseDto> responseDtoList = new ArrayList();
         ProblemEditorialResponseDto problemEditorialResponseDto = new ProblemEditorialResponseDto();
         List<ProblemSolution> problemSolutions = problemSolutionService.findEditorialByProblem(problem);
@@ -1007,8 +1029,8 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public ProblemInputParameterResponseDto getProblemInputParameterDtoList(Long problemId) {
-        Problem problem = getProblemById(problemId);
+    public ProblemInputParameterResponseDto getProblemInputParameterDtoList(String link) {
+        Problem problem = getActivePublicProblemByLink(link);
         List<ProblemInputParameter> problemInputParameters = problemInputParameterService
                 .getProblemInputParameters(problem);
         List<ProblemTemplate> problemTemplates = problemTemplateService.getAllTemplatesByProblem(problem);
@@ -1049,8 +1071,8 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public byte[] getExcelFile(Long problemId) {
-        Problem problem = getProblemById(problemId);
+    public byte[] getExcelFile(String link) {
+        Problem problem = getProblemByLink(link);
         List<ProblemTestCase> problemTestCases = problemTestCaseService.getProblemTestCaseByProblem(problem);
         return excelService.generateExcelFile(problemTestCases);
     }

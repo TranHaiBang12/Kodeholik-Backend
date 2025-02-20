@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -182,6 +183,10 @@ public class UserServiceImpl implements UserService {
     public ProfileResponseDto editProfile(EditProfileRequestDto editProfileRequestDto) {
         Users user = getCurrentUser();
 
+        if (!user.getUsername().equals(editProfileRequestDto.getUsername())) {
+            checkUsernameExisted(editProfileRequestDto.getUsername());
+        }
+
         List<MultipartFile> multipartFiles = new ArrayList();
         multipartFiles.add(editProfileRequestDto.getAvatar());
         String avatarKey = s3Service.uploadFileNameTypeFile(multipartFiles, FileNameType.AVATAR).get(0);
@@ -196,5 +201,15 @@ public class UserServiceImpl implements UserService {
     public ProfileResponseDto getProfileCurrentUser() {
         Users user = getCurrentUser();
         return profileResponseMapper.mapFrom(user);
+    }
+
+    @Override
+    public Optional<Users> isUserExistedbyUsernameOrEmail(String username) {
+        return userRepository.existsByUsernameOrEmail(username);
+    }
+
+    @Override
+    public boolean isUserNotAllowed(String username) {
+        return userRepository.isUserNotAllowed(username);
     }
 }
