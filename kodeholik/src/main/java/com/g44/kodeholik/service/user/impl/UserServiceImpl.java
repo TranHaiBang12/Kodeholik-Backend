@@ -6,15 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.g44.kodeholik.config.MessageProperties;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.user.AddUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
+import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.EditProfileRequestDto;
 import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
 import com.g44.kodeholik.model.entity.user.Users;
@@ -29,6 +32,7 @@ import com.g44.kodeholik.util.mapper.request.user.AddUserRequestMapper;
 import com.g44.kodeholik.util.mapper.request.user.EditProfileRequestMapper;
 import com.g44.kodeholik.util.mapper.response.user.ProfileResponseMapper;
 import com.g44.kodeholik.util.password.PasswordUtils;
+import com.g44.kodeholik.util.validation.Validation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -51,6 +55,8 @@ public class UserServiceImpl implements UserService {
     private final EditProfileRequestMapper editProfileRequestMapper;
 
     private final ProfileResponseMapper profileResponseMapper;
+
+    private final MessageProperties messageProperties;
 
     @Override
     public Users getUserById(Long userId) {
@@ -212,4 +218,5 @@ public class UserServiceImpl implements UserService {
     public boolean isUserNotAllowed(String username) {
         return userRepository.isUserNotAllowed(username);
     }
+
 }

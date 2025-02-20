@@ -22,6 +22,7 @@ import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.exception.UnauthorizedException;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
+import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.LoginRequestDto;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.token.TokenType;
@@ -229,6 +230,27 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = tokenService.generateRefreshToken(username, new Date());
         tokenService.addTokenToCookie(refreshToken, response, TokenType.REFRESH);
 
+    }
+
+    public void changePassword(ChangePasswordRequestDto changePasswordRequestDto) {
+        if (!changePasswordRequestDto.getNewPassword().equals(changePasswordRequestDto.getConfirmPassword())) {
+            throw new BadRequestException("Confirm password must be the same to new password",
+                    "Confirm password must be the same to new password");
+        }
+        Users user = userService.getCurrentUser();
+        String newPassword = changePasswordRequestDto.getNewPassword();
+        if (PasswordUtils.verifyPassword(changePasswordRequestDto.getOldPassword(), user.getPassword())) {
+            if (Validation.isValidPassword(newPassword)) {
+                user.setPassword(PasswordUtils.encodePassword(newPassword));
+                userRepository.save(user);
+            } else {
+                throw new BadRequestException(messageProperties.getMessage("MSG10"),
+                        messageProperties.getMessage("MSG10"));
+
+            }
+        } else {
+            throw new BadRequestException("Wrong password", "Wrong password");
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.g44.kodeholik.service.auth;
 
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
+import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.LoginRequestDto;
 import com.g44.kodeholik.model.entity.user.Users;
 
@@ -26,4 +27,7 @@ public interface AuthService {
 
     public void loginWithGoogle(OAuth2AuthenticationToken oAuth2User, HttpServletResponse response,
             HttpServletRequest request);
+
+    public void changePassword(ChangePasswordRequestDto ChangePasswordRequestDto);
+
 }

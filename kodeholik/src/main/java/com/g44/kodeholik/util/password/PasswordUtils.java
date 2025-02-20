@@ -23,6 +23,10 @@ public class PasswordUtils {
         return encoder.encode(password);
     }
 
+    public static boolean verifyPassword(String password, String encryptedPassword) {
+        return encoder.matches(password, encryptedPassword);
+    }
+
     public static String generatePassword() {
         // Đảm bảo mật khẩu có ít nhất 1 ký tự từ mỗi loại
         List<Character> passwordChars = new ArrayList<>();
