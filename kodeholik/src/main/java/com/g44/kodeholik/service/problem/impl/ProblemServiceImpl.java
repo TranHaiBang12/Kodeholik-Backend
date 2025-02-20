@@ -50,6 +50,8 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDt
 import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
+import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.AcceptedSubmissionResponseDto;
@@ -602,6 +604,8 @@ public class ProblemServiceImpl implements ProblemService {
         problemSolution
                 .setSkills(tagService.getSkillsByNameList(problemEditorialDto.getEditorialDtos().getEditorialSkills()));
         problemSolution.setProblemImplementation(true);
+        problemSolution.setCreatedAt(Timestamp.from(Instant.now()));
+        problemSolution.setCreatedBy(userService.getCurrentUser());
         problemSolutions.add(problemSolution);
         problemSolutionService.save(problemSolution);
         addProblemEditorialCode(problemEditorialDto.getEditorialDtos(), problemSolution);
@@ -1075,6 +1079,83 @@ public class ProblemServiceImpl implements ProblemService {
         Problem problem = getProblemByLink(link);
         List<ProblemTestCase> problemTestCases = problemTestCaseService.getProblemTestCaseByProblem(problem);
         return excelService.generateExcelFile(problemTestCases);
+    }
+
+    @Override
+    public Page<SolutionListResponseDto> getProblemListSolution(String link, int page, Integer size, String title,
+            String languageName,
+            String sortBy, Boolean ascending, Pageable pageable) {
+        Problem problem = getActivePublicProblemByLink(link);
+        if (languageName != null && languageName != "") {
+            Language language = languageService.findByName(languageName);
+            return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, language, sortBy,
+                    ascending,
+                    pageable);
+        } else {
+            return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, null, sortBy,
+                    ascending,
+                    pageable);
+        }
+    }
+
+    @Override
+    public ProblemSolutionDto getProblemSolutionDetail(Long solutionId) {
+        ProblemSolution problemSolution = problemSolutionService.findSolutionById(solutionId);
+        ProblemSolutionDto problemSolutionDto = new ProblemSolutionDto();
+        List<String> skills = new ArrayList<>();
+        for (Skill skill : problemSolution.getSkills()) {
+            skills.add(skill.getName());
+        }
+        problemSolutionDto.setId(solutionId);
+        problemSolutionDto.setSkills(skills);
+        problemSolutionDto.setProblem(problemResponseMapper.mapFrom(problemSolution.getProblem()));
+        problemSolutionDto.setTitle(problemSolution.getTitle());
+        problemSolutionDto.setTextSolution(problemSolution.getTextSolution());
+        List<SolutionCodeDto> solutionCodeDtos = solutionCodeService.findBySolution(problemSolution);
+        problemSolutionDto.setSolutionCodes(solutionCodeDtos);
+        return problemSolutionDto;
+    }
+
+    @Override
+    public void tagFavouriteProblem(Long problemId) {
+        Problem problem = getProblemById(problemId);
+        Set<Users> userFavourite = problem.getUsersFavourite();
+        Users currentUser = userService.getCurrentUser();
+        for (Users user : userFavourite) {
+            if (user.getEmail().equals(currentUser.getEmail())) {
+                throw new BadRequestException("This problem has already in your favourite",
+                        "This problem has already in your favourite");
+            }
+        }
+        userFavourite.add(currentUser);
+        problemRepository.save(problem);
+    }
+
+    @Override
+    public void untagFavouriteProblem(Long problemId) {
+        Problem problem = getProblemById(problemId);
+        Set<Users> userFavourite = problem.getUsersFavourite();
+        Users currentUser = userService.getCurrentUser();
+        boolean isInFavourite = false;
+        for (Users user : userFavourite) {
+            if (user.getEmail().equals(currentUser.getEmail())) {
+                userFavourite.remove(currentUser);
+                problemRepository.save(problem);
+                isInFavourite = true;
+                break;
+            }
+        }
+        if (!isInFavourite) {
+            throw new BadRequestException("This problem is not in your favourite",
+                    "This problem is not in your favourite");
+        }
+
+    }
+
+    @Override
+    public void upvoteSolution(Long solutionId) {
+        Users user = userService.getCurrentUser();
+        problemSolutionService.upvoteSolution(solutionId, user);
     }
 
 }

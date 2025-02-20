@@ -1,4 +1,4 @@
-package com.g44.kodeholik.controller;
+package com.g44.kodeholik.controller.problem;
 
 import java.util.List;
 
@@ -142,6 +142,11 @@ public class ProblemController {
             @RequestParam(required = false) ProblemSortField sortBy,
             @RequestParam(required = false) Boolean ascending,
             @RequestBody SearchProblemRequestDto searchProblemRequestDto) {
+        Page<ProblemElasticsearch> problemElasticsearch = problemService.searchProblems(searchProblemRequestDto, page,
+                size, sortBy, ascending);
+        if (problemElasticsearch.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(problemService.searchProblems(searchProblemRequestDto, page, size, sortBy, ascending));
     }
 
@@ -183,4 +188,18 @@ public class ProblemController {
         problemService.deleteProblem(link);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/tag-favourite/{id}")
+
+    public ResponseEntity<Void> tagFavouriteProblem(@PathVariable Long id) {
+        problemService.tagFavouriteProblem(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/untag-favourite/{id}")
+    public ResponseEntity<Void> untagFavouriteProblem(@PathVariable Long id) {
+        problemService.untagFavouriteProblem(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

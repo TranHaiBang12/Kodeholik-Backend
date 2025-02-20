@@ -1,4 +1,4 @@
-package com.g44.kodeholik.controller;
+package com.g44.kodeholik.controller.discussion;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,11 @@ public class CommentController {
             @RequestParam int page,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) Boolean ascending) {
-        return ResponseEntity.ok(commentService.getCommentsByProblemLink(link, page, sortBy, ascending));
+        Page<CommentResponseDto> commentPage = commentService.getCommentsByProblemLink(link, page, sortBy, ascending);
+        if (commentPage.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(commentPage);
     }
 
     @GetMapping("/problem-solution/{id}")
@@ -37,6 +41,11 @@ public class CommentController {
             @RequestParam int page,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) Boolean ascending) {
-        return ResponseEntity.ok(commentService.getCommentsByProblemSolutionId(id, page, sortBy, ascending));
+        Page<CommentResponseDto> commentPage = commentService.getCommentsByProblemSolutionId(id, page, sortBy,
+                ascending);
+        if (commentPage.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(commentPage);
     }
 }

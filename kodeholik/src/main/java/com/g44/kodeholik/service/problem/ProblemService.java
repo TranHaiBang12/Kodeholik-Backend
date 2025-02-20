@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.problem;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
@@ -21,6 +22,8 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDt
 import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
+import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
@@ -92,5 +95,17 @@ public interface ProblemService {
         public Problem getActivePublicProblemByLink(String link);
 
         public Problem getProblemByLink(String link);
+
+        public Page<SolutionListResponseDto> getProblemListSolution(String link, int page, Integer size, String title,
+                        String languageName,
+                        String sortBy, Boolean ascending, Pageable pageable);
+
+        public ProblemSolutionDto getProblemSolutionDetail(Long solutionId);
+
+        public void tagFavouriteProblem(Long problemId);
+
+        public void untagFavouriteProblem(Long problemId);
+
+        public void upvoteSolution(Long solutionId);
 
 }

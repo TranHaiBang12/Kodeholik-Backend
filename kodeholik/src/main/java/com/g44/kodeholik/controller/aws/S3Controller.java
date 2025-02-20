@@ -1,4 +1,4 @@
-package com.g44.kodeholik.controller;
+package com.g44.kodeholik.controller.aws;
 
 import java.util.Arrays;
 import java.util.List;

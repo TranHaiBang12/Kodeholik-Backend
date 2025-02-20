@@ -16,4 +16,5 @@ public interface CommentService {
     public void saveComment(Comment comment);
 
     public void deleteComment(Long commentId);
+
 }

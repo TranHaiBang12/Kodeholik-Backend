@@ -1,4 +1,4 @@
-package com.g44.kodeholik.controller;
+package com.g44.kodeholik.controller.auth;
 
 import java.io.IOException;
 

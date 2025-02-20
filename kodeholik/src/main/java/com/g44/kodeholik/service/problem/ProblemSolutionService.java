@@ -6,8 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
+import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
+import com.g44.kodeholik.model.entity.setting.Language;
+import com.g44.kodeholik.model.entity.user.Users;
 
 public interface ProblemSolutionService {
     public ProblemSolution save(ProblemSolution problemSolution);
@@ -20,7 +23,14 @@ public interface ProblemSolutionService {
 
     public Page<ProblemSolutionDto> findListSolutionByProblem(Problem problem, Pageable pageable);
 
+    public Page<SolutionListResponseDto> findOtherSolutionByProblem(Problem problem, int page, Integer size,
+            String title,
+            Language language,
+            String sortBy, Boolean ascending, Pageable pageable);
+
     public ProblemSolutionDto findSolutionDtoById(Long id);
 
     public ProblemSolution findSolutionById(Long id);
+
+    public void upvoteSolution(Long solutionId, Users user);
 }

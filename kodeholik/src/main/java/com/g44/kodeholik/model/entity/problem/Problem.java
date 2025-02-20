@@ -93,6 +93,10 @@ public class Problem {
     @JoinTable(name = "problem_skill", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<Skill> skills = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(name = "user_favourite", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<Users> usersFavourite = new HashSet<>();
+
     public Problem(String title, String description, Difficulty difficulty, float acceptanceRate, int noSubmission,
             ProblemStatus problemStatus, Timestamp createdAt, Users createdBy) {
         this.title = title;

@@ -1,4 +1,4 @@
-package com.g44.kodeholik.controller;
+package com.g44.kodeholik.controller.problem;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
