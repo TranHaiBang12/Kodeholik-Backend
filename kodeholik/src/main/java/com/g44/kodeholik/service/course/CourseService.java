@@ -16,4 +16,9 @@ public interface CourseService {
     public void editCourse(Long courseId, CourseRequestDto courseRequestDto);
 
     public void deleteCourse(Long courseId);
+
+    Page<CourseResponseDto> searchCoursesByTitle(String keyword, Pageable pageable);
+
+    public void enrollUserInCourse( Long courseId);
+    public void unenrollUserFromCourse( Long courseId);
 }

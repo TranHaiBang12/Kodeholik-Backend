@@ -41,7 +41,10 @@ public class SecurityConfig {
             "/api/v1/problem/search/**",
             "/api/v1/problem/suggest/**",
             "/api/v1/problem/description/**",
-            "/api/v1/problem/compile-information/**"
+            "/api/v1/problem/compile-information/**",
+            "/api/v1/course/add-course",
+            "/api/v1/course/edit-course/**",
+            "/api/v1/course"
     };
 
     private final String[] teacherUrls = {
@@ -49,6 +52,12 @@ public class SecurityConfig {
             "/api/v1/problem/edit-problem/**",
             "/api/v1/problem/activate-problem/**",
             "/api/v1/problem/deactivate-problem/**"
+    };
+
+    private final String[] courseUrls = {
+
+//            "/api/v1/course/activate-course/**",
+//            "/api/v1/course/deactivate-course/**"
     };
 
     private final JwtFilter jwtFilter;

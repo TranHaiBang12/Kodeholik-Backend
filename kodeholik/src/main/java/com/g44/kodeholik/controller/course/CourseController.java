@@ -1,5 +1,7 @@
 package com.g44.kodeholik.controller.course;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,4 +57,22 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<CourseResponseDto>> searchCoursesByTitle(
+            @RequestParam String keyword,
+            @PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(courseService.searchCoursesByTitle(keyword, pageable));
+    }
+
+    @PostMapping("/enroll/{courseId}")
+    public ResponseEntity<String> enrollUserInCourse(@PathVariable Long courseId) {
+        courseService.enrollUserInCourse(courseId);
+        return ResponseEntity.ok("User enrolled successfully!");
+    }
+
+    @DeleteMapping("/unenroll/{courseId}")
+    public ResponseEntity<String> unenrollUserFromCourse(@PathVariable Long courseId) {
+        courseService.unenrollUserFromCourse( courseId);
+        return ResponseEntity.ok("User unenrolled successfully!");
+    }
 }

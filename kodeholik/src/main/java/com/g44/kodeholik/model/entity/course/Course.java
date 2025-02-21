@@ -42,6 +42,8 @@ public class Course {
 
     private String image;
 
+    private Long numberOfParticipant;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private CourseStatus status;
