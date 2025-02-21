@@ -1,5 +1,7 @@
 package com.g44.kodeholik.service.discussion.impl;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -13,14 +15,18 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.NotFoundException;
+import com.g44.kodeholik.model.dto.request.comment.AddCommentRequestDto;
+import com.g44.kodeholik.model.dto.request.comment.CommentLocation;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
 import com.g44.kodeholik.repository.discussion.CommentRepository;
+import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.service.discussion.CommentService;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemSolutionService;
+import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.response.discussion.CommentResponseMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -38,6 +44,10 @@ public class CommentServiceImpl implements CommentService {
     private final CommentResponseMapper commentResponseMapper;
 
     private final ProblemSolutionService problemSolutionService;
+
+    private final UserService userService;
+
+    private final ProblemRepository problemRepository;
 
     @Override
     public Page<CommentResponseDto> getCommentsByProblemLink(String link, int page, String sortBy, Boolean ascending) {
@@ -102,6 +112,46 @@ public class CommentServiceImpl implements CommentService {
             commentPage = getCommentsPage(comments, page, 5, null);
         }
         return commentPage.map(commentResponseMapper::mapFrom);
+    }
+
+    @Override
+    public void addComment(AddCommentRequestDto addCommentRequestDto) {
+        Comment comment = new Comment();
+        comment.setComment(addCommentRequestDto.getComment());
+        if (addCommentRequestDto.getCommentReply() != null)
+            comment.setCommentReply(getCommentById(addCommentRequestDto.getCommentReply()));
+        comment.setCreatedAt(Timestamp.from(Instant.now()));
+        comment.setCreatedBy(userService.getCurrentUser());
+        commentRepository.save(comment);
+
+        if (addCommentRequestDto.getLocation() == CommentLocation.PROBLEM) {
+            addCommentProblem(addCommentRequestDto, comment);
+        } else if (addCommentRequestDto.getLocation() == CommentLocation.SOLUTION) {
+            addCommentProblemSolution(addCommentRequestDto, comment);
+        }
+    }
+
+    private void addCommentProblem(AddCommentRequestDto addCommentRequestDto, Comment comment) {
+        if (addCommentRequestDto.getLocationId() != null) {
+            Problem problem = problemService.getProblemById(addCommentRequestDto.getLocationId());
+            problem.getComments().add(comment);
+            problemRepository.save(problem);
+        }
+    }
+
+    private void addCommentProblemSolution(AddCommentRequestDto addCommentRequestDto, Comment comment) {
+        if (addCommentRequestDto.getLocationId() != null) {
+            ProblemSolution problemSolution = problemSolutionService
+                    .findSolutionById(addCommentRequestDto.getLocationId());
+            problemSolution.getComments().add(comment);
+            problemSolutionService.save(problemSolution);
+        }
+    }
+
+    @Override
+    public void editComment(Long commentId, AddCommentRequestDto addCommentRequestDto) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'editComment'");
     }
 
 }

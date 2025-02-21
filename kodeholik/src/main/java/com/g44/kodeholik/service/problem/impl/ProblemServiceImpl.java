@@ -1158,4 +1158,10 @@ public class ProblemServiceImpl implements ProblemService {
         problemSolutionService.upvoteSolution(solutionId, user);
     }
 
+    @Override
+    public void unupvoteSolution(Long solutionId) {
+        Users user = userService.getCurrentUser();
+        problemSolutionService.unupvoteSolution(solutionId, user);
+    }
+
 }

@@ -16,6 +16,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class CommentResponseDto {
+
+    private Long id;
+
     private String comment;
 
     private int noUpvote;
@@ -28,5 +31,5 @@ public class CommentResponseDto {
     @JsonSerialize(using = TimestampSerializer.class)
     private Long updatedAt;
 
-    private UserResponseDto commentReply;
+    private Long replyId;
 }

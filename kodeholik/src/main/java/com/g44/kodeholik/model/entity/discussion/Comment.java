@@ -55,6 +55,6 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "comment_reply", referencedColumnName = "id")
-    private Users commentReply;
+    private Comment commentReply;
 
 }

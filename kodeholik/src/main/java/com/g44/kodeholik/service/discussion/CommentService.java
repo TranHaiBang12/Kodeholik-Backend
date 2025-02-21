@@ -2,6 +2,7 @@ package com.g44.kodeholik.service.discussion;
 
 import org.springframework.data.domain.Page;
 
+import com.g44.kodeholik.model.dto.request.comment.AddCommentRequestDto;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 
@@ -16,5 +17,9 @@ public interface CommentService {
     public void saveComment(Comment comment);
 
     public void deleteComment(Long commentId);
+
+    public void addComment(AddCommentRequestDto addCommentRequestDto);
+
+    public void editComment(Long commentId, AddCommentRequestDto addCommentRequestDto);
 
 }

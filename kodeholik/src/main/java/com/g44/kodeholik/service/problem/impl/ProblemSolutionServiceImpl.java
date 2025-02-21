@@ -142,4 +142,26 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         problemSolutionRepository.save(problemSolution);
     }
 
+    @Override
+    public void unupvoteSolution(Long solutionId, Users user) {
+        ProblemSolution problemSolution = findSolutionById(solutionId);
+        Set<Users> usersVote = problemSolution.getUserVote();
+        boolean isVote = false;
+        for (Users userVote : usersVote) {
+            if (userVote.getEmail().equals(user.getEmail())) {
+                isVote = true;
+                usersVote.remove(user);
+                if (problemSolution.getNoUpvote() > 0) {
+                    problemSolution.setNoUpvote(problemSolution.getNoUpvote() - 1);
+                }
+                problemSolutionRepository.save(problemSolution);
+            }
+        }
+        if (!isVote) {
+            throw new BadRequestException("You haven't voted this solution",
+                    "You haven't voted this solution");
+        }
+
+    }
+
 }

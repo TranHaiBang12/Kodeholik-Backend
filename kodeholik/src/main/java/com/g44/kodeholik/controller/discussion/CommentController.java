@@ -9,11 +9,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.g44.kodeholik.model.dto.request.comment.AddCommentRequestDto;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.service.discussion.CommentService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,4 +52,11 @@ public class CommentController {
         }
         return ResponseEntity.ok(commentPage);
     }
+
+    @PostMapping("/post")
+    public ResponseEntity<Void> postComment(@RequestBody @Valid AddCommentRequestDto addCommentRequestDto) {
+        commentService.addComment(addCommentRequestDto);
+        return ResponseEntity.noContent().build();
+    }
+
 }

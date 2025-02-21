@@ -58,4 +58,9 @@ public class ProblemSolutionController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/unupvote/{id}")
+    public ResponseEntity<Void> unupvoteSolution(@PathVariable Long id) {
+        problemService.unupvoteSolution(id);
+        return ResponseEntity.noContent().build();
+    }
 }

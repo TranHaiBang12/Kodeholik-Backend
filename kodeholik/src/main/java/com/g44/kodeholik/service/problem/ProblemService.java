@@ -108,4 +108,6 @@ public interface ProblemService {
 
         public void upvoteSolution(Long solutionId);
 
+        public void unupvoteSolution(Long solutionId);
+
 }

@@ -33,4 +33,6 @@ public interface ProblemSolutionService {
     public ProblemSolution findSolutionById(Long id);
 
     public void upvoteSolution(Long solutionId, Users user);
+
+    public void unupvoteSolution(Long solutionId, Users user);
 }
