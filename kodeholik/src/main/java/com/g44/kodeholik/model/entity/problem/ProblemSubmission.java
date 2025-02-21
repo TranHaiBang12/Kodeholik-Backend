@@ -3,7 +3,7 @@ package com.g44.kodeholik.model.entity.problem;
 import java.sql.Timestamp;
 
 import com.g44.kodeholik.model.entity.setting.Language;
-import com.g44.kodeholik.model.entity.user.User;
+import com.g44.kodeholik.model.entity.user.Users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +37,7 @@ public class ProblemSubmission {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    private Users user;
 
     private String code;
 
@@ -63,4 +63,21 @@ public class ProblemSubmission {
 
     @Column(name = "input_wrong")
     private String inputWrong;
+
+    @Column(name = "no_testcase_passed")
+    private int noTestCasePassed;
+
+    public ProblemSubmission(Problem problem, Users user, String code, Language language, boolean isAccepted,
+            double executionTime, double memoryUsage, Timestamp createdAt, String status, String inputWrong) {
+        this.problem = problem;
+        this.user = user;
+        this.code = code;
+        this.language = language;
+        this.isAccepted = isAccepted;
+        this.executionTime = executionTime;
+        this.memoryUsage = memoryUsage;
+        this.createdAt = createdAt;
+        this.status = status;
+        this.inputWrong = inputWrong;
+    }
 }

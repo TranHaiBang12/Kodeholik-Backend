@@ -11,4 +11,6 @@ public interface ProblemTestCaseRepository extends JpaRepository<ProblemTestCase
     List<ProblemTestCase> findByProblemAndIsSample(Problem problem, boolean isSample);
 
     List<ProblemTestCase> findByProblem(Problem problem);
+
+    void deleteAllByProblem(Problem problem);
 }

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Email Notification</title>
+    <style>
+        @media screen and (max-width: 600px) {
+          .content {
+              width: 100% !important;
+              display: block !important;
+              padding: 10px !important;
+          }
+          .header, .body, .footer {
+              padding: 20px !important;
+          }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+<body style="font-family: 'Poppins', Arial, sans-serif">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td align="center" style="padding: 20px;">
+                <table class="content" width="600" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse; border: 1px solid #cccccc;background-color: black; color: #b9c5e5">
+                    <!-- Header -->
+                    <tr>
+                        <td class="header" style="background-color: #121221; font-weight: bold; padding: 25px; text-align: center; color: #98ff99; font-size: 24px;">
+                        Kodeholik
+                        </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                        <td class="body" style="padding-top: 20px;padding-left: 40px;padding-right: 40px; text-align: left; font-size: 16px; line-height: 1.6;">
+                        Hello, <span style="font-weight: bold;" th:text="${username}"></span> <br>
+                        We have received your request to log in with Google. Since you have not logged into the system before, we have created a default password for you to use for future logins. Below is the password (For security reasons, please <span style="font-weight: bold; text-decoration: underline; text-underline-offset: 3px;">DO NOT</span> share this information with anyone and change your password after logging in successfully.)                        <br><br>
+                        </td>
+                    </tr>
+
+                    <!-- Call to action Button -->
+                    <tr>
+                        <td th:text="${password}" style="padding: 0px 40px 30px 40px; text-align: center; margin-bottom: 40px; font-size: 40px; font-weight: bold;">
+                            <!-- CTA Button -->
+                            #Haibang20042003
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td class="footer" style="background-color: #121221; padding: 40px; text-align: center; color: white; font-size: 14px;">
+                        Copyright &copy; 2024 | Your brand name
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

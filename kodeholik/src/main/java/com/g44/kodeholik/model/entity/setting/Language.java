@@ -2,7 +2,7 @@ package com.g44.kodeholik.model.entity.setting;
 
 import java.sql.Timestamp;
 
-import com.g44.kodeholik.model.entity.user.User;
+import com.g44.kodeholik.model.entity.user.Users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,12 +37,12 @@ public class Language {
 
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
-    private User createdBy;
+    private Users createdBy;
 
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
-    private User updatedBy;
+    private Users updatedBy;
 }

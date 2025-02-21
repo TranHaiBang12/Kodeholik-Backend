@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +18,7 @@ import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemTemplateService;
 import com.g44.kodeholik.service.problem.ProblemTestCaseService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -25,24 +27,21 @@ import lombok.extern.log4j.Log4j2;
 @Service
 public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private final ProblemTestCaseRepository problemTestCaseRepository;
-    private final ProblemService problemService;
     private final ProblemTemplateService problemTemplateService;
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public ProblemCompileResponseDto getProblemCompileInformationById(Long problemId, String languageName) {
+    public ProblemCompileResponseDto getProblemCompileInformationByProblem(Problem problem, String languageName) {
         ProblemCompileResponseDto problemCompileResponseDto = new ProblemCompileResponseDto();
-        Problem problem = problemService.getProblemById(problemId);
         problemCompileResponseDto
                 .setTemplate(problemTemplateService.findByProblemAndLanguage(problem, languageName).getTemplateCode());
-        List<TestCase> testCases = getTestCaseByProblemId(problemId);
+        List<TestCase> testCases = getSampleTestCaseByProblem(problem);
         problemCompileResponseDto.setTestCases(testCases);
         return problemCompileResponseDto;
     }
 
     @Override
-    public List<TestCase> getTestCaseByProblemId(Long problemId) {
-        Problem problem = problemService.getProblemById(problemId);
+    public List<TestCase> getTestCaseByProblem(Problem problem) {
         List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblem(problem);
         List<TestCase> testCases = new ArrayList<>();
         for (int i = 0; i < problemTestCase.size(); i++) {
@@ -55,10 +54,44 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             } catch (Exception e) {
                 log.info(e.getMessage());
             }
-
             testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
         }
         return testCases;
+    }
+
+    @Override
+    public List<TestCase> getSampleTestCaseByProblem(Problem problem) {
+        List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblemAndIsSample(problem, true);
+        List<TestCase> testCases = new ArrayList<>();
+        for (int i = 0; i < problemTestCase.size(); i++) {
+            List<InputVariable> inputs = new ArrayList<>();
+            try {
+                inputs = objectMapper.readValue(
+                        problemTestCase.get(i).getInput(),
+                        new TypeReference<List<InputVariable>>() {
+                        });
+            } catch (Exception e) {
+                log.info(e.getMessage());
+            }
+            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+        }
+        return testCases;
+    }
+
+    @Override
+    public void saveListTestCase(List<ProblemTestCase> problemTestCases) {
+        problemTestCaseRepository.saveAll(problemTestCases);
+    }
+
+    @Transactional
+    @Override
+    public void removeTestCaseByProblem(Problem problem) {
+        problemTestCaseRepository.deleteAllByProblem(problem);
+    }
+
+    @Override
+    public List<ProblemTestCase> getProblemTestCaseByProblem(Problem problem) {
+        return problemTestCaseRepository.findByProblem(problem);
     }
 
 }

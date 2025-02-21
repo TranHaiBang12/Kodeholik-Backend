@@ -10,18 +10,28 @@ import com.g44.kodeholik.repository.problem.ProblemInputParameterRepository;
 import com.g44.kodeholik.service.problem.ProblemInputParameterService;
 import com.g44.kodeholik.service.problem.ProblemService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ProblemInputParameterServiceImpl implements ProblemInputParameterService {
     private final ProblemInputParameterRepository problemInputParameterRepository;
-    private final ProblemService problemService;
 
     @Override
-    public List<ProblemInputParameter> getProblemInputParameters(Long problemId) {
-        Problem problem = problemService.getProblemById(problemId);
+    public List<ProblemInputParameter> getProblemInputParameters(Problem problem) {
         return problemInputParameterRepository.findByProblem(problem);
+    }
+
+    @Override
+    public void addListInputParameters(List<ProblemInputParameter> listInputParameters) {
+        problemInputParameterRepository.saveAll(listInputParameters);
+    }
+
+    @Transactional
+    @Override
+    public void deleteProblemInputParameters(Problem problem) {
+        problemInputParameterRepository.deleteAllByProblem(problem);
     }
 
 }

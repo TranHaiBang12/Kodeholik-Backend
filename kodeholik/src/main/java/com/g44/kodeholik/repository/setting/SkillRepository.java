@@ -1,0 +1,12 @@
+package com.g44.kodeholik.repository.setting;
+
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.g44.kodeholik.model.entity.setting.Skill;
+
+public interface SkillRepository extends JpaRepository<Skill, Long> {
+    Set<Skill> findByNameIn(List<String> names);
+}
