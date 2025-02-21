@@ -41,7 +41,8 @@ public class SecurityConfig {
                         "/api/v1/problem/search/**",
                         "/api/v1/problem/suggest/**",
                         "/api/v1/problem/description/**",
-                        "/api/v1/problem/compile-information/**"
+                        "/api/v1/problem/compile-information/**",
+                        "/api/v1/course"
         };
 
         private final String[] teacherUrls = {

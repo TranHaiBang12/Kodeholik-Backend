@@ -14,13 +14,13 @@ spring:
           auth: true
           starttls.enable: true
   datasource:
-    url: jdbc:postgresql://localhost:5433/kodeholik?stringtype=unspecified
+    url: jdbc:postgresql://localhost:5432/kodeholik?stringtype=unspecified
     username: postgres
-    password: haibang20042003
+    password: 120503
     driver-class-name: org.postgresql.Driver
   jpa:
-    ddl-auto: update  
-    show-sql: false  
+    ddl-auto: update
+    show-sql: false
   sql:
     init:
       mode: always
@@ -31,8 +31,7 @@ spring:
   data:
     elasticsearch:
       repositories:
-        enabled: 
-          true
+        enabled: true
     redis:
       host: localhost
       port: 6379
@@ -47,14 +46,11 @@ spring:
   jwt:
     secret-key: d2f21asdabkocxz213123ADSAKDOACZXCMZKADKASODKWOEMKQMKCMAKDMASKDAKDMAKDASM
     access-token:
-      expiry-time:
-        150000 #seconds
+      expiry-time: 150000 #seconds
     refresh-token:
-      expiry-time:
-        86400000 #seconds
+      expiry-time: 86400000 #seconds
     forgot-token:
-      expiry-time:
-        900000
+      expiry-time: 900000
 aws:
   s3:
     region: ap-southeast-1

@@ -21,4 +21,10 @@ public class CourseResponseDto {
     private String image;
 
     private CourseStatus status;
+
+    private Double rate;
+
+    private Integer numberOfParticipant;
+
+//    private List<TopicDto> topics;
 }
