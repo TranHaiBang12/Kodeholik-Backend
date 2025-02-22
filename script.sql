@@ -5,7 +5,7 @@
 -- Dumped from database version 17.2
 -- Dumped by pg_dump version 17.2
 
--- Started on 2025-02-22 14:21:26
+-- Started on 2025-02-22 16:24:35
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1160,10 +1160,10 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 -- Data for Name: course; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
 
-INSERT INTO schema_course.course OVERRIDING SYSTEM VALUE VALUES (2, 'Introduction to Python', 'Learn the basics of Python', 'python.jpg', 'ACTIVATED', '2025-02-15 10:00:00', 1, '2025-02-15 11:00:00', 1, NULL, 0);
-INSERT INTO schema_course.course OVERRIDING SYSTEM VALUE VALUES (3, 'Web Development', 'Build websites', 'web.png', 'INACTIVATED', '2025-02-16 14:30:00', 2, '2025-02-16 15:30:00', 2, NULL, 0);
-INSERT INTO schema_course.course OVERRIDING SYSTEM VALUE VALUES (4, 'Data Science', 'Analyze data', 'data.gif', 'ACTIVATED', '2025-02-17 09:00:00', 3, '2025-02-17 10:00:00', 3, NULL, 0);
-INSERT INTO schema_course.course OVERRIDING SYSTEM VALUE VALUES (1, 'test1', 'test1', 'test1', 'ACTIVATED', '2025-02-14 23:04:27.938712', 70, '2025-02-14 23:13:10.547928', 70, NULL, 1);
+INSERT INTO schema_course.course (id, title, description, image, status, created_at, created_by, updated_at, updated_by, rate, number_of_participant) OVERRIDING SYSTEM VALUE VALUES (2, 'Introduction to Python', 'Learn the basics of Python', 'python.jpg', 'ACTIVATED', '2025-02-15 10:00:00', 1, '2025-02-15 11:00:00', 1, NULL, 0);
+INSERT INTO schema_course.course (id, title, description, image, status, created_at, created_by, updated_at, updated_by, rate, number_of_participant) OVERRIDING SYSTEM VALUE VALUES (3, 'Web Development', 'Build websites', 'web.png', 'INACTIVATED', '2025-02-16 14:30:00', 2, '2025-02-16 15:30:00', 2, NULL, 0);
+INSERT INTO schema_course.course (id, title, description, image, status, created_at, created_by, updated_at, updated_by, rate, number_of_participant) OVERRIDING SYSTEM VALUE VALUES (4, 'Data Science', 'Analyze data', 'data.gif', 'ACTIVATED', '2025-02-17 09:00:00', 3, '2025-02-17 10:00:00', 3, NULL, 0);
+INSERT INTO schema_course.course (id, title, description, image, status, created_at, created_by, updated_at, updated_by, rate, number_of_participant) OVERRIDING SYSTEM VALUE VALUES (1, 'test1', 'test1', 'test1', 'ACTIVATED', '2025-02-14 23:04:27.938712', 70, '2025-02-14 23:13:10.547928', 70, NULL, 1);
 
 
 --
@@ -1188,7 +1188,7 @@ INSERT INTO schema_course.course OVERRIDING SYSTEM VALUE VALUES (1, 'test1', 'te
 -- Data for Name: course_user; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
 
-INSERT INTO schema_course.course_user VALUES (1, 1, '2025-02-21 21:39:48.159');
+INSERT INTO schema_course.course_user (course_id, user_id, enrolled_at) VALUES (1, 1, '2025-02-21 21:39:48.159');
 
 
 --
@@ -1213,28 +1213,28 @@ INSERT INTO schema_course.course_user VALUES (1, 1, '2025-02-21 21:39:48.159');
 -- Data for Name: comment; Type: TABLE DATA; Schema: schema_discussion; Owner: postgres
 --
 
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (1, 'This practice is too good. Recomment you guys should take it', 0, '2025-01-02 12:56:21.718047', 1, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (2, 'Absolutely agree', 0, '2025-01-02 12:56:21.718047', 2, NULL, NULL, 1);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (3, 'Yes sir', 0, '2025-01-02 12:56:21.718047', 3, NULL, NULL, 1);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (5, 'I dont understand the problem, can someone explain it to me?', 0, '2025-01-02 12:56:21.718047', 5, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (6, 'What part do you not understand', 0, '2025-01-01 12:56:21.718047', 6, NULL, NULL, 5);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (7, 'Every part', 0, '2025-01-03 12:56:21.718047', 5, NULL, NULL, 5);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (8, 'This editorial is so good', 0, '2025-02-02 12:56:21.718047', 2, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (9, 'Please do not post any solution at this section', 0, '2025-02-02 12:56:21.718047', 5, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (10, 'Hehe', 0, '2025-02-02 12:56:21.718047', 3, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (11, 'If this has image to illustrate, it would have been so much better', 0, '2025-02-02 12:56:21.718047', 4, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (12, 'This site is really good, helping me a lot in software engineering', 0, '2025-02-21 19:15:55.427151', 1, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (13, 'This site is really good, helping me a lot in software engineering', 0, '2025-02-21 19:15:59.354771', 1, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (14, 'This problem is a bit hard to understand', 0, '2025-02-21 19:16:19.75001', 1, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (15, 'Where ?', 0, '2025-02-21 19:17:35.226774', 1, NULL, NULL, 14);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (16, 'Say what''s up ?', 0, '2025-02-21 19:18:54.705701', 1, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (17, 'Really easy to understand', 0, '2025-02-21 19:21:38.313679', 1, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (19, 'First comment', 0, '2025-02-21 19:21:57.063229', 1, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (20, 'Fourth comment', 0, '2025-02-21 19:25:46.557622', 1, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (21, 'Fifth comment', 0, '2025-02-21 21:36:19.054252', 1, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (22, 'First comment', 0, '2025-02-21 22:15:56.461285', 1, NULL, NULL, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (23, 'Sorry, actually third comment', 3, '2025-02-21 22:16:04.051995', 1, '2025-02-21 22:30:43.575884', 1, NULL);
-INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (4, 'This problem actually has many ways to solve.', 1, '2025-01-02 12:56:21.718047', 4, NULL, NULL, 1);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (1, 'This practice is too good. Recomment you guys should take it', 0, '2025-01-02 12:56:21.718047', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (2, 'Absolutely agree', 0, '2025-01-02 12:56:21.718047', 2, NULL, NULL, 1);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (3, 'Yes sir', 0, '2025-01-02 12:56:21.718047', 3, NULL, NULL, 1);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (5, 'I dont understand the problem, can someone explain it to me?', 0, '2025-01-02 12:56:21.718047', 5, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (6, 'What part do you not understand', 0, '2025-01-01 12:56:21.718047', 6, NULL, NULL, 5);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (7, 'Every part', 0, '2025-01-03 12:56:21.718047', 5, NULL, NULL, 5);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (8, 'This editorial is so good', 0, '2025-02-02 12:56:21.718047', 2, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (9, 'Please do not post any solution at this section', 0, '2025-02-02 12:56:21.718047', 5, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (10, 'Hehe', 0, '2025-02-02 12:56:21.718047', 3, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (11, 'If this has image to illustrate, it would have been so much better', 0, '2025-02-02 12:56:21.718047', 4, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (12, 'This site is really good, helping me a lot in software engineering', 0, '2025-02-21 19:15:55.427151', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (13, 'This site is really good, helping me a lot in software engineering', 0, '2025-02-21 19:15:59.354771', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (14, 'This problem is a bit hard to understand', 0, '2025-02-21 19:16:19.75001', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (15, 'Where ?', 0, '2025-02-21 19:17:35.226774', 1, NULL, NULL, 14);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (16, 'Say what''s up ?', 0, '2025-02-21 19:18:54.705701', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (17, 'Really easy to understand', 0, '2025-02-21 19:21:38.313679', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (19, 'First comment', 0, '2025-02-21 19:21:57.063229', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (20, 'Fourth comment', 0, '2025-02-21 19:25:46.557622', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (21, 'Fifth comment', 0, '2025-02-21 21:36:19.054252', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (22, 'First comment', 0, '2025-02-21 22:15:56.461285', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (23, 'Sorry, actually third comment', 3, '2025-02-21 22:16:04.051995', 1, '2025-02-21 22:30:43.575884', 1, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (4, 'This problem actually has many ways to solve.', 1, '2025-01-02 12:56:21.718047', 4, NULL, NULL, 1);
 
 
 --
@@ -1243,8 +1243,8 @@ INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (4, 'This p
 -- Data for Name: comment_vote; Type: TABLE DATA; Schema: schema_discussion; Owner: postgres
 --
 
-INSERT INTO schema_discussion.comment_vote VALUES (1, 23);
-INSERT INTO schema_discussion.comment_vote VALUES (1, 4);
+INSERT INTO schema_discussion.comment_vote (user_id, comment_id) VALUES (1, 23);
+INSERT INTO schema_discussion.comment_vote (user_id, comment_id) VALUES (1, 4);
 
 
 --
@@ -1253,34 +1253,34 @@ INSERT INTO schema_discussion.comment_vote VALUES (1, 4);
 -- Data for Name: problem; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (24, 'Divide Two Integers', 'Given two integers dividend and divisor, divide two integers without using multiplication, division, and mod operator.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (24, 'Divide Two Integers', 'Given two integers dividend and divisor, divide two integers without using multiplication, division, and mod operator.
 
 The integer division should truncate toward zero, which means losing its fractional part. For example, 8.345 would be truncated to 8, and -2.7335 would be truncated to -2.
 
 Return the quotient after dividing dividend by divisor.
 
 Note: Assume we are dealing with an environment that could only store integers within the 32-bit signed integer range: [−231, 231 − 1]. For this problem, if the quotient is strictly greater than 231 - 1, then return 231 - 1, and if the quotient is strictly less than -231, then return -231.', 'MEDIUM', 0.00, 0, 'PRIVATE', '2025-01-18 16:25:07.673921', 1, '2025-01-18 16:25:12.583489', 1, true, 'divide-two-integers');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (62, 'Valid Parentheses', 'Given an array nums of n integers, return an array of all the unique quadruplets [nums[a], nums[b], nums[c], nums[d]] such that: 0 <= a, b, c, d < n 
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (62, 'Valid Parentheses', 'Given an array nums of n integers, return an array of all the unique quadruplets [nums[a], nums[b], nums[c], nums[d]] such that: 0 <= a, b, c, d < n 
  a, b, c, and d are distinct.
 nums[a] + nums[b] + nums[c] + nums[d] == target.
 You may return the answer in any order.', 'EASY', 0.00, 0, 'PUBLIC', '2025-02-13 20:36:04.908291', 1, '2025-02-17 22:23:57.104682', 1, true, 'valid-parentheses');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (96, 'Multiply Strings', 'Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string. Note: You must not use any built-in BigInteger library or convert the inputs to integer directly.', 'MEDIUM', 100.00, 4, 'PUBLIC', '2025-02-17 19:33:03.092842', 1, '2025-02-18 13:48:42.126348', 1, true, 'multiply-strings');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (97, 'Edit Distance', 'Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.You have the following three operations permitted on a word: Insert a character 
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (96, 'Multiply Strings', 'Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string. Note: You must not use any built-in BigInteger library or convert the inputs to integer directly.', 'MEDIUM', 100.00, 4, 'PUBLIC', '2025-02-17 19:33:03.092842', 1, '2025-02-18 13:48:42.126348', 1, true, 'multiply-strings');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (97, 'Edit Distance', 'Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.You have the following three operations permitted on a word: Insert a character 
  Delete a character 
  Replace a character', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-02-18 16:46:29.310675', 1, NULL, NULL, true, 'edit-distance');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (6, 'Two Sum II - Input Array Is Sorted', 'Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number. Let these two numbers be numbers[index1] and numbers[index2] where 1 <= index1 < index2 <= numbers.length.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (6, 'Two Sum II - Input Array Is Sorted', 'Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number. Let these two numbers be numbers[index1] and numbers[index2] where 1 <= index1 < index2 <= numbers.length.
 
 Return the indices of the two numbers, index1 and index2, added by one as an integer array [index1, index2] of length 2.
 
 The tests are generated such that there is exactly one solution. You may not use the same element twice.
 
 Your solution must use only constant extra space.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:56:21.718047', 1, NULL, 1, true, 'two-sum-ii--input-array-is-sorted');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (25, 'Two Sum', 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.', 'MEDIUM', 6.45, 31, 'PUBLIC', '2025-01-23 22:00:00', 1, '2025-01-24 10:11:02.232449', 1, true, 'two-sum');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (13, 'Add Two Numbers', 'You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (25, 'Two Sum', 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.', 'MEDIUM', 6.45, 31, 'PUBLIC', '2025-01-23 22:00:00', 1, '2025-01-24 10:11:02.232449', 1, true, 'two-sum');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (13, 'Add Two Numbers', 'You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.
 
 You may assume the two numbers do not contain any leading zero, except the number 0 itself.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 13:29:35.752301', 1, NULL, NULL, true, 'add-two-numbers');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (27, 'Sum of Two Integers', 'Given two integers a and b, return the sum of the two integers without using the operators + and -.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'sum-of-two-integers');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (30, 'Distribute Elements Into Two Arrays II', 'You are given a 1-indexed array of integers nums of length n.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (27, 'Sum of Two Integers', 'Given two integers a and b, return the sum of the two integers without using the operators + and -.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'sum-of-two-integers');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (30, 'Distribute Elements Into Two Arrays II', 'You are given a 1-indexed array of integers nums of length n.
 
 We define a function greaterCount such that greaterCount(arr, val) returns the number of elements in arr that are strictly greater than val.
 
@@ -1293,11 +1293,11 @@ If there is still a tie, append nums[i] to arr1.
 The array result is formed by concatenating the arrays arr1 and arr2. For example, if arr1 == [1,2,3] and arr2 == [4,5,6], then result = [1,2,3,4,5,6].
 
 Return the integer array result.', 'HARD', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'distribute-elements-into-two-arrays-ii');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (98, 'Edit Distance 1', 'Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.You have the following three operations permitted on a word: Insert a character 
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (98, 'Edit Distance 1', 'Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.You have the following three operations permitted on a word: Insert a character 
  Delete a character 
  Replace a character', 'MEDIUM', 22.22, 9, 'PUBLIC', '2025-02-18 16:47:34.284482', 1, NULL, NULL, true, 'edit-distance-1');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (88, 'First Missing Positive', 'Given an unsorted integer array nums. Return the smallest positive integer that is not present in nums. You must implement an algorithm that runs in O(n) time and uses O(1) auxiliary space.', 'HARD', 0.00, 0, 'PUBLIC', '2025-02-16 23:34:15.469431', 1, '2025-02-17 16:01:35.564458', 1, true, 'first-missing-positive');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (29, 'Largest Merge Of Two Strings', 'ou are given two strings word1 and word2. You want to construct a string merge in the following way: while either word1 or word2 are non-empty, choose one of the following options:
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (88, 'First Missing Positive', 'Given an unsorted integer array nums. Return the smallest positive integer that is not present in nums. You must implement an algorithm that runs in O(n) time and uses O(1) auxiliary space.', 'HARD', 0.00, 0, 'PUBLIC', '2025-02-16 23:34:15.469431', 1, '2025-02-17 16:01:35.564458', 1, true, 'first-missing-positive');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (29, 'Largest Merge Of Two Strings', 'ou are given two strings word1 and word2. You want to construct a string merge in the following way: while either word1 or word2 are non-empty, choose one of the following options:
 
 If word1 is non-empty, append the first character in word1 to merge and delete it from word1.
 For example, if word1 = "abc" and merge = "dv", then after choosing this operation, word1 = "bc" and merge = "dva".
@@ -1306,19 +1306,19 @@ For example, if word2 = "abc" and merge = "", then after choosing this operation
 Return the lexicographically largest merge you can construct.
 
 A string a is lexicographically larger than a string b (of the same length) if in the first position where a and b differ, a has a character strictly larger than the corresponding character in b. For example, "abcd" is lexicographically larger than "abcc" because the first position they differ is at the fourth character, and d is greater than c.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'largest-merge-of-two-strings');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (51, 'Candy', 'There are n children standing in a line. Each child is assigned a rating value given in the integer array ratings.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (51, 'Candy', 'There are n children standing in a line. Each child is assigned a rating value given in the integer array ratings.
 
 You are giving candies to these children subjected to the following requirements:
 
 Each child must have at least one candy.
 Children with a higher rating get more candies than their neighbors.
 Return the minimum number of candies you need to have to distribute the candies to the children.', 'HARD', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'candy');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (48, 'Buy Two Chocolates', 'You are given an integer array prices representing the prices of various chocolates in a store. You are also given a single integer money, which represents your initial amount of money.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (48, 'Buy Two Chocolates', 'You are given an integer array prices representing the prices of various chocolates in a store. You are also given a single integer money, which represents your initial amount of money.
 
 You must buy exactly two chocolates in such a way that you still have some non-negative leftover money. You would like to minimize the sum of the prices of the two chocolates you buy.
 
 Return the amount of money you will have leftover after buying the two chocolates. If there is no way for you to buy two chocolates without ending up in debt, return money. Note that the leftover must be non-negative.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'buy-two-chocolates');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (49, 'Valid Number', 'Given a string s, return whether s is a valid number.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (49, 'Valid Number', 'Given a string s, return whether s is a valid number.
 
 For example, all the following are valid numbers: "2", "0089", "-0.1", "+3.14", "4.", "-.9", "2e10", "-90E3", "3e+7", "+6e-1", "53.5e93", "-123.456e789", while the following are not valid numbers: "abc", "1a", "1e", "e3", "99e2.5", "--6", "-+3", "95a54e53".
 
@@ -1336,53 +1336,53 @@ A dot ''.'' followed by digits.
 An exponent is defined with an exponent notation ''e'' or ''E'' followed by an integer number.
 
 The digits are defined as one or more digits.', 'HARD', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'valid-number');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (50, 'Text Justification', 'Given an array of strings words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and right) justified.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (50, 'Text Justification', 'Given an array of strings words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and right) justified.
 
 You should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces '' '' when necessary so that each line has exactly maxWidth characters.
 
 Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line does not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.
 
 For the last line of text, it should be left-justified, and no extra space is inserted between words.', 'HARD', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'text-justification');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (40, 'Power of Two', 'Given an integer n, return true if it is a power of two. Otherwise, return false.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (40, 'Power of Two', 'Given an integer n, return true if it is a power of two. Otherwise, return false.
 
 An integer n is a power of two, if there exists an integer x such that n == 2x.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'power-of-two');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (31, 'Find Minimum Diameter After Merging Two Trees', 'There exist two undirected trees with n and m nodes, numbered from 0 to n - 1 and from 0 to m - 1, respectively. You are given two 2D integer arrays edges1 and edges2 of lengths n - 1 and m - 1, respectively, where edges1[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the first tree and edges2[i] = [ui, vi] indicates that there is an edge between nodes ui and vi in the second tree.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (31, 'Find Minimum Diameter After Merging Two Trees', 'There exist two undirected trees with n and m nodes, numbered from 0 to n - 1 and from 0 to m - 1, respectively. You are given two 2D integer arrays edges1 and edges2 of lengths n - 1 and m - 1, respectively, where edges1[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the first tree and edges2[i] = [ui, vi] indicates that there is an edge between nodes ui and vi in the second tree.
 
 You must connect one node from the first tree with another node from the second tree with an edge.
 
 Return the minimum possible diameter of the resulting tree.
 
 The diameter of a tree is the length of the longest path between any two nodes in the tree.', 'HARD', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'find-minimum-diameter-after-merging-two-trees');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (33, 'Split Two Strings to Make Palindrome', 'You are given two strings a and b of the same length. Choose an index and split both strings at the same index, splitting a into two strings: aprefix and asuffix where a = aprefix + asuffix, and splitting b into two strings: bprefix and bsuffix where b = bprefix + bsuffix. Check if aprefix + bsuffix or bprefix + asuffix forms a palindrome.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (33, 'Split Two Strings to Make Palindrome', 'You are given two strings a and b of the same length. Choose an index and split both strings at the same index, splitting a into two strings: aprefix and asuffix where a = aprefix + asuffix, and splitting b into two strings: bprefix and bsuffix where b = bprefix + bsuffix. Check if aprefix + bsuffix or bprefix + asuffix forms a palindrome.
 
 When you split a string s into sprefix and ssuffix, either ssuffix or sprefix is allowed to be empty. For example, if s = "abc", then "" + "abc", "a" + "bc", "ab" + "c" , and "abc" + "" are valid splits.
 
 Return true if it is possible to form a palindrome string, otherwise return false.
 
 Notice that x + y denotes the concatenation of strings x and y.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'split-two-strings-to-make-palindrome');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (34, 'Minimum Number of Steps to Make Two Strings Anagram II', 'You are given two strings s and t. In one step, you can append any character to either s or t.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (34, 'Minimum Number of Steps to Make Two Strings Anagram II', 'You are given two strings s and t. In one step, you can append any character to either s or t.
 
 Return the minimum number of steps to make s and t anagrams of each other.
 
 An anagram of a string is a string that contains the same characters with a different (or the same) ordering.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'minimum-number-of-steps-to-make-two-strings-anagram-ii');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (35, 'Words Within Two Edits of Dictionary', 'You are given two string arrays, queries and dictionary. All words in each array comprise of lowercase English letters and have the same length.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (35, 'Words Within Two Edits of Dictionary', 'You are given two string arrays, queries and dictionary. All words in each array comprise of lowercase English letters and have the same length.
 
 In one edit you can take a word from queries, and change any letter in it to any other letter. Find all words from queries that, after a maximum of two edits, equal some word from dictionary.
 
 Return a list of all words from queries, that match with some word from dictionary after a maximum of two edits. Return the words in the same order they appear in queries.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'words-within-two-edits-of-dictionary');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (36, 'Maximize Win From Two Segments', 'There are some prizes on the X-axis. You are given an integer array prizePositions that is sorted in non-decreasing order, where prizePositions[i] is the position of the ith prize. There could be different prizes at the same position on the line. You are also given an integer k.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (36, 'Maximize Win From Two Segments', 'There are some prizes on the X-axis. You are given an integer array prizePositions that is sorted in non-decreasing order, where prizePositions[i] is the position of the ith prize. There could be different prizes at the same position on the line. You are also given an integer k.
 
 You are allowed to select two segments with integer endpoints. The length of each segment must be k. You will collect all prizes whose position falls within at least one of the two selected segments (including the endpoints of the segments). The two selected segments may intersect.
 
 For example if k = 2, you can choose segments [1, 3] and [2, 4], and you will win any prize i that satisfies 1 <= prizePositions[i] <= 3 or 2 <= prizePositions[i] <= 4.
 Return the maximum number of prizes you can win if you choose the two segments optimally.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'maximize-win-from-two-segments');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (37, 'Minimum Score by Changing Two Elements', 'You are given an integer array nums.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (37, 'Minimum Score by Changing Two Elements', 'You are given an integer array nums.
 
 The low score of nums is the minimum absolute difference between any two integers.
 The high score of nums is the maximum absolute difference between any two integers.
 The score of nums is the sum of the high and low scores.
 Return the minimum score after changing two elements of nums', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'minimum-score-by-changing-two-elements');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (38, 'Longest Non-decreasing Subarray From Two Arrays', 'You are given two 0-indexed integer arrays nums1 and nums2 of length n.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (38, 'Longest Non-decreasing Subarray From Two Arrays', 'You are given two 0-indexed integer arrays nums1 and nums2 of length n.
 
 Let''s define another 0-indexed integer array, nums3, of length n. For each index i in the range [0, n - 1], you can assign either nums1[i] or nums2[i] to nums3[i].
 
@@ -1391,28 +1391,28 @@ Your task is to maximize the length of the longest non-decreasing subarray in nu
 Return an integer representing the length of the longest non-decreasing subarray in nums3.
 
 Note: A subarray is a contiguous non-empty sequence of elements within an array.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'longest-nondecreasing-subarray-from-two-arrays');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (2, 'Add Two Numbers II', 'You are given two non-empty linked lists representing two non-negative integers. The most significant digit comes first and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (2, 'Add Two Numbers II', 'You are given two non-empty linked lists representing two non-negative integers. The most significant digit comes first and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.
 
 You may assume the two numbers do not contain any leading zero, except the number 0 itself.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, 1, true, 'add-two-numbers-ii');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (28, 'Two City Scheduling', 'A company is planning to interview 2n people. Given the array costs where costs[i] = [aCosti, bCosti], the cost of flying the ith person to city a is aCosti, and the cost of flying the ith person to city b is bCosti.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (28, 'Two City Scheduling', 'A company is planning to interview 2n people. Given the array costs where costs[i] = [aCosti, bCosti], the cost of flying the ith person to city a is aCosti, and the cost of flying the ith person to city b is bCosti.
 
 Return the minimum cost to fly every person to a city such that exactly n people arrive in each city.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'two-city-scheduling');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (32, 'Maximum XOR of Two Numbers in an Array', 'Given an integer array nums, return the maximum result of nums[i] XOR nums[j], where 0 <= i <= j < n.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'maximum-xor-of-two-numbers-in-an-array');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (42, 'Intersection of Two Arrays II', 'Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must appear as many times as it shows in both arrays and you may return the result in any order.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'intersection-of-two-arrays-ii');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (44, 'Number of Days Between Two Dates', 'Write a program to count the number of days between two dates.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (32, 'Maximum XOR of Two Numbers in an Array', 'Given an integer array nums, return the maximum result of nums[i] XOR nums[j], where 0 <= i <= j < n.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'maximum-xor-of-two-numbers-in-an-array');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (42, 'Intersection of Two Arrays II', 'Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must appear as many times as it shows in both arrays and you may return the result in any order.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'intersection-of-two-arrays-ii');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (44, 'Number of Days Between Two Dates', 'Write a program to count the number of days between two dates.
 
 The two dates are given as strings, their format is YYYY-MM-DD as shown in the examples.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'number-of-days-between-two-dates');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (45, 'Find the Distance Value Between Two Arrays', 'Given two integer arrays arr1 and arr2, and the integer d, return the distance value between the two arrays.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (45, 'Find the Distance Value Between Two Arrays', 'Given two integer arrays arr1 and arr2, and the integer d, return the distance value between the two arrays.
 
 The distance value is defined as the number of elements arr1[i] such that there is not any element arr2[j] where |arr1[i]-arr2[j]| <= d.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'find-the-distance-value-between-two-arrays');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (43, 'Minimum Index Sum of Two Lists', 'Given two arrays of strings list1 and list2, find the common strings with the least index sum.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (43, 'Minimum Index Sum of Two Lists', 'Given two arrays of strings list1 and list2, find the common strings with the least index sum.
 
 A common string is a string that appeared in both list1 and list2.
 
 A common string with the least index sum is a common string such that if it appeared at list1[i] and list2[j] then i + j should be the minimum value among all the other common strings.
 
 Return all the common strings with the least index sum. Return the answer in any order.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'minimum-index-sum-of-two-lists');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (39, 'Shift Distance Between Two Strings', 'You are given two strings s and t of the same length, and two integer arrays nextCost and previousCost.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (39, 'Shift Distance Between Two Strings', 'You are given two strings s and t of the same length, and two integer arrays nextCost and previousCost.
 
 In one operation, you can pick any index i of s, and perform either one of the following actions:
 
@@ -1421,11 +1421,11 @@ Shift s[i] to the previous letter in the alphabet. If s[i] == ''a'', you should 
 The shift distance is the minimum total cost of operations required to transform s into t.
 
 Return the shift distance from s to t.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'shift-distance-between-two-strings');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (41, 'Intersection of Two Arrays', 'Given two integer arrays nums1 and nums2, return an array of their 
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (41, 'Intersection of Two Arrays', 'Given two integer arrays nums1 and nums2, return an array of their 
 intersection
 . Each element in the result must be unique and you may return the result in any order.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'intersection-of-two-arrays');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (46, 'Two Out of Three', 'Given three integer arrays nums1, nums2, and nums3, return a distinct array containing all the values that are present in at least two out of the three arrays. You may return the values in any order.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'two-out-of-three');
-INSERT INTO schema_problem.problem OVERRIDING SYSTEM VALUE VALUES (47, 'Keep Multiplying Found Values by Two', 'You are given an array of integers nums. You are also given an integer original which is the first number that needs to be searched for in nums.
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (46, 'Two Out of Three', 'Given three integer arrays nums1, nums2, and nums3, return a distinct array containing all the values that are present in at least two out of the three arrays. You may return the values in any order.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'two-out-of-three');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (47, 'Keep Multiplying Found Values by Two', 'You are given an array of integers nums. You are also given an integer original which is the first number that needs to be searched for in nums.
 
 You then do the following steps:
 
@@ -1441,17 +1441,17 @@ Return the final value of original.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:
 -- Data for Name: problem_comment; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_comment VALUES (25, 1);
-INSERT INTO schema_problem.problem_comment VALUES (25, 2);
-INSERT INTO schema_problem.problem_comment VALUES (25, 3);
-INSERT INTO schema_problem.problem_comment VALUES (25, 4);
-INSERT INTO schema_problem.problem_comment VALUES (25, 5);
-INSERT INTO schema_problem.problem_comment VALUES (25, 6);
-INSERT INTO schema_problem.problem_comment VALUES (25, 7);
-INSERT INTO schema_problem.problem_comment VALUES (96, 13);
-INSERT INTO schema_problem.problem_comment VALUES (96, 14);
-INSERT INTO schema_problem.problem_comment VALUES (96, 15);
-INSERT INTO schema_problem.problem_comment VALUES (96, 23);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 1);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 2);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 3);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 4);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 5);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 6);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 7);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 13);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 14);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 15);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 23);
 
 
 --
@@ -1460,15 +1460,15 @@ INSERT INTO schema_problem.problem_comment VALUES (96, 23);
 -- Data for Name: problem_input_parameter; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUES (1, 25, NULL, NULL);
-INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUES (2, 25, NULL, NULL);
-INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUES (131, 96, '{"name":"num1","type":"STRING"}', 1);
-INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUES (132, 96, '{"name":"num2","type":"STRING"}', 1);
-INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUES (133, 98, '{"name":"word1","type":"STRING"}', 1);
-INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUES (134, 98, '{"name":"word2","type":"STRING"}', 1);
-INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUES (29, 62, NULL, NULL);
-INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUES (30, 62, NULL, NULL);
-INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUES (56, 88, NULL, NULL);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (1, 25, NULL, NULL);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (2, 25, NULL, NULL);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (131, 96, '{"name":"num1","type":"STRING"}', 1);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (132, 96, '{"name":"num2","type":"STRING"}', 1);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (133, 98, '{"name":"word1","type":"STRING"}', 1);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (134, 98, '{"name":"word2","type":"STRING"}', 1);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (29, 62, NULL, NULL);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (30, 62, NULL, NULL);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (56, 88, NULL, NULL);
 
 
 --
@@ -1477,21 +1477,21 @@ INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUE
 -- Data for Name: problem_skill; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_skill VALUES (25, 1);
-INSERT INTO schema_problem.problem_skill VALUES (25, 3);
-INSERT INTO schema_problem.problem_skill VALUES (25, 4);
-INSERT INTO schema_problem.problem_skill VALUES (25, 5);
-INSERT INTO schema_problem.problem_skill VALUES (88, 1);
-INSERT INTO schema_problem.problem_skill VALUES (88, 3);
-INSERT INTO schema_problem.problem_skill VALUES (62, 11);
-INSERT INTO schema_problem.problem_skill VALUES (62, 1);
-INSERT INTO schema_problem.problem_skill VALUES (62, 3);
-INSERT INTO schema_problem.problem_skill VALUES (96, 2);
-INSERT INTO schema_problem.problem_skill VALUES (96, 3);
-INSERT INTO schema_problem.problem_skill VALUES (97, 2);
-INSERT INTO schema_problem.problem_skill VALUES (97, 3);
-INSERT INTO schema_problem.problem_skill VALUES (98, 2);
-INSERT INTO schema_problem.problem_skill VALUES (98, 3);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (25, 1);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (25, 3);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (25, 4);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (25, 5);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (88, 1);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (88, 3);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (62, 11);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (62, 1);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (62, 3);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (96, 2);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (96, 3);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (97, 2);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (97, 3);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (98, 2);
+INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (98, 3);
 
 
 --
@@ -1500,25 +1500,25 @@ INSERT INTO schema_problem.problem_skill VALUES (98, 3);
 -- Data for Name: problem_solution; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (14, 62, 'Kodeholik - Editorial', 'test', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (82, 98, 'Kodeholik - Editorial', 'The problem requires transforming one string into another using three operations: insert, delete, or replace. This is a classic Dynamic Programming problem, where we aim to minimize the cost of edits. The solution involves comparing prefixes of both strings to compute the minimum operations required.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (81, 96, 'Kodeholik - Editorial', 'We can solve the problem by iterating through the numbers 1 to n, and use linear search to determine whether each number is in the array. The first number we cannot find is the smallest missing integer. This approach would result in a quadratic time complexity.We need to determine whether an element is in the array in constant time. Array indexing provides constant lookup time. We need to check the existence of a relatively small range of values, positive numbers between 1 and n, so we can use an array like a hash table by using the index as a key and the value as a presence indicator. The default value is false, which represents a missing number, and we set the value to true for keys that exist in nums. Numbers not in the range 1 to n are not relevant in the search for the first missing positive, so we do not mark them in the seen array. To solve the problem, we can create an array of size n + 1. For each positive number less than n in nums, we set seen[num] to true. Then, we iterate through the integers 1 to n and return the first number that is not marked as seen in the array. If the array contains all of the elements 1 to n, we return n + 1.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (39, 88, 'Kodeholik - Editorial', 'We can solve the problem by iterating through the numbers 1 to n, and use linear search to determine whether each number is in the array. The first number we cannot find is the smallest missing integer. This approach would result in a quadratic time complexity.We need to determine whether an element is in the array in constant time. Array indexing provides constant lookup time. We need to check the existence of a relatively small range of values, positive numbers between 1 and n, so we can use an array like a hash table by using the index as a key and the value as a presence indicator. The default value is false, which represents a missing number, and we set the value to true for keys that exist in nums. Numbers not in the range 1 to n are not relevant in the search for the first missing positive, so we do not mark them in the seen array. To solve the problem, we can create an array of size n + 1. For each positive number less than n in nums, we set seen[num] to true. Then, we iterate through the integers 1 to n and return the first number that is not marked as seen in the array. If the array contains all of the elements 1 to n, we return n + 1.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (98, 96, 'Easiest solution', 'Remember how we do multiplication?
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (14, 62, 'Kodeholik - Editorial', 'test', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (82, 98, 'Kodeholik - Editorial', 'The problem requires transforming one string into another using three operations: insert, delete, or replace. This is a classic Dynamic Programming problem, where we aim to minimize the cost of edits. The solution involves comparing prefixes of both strings to compute the minimum operations required.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (81, 96, 'Kodeholik - Editorial', 'We can solve the problem by iterating through the numbers 1 to n, and use linear search to determine whether each number is in the array. The first number we cannot find is the smallest missing integer. This approach would result in a quadratic time complexity.We need to determine whether an element is in the array in constant time. Array indexing provides constant lookup time. We need to check the existence of a relatively small range of values, positive numbers between 1 and n, so we can use an array like a hash table by using the index as a key and the value as a presence indicator. The default value is false, which represents a missing number, and we set the value to true for keys that exist in nums. Numbers not in the range 1 to n are not relevant in the search for the first missing positive, so we do not mark them in the seen array. To solve the problem, we can create an array of size n + 1. For each positive number less than n in nums, we set seen[num] to true. Then, we iterate through the integers 1 to n and return the first number that is not marked as seen in the array. If the array contains all of the elements 1 to n, we return n + 1.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (39, 88, 'Kodeholik - Editorial', 'We can solve the problem by iterating through the numbers 1 to n, and use linear search to determine whether each number is in the array. The first number we cannot find is the smallest missing integer. This approach would result in a quadratic time complexity.We need to determine whether an element is in the array in constant time. Array indexing provides constant lookup time. We need to check the existence of a relatively small range of values, positive numbers between 1 and n, so we can use an array like a hash table by using the index as a key and the value as a presence indicator. The default value is false, which represents a missing number, and we set the value to true for keys that exist in nums. Numbers not in the range 1 to n are not relevant in the search for the first missing positive, so we do not mark them in the seen array. To solve the problem, we can create an array of size n + 1. For each positive number less than n in nums, we set seen[num] to true. Then, we iterate through the integers 1 to n and return the first number that is not marked as seen in the array. If the array contains all of the elements 1 to n, we return n + 1.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (98, 96, 'Easiest solution', 'Remember how we do multiplication?
 
 Start from right to left, perform multiplication on every pair of digits, and add them together', false, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (99, 96, 'Easy understand', 'If we break it into steps, it will have the following steps. 1. compute products from each pair of digits from num1 and num2. 2. carry each element over. 3. output the solution.
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (99, 96, 'Easy understand', 'If we break it into steps, it will have the following steps. 1. compute products from each pair of digits from num1 and num2. 2. carry each element over. 3. output the solution.
 
 Things to note:
 
 The product of two numbers cannot exceed the sum of the two lengths. (e.g. 99 * 99 cannot be five digit)', false, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (100, 96, 'Easy Java solution', 'Complexity
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (100, 96, 'Easy Java solution', 'Complexity
 Time complexity:
 The time complexity of the provided code is O(n * m), where n is the length of the num1 string and m is the length of the num2 string. This complexity arises from the nested loops iterating over each digit of both input strings to calculate the products.
 
 Space complexity:
 The space complexity is O(n + m), primarily due to the products array, which holds the intermediate results of the multiplication. The length of this array is equal to the sum of the lengths of the two input strings. Additionally, the StringBuilder sb also contributes to the space complexity, but its size is proportional to the number of digits in the final result, which can be at most n + m. Therefore, the dominant factor is the size of the products array.', false, 2, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (101, 96, 'Multiply Strings Optimization', 'Facts You should know:
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (101, 96, 'Multiply Strings Optimization', 'Facts You should know:
 
 Product of two number of length n and m will be atmax of length n+m.
 Eg : 9*9 =81 . Its a fact kind of thing needed for this question.
@@ -1530,14 +1530,14 @@ Boundary Cases:
 If any of num is zero then Product is zero.
 if one number is negative or second is Positive [here they have mentioned string consist digit only]
 So no need to handle this boundary Case. But in Interview Clarify this from your Interviewer.Else you may get Rejection even after Solving Correctly.', false, 0, '2025-01-18 16:25:12.583489', 3, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (102, 96, 'AC solution in Java with explanation', '[✅ Please UPVOTE if you like this solution! ✅]', false, 0, '2025-01-18 16:25:12.583489', 4, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (103, 96, 'Best Java solution', 'Multiply according to number position.', false, 0, '2025-01-18 16:25:12.583489', 5, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (104, 96, '[Java] Easy and clean solution', 'Need to know that n1[i] * n2[j] need to be put into res[i+j] and res[i+j+1] based on observation
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (102, 96, 'AC solution in Java with explanation', '[✅ Please UPVOTE if you like this solution! ✅]', false, 0, '2025-01-18 16:25:12.583489', 4, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (103, 96, 'Best Java solution', 'Multiply according to number position.', false, 0, '2025-01-18 16:25:12.583489', 5, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (104, 96, '[Java] Easy and clean solution', 'Need to know that n1[i] * n2[j] need to be put into res[i+j] and res[i+j+1] based on observation
 Need to add with previous calculated result, and consider carrier.', false, 0, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (106, 96, '10ms Java', 'We can check if(a != 0) before we enter into the nested for loop', false, 0, '2025-01-18 16:25:12.583489', 3, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (107, 96, 'Java beat 100%', '', false, 0, '2025-01-18 16:25:12.583489', 6, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (108, 96, 'One line code in Java', 'Just one line of code in java', false, 0, '2025-01-18 16:25:12.583489', 6, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (105, 96, 'Simple to understand Java code', 'Intuition
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (106, 96, '10ms Java', 'We can check if(a != 0) before we enter into the nested for loop', false, 0, '2025-01-18 16:25:12.583489', 3, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (107, 96, 'Java beat 100%', '', false, 0, '2025-01-18 16:25:12.583489', 6, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (108, 96, 'One line code in Java', 'Just one line of code in java', false, 0, '2025-01-18 16:25:12.583489', 6, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (105, 96, 'Simple to understand Java code', 'Intuition
 The problem appears to involve multiplying two numbers represented as strings. Using BigInteger is a common approach to handle large numbers that exceed the limits of primitive data types.
 
 Approach
@@ -1547,7 +1547,7 @@ Complexity
 Timecomplexity: O(n^2)
 
 Spacecomplexity: O(n)', false, 0, '2025-01-18 16:25:12.583489', 6, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (109, 96, 'Simple Math Multiplication Java', 'This Java code defines a class Solution with two primary methods: add(String num1, String num2) and multiply(String num1, String num2). The class is designed to perform addition and multiplication of two large non-negative numbers represented as strings.
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (109, 96, 'Simple Math Multiplication Java', 'This Java code defines a class Solution with two primary methods: add(String num1, String num2) and multiply(String num1, String num2). The class is designed to perform addition and multiplication of two large non-negative numbers represented as strings.
 
 add(String num1, String num2):
 
@@ -1564,17 +1564,17 @@ It assigns the longer number to topNumber and the shorter number to downNumber. 
 The method iterates through the digits of the downNumber, multiplies each digit with the topNumber, and appends the partial products to the sumitionList.
 After all partial products are computed, they are added together using the add method, and the final result is returned as a string.
 In summary, this class provides a way to perform addition and multiplication operations on large non-negative numbers represented as strings.', false, 0, '2025-01-18 16:25:12.583489', 5, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (110, 96, '[Java] Simple solution', 'Multiply num2 with each element of num1 and store it in an arraylist.
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (110, 96, '[Java] Simple solution', 'Multiply num2 with each element of num1 and store it in an arraylist.
 Add the arraylist elements through function "addStrings". It will keep on addin each element and store the total sum in last element.
 Return the last element of arraylist', false, 0, '2025-01-18 16:25:12.583489', 3, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (111, 96, 'Easiest solution', 'This solution does not rely on BigInteger or any other fancy stuff. Just plain single-digit operations. Anything higher was computed directly on Strings.
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (111, 96, 'Easiest solution', 'This solution does not rely on BigInteger or any other fancy stuff. Just plain single-digit operations. Anything higher was computed directly on Strings.
 The Karatsuba algorithm is a divide an conquer algorithm that only makes 3 recursive multiplications and 4 additions. More efficient than grade school multiplication. Please note that I did a lot of string allocations which caused great overhead; this should be easily refactorable.', false, 0, '2025-01-18 16:25:12.583489', 3, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (112, 96, 'Java O(n * m)', '', false, 0, '2025-01-18 16:25:12.583489', 4, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (113, 96, 'Easy java solution', '', false, 0, '2025-01-18 16:25:12.583489', 4, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (114, 96, 'Big integer, easy approach', '', false, 0, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (115, 96, 'JAVA', '', false, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (116, 96, 'Simple and clear solution', 'I am using long multiplication technique from school program.', false, 0, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (117, 96, 'Try it if you are stuck in other solution', '', false, 0, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (112, 96, 'Java O(n * m)', '', false, 0, '2025-01-18 16:25:12.583489', 4, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (113, 96, 'Easy java solution', '', false, 0, '2025-01-18 16:25:12.583489', 4, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (114, 96, 'Big integer, easy approach', '', false, 0, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (115, 96, 'JAVA', '', false, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (116, 96, 'Simple and clear solution', 'I am using long multiplication technique from school program.', false, 0, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (117, 96, 'Try it if you are stuck in other solution', '', false, 0, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
 
 
 --
@@ -1583,15 +1583,15 @@ INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (117,
 -- Data for Name: problem_solution_comment; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_solution_comment VALUES (82, 8);
-INSERT INTO schema_problem.problem_solution_comment VALUES (82, 9);
-INSERT INTO schema_problem.problem_solution_comment VALUES (82, 10);
-INSERT INTO schema_problem.problem_solution_comment VALUES (82, 11);
-INSERT INTO schema_problem.problem_solution_comment VALUES (82, 16);
-INSERT INTO schema_problem.problem_solution_comment VALUES (82, 17);
-INSERT INTO schema_problem.problem_solution_comment VALUES (82, 19);
-INSERT INTO schema_problem.problem_solution_comment VALUES (82, 20);
-INSERT INTO schema_problem.problem_solution_comment VALUES (82, 21);
+INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 8);
+INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 9);
+INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 10);
+INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 11);
+INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 16);
+INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 17);
+INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 19);
+INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 20);
+INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 21);
 
 
 --
@@ -1600,17 +1600,17 @@ INSERT INTO schema_problem.problem_solution_comment VALUES (82, 21);
 -- Data for Name: problem_solution_skill; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_solution_skill VALUES (82, 1);
-INSERT INTO schema_problem.problem_solution_skill VALUES (82, 11);
-INSERT INTO schema_problem.problem_solution_skill VALUES (100, 1);
-INSERT INTO schema_problem.problem_solution_skill VALUES (100, 3);
-INSERT INTO schema_problem.problem_solution_skill VALUES (100, 11);
-INSERT INTO schema_problem.problem_solution_skill VALUES (39, 1);
-INSERT INTO schema_problem.problem_solution_skill VALUES (39, 11);
-INSERT INTO schema_problem.problem_solution_skill VALUES (14, 1);
-INSERT INTO schema_problem.problem_solution_skill VALUES (14, 11);
-INSERT INTO schema_problem.problem_solution_skill VALUES (81, 1);
-INSERT INTO schema_problem.problem_solution_skill VALUES (81, 11);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (82, 1);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (82, 11);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (100, 1);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (100, 3);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (100, 11);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (39, 1);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (39, 11);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (14, 1);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (14, 11);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (81, 1);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (81, 11);
 
 
 --
@@ -1619,19 +1619,19 @@ INSERT INTO schema_problem.problem_solution_skill VALUES (81, 11);
 -- Data for Name: problem_submission; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (56, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (56, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
  
   
 int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 3.15, 4, '2025-02-16 22:58:20.277696', true, NULL, NULL, 5);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (59, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (59, 1, 25, 'public static int[] twoSum(int[] nums, int target) {
  
   
 int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 5, '2025-02-16 23:10:41.927647', true, NULL, NULL, 5);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (61, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0.52, 5, '2025-02-17 19:33:35.860922', true, NULL, NULL, 2);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (62, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0.52, 4, '2025-02-17 19:55:38.722401', true, NULL, NULL, 2);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (63, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 3.08, 4, '2025-02-17 22:20:02.666287', true, NULL, NULL, 2);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (64, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 2.88, 4, '2025-02-18 16:10:35.992705', true, NULL, NULL, 2);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (65, 1, 96, 'char* multiply(char* num1, char* num2) {\nif (strcmp(num1, \"0\") == 0 || strcmp(num2, \"0\") == 0) {\nchar* zero_result = (char*)malloc(2 * sizeof(char));\nstrcpy(zero_result, \"0\");\nreturn zero_result;\n}\nint len1 = strlen(num1);\nint len2 = strlen(num2);\nint* result = (int*)calloc(len1 + len2, sizeof(int));\nfor (int i = len1 - 1; i >= 0; i--) {\nfor (int j = len2 - 1; j >= 0; j--) {\nint mul = (num1[i] - ''0'') * (num2[j] - ''0'');\nint total = mul + result[i + j + 1];\nresult[i + j] += total / 10;\nresult[i + j + 1] = total % 10;\n}\n}\nchar* result_str = (char*)malloc((len1 + len2 + 1) * sizeof(char));\nint idx = 0;\nint start = 0;\nfor (int i = 0; i < len1 + len2; i++) {\nif (!(result[i] == 0 && start == 0)) {\nresult_str[idx++] = result[i] + ''0'';\nstart = 1;\n}\n}\nresult_str[idx] = ''\0'';\nfree(result);\nif (idx == 0) {\nstrcpy(result_str, \"0\");\n}\nreturn result_str;\n}', 2, NULL, 0, 0, '2025-02-18 16:13:32.323691', false, 'Compilation Error:
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (61, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0.52, 5, '2025-02-17 19:33:35.860922', true, NULL, NULL, 2);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (62, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0.52, 4, '2025-02-17 19:55:38.722401', true, NULL, NULL, 2);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (63, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 3.08, 4, '2025-02-17 22:20:02.666287', true, NULL, NULL, 2);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (64, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 2.88, 4, '2025-02-18 16:10:35.992705', true, NULL, NULL, 2);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (65, 1, 96, 'char* multiply(char* num1, char* num2) {\nif (strcmp(num1, \"0\") == 0 || strcmp(num2, \"0\") == 0) {\nchar* zero_result = (char*)malloc(2 * sizeof(char));\nstrcpy(zero_result, \"0\");\nreturn zero_result;\n}\nint len1 = strlen(num1);\nint len2 = strlen(num2);\nint* result = (int*)calloc(len1 + len2, sizeof(int));\nfor (int i = len1 - 1; i >= 0; i--) {\nfor (int j = len2 - 1; j >= 0; j--) {\nint mul = (num1[i] - ''0'') * (num2[j] - ''0'');\nint total = mul + result[i + j + 1];\nresult[i + j] += total / 10;\nresult[i + j + 1] = total % 10;\n}\n}\nchar* result_str = (char*)malloc((len1 + len2 + 1) * sizeof(char));\nint idx = 0;\nint start = 0;\nfor (int i = 0; i < len1 + len2; i++) {\nif (!(result[i] == 0 && start == 0)) {\nresult_str[idx++] = result[i] + ''0'';\nstart = 1;\n}\n}\nresult_str[idx] = ''\0'';\nfree(result);\nif (idx == 0) {\nstrcpy(result_str, \"0\");\n}\nreturn result_str;\n}', 2, NULL, 0, 0, '2025-02-18 16:13:32.323691', false, 'Compilation Error:
 main.c: In function ‘multiply’:
 main.c:6:41: error: stray ‘’ in program
  char* multiply(char* num1, char* num2) {nif (strcmp(num1, "0") == 0 || strcmp(num2, "0") == 0) {nchar* zero_result = (char*)malloc(2 * sizeof(char));nstrcpy(zero_result, "0");nreturn zero_result;n}nint len1 = strlen(num1);nint len2 = strlen(num2);nint* result = (int*)calloc(len1 + len2, sizeof(int));nfor (int i = len1 - 1; i >= 0; i--) {nfor (int j = len2 - 1; j >= 0; j--) {nint mul = (num1[i] - ''0'') * (num2[j] - ''0'');nint total = mul + result[i + j + 1];nresult[i + j] += total / 10;nresult[i + j + 1] = total % 10;n}n}nchar* result_str = (char*)malloc((len1 + len2 + 1) * sizeof(char));nint idx = 0;nint start = 0;nfor (int i = 0; i < len1 + len2; i++) {nif (!(result[i] == 0 && start == 0)) {nresult_str[idx++] = result[i] + ''0'';nstart = 1;n}n}nresult_str[idx] = ''0'';nfree(result);nif (idx == 0) {nstrcpy(result_str, "0");n}nreturn result_str;n}
@@ -1655,8 +1655,8 @@ main.c:15:1: error: expected declaration or statement at end of input
  }
  ^
 ', NULL, 0);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (76, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}public static int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 2.88, 4, '2025-02-20 14:21:39.655203', true, NULL, NULL, 2);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (66, 1, 96, 'char* multiply(char* num1, char* num2) {
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (76, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}public static int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 2.88, 4, '2025-02-20 14:21:39.655203', true, NULL, NULL, 2);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (66, 1, 96, 'char* multiply(char* num1, char* num2) {
 if (strcmp(num1,"0") == 0 || strcmp(num2, "0") == 0) {
 char* zero_result = (char*)malloc(2 * sizeof(char));
 strcpy(zero_result, "0");
@@ -1697,7 +1697,7 @@ main.c:32:25: warning: implicit declaration of function ‘nfree’; did you mea
                          ^~~~~
                          free
 ', NULL, 0);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (67, 1, 96, 'char* multiply(char* num1, char* num2) {
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (67, 1, 96, 'char* multiply(char* num1, char* num2) {
 if (strcmp(num1,"0") == 0 || strcmp(num2, "0") == 0) {
 char* zero_result = (char*)malloc(2 * sizeof(char));
 strcpy(zero_result, "0");
@@ -1730,7 +1730,7 @@ strcpy(result_str, "0");
 }
 return result_str;
 }', 2, NULL, 3.15, 4, '2025-02-18 16:22:57.949125', false, NULL, '{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2"},{"name":"num2","type":"STRING","value":"3"}],"expectedOutput":"6","status":"Failed","actualOutput":"60"}', 0);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (68, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (68, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
 return j + 1;if (dp[i][j] != -1)
@@ -1741,7 +1741,7 @@ int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charA
                                                                                                                                                                                                                                                                                                                                                                           ^
 1 error
 ', NULL, 0);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (69, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (69, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
 return j + 1;if (dp[i][j] != -1)
@@ -1752,13 +1752,13 @@ int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charA
                                                                                                                                                                                                                                                                                                                                                                           ^
 1 error
 ', NULL, 0);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (74, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 0, 0, '2025-02-20 09:41:47.285648', false, 'Compilation Error:
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (74, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 0, 0, '2025-02-20 09:41:47.285648', false, 'Compilation Error:
 Main.java:56: error: <identifier> expected
 public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ^
 1 error
 ', NULL, 0);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (70, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (70, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
 return j + 1;if (dp[i][j] != -1)
@@ -1769,7 +1769,7 @@ Main.java:61: error: <identifier> expected
                                                                                                                                                                                                                                                                                                                                                                            ^
 1 error
 ', NULL, 0);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (71, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (71, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
 return j + 1;if (dp[i][j] != -1)
@@ -1779,7 +1779,7 @@ return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 3000
                                                                                                                                                                                                                                                                                                                                                                                            ^
 1 error
 ', NULL, 0);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (72, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (72, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
 return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 0, 0, '2025-02-20 09:41:28.979633', false, 'Compilation Error:
@@ -1788,14 +1788,14 @@ return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int repl
                                                                                                                                                                                                                                                                                                                                                                                                                            ^
 1 error
 ', NULL, 0);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (73, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (73, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 0, 0, '2025-02-20 09:41:38.515441', false, 'Compilation Error:
 Main.java:57: error: <identifier> expected
 return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}
                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ^
 1 error
 ', NULL, 0);
-INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (75, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}public static int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 2.62, 5, '2025-02-20 09:43:18.431181', true, NULL, NULL, 2);
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, status, input_wrong, no_testcase_passed) OVERRIDING SYSTEM VALUE VALUES (75, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}public static int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 2.62, 5, '2025-02-20 09:43:18.431181', true, NULL, NULL, 2);
 
 
 --
@@ -1804,23 +1804,23 @@ INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (75
 -- Data for Name: problem_template; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_template OVERRIDING SYSTEM VALUE VALUES (2, 25, 1, 'public int[] twoSum(int[] nums, int target) {}', 'twoSum', 'ARR_INT');
-INSERT INTO schema_problem.problem_template OVERRIDING SYSTEM VALUE VALUES (3, 25, 2, 'int* twoSum(int* nums, int numsSize, int target, int* returnSize) {}', 'twoSum', 'ARR_INT');
-INSERT INTO schema_problem.problem_template OVERRIDING SYSTEM VALUE VALUES (18, 62, 1, 'public static List<List<Integer>> fourSum(int[] nums, int target) {
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (2, 25, 1, 'public int[] twoSum(int[] nums, int target) {}', 'twoSum', 'ARR_INT');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (3, 25, 2, 'int* twoSum(int* nums, int numsSize, int target, int* returnSize) {}', 'twoSum', 'ARR_INT');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (18, 62, 1, 'public static List<List<Integer>> fourSum(int[] nums, int target) {
 }', 'fourSum', 'BOOLEAN');
-INSERT INTO schema_problem.problem_template OVERRIDING SYSTEM VALUE VALUES (88, 96, 1, '
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (88, 96, 1, '
  public static String multiply(String num1, String num2) {
 }', 'multiply', 'STRING');
-INSERT INTO schema_problem.problem_template OVERRIDING SYSTEM VALUE VALUES (89, 96, 2, '
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (89, 96, 2, '
  public char* multiply(char* num1, char* num2) {
 }', 'multiply', 'STRING');
-INSERT INTO schema_problem.problem_template OVERRIDING SYSTEM VALUE VALUES (90, 98, 1, '
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (90, 98, 1, '
  public static int minDistance(String word1, String word2) {
 }', 'minDistance', 'INT');
-INSERT INTO schema_problem.problem_template OVERRIDING SYSTEM VALUE VALUES (91, 98, 2, '
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (91, 98, 2, '
  public int minDistance(char* word1, char* word2) {
 }', 'minDistance', 'INT');
-INSERT INTO schema_problem.problem_template OVERRIDING SYSTEM VALUE VALUES (44, 88, 1, 'public int firstMissingPositive(int[] nums) {
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (44, 88, 1, 'public int firstMissingPositive(int[] nums) {
 }', 'firstMissingPositive', 'INT');
 
 
@@ -1830,20 +1830,20 @@ INSERT INTO schema_problem.problem_template OVERRIDING SYSTEM VALUE VALUES (44, 
 -- Data for Name: problem_topic; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_topic VALUES (25, 2);
-INSERT INTO schema_problem.problem_topic VALUES (25, 3);
-INSERT INTO schema_problem.problem_topic VALUES (25, 9);
-INSERT INTO schema_problem.problem_topic VALUES (88, 9);
-INSERT INTO schema_problem.problem_topic VALUES (88, 2);
-INSERT INTO schema_problem.problem_topic VALUES (62, 2);
-INSERT INTO schema_problem.problem_topic VALUES (62, 1);
-INSERT INTO schema_problem.problem_topic VALUES (62, 9);
-INSERT INTO schema_problem.problem_topic VALUES (96, 9);
-INSERT INTO schema_problem.problem_topic VALUES (96, 6);
-INSERT INTO schema_problem.problem_topic VALUES (97, 6);
-INSERT INTO schema_problem.problem_topic VALUES (97, 9);
-INSERT INTO schema_problem.problem_topic VALUES (98, 6);
-INSERT INTO schema_problem.problem_topic VALUES (98, 9);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (25, 2);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (25, 3);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (25, 9);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (88, 9);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (88, 2);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (62, 2);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (62, 1);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (62, 9);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (96, 9);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (96, 6);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (97, 6);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (97, 9);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (98, 6);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (98, 9);
 
 
 --
@@ -1852,7 +1852,7 @@ INSERT INTO schema_problem.problem_topic VALUES (98, 9);
 -- Data for Name: solution_code; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.solution_code VALUES (14, 62, 1, 'public static List<List<Integer>> fourSum(int[] nums, int target) {
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (14, 62, 1, 'public static List<List<Integer>> fourSum(int[] nums, int target) {
 Arrays.sort(nums);
 return kSum(nums, target, 0, 4);
 }
@@ -1903,23 +1903,23 @@ res.add(Arrays.asList(nums[lo++], nums[hi--]));
 }
 return res;
 }');
-INSERT INTO schema_problem.solution_code VALUES (81, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
-INSERT INTO schema_problem.solution_code VALUES (82, 98, 1, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (81, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (82, 98, 1, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
 return j + 1;if (dp[i][j] != -1)
 return dp[i][j];
 int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}');
-INSERT INTO schema_problem.solution_code VALUES (100, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (101, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (102, 96, 1, 'public static String multiply(String num1, String num2) { \n int len1 = num1.length(), len2 = num2.length(); \n int[] prod = new int [len1 + len2]; \n int currIdx = prod.length-1; \n for(int i = len1-1; i >= 0; i--) { \n int idx = currIdx--; \n for(int j = len2-1; j >= 0; j--) { \n int a = num1.charAt(i) - ''0''; \n int b = num2.charAt(j) - ''0''; \n int res = a * b + prod[idx]; \n prod[idx] = res % 10; \n prod[--idx] += res / 10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int num : prod) { \n if(num == 0 && sb.length() == 0) continue; \n sb.append(num); \n } \n if(sb.length() == 0) return "0"; \n return sb.toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (103, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (104, 96, 1, 'public static String multiply(String num1, String num2) { \n BigInteger a = new BigInteger(num1); \n BigInteger b = new BigInteger(num2); \n BigInteger c = a.multiply(b); \n return String.valueOf(c); \n }');
-INSERT INTO schema_problem.solution_code VALUES (105, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }');
-INSERT INTO schema_problem.solution_code VALUES (106, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (107, 96, 1, 'public static String multiply(String num1, String num2) { \n BigInteger a = new BigInteger(num1); \n BigInteger b = new BigInteger(num2); \n BigInteger c = a.multiply(b); \n return String.valueOf(c); \n }');
-INSERT INTO schema_problem.solution_code VALUES (108, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (39, 88, 1, 'public static int firstMissingPositive(int[] nums) {
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (100, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (101, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (102, 96, 1, 'public static String multiply(String num1, String num2) { \n int len1 = num1.length(), len2 = num2.length(); \n int[] prod = new int [len1 + len2]; \n int currIdx = prod.length-1; \n for(int i = len1-1; i >= 0; i--) { \n int idx = currIdx--; \n for(int j = len2-1; j >= 0; j--) { \n int a = num1.charAt(i) - ''0''; \n int b = num2.charAt(j) - ''0''; \n int res = a * b + prod[idx]; \n prod[idx] = res % 10; \n prod[--idx] += res / 10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int num : prod) { \n if(num == 0 && sb.length() == 0) continue; \n sb.append(num); \n } \n if(sb.length() == 0) return "0"; \n return sb.toString(); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (103, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (104, 96, 1, 'public static String multiply(String num1, String num2) { \n BigInteger a = new BigInteger(num1); \n BigInteger b = new BigInteger(num2); \n BigInteger c = a.multiply(b); \n return String.valueOf(c); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (105, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (106, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (107, 96, 1, 'public static String multiply(String num1, String num2) { \n BigInteger a = new BigInteger(num1); \n BigInteger b = new BigInteger(num2); \n BigInteger c = a.multiply(b); \n return String.valueOf(c); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (108, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (39, 88, 1, 'public static int firstMissingPositive(int[] nums) {
 int n = nums.length;
 boolean[] seen = new boolean[n + 1];
  // Array for lookup 
@@ -1940,17 +1940,17 @@ boolean[] seen = new boolean[n + 1];
 // the smallest missing positive number is n + 1 
  return n + 1; 
  }');
-INSERT INTO schema_problem.solution_code VALUES (109, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (110, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (112, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (113, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (114, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (115, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (116, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }');
-INSERT INTO schema_problem.solution_code VALUES (117, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (98, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (99, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }');
-INSERT INTO schema_problem.solution_code VALUES (111, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (109, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (110, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (112, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (113, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (114, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (115, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (116, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (117, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (98, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (99, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (111, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
 
 
 --
@@ -1959,8 +1959,8 @@ INSERT INTO schema_problem.solution_code VALUES (111, 96, 1, 'public static Stri
 -- Data for Name: solution_vote; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.solution_vote VALUES (3, 100);
-INSERT INTO schema_problem.solution_vote VALUES (1, 100);
+INSERT INTO schema_problem.solution_vote (user_id, solution_id) VALUES (3, 100);
+INSERT INTO schema_problem.solution_vote (user_id, solution_id) VALUES (1, 100);
 
 
 --
@@ -1969,7 +1969,7 @@ INSERT INTO schema_problem.solution_vote VALUES (1, 100);
 -- Data for Name: test_case; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (2, 25, '[
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (2, 25, '[
         {
             "name": "nums",
             "type": "ARR_INT",
@@ -1981,7 +1981,7 @@ INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (2, 25, '[
             "value": 6
         }
     ]', '[1,2]', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (3, 25, '[
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (3, 25, '[
         {
             "name": "nums",
             "type": "ARR_INT",
@@ -1993,7 +1993,7 @@ INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (3, 25, '[
             "value": 6
         }
     ]', '[0,1]', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (4, 25, '[
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (4, 25, '[
         {
             "name": "nums",
             "type": "ARR_INT",
@@ -2005,7 +2005,7 @@ INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (4, 25, '[
             "value": 12
         }
     ]', '[0,3]', false);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (5, 25, '[
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (5, 25, '[
         {
             "name":"nums",
             "type": "ARR_INT",
@@ -2017,7 +2017,7 @@ INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (5, 25, '[
             "value": 7
         }
     ]', '[0,2]', false);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (1, 25, '[
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (1, 25, '[
         {
             "name": "nums",
             "type": "ARR_INT",
@@ -2029,15 +2029,15 @@ INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (1, 25, '[
             "value": 9
         }
     ]', '[0,1]', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (22, 62, '[{"name": "nums","type": "ARR_INT","value": [1,0,-1,0,-2,2]},{"name": "target","type": "INT","value": 0}]', '[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (23, 62, '[{"name": "nums","type": "ARR_INT","value": [2,2,2,2,2]},{"name": "target","type": "INT","value": 8}]', '[[2,2,2,2]]', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (81, 88, '[{"name":"nums","type":"ARR_INT","value":[1,2,0]}]', '3', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (82, 88, '[{"name":"nums","type":"ARR_INT","value":[3,4,-1,1]}]', '2', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (83, 88, '[{"name":"nums","type":"ARR_INT","value":[7,8,9,11,12]}]', '1', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (164, 96, '[{"name":"num1","type":"STRING","value":"2"},{"name":"num2","type":"STRING","value":"3"}]', '"6"', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (165, 96, '[{"name":"num1","type":"STRING","value":"123"},{"name":"num2","type":"STRING","value":"456"}]', '"56088"', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (166, 98, '[{"name":"word1","type":"STRING","value":"horse"},{"name":"word2","type":"STRING","value":"ros"}]', '3', true);
-INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (167, 98, '[{"name":"word1","type":"STRING","value":"intention"},{"name":"word2","type":"STRING","value":"execution"}]', '5', true);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (22, 62, '[{"name": "nums","type": "ARR_INT","value": [1,0,-1,0,-2,2]},{"name": "target","type": "INT","value": 0}]', '[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]', true);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (23, 62, '[{"name": "nums","type": "ARR_INT","value": [2,2,2,2,2]},{"name": "target","type": "INT","value": 8}]', '[[2,2,2,2]]', true);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (81, 88, '[{"name":"nums","type":"ARR_INT","value":[1,2,0]}]', '3', true);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (82, 88, '[{"name":"nums","type":"ARR_INT","value":[3,4,-1,1]}]', '2', true);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (83, 88, '[{"name":"nums","type":"ARR_INT","value":[7,8,9,11,12]}]', '1', true);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (164, 96, '[{"name":"num1","type":"STRING","value":"2"},{"name":"num2","type":"STRING","value":"3"}]', '"6"', true);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (165, 96, '[{"name":"num1","type":"STRING","value":"123"},{"name":"num2","type":"STRING","value":"456"}]', '"56088"', true);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (166, 98, '[{"name":"word1","type":"STRING","value":"horse"},{"name":"word2","type":"STRING","value":"ros"}]', '3', true);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (167, 98, '[{"name":"word1","type":"STRING","value":"intention"},{"name":"word2","type":"STRING","value":"execution"}]', '5', true);
 
 
 --
@@ -2046,9 +2046,9 @@ INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (167, 98, '[
 -- Data for Name: user_favourite; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.user_favourite VALUES (1, 96);
-INSERT INTO schema_problem.user_favourite VALUES (3, 96);
-INSERT INTO schema_problem.user_favourite VALUES (3, 98);
+INSERT INTO schema_problem.user_favourite (user_id, problem_id) VALUES (1, 96);
+INSERT INTO schema_problem.user_favourite (user_id, problem_id) VALUES (3, 96);
+INSERT INTO schema_problem.user_favourite (user_id, problem_id) VALUES (3, 98);
 
 
 --
@@ -2057,8 +2057,8 @@ INSERT INTO schema_problem.user_favourite VALUES (3, 98);
 -- Data for Name: language; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
 
-INSERT INTO schema_setting.language OVERRIDING SYSTEM VALUE VALUES (1, 'Java', '2025-01-23 22:00:00', 1, NULL, NULL);
-INSERT INTO schema_setting.language OVERRIDING SYSTEM VALUE VALUES (2, 'C', '2025-01-23 22:00:00', 1, NULL, NULL);
+INSERT INTO schema_setting.language (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (1, 'Java', '2025-01-23 22:00:00', 1, NULL, NULL);
+INSERT INTO schema_setting.language (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (2, 'C', '2025-01-23 22:00:00', 1, NULL, NULL);
 
 
 --
@@ -2067,22 +2067,22 @@ INSERT INTO schema_setting.language OVERRIDING SYSTEM VALUE VALUES (2, 'C', '202
 -- Data for Name: skill; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
 
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (1, 'Array', 'FUNDAMENTAL', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (2, 'String', 'FUNDAMENTAL', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (3, 'Brute Force', 'FUNDAMENTAL', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (4, 'Two-pass Hash Table', 'FUNDAMENTAL', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (5, 'One-pass Hash Table', 'FUNDAMENTAL', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (6, 'Dynamic Programming', 'ADVANCED', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (7, 'Backtracking', 'ADVANCED', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (8, 'Trie', 'ADVANCED', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (9, 'Hash Table', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (10, 'Depth-First Search', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (11, 'Math', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (12, 'Recursion', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (13, 'Tree', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (14, 'Binary Tree', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (15, 'Greedy', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (16, 'Bredth-First Search', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (1, 'Array', 'FUNDAMENTAL', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (2, 'String', 'FUNDAMENTAL', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (3, 'Brute Force', 'FUNDAMENTAL', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (4, 'Two-pass Hash Table', 'FUNDAMENTAL', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (5, 'One-pass Hash Table', 'FUNDAMENTAL', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (6, 'Dynamic Programming', 'ADVANCED', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (7, 'Backtracking', 'ADVANCED', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (8, 'Trie', 'ADVANCED', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (9, 'Hash Table', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (10, 'Depth-First Search', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (11, 'Math', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (12, 'Recursion', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (13, 'Tree', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (14, 'Binary Tree', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (15, 'Greedy', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (16, 'Bredth-First Search', 'INTERMEDIATE', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
 
 
 --
@@ -2091,16 +2091,16 @@ INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (16, 'Bredth-Fir
 -- Data for Name: topic; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
 
-INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (1, 'Companies', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (2, 'Array', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (3, 'Loop', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (4, 'Recursion', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (5, 'List', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (6, 'String', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (7, 'Map', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (8, 'Object', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (9, 'Math', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
-INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (16, 'Interview', '2025-02-14 16:29:07.051563', 70, NULL, NULL);
+INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (1, 'Companies', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (2, 'Array', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (3, 'Loop', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (4, 'Recursion', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (5, 'List', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (6, 'String', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (7, 'Map', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (8, 'Object', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (9, 'Math', '2025-01-02 12:56:21.718047', 1, NULL, NULL);
+INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (16, 'Interview', '2025-02-14 16:29:07.051563', 70, NULL, NULL);
 
 
 --
@@ -2125,17 +2125,17 @@ INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (16, 'Interview'
 -- Data for Name: users; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
 
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (22, '27 - Trần Hải Bằng', '27 - Trần Hải Bằng', '$2a$10$VS.SuPBGxhmF6LMckxvnauCcZeRYQ/Jzf4WOuhJM9KS.myVT2oY.C', 'bangthhe170871@fpt.edu.vn', 'STUDENT', 'ACTIVATED', '2025-02-10', 'https://lh3.googleusercontent.com/a/ACg8ocLUGVSI7vY8J1U-dedYf6BNl_pub8sHys0YFcbHGUSToW5ihw=s96-c');
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (3, 'Thai', 'Pham Hong Thai', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thaiph@gmail.com', 'STUDENT', 'ACTIVATED', '2024-06-02', NULL);
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (4, 'Duy', 'Dang Nguyen Quang Duy', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'duydnq123@gmail.com', 'STUDENT', 'ACTIVATED', '2024-07-03', NULL);
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (5, 'HngThng', 'Dang Hong Thang', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thangdh1557@gmail.com', 'STUDENT', 'ACTIVATED', '2024-09-06', NULL);
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (6, 'Jasmine Milk', 'Vu Tuan Hung', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'hungvt321@gmail.com', 'STUDENT', 'BANNED', '2024-10-12', NULL);
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (67, 'binhtq', 'Tran Quoc Binh', '$2a$10$P2Y3FTKGIoMtXqNfLYQ95OjXfplOACRVoJc/tcXdzdVqCcfmjCSf2', 'binhtq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sa');
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (68, 'baotq', 'Tran Quoc Bao', '$2a$10$4T5KVE1i8E3ExtT9uRX1s.IL5d6P.VnGym8oXlt/J7kT.YY8PEOUi', 'baotq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sas');
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (2, 'Phong', 'Pham Duy Phong', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'phongk72tp@gmail.com', 'ADMIN', 'ACTIVATED', '2024-05-01', NULL);
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (70, 'haitq', 'Tran Quoc Hai', '$2a$10$DqXH5YDKXQD35XrztK1SeudCH5g1boI1z22pUuSPMYgxqaQ6vSlHa', '12', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sas');
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (75, 'mast12', 'Tran Hoang Hai', '$2a$10$Xmlb7nvVBqU9TvLCndVsSulhZxZQY0YY6eC6knMXdz1mHCGIECKBK', 'basihamedical@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-15', 'kodeholik-avatar-image-0e609cfa-d0dd-4cd8-8ce6-6c896389a724');
-INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$3VrCnF11UcTUaRejqZ7yDuJQ81i6nEBzEtItoLyWwZ9CR3V/LRpfW', 'tranhaibang665@gmail.com', 'TEACHER', 'ACTIVATED', '2024-03-20', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (22, '27 - Trần Hải Bằng', '27 - Trần Hải Bằng', '$2a$10$VS.SuPBGxhmF6LMckxvnauCcZeRYQ/Jzf4WOuhJM9KS.myVT2oY.C', 'bangthhe170871@fpt.edu.vn', 'STUDENT', 'ACTIVATED', '2025-02-10', 'https://lh3.googleusercontent.com/a/ACg8ocLUGVSI7vY8J1U-dedYf6BNl_pub8sHys0YFcbHGUSToW5ihw=s96-c');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (3, 'Thai', 'Pham Hong Thai', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thaiph@gmail.com', 'STUDENT', 'ACTIVATED', '2024-06-02', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (4, 'Duy', 'Dang Nguyen Quang Duy', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'duydnq123@gmail.com', 'STUDENT', 'ACTIVATED', '2024-07-03', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (5, 'HngThng', 'Dang Hong Thang', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thangdh1557@gmail.com', 'STUDENT', 'ACTIVATED', '2024-09-06', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (6, 'Jasmine Milk', 'Vu Tuan Hung', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'hungvt321@gmail.com', 'STUDENT', 'BANNED', '2024-10-12', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (67, 'binhtq', 'Tran Quoc Binh', '$2a$10$P2Y3FTKGIoMtXqNfLYQ95OjXfplOACRVoJc/tcXdzdVqCcfmjCSf2', 'binhtq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sa');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (68, 'baotq', 'Tran Quoc Bao', '$2a$10$4T5KVE1i8E3ExtT9uRX1s.IL5d6P.VnGym8oXlt/J7kT.YY8PEOUi', 'baotq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sas');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (2, 'Phong', 'Pham Duy Phong', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'phongk72tp@gmail.com', 'ADMIN', 'ACTIVATED', '2024-05-01', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (70, 'haitq', 'Tran Quoc Hai', '$2a$10$DqXH5YDKXQD35XrztK1SeudCH5g1boI1z22pUuSPMYgxqaQ6vSlHa', '12', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sas');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (75, 'mast12', 'Tran Hoang Hai', '$2a$10$Xmlb7nvVBqU9TvLCndVsSulhZxZQY0YY6eC6knMXdz1mHCGIECKBK', 'basihamedical@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-15', 'kodeholik-avatar-image-0e609cfa-d0dd-4cd8-8ce6-6c896389a724');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$3VrCnF11UcTUaRejqZ7yDuJQ81i6nEBzEtItoLyWwZ9CR3V/LRpfW', 'tranhaibang665@gmail.com', 'TEACHER', 'ACTIVATED', '2024-03-20', NULL);
 
 
 --
@@ -3242,7 +3242,7 @@ ALTER TABLE ONLY schema_user.transaction
     ADD CONSTRAINT transaction_user_id_fkey FOREIGN KEY (user_id) REFERENCES schema_user.users(id);
 
 
--- Completed on 2025-02-22 14:21:26
+-- Completed on 2025-02-22 16:24:35
 
 --
 -- PostgreSQL database dump complete
