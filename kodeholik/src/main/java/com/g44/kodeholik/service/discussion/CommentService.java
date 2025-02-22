@@ -16,10 +16,12 @@ public interface CommentService {
 
     public void saveComment(Comment comment);
 
-    public void deleteComment(Long commentId);
-
     public void addComment(AddCommentRequestDto addCommentRequestDto);
 
-    public void editComment(Long commentId, AddCommentRequestDto addCommentRequestDto);
+    public void editComment(Long commentId, String newComment);
+
+    public void upvoteComment(Long commentId);
+
+    public void unupvoteComment(Long commentId);
 
 }

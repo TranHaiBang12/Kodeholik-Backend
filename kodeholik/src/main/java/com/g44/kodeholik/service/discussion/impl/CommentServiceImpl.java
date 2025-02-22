@@ -2,6 +2,7 @@ package com.g44.kodeholik.service.discussion.impl;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -14,13 +15,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.g44.kodeholik.config.MessageProperties;
+import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
+import com.g44.kodeholik.exception.UnauthorizedException;
 import com.g44.kodeholik.model.dto.request.comment.AddCommentRequestDto;
 import com.g44.kodeholik.model.dto.request.comment.CommentLocation;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
+import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.service.discussion.CommentService;
@@ -49,6 +54,8 @@ public class CommentServiceImpl implements CommentService {
 
     private final ProblemRepository problemRepository;
 
+    private final MessageProperties messageProperties;
+
     @Override
     public Page<CommentResponseDto> getCommentsByProblemLink(String link, int page, String sortBy, Boolean ascending) {
         Problem problem = problemService.getActivePublicProblemByLink(link);
@@ -60,7 +67,22 @@ public class CommentServiceImpl implements CommentService {
         } else {
             commentPage = getCommentsPage(comments, page, 5, null);
         }
-        return commentPage.map(commentResponseMapper::mapFrom);
+        Page<CommentResponseDto> commentResponseDtos = commentPage.map(commentResponseMapper::mapFrom);
+        for (CommentResponseDto commentResponseDto : commentResponseDtos) {
+            commentResponseDto.setVoted(isUserVoteComment(commentResponseDto.getId()));
+        }
+        return commentResponseDtos;
+    }
+
+    private boolean isUserVoteComment(Long commentId) {
+        Users currentUser = userService.getCurrentUser();
+        Set<Users> usersVote = getCommentById(commentId).getUserVote();
+        for (Users userVote : usersVote) {
+            if (userVote.getEmail().equals(currentUser.getEmail())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Page<Comment> getCommentsPage(Set<Comment> comments, int page, int size, Sort sort) {
@@ -95,11 +117,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(Long commentId) {
-        commentRepository.deleteById(commentId);
-    }
-
-    @Override
     public Page<CommentResponseDto> getCommentsByProblemSolutionId(Long solutionId, int page, String sortBy,
             Boolean ascending) {
         ProblemSolution problemSolution = problemSolutionService.findSolutionById(solutionId);
@@ -111,7 +128,11 @@ public class CommentServiceImpl implements CommentService {
         } else {
             commentPage = getCommentsPage(comments, page, 5, null);
         }
-        return commentPage.map(commentResponseMapper::mapFrom);
+        Page<CommentResponseDto> commentResponseDtos = commentPage.map(commentResponseMapper::mapFrom);
+        for (CommentResponseDto commentResponseDto : commentResponseDtos) {
+            commentResponseDto.setVoted(isUserVoteComment(commentResponseDto.getId()));
+        }
+        return commentResponseDtos;
     }
 
     @Override
@@ -143,15 +164,83 @@ public class CommentServiceImpl implements CommentService {
         if (addCommentRequestDto.getLocationId() != null) {
             ProblemSolution problemSolution = problemSolutionService
                     .findSolutionById(addCommentRequestDto.getLocationId());
+            problemSolution.setNoComment(problemSolution.getNoComment() + 1);
             problemSolution.getComments().add(comment);
             problemSolutionService.save(problemSolution);
         }
     }
 
     @Override
-    public void editComment(Long commentId, AddCommentRequestDto addCommentRequestDto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'editComment'");
+    public void editComment(Long commentId, String newComment) {
+        Comment comment = getCommentById(commentId);
+        Timestamp updatedAt;
+        Users currentUser = userService.getCurrentUser();
+
+        if (comment.getUpdatedAt() != null) {
+            updatedAt = comment.getUpdatedAt();
+        } else {
+            updatedAt = comment.getCreatedAt();
+        }
+        if (newComment == null || newComment.equals("")) {
+            throw new BadRequestException(messageProperties.getMessage("MSG17"), messageProperties.getMessage("MSG17"));
+        }
+        if (currentUser.getId().intValue() != comment.getCreatedBy().getId().intValue()) {
+            throw new UnauthorizedException("You are not the owner of this comment",
+                    "You are not the owner of this comment");
+        }
+        if (!isWithinSevenDays(updatedAt.toInstant(), Instant.now())) {
+            throw new BadRequestException("Comment can only be edited in 7 days",
+                    "Comment can only be edited in 7 days");
+        }
+        comment.setComment(newComment.substring(1, newComment.length() - 1));
+        comment.setUpdatedAt(Timestamp.from(Instant.now()));
+        comment.setUpdatedBy(currentUser);
+
+        commentRepository.save(comment);
     }
 
+    public boolean isWithinSevenDays(Instant t1, Instant t2) {
+        return ChronoUnit.DAYS.between(t1, t2) <= 7;
+    }
+
+    @Override
+    public void upvoteComment(Long commentId) {
+        Comment comment = getCommentById(commentId);
+        Set<Users> usersVote = comment.getUserVote();
+        Users currentUser = userService.getCurrentUser();
+
+        for (Users userVote : usersVote) {
+            if (userVote.getEmail().equals(currentUser.getEmail())) {
+                throw new BadRequestException("You have already voted this comment",
+                        "You have already voted this comment");
+            }
+        }
+
+        usersVote.add(currentUser);
+        comment.setNoUpvote(comment.getNoUpvote() + 1);
+        commentRepository.save(comment);
+    }
+
+    @Override
+    public void unupvoteComment(Long commentId) {
+        Comment comment = getCommentById(commentId);
+        Set<Users> usersVote = comment.getUserVote();
+        Users currentUser = userService.getCurrentUser();
+        boolean isVote = false;
+
+        for (Users userVote : usersVote) {
+            if (userVote.getEmail().equals(currentUser.getEmail())) {
+                isVote = true;
+                usersVote.remove(currentUser);
+                if (comment.getNoUpvote() > 0)
+                    comment.setNoUpvote(comment.getNoUpvote() + 1);
+                commentRepository.save(comment);
+            }
+        }
+        if (!isVote) {
+            throw new BadRequestException("You have not vote this comment",
+                    "You have not vote this comment");
+        }
+
+    }
 }

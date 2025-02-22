@@ -3,6 +3,7 @@ package com.g44.kodeholik.controller.discussion;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -56,6 +58,24 @@ public class CommentController {
     @PostMapping("/post")
     public ResponseEntity<Void> postComment(@RequestBody @Valid AddCommentRequestDto addCommentRequestDto) {
         commentService.addComment(addCommentRequestDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<Void> editComment(@PathVariable Long id, @RequestBody String newComment) {
+        commentService.editComment(id, newComment);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/upvote/{id}")
+    public ResponseEntity<Void> upvoteComment(@PathVariable Long id) {
+        commentService.upvoteComment(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/unupvote/{id}")
+    public ResponseEntity<Void> unupvoteComment(@PathVariable Long id) {
+        commentService.unupvoteComment(id);
         return ResponseEntity.noContent().build();
     }
 

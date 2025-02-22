@@ -23,6 +23,8 @@ public class CommentResponseDto {
 
     private int noUpvote;
 
+    private boolean isVoted;
+
     private UserResponseDto createdBy;
 
     @JsonSerialize(using = TimestampSerializer.class)
