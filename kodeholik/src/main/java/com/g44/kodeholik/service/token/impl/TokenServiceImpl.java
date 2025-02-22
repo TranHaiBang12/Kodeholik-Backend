@@ -134,6 +134,7 @@ public class TokenServiceImpl implements TokenService {
         }
         Cookie tokenCookie = new Cookie(cookieName, token);
         tokenCookie.setHttpOnly(true);
+
         tokenCookie.setPath("/");
         tokenCookie.setMaxAge(expiryTime / 1000);
 

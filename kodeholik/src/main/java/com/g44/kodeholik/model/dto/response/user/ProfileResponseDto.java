@@ -2,8 +2,11 @@ package com.g44.kodeholik.model.dto.response.user;
 
 import java.sql.Date;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.model.enums.user.UserStatus;
+import com.g44.kodeholik.util.serializer.DateSerializer;
+import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,13 +24,12 @@ public class ProfileResponseDto {
 
     private String fullname;
 
-    private String password;
-
     private String email;
 
     private UserStatus status;
 
     private UserRole role;
 
-    private Date createdDate;
+    @JsonSerialize(using = DateSerializer.class)
+    private Long createdDate;
 }

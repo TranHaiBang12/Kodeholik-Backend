@@ -173,7 +173,7 @@ public class ProblemServiceImpl implements ProblemService {
                         .difficulty(problem.getDifficulty().toString())
                         .acceptanceRate(problem.getAcceptanceRate())
                         .noSubmission(problem.getNoSubmission())
-                        .link(problem.getLink())
+                        .link(problem.getTitle())
                         .topics(problem.getTopics().stream().map(Topic::getName).collect(Collectors.toList()))
                         .skills(problem.getSkills().stream().map(Skill::getName).collect(Collectors.toList()))
                         .solved(problemSubmissionService.checkIsCurrentUserSolvedProblem(problem))
@@ -365,7 +365,9 @@ public class ProblemServiceImpl implements ProblemService {
             List<ProblemElasticsearch> content = searchResponse.hits().hits().stream()
                     .map(h -> h.source())
                     .toList();
-
+            log.info(content);
+            Problem problem = problemRepository.findById(24L).get();
+            log.info(problem.getLink());
             long totalHits = searchResponse.hits().total() != null ? searchResponse.hits().total().value() : 0;
             return new PageImpl<>(content, pageable, totalHits);
 
