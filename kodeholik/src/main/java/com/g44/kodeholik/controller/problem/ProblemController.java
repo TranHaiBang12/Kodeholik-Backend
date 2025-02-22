@@ -135,7 +135,7 @@ public class ProblemController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ResponseEntity<Page<ProblemElasticsearch>> searchProblem(
             @RequestParam Integer page,
             @RequestParam(required = false) Integer size,
