@@ -4,16 +4,22 @@ import java.sql.Date;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.g44.kodeholik.config.MessageProperties;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.user.AddUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
+import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
+import com.g44.kodeholik.model.dto.request.user.EditProfileRequestDto;
+import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.s3.FileNameType;
 import com.g44.kodeholik.model.enums.user.UserStatus;
@@ -23,7 +29,10 @@ import com.g44.kodeholik.service.email.EmailService;
 import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.request.user.AddUserAvatarFileMapper;
 import com.g44.kodeholik.util.mapper.request.user.AddUserRequestMapper;
+import com.g44.kodeholik.util.mapper.request.user.EditProfileRequestMapper;
+import com.g44.kodeholik.util.mapper.response.user.ProfileResponseMapper;
 import com.g44.kodeholik.util.password.PasswordUtils;
+import com.g44.kodeholik.util.validation.Validation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -42,6 +51,12 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
 
     private final S3Service s3Service;
+
+    private final EditProfileRequestMapper editProfileRequestMapper;
+
+    private final ProfileResponseMapper profileResponseMapper;
+
+    private final MessageProperties messageProperties;
 
     @Override
     public Users getUserById(Long userId) {
@@ -169,4 +184,39 @@ public class UserServiceImpl implements UserService {
         user.setStatus(UserStatus.ACTIVATED);
         userRepository.save(user);
     }
+
+    @Override
+    public ProfileResponseDto editProfile(EditProfileRequestDto editProfileRequestDto) {
+        Users user = getCurrentUser();
+
+        if (!user.getUsername().equals(editProfileRequestDto.getUsername())) {
+            checkUsernameExisted(editProfileRequestDto.getUsername());
+        }
+
+        List<MultipartFile> multipartFiles = new ArrayList();
+        multipartFiles.add(editProfileRequestDto.getAvatar());
+        String avatarKey = s3Service.uploadFileNameTypeFile(multipartFiles, FileNameType.AVATAR).get(0);
+
+        user.setAvatar(avatarKey);
+        user.setFullname(editProfileRequestDto.getFullname());
+        user.setUsername(editProfileRequestDto.getUsername());
+        return getProfileCurrentUser();
+    }
+
+    @Override
+    public ProfileResponseDto getProfileCurrentUser() {
+        Users user = getCurrentUser();
+        return profileResponseMapper.mapFrom(user);
+    }
+
+    @Override
+    public Optional<Users> isUserExistedbyUsernameOrEmail(String username) {
+        return userRepository.existsByUsernameOrEmail(username);
+    }
+
+    @Override
+    public boolean isUserNotAllowed(String username) {
+        return userRepository.isUserNotAllowed(username);
+    }
+
 }

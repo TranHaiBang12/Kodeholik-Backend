@@ -2,7 +2,9 @@ package com.g44.kodeholik.model.dto.response.discussion;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
+import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,15 +16,22 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class CommentResponseDto {
+
+    private Long id;
+
     private String comment;
 
     private int noUpvote;
 
+    private boolean isVoted;
+
     private UserResponseDto createdBy;
 
-    private Timestamp createdAt;
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long createdAt;
 
-    private Timestamp updatedAt;
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long updatedAt;
 
-    private UserResponseDto commentReply;
+    private Long replyId;
 }

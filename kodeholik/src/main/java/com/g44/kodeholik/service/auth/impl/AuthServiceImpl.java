@@ -22,6 +22,7 @@ import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.exception.UnauthorizedException;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
+import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.LoginRequestDto;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.token.TokenType;
@@ -102,8 +103,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void resetPasswordInit(String username) {
-        Users user = checkUsernameExists(username);
-        if (user != null) {
+        Optional<Users> userOptional = userRepository.findByEmail(username);
+        if (userOptional.isPresent()) {
+            Users user = userOptional.get();
             if (userRepository.isUserNotAllowed(username)) {
                 throw new ForbiddenException("This account is not allowed to do this action",
                         "This account is not allowed to do this action");
@@ -114,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
             emailService.sendEmailResetPassword(user.getEmail(), "[KODEHOLIK] Reset Password", user.getUsername(),
                     feLink + token);
         } else {
-            throw new BadRequestException(messageProperties.getMessage("MSG08"), "Username or email not existed");
+            throw new BadRequestException("Email not found", "Email not found");
         }
     }
 
@@ -137,11 +139,12 @@ public class AuthServiceImpl implements AuthService {
             throw new ForbiddenException("This account is not allowed to do this action",
                     "This account is not allowed to do this action");
         }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        if (userDetails != null) {
+        log.info(username);
+        if (userRepository.existsByUsernameOrEmail(username).isPresent()) {
+            log.info(username + "s");
             String savedToken = redisService.getToken(username, TokenType.FORGOT);
             if (savedToken != null) {
-                if (tokenService.validateToken(token, userDetails) &&
+                if (tokenService.validateToken(token) &&
                         token.equals(savedToken.trim())) {
                     return true;
                 }
@@ -154,8 +157,8 @@ public class AuthServiceImpl implements AuthService {
     public void resetPasswordFinish(String token, String password) {
         if (checkValidForgotPasswordToken(token)) {
             String username = tokenService.extractUsername(token);
-            Users user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new NotFoundException("User not found", "User not found"));
+            Users user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new NotFoundException("Email not found", "Email not found"));
             password = password.trim().replaceAll("\"", "");
             if (Validation.isValidPassword(password)) {
                 user.setPassword(PasswordUtils.encodePassword(password));
@@ -227,6 +230,27 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = tokenService.generateRefreshToken(username, new Date());
         tokenService.addTokenToCookie(refreshToken, response, TokenType.REFRESH);
 
+    }
+
+    public void changePassword(ChangePasswordRequestDto changePasswordRequestDto) {
+        if (!changePasswordRequestDto.getNewPassword().equals(changePasswordRequestDto.getConfirmPassword())) {
+            throw new BadRequestException("Confirm password must be the same to new password",
+                    "Confirm password must be the same to new password");
+        }
+        Users user = userService.getCurrentUser();
+        String newPassword = changePasswordRequestDto.getNewPassword();
+        if (PasswordUtils.verifyPassword(changePasswordRequestDto.getOldPassword(), user.getPassword())) {
+            if (Validation.isValidPassword(newPassword)) {
+                user.setPassword(PasswordUtils.encodePassword(newPassword));
+                userRepository.save(user);
+            } else {
+                throw new BadRequestException(messageProperties.getMessage("MSG10"),
+                        messageProperties.getMessage("MSG10"));
+
+            }
+        } else {
+            throw new BadRequestException("Wrong password", "Wrong password");
+        }
     }
 
 }

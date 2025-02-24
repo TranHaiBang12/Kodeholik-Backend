@@ -20,7 +20,7 @@ public interface TokenService {
 
     public String extractUsername(String token);
 
-    public boolean validateToken(String token, UserDetails userDetails);
+    public boolean validateToken(String token);
 
     public void addTokenToCookie(String token, HttpServletResponse response, TokenType tokenType);
 

@@ -147,6 +147,16 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     @Override
     public RunProblemResponseDto run(Problem problem, ProblemCompileRequestDto problemCompileRequestDto,
             List<TestCase> testCases, ProblemTemplate problemTemplate) {
+        if (problemCompileRequestDto.getTestCases() != null && !problemCompileRequestDto.getTestCases().isEmpty()) {
+            List<TestCase> runTestCase = problemCompileRequestDto.getTestCases();
+            for (int i = 0; i < runTestCase.size(); i++) {
+                for (int j = 0; j < testCases.size(); j++) {
+                    if (testCases.get(j).getInput() != runTestCase.get(i).getInput()) {
+                        testCases.add(runTestCase.get(i));
+                    }
+                }
+            }
+        }
         if (problemCompileRequestDto.getCode().isEmpty()) {
             throw new BadRequestException("Code is required", "Code is required");
         }

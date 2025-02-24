@@ -1,11 +1,20 @@
 package com.g44.kodeholik.model.entity.course;
 
-import com.g44.kodeholik.model.entity.user.Users;
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+
+import com.g44.kodeholik.model.entity.user.Users;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "course_user", schema = "schema_course")
@@ -43,5 +52,3 @@ public class CourseUser {
         this.enrolledAt = new Timestamp(System.currentTimeMillis());
     }
 }
-
-

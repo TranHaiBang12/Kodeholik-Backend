@@ -64,11 +64,12 @@ public class ExcelServiceImpl implements ExcelService {
         // Kiểm tra nếu có các cột cần thiết
         if (!columnIndexMap.containsKey("Expected Output") ||
                 !columnIndexMap.containsKey("Is Sample")) {
-            throw new BadRequestException("Excel file in wrong format", "Excel file in wrong format");
+            throw new BadRequestException("Excel file in wrong format",
+                    "Please define a column name Expected Output and Is Sample");
         }
         for (int i = 0; i < inputNames.size(); i++) {
             if (!columnIndexMap.containsKey(inputNames.get(i))) {
-                throw new BadRequestException("Excel file in wrong format", "Excel file in wrong format");
+                throw new BadRequestException("Excel file in wrong format", "Please define column for each input");
             }
         }
         List<Integer> inputIndexList = new ArrayList();

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,12 +53,16 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/problem/search/**",
             "/api/v1/problem/suggest/**",
             "/api/v1/problem/description/**",
-            "/api/v1/problem/compile-information/**");
+            "/api/v1/problem/compile-information/**",
+            "/api/v1/course/list/**",
+            "/api/v1/course/detail/**",
+            "/api/v1/course/search/**");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String accessToken = null;
+
         String username = null;
         // Lấy token từ Cookie
         Cookie[] cookies = request.getCookies();
@@ -69,11 +74,13 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         }
+        log.info("access: " + accessToken + " " + request.getRequestURI());
         if (accessToken != null && !accessToken.equals("")) {
             if ((username != null && !username.equals("")) &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (tokenService.validateToken(accessToken, userDetails)) {
+                if (userRepository.existsByUsernameOrEmail(username).isPresent()
+                        && tokenService.validateToken(accessToken)) {
                     if (userRepository.isUserNotAllowed(username)) {
                         throw new ForbiddenException("This account is not allowed to do this action",
                                 "This account is not allowed to do this action");
@@ -101,6 +108,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+
+        if (request.getMethod().equals(HttpMethod.OPTIONS.toString())) {
+            log.info("OPTIONS");
+            return true;
+        }
+
         Cookie[] cookies = request.getCookies();
         if (!request.getRequestURI().equals("/api/v1/auth/login/oauth2/google")) {
             String accessToken = "";
@@ -113,11 +126,13 @@ public class JwtFilter extends OncePerRequestFilter {
                     }
                 }
             }
+            log.info("access: " + accessToken);
             if (accessToken != null && !accessToken.equals("")) {
                 if ((username != null && !username.equals("")) &&
                         SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    if (tokenService.validateToken(accessToken, userDetails)) {
+                    if (userRepository.existsByUsernameOrEmail(username).isPresent()
+                            && tokenService.validateToken(accessToken)) {
                         if (userRepository.isUserNotAllowed(username)) {
                             throw new ForbiddenException("This account is not allowed to do this action",
                                     "This account is not allowed to do this action");

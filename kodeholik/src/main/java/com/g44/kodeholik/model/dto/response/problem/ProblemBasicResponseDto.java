@@ -3,9 +3,11 @@ package com.g44.kodeholik.model.dto.response.problem;
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.g44.kodeholik.model.dto.response.user.EmployeeResponseDto;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
+import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,11 +36,13 @@ public class ProblemBasicResponseDto {
 
     private Boolean isActive;
 
-    private Timestamp createdAt;
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long createdAt;
 
     private EmployeeResponseDto createdBy;
 
-    private Timestamp updatedAt;
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long updatedAt;
 
     private EmployeeResponseDto updatedBy;
 }

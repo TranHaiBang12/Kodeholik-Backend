@@ -1,5 +1,6 @@
 package com.g44.kodeholik.model.entity.problem;
 
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.enums.problem.InputType;
 
 import jakarta.persistence.Column;
@@ -34,15 +35,10 @@ public class ProblemInputParameter {
     @JoinColumn(name = "problem_id", referencedColumnName = "id")
     private Problem problem;
 
-    private String name;
+    private String parameters;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type")
-    private InputType type;
+    @ManyToOne
+    @JoinColumn(name = "language_id", referencedColumnName = "id")
+    private Language language;
 
-    public ProblemInputParameter(Problem problem, String name, InputType type) {
-        this.problem = problem;
-        this.name = name;
-        this.type = type;
-    }
 }

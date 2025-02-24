@@ -1,6 +1,8 @@
 package com.g44.kodeholik.model.entity.discussion;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -12,6 +14,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -55,6 +59,10 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "comment_reply", referencedColumnName = "id")
-    private Users commentReply;
+    private Comment commentReply;
+
+    @ManyToMany
+    @JoinTable(name = "comment_vote", schema = "schema_discussion", joinColumns = @JoinColumn(name = "comment_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<Users> userVote = new HashSet<>();
 
 }

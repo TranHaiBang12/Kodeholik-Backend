@@ -28,6 +28,6 @@ public class JwtAuthenticationFailureHandler implements AuthenticationFailureHan
                 + "\"status\": 401, "
                 + "\"error\": \"Unauthorized\", "
                 + "\"message\": \"Authentication failed: bad credentials\", "
-                + "\"path\": \"/login\"}";
+                + "\"path\": \"/api/v1/auth/login\"}";
     }
 }

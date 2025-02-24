@@ -22,7 +22,13 @@ public class CommentResponseMapper implements Mapper<Comment, CommentResponseDto
 
     @Override
     public CommentResponseDto mapFrom(Comment a) {
-        return modelMapper.map(a, CommentResponseDto.class);
+        CommentResponseDto commentResponseDto = modelMapper.map(a, CommentResponseDto.class);
+        if (a.getCommentReply() != null) {
+            commentResponseDto.setReplyId(a.getCommentReply().getId());
+        } else {
+            commentResponseDto.setReplyId(null);
+        }
+        return commentResponseDto;
     }
 
 }

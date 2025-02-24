@@ -42,6 +42,9 @@ public class ProblemElasticsearch {
 
     private boolean solved;
 
+    @Field(type = FieldType.Text)
+    private String link;
+
     @Field(type = FieldType.Keyword)
     private List<String> topics;
 
