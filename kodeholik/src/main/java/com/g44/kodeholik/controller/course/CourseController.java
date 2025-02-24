@@ -1,5 +1,7 @@
 package com.g44.kodeholik.controller.course;
 
+import com.g44.kodeholik.model.entity.discussion.Comment;
+import com.g44.kodeholik.service.course.CourseCommentService;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,11 +25,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/course")
 public class CourseController {
     private final CourseService courseService;
+    private final CourseCommentService courseCommentService;
+
 
     @GetMapping("/list")
     public ResponseEntity<Page<CourseResponseDto>> getListCourse(Pageable pageable) {
@@ -74,5 +80,11 @@ public class CourseController {
     public ResponseEntity<String> unenrollUserFromCourse(@PathVariable Long courseId) {
         courseService.unenrollUserFromCourse( courseId);
         return ResponseEntity.ok("User unenrolled successfully!");
+    }
+
+    @GetMapping("/discussion/{courseId}")
+    public ResponseEntity<List<Comment>> getCourseComments(@PathVariable Long courseId) {
+        List<Comment> comments = courseCommentService.getAllCommentsByCourse(courseId);
+        return ResponseEntity.ok(comments);
     }
 }

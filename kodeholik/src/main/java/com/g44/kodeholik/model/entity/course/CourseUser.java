@@ -23,12 +23,12 @@ public class CourseUser {
     private Long userId;
 
     @ManyToOne
-    @MapsId("courseId") // Ánh xạ với trường `courseId`
+    @MapsId("courseId")
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     private Course course;
 
     @ManyToOne
-    @MapsId("userId") // Ánh xạ với trường `userId`
+    @MapsId("userId")
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users user;
 
