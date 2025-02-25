@@ -13,6 +13,7 @@ import com.g44.kodeholik.model.entity.user.Users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -73,6 +74,9 @@ public class ProblemSolution {
     @ManyToOne
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
     private Users updatedBy;
+
+    @OneToMany(mappedBy = "solution", fetch = FetchType.LAZY)
+    private Set<SolutionCode> solutionCodes;
 
     @ManyToMany
     @JoinTable(name = "problem_solution_comment", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_solution_id"), inverseJoinColumns = @JoinColumn(name = "comment_id"))

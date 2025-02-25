@@ -38,6 +38,7 @@ import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ShareSolutionRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.SolutionCodeDto;
 import com.g44.kodeholik.model.dto.request.problem.add.TemplateCode;
 import com.g44.kodeholik.model.dto.request.problem.add.TestCaseDto;
@@ -76,6 +77,7 @@ import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.InputType;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
@@ -849,7 +851,8 @@ public class ProblemServiceImpl implements ProblemService {
                                 solutionCodes.get(j).getSolutionCode(),
                                 solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
                                 responseResult.getNoSuccessTestcase(),
-                                Timestamp.from(Instant.now()));
+                                Timestamp.from(Instant.now()),
+                                SubmissionStatus.SUCCESS);
                         break;
                     case "FAILED":
                         submissionResponseDto = new FailedSubmissionResponseDto(
@@ -858,14 +861,16 @@ public class ProblemServiceImpl implements ProblemService {
                                 responseResult.getInputWrong(),
                                 solutionCodes.get(j).getSolutionCode(),
                                 solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
-                                Timestamp.from(Instant.now()));
+                                Timestamp.from(Instant.now()),
+                                SubmissionStatus.FAILED);
                         return false;
                     default:
                         submissionResponseDto = new CompileErrorResposneDto(
                                 status,
                                 solutionCodes.get(j).getSolutionCode(),
                                 solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
-                                Timestamp.from(Instant.now()));
+                                Timestamp.from(Instant.now()),
+                                SubmissionStatus.FAILED);
                         return false;
                 }
             }
@@ -1176,6 +1181,22 @@ public class ProblemServiceImpl implements ProblemService {
         Problem problem = getActivePublicProblemByLink(link);
         Users user = userService.getCurrentUser();
         return problemSubmissionService.getListSubmission(problem, user);
+    }
+
+    @Override
+    public void postSolution(List<ShareSolutionRequestDto> shareSolutionRequestDto) {
+        Users user = userService.getCurrentUser();
+        for (ShareSolutionRequestDto shareSolution : shareSolutionRequestDto) {
+            List<ProblemSubmission> problemSubmissions = new ArrayList<>();
+            Problem problem = getActivePublicProblemByLink(shareSolution.getLink());
+            shareSolution.setProblem(problem);
+            List<Long> submissionIds = shareSolution.getSubmissionId();
+            for (int i = 0; i < submissionIds.size(); i++) {
+                problemSubmissions.add(problemSubmissionService.getProblemSubmissionById(submissionIds.get(i)));
+            }
+            shareSolution.setSubmissions(problemSubmissions);
+        }
+        problemSolutionService.postSolution(shareSolutionRequestDto, user);
     }
 
 }

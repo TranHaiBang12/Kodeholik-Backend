@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.g44.kodeholik.model.dto.request.problem.add.ShareSolutionRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
@@ -35,4 +36,6 @@ public interface ProblemSolutionService {
     public void upvoteSolution(Long solutionId, Users user);
 
     public void unupvoteSolution(Long solutionId, Users user);
+
+    public void postSolution(List<ShareSolutionRequestDto> shareSolutionRequestDto, Users user);
 }

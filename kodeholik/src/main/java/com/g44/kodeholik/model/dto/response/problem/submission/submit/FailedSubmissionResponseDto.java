@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.lambda.TestResult;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 
 public class FailedSubmissionResponseDto extends SubmissionResponseDto {
     private int noSuccessTestcase;
@@ -13,8 +14,8 @@ public class FailedSubmissionResponseDto extends SubmissionResponseDto {
     private Timestamp createdAt;
 
     public FailedSubmissionResponseDto(int noSuccessTestcase, int noTestcase, TestResult inputWrong, String code,
-            String languageName, Timestamp createdAt) {
-        super(code, languageName);
+            String languageName, Timestamp createdAt, SubmissionStatus status) {
+        super(code, languageName, status);
         this.noSuccessTestcase = noSuccessTestcase;
         this.noTestcase = noTestcase;
         this.inputWrong = inputWrong;
@@ -71,5 +72,15 @@ public class FailedSubmissionResponseDto extends SubmissionResponseDto {
     @Override
     public void setLanguageName(String languageName) {
         this.languageName = languageName;
+    }
+
+    @Override
+    public SubmissionStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(SubmissionStatus status) {
+        this.status = status;
     }
 }

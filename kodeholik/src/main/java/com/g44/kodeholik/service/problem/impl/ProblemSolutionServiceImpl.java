@@ -1,5 +1,6 @@
 package com.g44.kodeholik.service.problem.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.math.*;
@@ -13,10 +14,13 @@ import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
+import com.g44.kodeholik.model.dto.request.problem.add.ShareSolutionRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
+import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
+import com.g44.kodeholik.model.entity.problem.SolutionCode;
 import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.repository.problem.ProblemSolutionRepository;
@@ -162,6 +166,40 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                     "You haven't voted this solution");
         }
 
+    }
+
+    @Override
+    public void postSolution(List<ShareSolutionRequestDto> shareSolutionRequestDtoList, Users user) {
+        for (int i = 0; i < shareSolutionRequestDtoList.size(); i++) {
+            Problem problem = shareSolutionRequestDtoList.get(i).getProblem();
+            String title = shareSolutionRequestDtoList.get(i).getTitle();
+            String textSolution = shareSolutionRequestDtoList.get(i).getTextSolution();
+            int noUpvote = 0;
+            int noComment = 0;
+            ProblemSolution problemSolution = ProblemSolution.builder()
+                    .problem(problem)
+                    .title(title)
+                    .textSolution(textSolution)
+                    .isProblemImplementation(false)
+                    .noUpvote(noUpvote)
+                    .noComment(noComment)
+                    .createdBy(user)
+                    .updatedBy(user)
+                    .build();
+            Set<SolutionCode> solutionCodes = new HashSet<SolutionCode>();
+            List<ProblemSubmission> problemSubmissionList = shareSolutionRequestDtoList.get(i).getSubmissions();
+            for (int j = 0; j < problemSubmissionList.size(); j++) {
+                ProblemSubmission problemSubmission = problemSubmissionList.get(j);
+                SolutionCode solutionCode = new SolutionCode();
+                solutionCode.setCode(problemSubmission.getCode());
+                solutionCode.setLanguage(problemSubmission.getLanguage());
+                solutionCode.setProblem(problemSubmission.getProblem());
+                solutionCode.setSolution(problemSolution);
+                solutionCodes.add(solutionCode);
+            }
+            problemSolution.setSolutionCodes(solutionCodes);
+            save(problemSolution);
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package com.g44.kodeholik.model.dto.response.problem.submission;
 
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,6 +10,7 @@ import lombok.Data;
 public abstract class SubmissionResponseDto {
     protected String code;
     protected String languageName;
+    protected SubmissionStatus status;
 
     public abstract String getCode();
 
@@ -16,4 +19,8 @@ public abstract class SubmissionResponseDto {
     public abstract String getLanguageName();
 
     public abstract void setLanguageName(String languageName);
+
+    public abstract SubmissionStatus getStatus();
+
+    public abstract void setStatus(SubmissionStatus status);
 }

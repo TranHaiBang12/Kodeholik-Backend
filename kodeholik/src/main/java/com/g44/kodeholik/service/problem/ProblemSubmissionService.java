@@ -11,7 +11,9 @@ import com.g44.kodeholik.model.dto.response.problem.submission.ProblemSubmission
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
+import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
 import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
@@ -37,7 +39,15 @@ public interface ProblemSubmissionService {
 
         public ProblemSubmissionDto getSubmissionDtoById(Long submissionId);
 
+        public ProblemSubmission getProblemSubmissionById(Long submissionId);
+
         public List<SubmissionListResponseDto> getListSubmission(
                         Problem problem,
                         Users user);
+
+        public List<SuccessSubmissionListResponseDto> getSuccessSubmissionList(
+                        Problem problem,
+                        Users user);
+
+        public SubmissionResponseDto getSubmissionDetail(Long submissionId, int noTestCase, Users currentUser);
 }

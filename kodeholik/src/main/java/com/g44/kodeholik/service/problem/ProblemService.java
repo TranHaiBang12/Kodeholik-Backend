@@ -13,6 +13,7 @@ import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ShareSolutionRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
@@ -31,6 +32,7 @@ import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
+import com.g44.kodeholik.model.entity.user.Users;
 
 public interface ProblemService {
 
@@ -116,4 +118,5 @@ public interface ProblemService {
 
         public List<SubmissionListResponseDto> getSubmissionListByUserAndProblem(String link);
 
+        public void postSolution(List<ShareSolutionRequestDto> shareSolutionRequestDto);
 }
