@@ -2,6 +2,7 @@ package com.g44.kodeholik.service.setting.impl;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -127,5 +128,25 @@ public class TagServiceImpl implements TagService {
         } else {
             skillRepository.deleteById(id);
         }
+    }
+
+    @Override
+    public List<String> getAllSkills() {
+        List<String> skillList = new ArrayList();
+        List<Skill> skills = skillRepository.findAll();
+        for (Skill skill : skills) {
+            skillList.add(skill.getName());
+        }
+        return skillList;
+    }
+
+    @Override
+    public List<String> getAllTopics() {
+        List<String> topicList = new ArrayList();
+        List<Topic> topics = topicRepository.findAll();
+        for (Topic topic : topics) {
+            topicList.add(topic.getName());
+        }
+        return topicList;
     }
 }

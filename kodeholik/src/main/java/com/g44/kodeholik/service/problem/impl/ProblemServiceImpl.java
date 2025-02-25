@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -163,7 +164,8 @@ public class ProblemServiceImpl implements ProblemService {
 
     private SubmissionResponseDto submissionResponseDto;
 
-    @Scheduled(fixedRate = 600000)
+    @Async("s3TaskExecutor")
+    @Override
     public void syncProblemsToElasticsearch() {
         List<ProblemElasticsearch> problems = problemRepository.findByStatusAndIsActive(ProblemStatus.PUBLIC, true)
                 .stream()
@@ -291,7 +293,7 @@ public class ProblemServiceImpl implements ProblemService {
         } else {
             sizeN = size.intValue();
         }
-        syncProblemsToElasticsearch();
+        // syncProblemsToElasticsearch();
         Pageable pageable;
         if (sortBy != null && !sortBy.equals("")) {
             Sort sort = ascending.booleanValue() ? Sort.by(sortBy.toString()).ascending()
@@ -494,6 +496,7 @@ public class ProblemServiceImpl implements ProblemService {
         addProblemTemplate(problemInputParameterDto, problem);
         addProblemEditorial(problemEditorialDto, problem);
         addProblemTestCase(problemTestCaseDto, problem, problemInputParameterDto);
+        syncProblemsToElasticsearch();
     }
 
     private Problem addProblemBasic(ProblemBasicAddDto problemBasicAddDto) {
@@ -538,6 +541,7 @@ public class ProblemServiceImpl implements ProblemService {
 
         problem.setTopics(topics);
         problem.setSkills(skills);
+        syncProblemsToElasticsearch();
 
         return problemRepository.save(problem);
     }

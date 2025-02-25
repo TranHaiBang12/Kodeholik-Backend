@@ -66,9 +66,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails getCurrentUserDetails() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal != null && principal instanceof UserDetails userDetails) {
-            return userDetails;
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal != null && principal instanceof UserDetails userDetails) {
+                return userDetails;
+            }
         }
         return null;
     }

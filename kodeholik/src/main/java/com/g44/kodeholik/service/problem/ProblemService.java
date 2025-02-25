@@ -33,6 +33,9 @@ import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
 
 public interface ProblemService {
+
+        public void syncProblemsToElasticsearch();
+
         public List<ProblemResponseDto> getAllProblems();
 
         public ProblemResponseDto getProblemResponseDtoById(String link);

@@ -35,7 +35,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         ProblemCompileResponseDto problemCompileResponseDto = new ProblemCompileResponseDto();
         problemCompileResponseDto
                 .setTemplate(problemTemplateService.findByProblemAndLanguage(problem, languageName).getTemplateCode());
-        List<TestCase> testCases = getSampleTestCaseByProblem(problem);
+        List<TestCase> testCases = getSampleTestCaseByProblemWithFormat(problem);
         problemCompileResponseDto.setTestCases(testCases);
         return problemCompileResponseDto;
     }
@@ -61,6 +61,26 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public List<TestCase> getSampleTestCaseByProblem(Problem problem) {
+        List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblemAndIsSample(problem, true);
+        List<TestCase> testCases = new ArrayList<>();
+        for (int i = 0; i < problemTestCase.size(); i++) {
+            List<InputVariable> inputs = new ArrayList<>();
+            Object output = null;
+            try {
+                inputs = objectMapper.readValue(
+                        problemTestCase.get(i).getInput(),
+                        new TypeReference<List<InputVariable>>() {
+                        });
+            } catch (Exception e) {
+                log.info(e.getMessage());
+            }
+            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+        }
+        return testCases;
+    }
+
+    @Override
+    public List<TestCase> getSampleTestCaseByProblemWithFormat(Problem problem) {
         List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblemAndIsSample(problem, true);
         List<TestCase> testCases = new ArrayList<>();
         for (int i = 0; i < problemTestCase.size(); i++) {
