@@ -34,7 +34,8 @@ public class Course {
 
     private String image;
 
-    private Long numberOfParticipant;
+    @Column(name = "number_of_participant")
+    private long numberOfParticipant;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

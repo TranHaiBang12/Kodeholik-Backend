@@ -25,5 +25,9 @@ public class LessonResponseDto {
 
     private LessonType type;
 
+    private String videoUrl;
+
+    private String attachedFile;
+
     private LessonStatus status;
 }

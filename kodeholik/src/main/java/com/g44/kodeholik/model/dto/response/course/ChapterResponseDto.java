@@ -1,5 +1,6 @@
 package com.g44.kodeholik.model.dto.response.course;
 
+import com.g44.kodeholik.model.entity.course.Lesson;
 import com.g44.kodeholik.model.enums.course.ChapterStatus;
 
 import lombok.AllArgsConstructor;

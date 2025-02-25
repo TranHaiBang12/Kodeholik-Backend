@@ -1,7 +1,11 @@
 package com.g44.kodeholik.controller.course;
 
+import com.g44.kodeholik.model.dto.request.course.CourseRatingRequestDto;
+import com.g44.kodeholik.model.dto.response.course.CourseRatingResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.service.course.CourseCommentService;
+import com.g44.kodeholik.service.course.CourseRatingService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +37,7 @@ import java.util.List;
 public class CourseController {
     private final CourseService courseService;
     private final CourseCommentService courseCommentService;
+    private final CourseRatingService courseRatingService;
 
 
     @GetMapping("/list")
@@ -86,5 +91,11 @@ public class CourseController {
     public ResponseEntity<List<Comment>> getCourseComments(@PathVariable Long courseId) {
         List<Comment> comments = courseCommentService.getAllCommentsByCourse(courseId);
         return ResponseEntity.ok(comments);
+    }
+
+    @PostMapping("/rate")
+    public ResponseEntity<CourseRatingResponseDto> rateCourse(@RequestBody @Valid CourseRatingRequestDto requestDto) {
+        CourseRatingResponseDto responseDto = courseRatingService.rateCourse(requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 }

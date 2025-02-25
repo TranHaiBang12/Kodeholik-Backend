@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.course.impl;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import com.g44.kodeholik.util.mapper.request.course.LessonRequestMapper;
 import com.g44.kodeholik.util.mapper.response.course.LessonResponseMapper;
 
 import lombok.RequiredArgsConstructor;
-
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class LessonServiceImpl implements LessonService {
@@ -42,6 +43,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public LessonResponseDto getLessonById(Long id) {
+        log.info(id);
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
         return lessonResponseMapper.mapFrom(lesson);

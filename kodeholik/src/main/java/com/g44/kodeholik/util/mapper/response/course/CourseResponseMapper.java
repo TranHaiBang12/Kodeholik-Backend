@@ -35,6 +35,7 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
     @Override
     public CourseResponseDto mapFrom(Course a) {
         return modelMapper.map(a, CourseResponseDto.class);
-    }
-}
 
+    }
+
+}
