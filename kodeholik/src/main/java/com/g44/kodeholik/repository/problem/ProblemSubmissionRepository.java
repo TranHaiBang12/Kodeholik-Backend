@@ -20,7 +20,7 @@ public interface ProblemSubmissionRepository extends JpaRepository<ProblemSubmis
     public List<ProblemSubmission> findByUserAndProblemAndIsAccepted(Users user, Problem problem,
             boolean isAccepted);
 
-    public Page<ProblemSubmission> findByUserAndProblem(Users user, Problem problem, Pageable pageable);
+    public List<ProblemSubmission> findByUserAndProblem(Users user, Problem problem);
 
     public Page<ProblemSubmission> findByProblem(Problem problem, Pageable pageable);
 

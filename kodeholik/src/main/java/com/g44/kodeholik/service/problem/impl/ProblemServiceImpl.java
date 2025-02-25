@@ -57,6 +57,7 @@ import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemRes
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.AcceptedSubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.CompileErrorResposneDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.FailedSubmissionResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
@@ -1164,6 +1165,13 @@ public class ProblemServiceImpl implements ProblemService {
     public void unupvoteSolution(Long solutionId) {
         Users user = userService.getCurrentUser();
         problemSolutionService.unupvoteSolution(solutionId, user);
+    }
+
+    @Override
+    public List<SubmissionListResponseDto> getSubmissionListByUserAndProblem(String link) {
+        Problem problem = getActivePublicProblemByLink(link);
+        Users user = userService.getCurrentUser();
+        return problemSubmissionService.getListSubmission(problem, user);
     }
 
 }

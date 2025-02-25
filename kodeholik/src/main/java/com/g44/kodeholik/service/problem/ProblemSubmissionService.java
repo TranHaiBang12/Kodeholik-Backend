@@ -10,8 +10,10 @@ import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.ProblemSubmissionDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
 
 public interface ProblemSubmissionService {
@@ -35,6 +37,7 @@ public interface ProblemSubmissionService {
 
         public ProblemSubmissionDto getSubmissionDtoById(Long submissionId);
 
-        public Page<ProblemSubmissionDto> getSubmissionDtosByProblemAndUser(Problem problem, Users user,
-                        Pageable pageable);
+        public List<SubmissionListResponseDto> getListSubmission(
+                        Problem problem,
+                        Users user);
 }

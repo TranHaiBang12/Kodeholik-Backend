@@ -1,5 +1,7 @@
 package com.g44.kodeholik.service.discussion;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 import com.g44.kodeholik.model.dto.request.comment.AddCommentRequestDto;
@@ -23,5 +25,9 @@ public interface CommentService {
     public void upvoteComment(Long commentId);
 
     public void unupvoteComment(Long commentId);
+
+    public List<CommentResponseDto> getAllCommentReplyByComment(Long commentId);
+
+    public int countCommentReply(Long commentId);
 
 }

@@ -26,6 +26,7 @@ import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
@@ -109,5 +110,7 @@ public interface ProblemService {
         public void upvoteSolution(Long solutionId);
 
         public void unupvoteSolution(Long solutionId);
+
+        public List<SubmissionListResponseDto> getSubmissionListByUserAndProblem(String link);
 
 }

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -22,11 +23,14 @@ import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemRes
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.AcceptedSubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.CompileErrorResposneDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.FailedSubmissionResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.InputType;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
@@ -99,6 +103,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         responseResult.getNoSuccessTestcase(),
                         Timestamp.from(Instant.now()));
                 problemSubmission.setAccepted(true);
+                problemSubmission.setStatus(SubmissionStatus.SUCCESS);
                 break;
             case "FAILED":
                 submissionResponseDto = new FailedSubmissionResponseDto(
@@ -108,6 +113,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         problemCompileRequestDto.getCode(),
                         languageName,
                         Timestamp.from(Instant.now()));
+                problemSubmission.setStatus(SubmissionStatus.FAILED);
                 problemSubmission.setAccepted(false);
                 problemSubmission.setInputWrong(gson.toJson(responseResult.getInputWrong()));
                 break;
@@ -117,8 +123,9 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         problemCompileRequestDto.getCode(),
                         languageName,
                         Timestamp.from(Instant.now()));
+                problemSubmission.setStatus(SubmissionStatus.FAILED);
                 problemSubmission.setAccepted(false);
-                problemSubmission.setStatus(status);
+                problemSubmission.setMessage(status);
                 break;
         }
         problemSubmission.setProblem(problem);
@@ -186,9 +193,16 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         runProblemResponseDto.setResults(responseResult.getResults());
         switch (status) {
             case "ACCEPTED":
+                runProblemResponseDto.setStatus(SubmissionStatus.SUCCESS);
+                runProblemResponseDto.setAccepted(true);
+                break;
+            case "FAILED":
+                runProblemResponseDto.setStatus(SubmissionStatus.SUCCESS);
                 runProblemResponseDto.setAccepted(true);
                 break;
             default:
+                runProblemResponseDto.setMessage(status);
+                runProblemResponseDto.setStatus(SubmissionStatus.FAILED);
                 runProblemResponseDto.setAccepted(false);
                 break;
         }
@@ -226,9 +240,19 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     }
 
     @Override
-    public Page<ProblemSubmissionDto> getSubmissionDtosByProblemAndUser(Problem problem, Users user,
-            Pageable pageable) {
-        Page<ProblemSubmission> problemPage = problemSubmissionRepository.findByUserAndProblem(user, problem, pageable);
-        return problemPage.map(problemSubmissionMapper::mapFrom);
+    public List<SubmissionListResponseDto> getListSubmission(Problem problem, Users user) {
+        List<ProblemSubmission> problemSubmissions = problemSubmissionRepository.findByUserAndProblem(user, problem);
+        List<SubmissionListResponseDto> submissionListResponseDtos = new ArrayList();
+        for (int i = 0; i < problemSubmissions.size(); i++) {
+            SubmissionListResponseDto submissionListResponseDto = new SubmissionListResponseDto();
+            submissionListResponseDto.setExecutionTime(problemSubmissions.get(i).getExecutionTime());
+            submissionListResponseDto.setMemoryUsage(problemSubmissions.get(i).getMemoryUsage());
+            submissionListResponseDto.setStatus(problemSubmissions.get(i).getStatus());
+            submissionListResponseDto.setLanguageName(problemSubmissions.get(i).getLanguage().getName());
+            submissionListResponseDto.setCreatedAt(problemSubmissions.get(i).getCreatedAt().getTime());
+            submissionListResponseDtos.add(submissionListResponseDto);
+        }
+        return submissionListResponseDtos;
     }
+
 }

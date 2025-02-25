@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 
@@ -14,6 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +39,16 @@ public class ProblemSubmissionController {
     public RunProblemResponseDto run(@PathVariable String link,
             @RequestBody ProblemCompileRequestDto problemCompileRequestDto) {
         return problemService.run(link, problemCompileRequestDto);
+    }
+
+    @GetMapping("/list/{link}")
+    public ResponseEntity<List<SubmissionListResponseDto>> getSubmissionListByProblemAndUser(
+            @PathVariable String link) {
+        List<SubmissionListResponseDto> submissionList = problemService.getSubmissionListByUserAndProblem(link);
+        if (submissionList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(submissionList);
     }
 
 }
