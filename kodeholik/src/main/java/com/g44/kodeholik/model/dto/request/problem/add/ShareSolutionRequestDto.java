@@ -19,9 +19,7 @@ public class ShareSolutionRequestDto {
 
     private String textSolution;
 
-    private boolean isProblemImplementation;
-
     private List<String> skills;
 
-    private List<SolutionCodeDto> solutionCodes;
+    private List<Integer> submissionId;
 }
