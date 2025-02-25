@@ -173,7 +173,7 @@ public class ProblemServiceImpl implements ProblemService {
                         .difficulty(problem.getDifficulty().toString())
                         .acceptanceRate(problem.getAcceptanceRate())
                         .noSubmission(problem.getNoSubmission())
-                        .link(problem.getTitle())
+                        .link(problem.getLink())
                         .topics(problem.getTopics().stream().map(Topic::getName).collect(Collectors.toList()))
                         .skills(problem.getSkills().stream().map(Skill::getName).collect(Collectors.toList()))
                         .solved(problemSubmissionService.checkIsCurrentUserSolvedProblem(problem))
@@ -1119,8 +1119,8 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void tagFavouriteProblem(Long problemId) {
-        Problem problem = getProblemById(problemId);
+    public void tagFavouriteProblem(String link) {
+        Problem problem = getActivePublicProblemByLink(link);
         Set<Users> userFavourite = problem.getUsersFavourite();
         Users currentUser = userService.getCurrentUser();
         for (Users user : userFavourite) {
@@ -1134,8 +1134,8 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void untagFavouriteProblem(Long problemId) {
-        Problem problem = getProblemById(problemId);
+    public void untagFavouriteProblem(String link) {
+        Problem problem = getActivePublicProblemByLink(link);
         Set<Users> userFavourite = problem.getUsersFavourite();
         Users currentUser = userService.getCurrentUser();
         boolean isInFavourite = false;

@@ -102,9 +102,9 @@ public interface ProblemService {
 
         public ProblemSolutionDto getProblemSolutionDetail(Long solutionId);
 
-        public void tagFavouriteProblem(Long problemId);
+        public void tagFavouriteProblem(String link);
 
-        public void untagFavouriteProblem(Long problemId);
+        public void untagFavouriteProblem(String link);
 
         public void upvoteSolution(Long solutionId);
 

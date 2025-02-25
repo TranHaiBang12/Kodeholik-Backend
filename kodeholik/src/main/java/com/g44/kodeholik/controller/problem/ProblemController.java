@@ -189,16 +189,16 @@ public class ProblemController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/tag-favourite/{id}")
+    @PutMapping("/tag-favourite/{link}")
 
-    public ResponseEntity<Void> tagFavouriteProblem(@PathVariable Long id) {
-        problemService.tagFavouriteProblem(id);
+    public ResponseEntity<Void> tagFavouriteProblem(@PathVariable String link) {
+        problemService.tagFavouriteProblem(link);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/untag-favourite/{id}")
-    public ResponseEntity<Void> untagFavouriteProblem(@PathVariable Long id) {
-        problemService.untagFavouriteProblem(id);
+    @PutMapping("/untag-favourite/{link}")
+    public ResponseEntity<Void> untagFavouriteProblem(@PathVariable String link) {
+        problemService.untagFavouriteProblem(link);
         return ResponseEntity.noContent().build();
     }
 
