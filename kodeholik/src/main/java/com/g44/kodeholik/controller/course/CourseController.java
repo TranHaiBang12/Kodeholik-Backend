@@ -1,6 +1,8 @@
 package com.g44.kodeholik.controller.course;
 
 import com.g44.kodeholik.model.dto.request.course.CourseRatingRequestDto;
+import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
+import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseRatingResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.service.course.CourseCommentService;
@@ -69,10 +71,15 @@ public class CourseController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<CourseResponseDto>> searchCoursesByTitle(
-            @RequestParam String keyword,
-            @PageableDefault(size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(courseService.searchCoursesByTitle(keyword, pageable));
+    public ResponseEntity<Page<CourseResponseDto>> searchCourses(
+            @RequestBody SearchCourseRequestDto request,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "title") CourseSortField sortBy,
+            @RequestParam(defaultValue = "true") Boolean ascending
+    ) {
+        Page<CourseResponseDto> courses = courseService.searchCourses(request, page, size, sortBy, ascending);
+        return ResponseEntity.ok(courses);
     }
 
     @PostMapping("/enroll/{courseId}")

@@ -1,10 +1,13 @@
 package com.g44.kodeholik.model.entity.course;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
 
@@ -57,4 +60,8 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Chapter> chapters;
+
+    @ManyToMany
+    @JoinTable(name = "course_topic", schema = "schema_course", joinColumns = @JoinColumn(name = "course_id"), inverseJoinColumns = @JoinColumn(name = "topic_id"))
+    private Set<Topic> topics = new HashSet<>();
 }

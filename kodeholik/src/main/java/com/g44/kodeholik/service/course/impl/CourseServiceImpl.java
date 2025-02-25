@@ -2,18 +2,27 @@ package com.g44.kodeholik.service.course.impl;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
+import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
+import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.entity.course.CourseUser;
+import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
 import com.g44.kodeholik.repository.course.CourseUserRepository;
+import com.g44.kodeholik.repository.setting.TopicRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.NotFoundException;
@@ -27,6 +36,7 @@ import com.g44.kodeholik.util.mapper.request.course.CourseRequestMapper;
 import com.g44.kodeholik.util.mapper.response.course.CourseResponseMapper;
 
 import lombok.RequiredArgsConstructor;
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -43,6 +53,8 @@ public class CourseServiceImpl implements CourseService {
     private final UserRepository userRepository;
 
     private final CourseUserRepository courseUserRepository;
+
+    private final TopicRepository topicRepository;
 
     @Override
     public Page<CourseResponseDto> getAllCourse(Pageable pageable) {
@@ -92,9 +104,43 @@ public class CourseServiceImpl implements CourseService {
         return coursePage.map(courseResponseMapper::mapFrom);
     }
 
+    @Override
+    public Page<CourseResponseDto> searchCourses(
+            SearchCourseRequestDto request, Integer page, Integer size,
+            CourseSortField sortBy, Boolean ascending) {
+
+        String title = request.getTitle() != null ? request.getTitle().trim() : "";
+        List<String> topicNames = request.getTopics(); // Danh sách topic name
+
+        List<Topic> topics = new ArrayList<>(); // Danh sách List<Topic> rỗng
+
+        if (topicNames != null && !topicNames.isEmpty()) {
+            Set<Topic> topicSet = topicRepository.findByNameIn(topicNames); // Lấy Set<Topic>
+            topics = new ArrayList<>(topicSet); // Convert sang List<Topic>
+        }
+
+        Sort.Direction direction = (ascending != null && ascending) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy.name());
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Course> courses;
+
+        if (title.isEmpty() && topics.isEmpty()) {
+            courses = courseRepository.findAll(pageable);
+        } else if (!title.isEmpty() && topics.isEmpty()) {
+            courses = courseRepository.findByTitleContainingIgnoreCase(title, pageable);
+        } else if (title.isEmpty()) {
+            courses = courseRepository.findByTopicsIn(topics, pageable);
+        } else {
+            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsIn(title, topics, pageable);
+        }
+
+        return courses.map(course -> courseResponseMapper.mapFrom(course));
+    }
+
     @Transactional
     @Override
-    public void enrollUserInCourse( Long courseId) {
+    public void enrollUserInCourse(Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
