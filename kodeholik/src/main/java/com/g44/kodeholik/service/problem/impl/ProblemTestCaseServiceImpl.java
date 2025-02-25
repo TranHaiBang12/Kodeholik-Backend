@@ -65,15 +65,20 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         List<TestCase> testCases = new ArrayList<>();
         for (int i = 0; i < problemTestCase.size(); i++) {
             List<InputVariable> inputs = new ArrayList<>();
+            Object output = null;
             try {
                 inputs = objectMapper.readValue(
                         problemTestCase.get(i).getInput(),
                         new TypeReference<List<InputVariable>>() {
                         });
+                output = objectMapper.readValue(
+                        problemTestCase.get(i).getExpectedOutput().toString(),
+                        Object.class);
+
             } catch (Exception e) {
                 log.info(e.getMessage());
             }
-            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+            testCases.add(new TestCase(inputs, output));
         }
         return testCases;
     }

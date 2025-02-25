@@ -197,7 +197,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                 runProblemResponseDto.setAccepted(true);
                 break;
             case "FAILED":
-                runProblemResponseDto.setStatus(SubmissionStatus.SUCCESS);
+                runProblemResponseDto.setStatus(SubmissionStatus.FAILED);
                 runProblemResponseDto.setAccepted(true);
                 break;
             default:
