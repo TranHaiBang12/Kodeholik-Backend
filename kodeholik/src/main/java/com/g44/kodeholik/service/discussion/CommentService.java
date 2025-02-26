@@ -14,6 +14,8 @@ public interface CommentService {
     public Page<CommentResponseDto> getCommentsByProblemSolutionId(Long solutionId, int page, String sortBy,
             Boolean ascending);
 
+    public boolean isUserVoteComment(Long commentId);
+
     public Comment getCommentById(Long commentId);
 
     public void saveComment(Comment comment);

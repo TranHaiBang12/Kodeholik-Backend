@@ -216,7 +216,6 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     @Override
     public boolean checkIsCurrentUserSolvedProblem(Problem problem) {
         Users currentUser = userService.getCurrentUser();
-
         return !(problemSubmissionRepository.findByUserAndProblemAndIsAccepted(currentUser, problem, true).isEmpty());
     }
 

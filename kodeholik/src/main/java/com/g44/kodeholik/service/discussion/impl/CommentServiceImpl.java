@@ -76,12 +76,15 @@ public class CommentServiceImpl implements CommentService {
         return commentResponseDtos;
     }
 
-    private boolean isUserVoteComment(Long commentId) {
+    @Override
+    public boolean isUserVoteComment(Long commentId) {
         Users currentUser = userService.getCurrentUser();
-        Set<Users> usersVote = getCommentById(commentId).getUserVote();
-        for (Users userVote : usersVote) {
-            if (userVote.getEmail().equals(currentUser.getEmail())) {
-                return true;
+        if (currentUser != null) {
+            Set<Users> usersVote = getCommentById(commentId).getUserVote();
+            for (Users userVote : usersVote) {
+                if (userVote.getEmail().equals(currentUser.getEmail())) {
+                    return true;
+                }
             }
         }
         return false;

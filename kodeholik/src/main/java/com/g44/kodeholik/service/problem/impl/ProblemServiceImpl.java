@@ -106,6 +106,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -326,19 +327,21 @@ public class ProblemServiceImpl implements ProblemService {
                                         if (searchProblemRequestDto.getTitle() != null
                                                 && !searchProblemRequestDto.getTitle().equals("")) {
                                             return m.wildcard(t -> t
-                                                    .field("title")
+                                                    .field("title.keyword")
                                                     .value("*" + searchProblemRequestDto.getTitle() + "*")
                                                     .caseInsensitive(true));
                                         } else {
                                             return m.matchAll(ma -> ma);
                                         }
-                                    }) // Fuzzy Search
+                                    })
                                     .must(m -> {
                                         if (searchProblemRequestDto.getDifficulty() != null
                                                 && !searchProblemRequestDto.getDifficulty().isEmpty()) {
-                                            return m.match(t -> t
-                                                    .field("difficulty")
-                                                    .query(String.join(" ", searchProblemRequestDto.getDifficulty())));
+                                            return m.terms(t -> t
+                                                    .field("difficulty") // Tìm chính xác theo keyword
+                                                    .terms(v -> v.value(searchProblemRequestDto.getDifficulty().stream()
+                                                            .map(FieldValue::of)
+                                                            .collect(Collectors.toList()))));
                                         } else {
                                             return m.matchAll(ma -> ma);
                                         }
@@ -368,13 +371,18 @@ public class ProblemServiceImpl implements ProblemService {
             SearchResponse<ProblemElasticsearch> searchResponse = elasticsearchClient.search(searchRequest,
                     ProblemElasticsearch.class);
 
-            List<ProblemElasticsearch> content = searchResponse.hits().hits().stream()
-                    .map(h -> h.source())
-                    .toList();
-            log.info(content);
-            Problem problem = problemRepository.findById(24L).get();
-            log.info(problem.getLink());
-            long totalHits = searchResponse.hits().total() != null ? searchResponse.hits().total().value() : 0;
+            List<ProblemElasticsearch> content;
+            long totalHits;
+
+            if (searchResponse.hits() != null) {
+                content = searchResponse.hits().hits().stream()
+                        .map(h -> h.source())
+                        .toList();
+                totalHits = searchResponse.hits().total() != null ? searchResponse.hits().total().value() : 0;
+            } else {
+                content = new ArrayList<>();
+                totalHits = 0;
+            }
             return new PageImpl<>(content, pageable, totalHits);
 
         } catch (IOException e) {
@@ -386,7 +394,7 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public List<String> getAutocompleteSuggestionsForProblemTitle(String searchText) {
         try {
-            syncProblemsToElasticsearch();
+            // syncProblemsToElasticsearch();
             if (searchText != null) {
                 SearchRequest searchRequest = SearchRequest.of(s -> s
                         .index("problems") // Tên index của bạn
@@ -407,11 +415,12 @@ public class ProblemServiceImpl implements ProblemService {
                 // Thực hiện truy vấn Elasticsearch
                 SearchResponse<ProblemElasticsearch> searchResponse = elasticsearchClient.search(searchRequest,
                         ProblemElasticsearch.class);
-
-                // Lấy các gợi ý từ kết quả trả về
-                return searchResponse.hits().hits().stream()
-                        .map(hit -> hit.source().getTitle()) // Lấy title từ kết quả
-                        .collect(Collectors.toList());
+                if (searchResponse.hits() != null) {
+                    // Lấy các gợi ý từ kết quả trả về
+                    return searchResponse.hits().hits().stream()
+                            .map(hit -> hit.source().getTitle()) // Lấy title từ kết quả
+                            .collect(Collectors.toList());
+                }
             }
             return new ArrayList<>();
         } catch (Exception e) {
