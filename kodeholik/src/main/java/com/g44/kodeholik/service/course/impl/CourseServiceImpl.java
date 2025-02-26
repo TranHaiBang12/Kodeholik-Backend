@@ -105,15 +105,34 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void editCourse(Long courseId, CourseRequestDto courseRequestDto) {
-        Course savedCourse = courseRepository.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course not found", "Course not found"));
-        Course course = courseRequestMapper.mapTo(courseRequestDto);
-        course.setId(courseId);
-        course.setUpdatedAt(Timestamp.from(Instant.now()));
-        course.setUpdatedBy(userService.getCurrentUser());
-        course.setCreatedAt(savedCourse.getCreatedAt());
-        course.setCreatedBy(savedCourse.getCreatedBy());
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new EntityNotFoundException("Course not found with id: " + courseId));
+
+        // Cập nhật thông tin (chỉ cập nhật nếu requestDto có dữ liệu)
+        if (courseRequestDto.getTitle() != null) {
+            course.setTitle(courseRequestDto.getTitle());
+        }
+        if (courseRequestDto.getDescription() != null) {
+            course.setDescription(courseRequestDto.getDescription());
+        }
+        if (courseRequestDto.getImage() != null) {
+            course.setImage(courseRequestDto.getImage());
+        }
+        if (courseRequestDto.getStatus() != null) {
+            course.setStatus(courseRequestDto.getStatus());
+        }
+
+        if (courseRequestDto.getTopicIds() != null) {
+            Set<Topic> topics = topicService.getTopicsByIds(courseRequestDto.getTopicIds());
+            course.setTopics(topics);
+        }
+
+        Users currentUser = userService.getCurrentUser();
+        course.setUpdatedBy(currentUser);
+        course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
         courseRepository.save(course);
+
     }
 
     @Override
