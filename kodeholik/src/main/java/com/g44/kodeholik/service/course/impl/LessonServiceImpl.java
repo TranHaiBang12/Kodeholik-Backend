@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.course.impl;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+import com.g44.kodeholik.model.enums.course.LessonStatus;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +38,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public Page<LessonResponseDto> getAllLesson(Pageable pageable) {
-        Page<Lesson> lessonPage = lessonRepository.findAll(pageable);
+        Page<Lesson> lessonPage = lessonRepository.findByStatus(LessonStatus.ACTIVATED,pageable);
         return lessonPage.map(lessonResponseMapper::mapFrom);
     }
 

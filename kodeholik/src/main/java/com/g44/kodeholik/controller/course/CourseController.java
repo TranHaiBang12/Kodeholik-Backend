@@ -3,6 +3,7 @@ package com.g44.kodeholik.controller.course;
 import com.g44.kodeholik.model.dto.request.course.CourseRatingRequestDto;
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
+import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.course.CourseRatingResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.service.course.CourseCommentService;
@@ -48,7 +49,7 @@ public class CourseController {
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<CourseResponseDto> getCourseDetail(@PathVariable Long id) {
+    public ResponseEntity<CourseDetailResponseDto> getCourseDetail(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.SC_OK).body(courseService.getCourseById(id));
     }
 

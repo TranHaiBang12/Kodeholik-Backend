@@ -38,7 +38,9 @@ public class Course {
     private String image;
 
     @Column(name = "number_of_participant")
-    private long numberOfParticipant;
+    private Integer numberOfParticipant;
+
+    private Double rate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

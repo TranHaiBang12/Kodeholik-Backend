@@ -18,7 +18,7 @@ public class CourseResponseDto {
 
     private String title;
 
-    private String description;
+//    private String description;
 
     private String image;
 
@@ -28,6 +28,6 @@ public class CourseResponseDto {
 
     private Integer numberOfParticipant;
 
-    private List<ChapterResponseDto> chapters;
-//    private List<TopicDto> topics;
+//    private List<ChapterResponseDto> chapters;
+    private List<String> topics;
 }

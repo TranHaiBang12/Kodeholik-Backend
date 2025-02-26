@@ -30,4 +30,6 @@ public class LessonResponseDto {
     private String attachedFile;
 
     private LessonStatus status;
+
+    //TODO: Thêm trường ifSolved
 }

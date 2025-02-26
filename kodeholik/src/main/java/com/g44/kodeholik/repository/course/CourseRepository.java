@@ -16,19 +16,12 @@ import java.util.List;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
     Page<Course> findByStatus(CourseStatus status, Pageable pageable);
-    Page<Course> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
-    Page<Course> findByTitleContainingIgnoreCaseAndTopicsIn(String title, List<Topic> topics, Pageable pageable);
+    Page<Course> findByTitleContainingIgnoreCaseAndStatus(String title, CourseStatus status, Pageable pageable);
 
-    Page<Course> findByTopicsIn(List<Topic> topics, Pageable pageable);
+    Page<Course> findByTopicsInAndStatus(List<Topic> topics, CourseStatus status, Pageable pageable);
 
+    Page<Course> findByTitleContainingIgnoreCaseAndTopicsInAndStatus(String title, List<Topic> topics, CourseStatus status, Pageable pageable);
 
-//    @Query("SELECT c FROM Course c LEFT JOIN c.topics t WHERE " +
-//            "(:title IS NULL OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))) " +
-//            "AND (:topics IS NULL OR t.name IN :topics) " +
-//            "GROUP BY c.id")
-//    Page<Course> searchCourses(@Param("title") String title,
-//                               @Param("topics") List<String> topics,
-//                               Pageable pageable);
 }
 

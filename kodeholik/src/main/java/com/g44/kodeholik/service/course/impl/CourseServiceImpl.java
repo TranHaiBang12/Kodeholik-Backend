@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
+import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 import com.g44.kodeholik.model.entity.course.CourseUser;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
@@ -15,6 +16,7 @@ import com.g44.kodeholik.model.enums.course.CourseStatus;
 import com.g44.kodeholik.repository.course.CourseUserRepository;
 import com.g44.kodeholik.repository.setting.TopicRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
+import com.g44.kodeholik.util.mapper.response.course.CourseDetailResponseMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.java.Log;
@@ -48,6 +50,8 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseResponseMapper courseResponseMapper;
 
+    private final CourseDetailResponseMapper courseDetailResponseMapper;
+
     private final UserService userService;
 
     private final UserRepository userRepository;
@@ -64,10 +68,10 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseResponseDto getCourseById(Long courseId) {
+    public CourseDetailResponseDto getCourseById(Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found"));
-        return courseResponseMapper.mapFrom(course);
+        return courseDetailResponseMapper.mapFrom(course);
     }
 
     @Override
@@ -99,43 +103,51 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Page<CourseResponseDto> searchCoursesByTitle(String keyword, Pageable pageable) {
-        Page<Course> coursePage = courseRepository.findByTitleContainingIgnoreCase(keyword, pageable);
-        return coursePage.map(courseResponseMapper::mapFrom);
-    }
-
-    @Override
     public Page<CourseResponseDto> searchCourses(
             SearchCourseRequestDto request, Integer page, Integer size,
             CourseSortField sortBy, Boolean ascending) {
 
         String title = request.getTitle() != null ? request.getTitle().trim() : "";
-        List<String> topicNames = request.getTopics(); // Danh sách topic name
+        List<String> topicNames = request.getTopics();
 
-        List<Topic> topics = new ArrayList<>(); // Danh sách List<Topic> rỗng
-
+        List<Topic> topics = new ArrayList<>();
         if (topicNames != null && !topicNames.isEmpty()) {
-            Set<Topic> topicSet = topicRepository.findByNameIn(topicNames); // Lấy Set<Topic>
-            topics = new ArrayList<>(topicSet); // Convert sang List<Topic>
+            Set<Topic> topicSet = topicRepository.findByNameIn(topicNames);
+            topics = new ArrayList<>(topicSet);
         }
 
         Sort.Direction direction = (ascending != null && ascending) ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, sortBy.name());
-        Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Course> courses;
-
-        if (title.isEmpty() && topics.isEmpty()) {
-            courses = courseRepository.findAll(pageable);
-        } else if (!title.isEmpty() && topics.isEmpty()) {
-            courses = courseRepository.findByTitleContainingIgnoreCase(title, pageable);
-        } else if (title.isEmpty()) {
-            courses = courseRepository.findByTopicsIn(topics, pageable);
-        } else {
-            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsIn(title, topics, pageable);
+        // Xác định field để sort
+        String sortField;
+        switch (sortBy) {
+            case createdAt:
+                sortField = "createdAt";
+                break;
+            case numberOfParticipant:
+                sortField = "numberOfParticipant";
+                break;
+            default:
+                sortField = "title";
         }
 
-        return courses.map(course -> courseResponseMapper.mapFrom(course));
+        Sort sort = Sort.by(direction, sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        CourseStatus activeStatus = CourseStatus.ACTIVATED;
+
+        Page<Course> courses;
+        if (title.isEmpty() && topics.isEmpty()) {
+            courses = courseRepository.findByStatus(activeStatus, pageable);
+        } else if (!title.isEmpty() && topics.isEmpty()) {
+            courses = courseRepository.findByTitleContainingIgnoreCaseAndStatus(title, activeStatus, pageable);
+        } else if (title.isEmpty()) {
+            courses = courseRepository.findByTopicsInAndStatus(topics, activeStatus, pageable);
+        } else {
+            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsInAndStatus(title, topics, activeStatus, pageable);
+        }
+
+        return courses.map(courseResponseMapper::mapFrom);
     }
 
     @Transactional
