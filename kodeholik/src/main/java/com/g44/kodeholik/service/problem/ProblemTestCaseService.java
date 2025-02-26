@@ -21,4 +21,6 @@ public interface ProblemTestCaseService {
     public void removeTestCaseByProblem(Problem problem);
 
     public List<TestCase> getSampleTestCaseByProblemWithFormat(Problem problem);
+
+    public int getNoTestCaseByProblem(Problem problem);
 }

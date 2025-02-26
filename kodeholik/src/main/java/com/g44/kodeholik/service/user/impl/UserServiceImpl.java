@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
     public Users addUserAfterLoginGoogle(AddUserRequestDto addUserRequestDto) {
         String password = PasswordUtils.generatePassword();
         Users user = addUser(addUserRequestDto, UserStatus.ACTIVATED, password);
-        emailService.sendEmailAddUser(user.getEmail(), "[KODEHOLIK] First Time Login", user.getUsername(),
+        emailService.sendEmailLoginGoogle(user.getEmail(), "[KODEHOLIK] First Time Login", user.getUsername(),
                 password);
         return user;
     }

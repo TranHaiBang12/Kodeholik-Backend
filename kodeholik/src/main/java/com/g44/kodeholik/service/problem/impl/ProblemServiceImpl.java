@@ -60,6 +60,7 @@ import com.g44.kodeholik.model.dto.response.problem.submission.submit.AcceptedSu
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.CompileErrorResposneDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.FailedSubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
@@ -324,10 +325,10 @@ public class ProblemServiceImpl implements ProblemService {
                                     .must(m -> {
                                         if (searchProblemRequestDto.getTitle() != null
                                                 && !searchProblemRequestDto.getTitle().equals("")) {
-                                            return m.match(t -> t
+                                            return m.wildcard(t -> t
                                                     .field("title")
-                                                    .query(searchProblemRequestDto.getTitle())
-                                                    .fuzziness("AUTO"));
+                                                    .value("*" + searchProblemRequestDto.getTitle() + "*")
+                                                    .caseInsensitive(true));
                                         } else {
                                             return m.matchAll(ma -> ma);
                                         }
@@ -397,9 +398,10 @@ public class ProblemServiceImpl implements ProblemService {
                         .query(q -> q
                                 .bool(b -> b
                                         .must(m -> m
-                                                .prefix(p -> p
+                                                .wildcard(p -> p
                                                         .field("titleSearchAndSort")
-                                                        .value(searchText) // Từ tìm kiếm từ người dùng
+                                                        .value("*" + searchText + "*")
+                                                        .caseInsensitive(true)// Từ tìm kiếm từ người dùng
                                                 )))));
 
                 // Thực hiện truy vấn Elasticsearch
@@ -1197,6 +1199,21 @@ public class ProblemServiceImpl implements ProblemService {
             shareSolution.setSubmissions(problemSubmissions);
         }
         problemSolutionService.postSolution(shareSolutionRequestDto, user);
+    }
+
+    @Override
+    public SubmissionResponseDto getSubmissionDetail(Long submissionId) {
+        Users currentUser = userService.getCurrentUser();
+        ProblemSubmission problemSubmission = problemSubmissionService.getProblemSubmissionById(submissionId);
+        int noTestCase = problemTestCaseService.getNoTestCaseByProblem(problemSubmission.getProblem());
+        return problemSubmissionService.getSubmissionDetail(problemSubmission, noTestCase, currentUser);
+    }
+
+    @Override
+    public List<SuccessSubmissionListResponseDto> getSuccessSubmissionList(String link, List<Long> excludes) {
+        Problem problem = getActivePublicProblemByLink(link);
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getSuccessSubmissionList(excludes, problem, currentUser);
     }
 
 }

@@ -28,6 +28,7 @@ import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListRespons
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
@@ -119,4 +120,8 @@ public interface ProblemService {
         public List<SubmissionListResponseDto> getSubmissionListByUserAndProblem(String link);
 
         public void postSolution(List<ShareSolutionRequestDto> shareSolutionRequestDto);
+
+        public SubmissionResponseDto getSubmissionDetail(Long submissionId);
+
+        public List<SuccessSubmissionListResponseDto> getSuccessSubmissionList(String link, List<Long> excludes);
 }

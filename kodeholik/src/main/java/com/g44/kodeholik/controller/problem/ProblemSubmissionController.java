@@ -7,6 +7,7 @@ import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 
@@ -49,6 +50,21 @@ public class ProblemSubmissionController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(submissionList);
+    }
+
+    @PostMapping("/success-list/{link}")
+    public ResponseEntity<List<SuccessSubmissionListResponseDto>> getSuccessSubmissionList(
+            @RequestBody List<Long> excludes,
+            @PathVariable String link) {
+        List<SuccessSubmissionListResponseDto> successSubmissionList = problemService.getSuccessSubmissionList(link,
+                excludes);
+        return ResponseEntity.ok(successSubmissionList);
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<SubmissionResponseDto> getSubmissionDetail(@PathVariable Long id) {
+        SubmissionResponseDto submissionDetail = problemService.getSubmissionDetail(id);
+        return ResponseEntity.ok(submissionDetail);
     }
 
 }

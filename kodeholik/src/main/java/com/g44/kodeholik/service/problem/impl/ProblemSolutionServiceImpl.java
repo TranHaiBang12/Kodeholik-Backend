@@ -1,5 +1,6 @@
 package com.g44.kodeholik.service.problem.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -187,11 +188,20 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                     .updatedBy(user)
                     .build();
             Set<SolutionCode> solutionCodes = new HashSet<SolutionCode>();
+            List<String> codeList = new ArrayList();
             List<ProblemSubmission> problemSubmissionList = shareSolutionRequestDtoList.get(i).getSubmissions();
             for (int j = 0; j < problemSubmissionList.size(); j++) {
                 ProblemSubmission problemSubmission = problemSubmissionList.get(j);
                 SolutionCode solutionCode = new SolutionCode();
-                solutionCode.setCode(problemSubmission.getCode());
+                String code = problemSubmission.getCode();
+                if (!codeList.contains(code)) {
+                    solutionCode.setCode(code);
+                    codeList.add(code);
+                } else {
+                    throw new BadRequestException(
+                            "There are duplicate code in the solution you trying to post. Please try again",
+                            "There are duplicate code in the solution you trying to post. Please try again");
+                }
                 solutionCode.setLanguage(problemSubmission.getLanguage());
                 solutionCode.setProblem(problemSubmission.getProblem());
                 solutionCode.setSolution(problemSolution);

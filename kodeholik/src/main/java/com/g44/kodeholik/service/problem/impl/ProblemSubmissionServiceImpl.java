@@ -255,24 +255,26 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     }
 
     @Override
-    public List<SuccessSubmissionListResponseDto> getSuccessSubmissionList(Problem problem, Users user) {
+    public List<SuccessSubmissionListResponseDto> getSuccessSubmissionList(List<Long> excludes, Problem problem,
+            Users user) {
         List<ProblemSubmission> problemSubmissions = problemSubmissionRepository.findByUserAndProblemAndIsAccepted(user,
                 problem, true);
         List<SuccessSubmissionListResponseDto> successSubmissionListResponseDtos = new ArrayList();
         for (int i = 0; i < problemSubmissions.size(); i++) {
             SuccessSubmissionListResponseDto successSubmissionListResponseDto = new SuccessSubmissionListResponseDto();
-            successSubmissionListResponseDto.setId(problemSubmissions.get(i).getId());
-            successSubmissionListResponseDto.setLanguageName(problemSubmissions.get(i).getLanguage().getName());
-            successSubmissionListResponseDto.setCreatedAt(problemSubmissions.get(i).getCreatedAt().getTime());
-            successSubmissionListResponseDtos.add(successSubmissionListResponseDto);
+            if (!excludes.contains(problemSubmissions.get(i).getId())) {
+                successSubmissionListResponseDto.setId(problemSubmissions.get(i).getId());
+                successSubmissionListResponseDto.setLanguageName(problemSubmissions.get(i).getLanguage().getName());
+                successSubmissionListResponseDto.setCreatedAt(problemSubmissions.get(i).getCreatedAt().getTime());
+                successSubmissionListResponseDtos.add(successSubmissionListResponseDto);
+            }
         }
         return successSubmissionListResponseDtos;
     }
 
     @Override
-    public SubmissionResponseDto getSubmissionDetail(Long submissionId, int noTestCase, Users currentUser) {
-        ProblemSubmission problemSubmission = problemSubmissionRepository.findById(submissionId)
-                .orElseThrow(() -> new NotFoundException("Submission not found", "Submission not found"));
+    public SubmissionResponseDto getSubmissionDetail(ProblemSubmission problemSubmission, int noTestCase,
+            Users currentUser) {
         if (currentUser.getId() != problemSubmission.getUser().getId()) {
             throw new ForbiddenException("You are not allowed to view this submission",
                     "You are not allowed to view this submission");

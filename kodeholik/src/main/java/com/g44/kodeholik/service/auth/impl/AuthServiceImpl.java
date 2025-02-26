@@ -83,12 +83,14 @@ public class AuthServiceImpl implements AuthService {
     public void loginNormal(LoginRequestDto loginRequest, HttpServletResponse response) {
         verify(loginRequest);
         String username = loginRequest.getUsername();
+
+        Users user = userRepository.existsByUsernameOrEmail(username)
+                .orElseThrow(() -> new NotFoundException("User not found", "User not found"));
         if (userRepository.isUserNotAllowed(username)) {
             throw new ForbiddenException("This account is not allowed to do this action",
                     "This account is not allowed to do this action");
         }
-        Users user = userRepository.existsByUsernameOrEmail(username)
-                .orElseThrow(() -> new NotFoundException("User not found", "User not found"));
+
         String accessToken = tokenService.generateAccessToken(user.getUsername());
         tokenService.addTokenToCookie(accessToken, response, TokenType.ACCESS);
         String refreshToken = tokenService.generateRefreshToken(user.getUsername(), new Date());
@@ -111,8 +113,8 @@ public class AuthServiceImpl implements AuthService {
                         "This account is not allowed to do this action");
             }
             String token = tokenService.generateForgotPasswordToken(username);
-            redisService.saveToken(username, token, forgotTokenExpiryTime, TokenType.FORGOT);
-            log.info(token);
+            redisService.saveToken(user.getUsername(), token, forgotTokenExpiryTime, TokenType.FORGOT);
+            // log.info(token);
             emailService.sendEmailResetPassword(user.getEmail(), "[KODEHOLIK] Reset Password", user.getUsername(),
                     feLink + token);
         } else {
@@ -139,9 +141,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ForbiddenException("This account is not allowed to do this action",
                     "This account is not allowed to do this action");
         }
-        log.info(username);
         if (userRepository.existsByUsernameOrEmail(username).isPresent()) {
-            log.info(username + "s");
             String savedToken = redisService.getToken(username, TokenType.FORGOT);
             if (savedToken != null) {
                 if (tokenService.validateToken(token) &&
@@ -165,7 +165,7 @@ public class AuthServiceImpl implements AuthService {
             } else {
                 throw new BadRequestException(
                         messageProperties.getMessage("MSG06"),
-                        "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character");
+                        messageProperties.getMessage("MSG06"));
             }
             userRepository.save(user);
             redisService.deleteToken(username, TokenType.FORGOT);
@@ -239,6 +239,7 @@ public class AuthServiceImpl implements AuthService {
         }
         Users user = userService.getCurrentUser();
         String newPassword = changePasswordRequestDto.getNewPassword();
+
         if (PasswordUtils.verifyPassword(changePasswordRequestDto.getOldPassword(), user.getPassword())) {
             if (Validation.isValidPassword(newPassword)) {
                 user.setPassword(PasswordUtils.encodePassword(newPassword));

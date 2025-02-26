@@ -119,4 +119,9 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
         return problemTestCaseRepository.findByProblem(problem);
     }
 
+    @Override
+    public int getNoTestCaseByProblem(Problem problem) {
+        return problemTestCaseRepository.countByProblem(problem);
+    }
+
 }

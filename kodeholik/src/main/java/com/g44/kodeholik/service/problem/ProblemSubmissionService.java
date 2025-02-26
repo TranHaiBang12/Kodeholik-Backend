@@ -46,8 +46,10 @@ public interface ProblemSubmissionService {
                         Users user);
 
         public List<SuccessSubmissionListResponseDto> getSuccessSubmissionList(
+                        List<Long> excludes,
                         Problem problem,
                         Users user);
 
-        public SubmissionResponseDto getSubmissionDetail(Long submissionId, int noTestCase, Users currentUser);
+        public SubmissionResponseDto getSubmissionDetail(ProblemSubmission problemSubmission, int noTestCase,
+                        Users currentUser);
 }
