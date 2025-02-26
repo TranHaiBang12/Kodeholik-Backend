@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.course.impl;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import com.g44.kodeholik.model.enums.course.CourseStatus;
 import com.g44.kodeholik.repository.course.CourseUserRepository;
 import com.g44.kodeholik.repository.setting.TopicRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
+import com.g44.kodeholik.service.setting.TopicService;
 import com.g44.kodeholik.util.mapper.response.course.CourseDetailResponseMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -60,6 +62,8 @@ public class CourseServiceImpl implements CourseService {
 
     private final TopicRepository topicRepository;
 
+    private final TopicService topicService;
+
     @Override
     public Page<CourseResponseDto> getAllCourse(Pageable pageable) {
         Page<Course> coursePage = courseRepository
@@ -75,12 +79,29 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void addCourse(CourseRequestDto courseRequestDto) {
-        Course course = courseRequestMapper.mapTo(courseRequestDto);
-        course.setCreatedAt(Timestamp.from(Instant.now()));
-        course.setCreatedBy(userService.getCurrentUser());
+    public void addCourse(CourseRequestDto requestDto) {
+        Course course = new Course();
+        course.setTitle(requestDto.getTitle());
+        course.setDescription(requestDto.getDescription());
+        course.setImage(requestDto.getImage());
+        course.setStatus(requestDto.getStatus());
+        course.setNumberOfParticipant(0);
+        course.setRate(0.0);
+        course.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
+        Set<Topic> topics = requestDto.getTopicIds() != null ?
+                topicService.getTopicsByIds(requestDto.getTopicIds()) : new HashSet<>();
+
+        course.setTopics(topics);
+
+        Users currentUser = userService.getCurrentUser();
+        course.setCreatedBy(currentUser);
+        course.setUpdatedBy(currentUser);
+
         courseRepository.save(course);
     }
+
 
     @Override
     public void editCourse(Long courseId, CourseRequestDto courseRequestDto) {

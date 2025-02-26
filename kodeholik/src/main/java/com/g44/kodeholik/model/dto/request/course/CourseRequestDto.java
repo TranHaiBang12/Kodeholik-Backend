@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -19,4 +21,6 @@ public class CourseRequestDto {
     private String image;
 
     private CourseStatus status;
+
+    private Set<Long> topicIds;
 }
