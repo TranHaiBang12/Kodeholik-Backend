@@ -3,8 +3,10 @@ package com.g44.kodeholik.controller.course;
 import com.g44.kodeholik.model.dto.request.course.CourseRatingRequestDto;
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
+import com.g44.kodeholik.model.dto.request.discussion.AddCommentRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.course.CourseRatingResponseDto;
+import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.service.course.CourseCommentService;
 import com.g44.kodeholik.service.course.CourseRatingService;
@@ -106,4 +108,12 @@ public class CourseController {
         CourseRatingResponseDto responseDto = courseRatingService.rateCourse(requestDto);
         return ResponseEntity.ok(responseDto);
     }
+
+    @PostMapping("/comment/{courseId}")
+    public ResponseEntity<CommentResponseDto> addComment(@PathVariable Long courseId,
+                                                         @RequestBody @Valid AddCommentRequestDto request) {
+        Comment comment = courseCommentService.addCommentToCourse(courseId, request);
+        return ResponseEntity.ok(new CommentResponseDto(comment));
+    }
+
 }
