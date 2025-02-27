@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.math.*;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.BadRequestException;
+import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.problem.add.ShareSolutionRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
@@ -22,7 +25,9 @@ import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.SolutionCode;
+import com.g44.kodeholik.model.entity.problem.SolutionLanguageId;
 import com.g44.kodeholik.model.entity.setting.Language;
+import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.repository.problem.ProblemSolutionRepository;
 import com.g44.kodeholik.service.problem.ProblemSolutionService;
@@ -31,7 +36,9 @@ import com.g44.kodeholik.util.mapper.response.problem.SolutionListResponseMapper
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class ProblemSolutionServiceImpl implements ProblemSolutionService {
@@ -86,6 +93,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     @Override
     public Page<SolutionListResponseDto> findOtherSolutionByProblem(Problem problem, int page, Integer size,
             String title,
+            Set<Skill> skillList,
             Language language,
             String sortBy, Boolean ascending, Pageable pageable) {
         int sizeN = 5;
@@ -115,13 +123,25 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                     throw new BadRequestException("Sort field is wrong", "Sort field is wrong");
             }
         }
-        Page<ProblemSolution> solution = problemSolutionRepository
-                .findByProblemAndIsProblemImplementationAndTitleContain(
-                        problem,
-                        title,
-                        language,
-                        false,
-                        pageable);
+        Page<ProblemSolution> solution;
+        if (skillList != null && !skillList.isEmpty()) {
+            solution = problemSolutionRepository
+                    .findByProblemAndIsProblemImplementationAndTitleContainAndSkillsIn(
+                            problem,
+                            title,
+                            language,
+                            false,
+                            skillList,
+                            pageable);
+        } else {
+            solution = problemSolutionRepository
+                    .findByProblemAndIsProblemImplementationAndTitleContain(
+                            problem,
+                            title,
+                            language,
+                            false,
+                            pageable);
+        }
         List<ProblemSolution> solutionList = solution.getContent();
         Page<SolutionListResponseDto> solutionPage = solution.map(solutionListResponseMapper::mapFrom);
         int index = 0;
@@ -170,46 +190,115 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     @Override
-    public void postSolution(List<ShareSolutionRequestDto> shareSolutionRequestDtoList, Users user) {
-        for (int i = 0; i < shareSolutionRequestDtoList.size(); i++) {
-            Problem problem = shareSolutionRequestDtoList.get(i).getProblem();
-            String title = shareSolutionRequestDtoList.get(i).getTitle();
-            String textSolution = shareSolutionRequestDtoList.get(i).getTextSolution();
-            int noUpvote = 0;
-            int noComment = 0;
-            ProblemSolution problemSolution = ProblemSolution.builder()
-                    .problem(problem)
-                    .title(title)
-                    .textSolution(textSolution)
-                    .isProblemImplementation(false)
-                    .noUpvote(noUpvote)
-                    .noComment(noComment)
-                    .createdBy(user)
-                    .updatedBy(user)
-                    .build();
-            Set<SolutionCode> solutionCodes = new HashSet<SolutionCode>();
-            List<String> codeList = new ArrayList();
-            List<ProblemSubmission> problemSubmissionList = shareSolutionRequestDtoList.get(i).getSubmissions();
-            for (int j = 0; j < problemSubmissionList.size(); j++) {
-                ProblemSubmission problemSubmission = problemSubmissionList.get(j);
-                SolutionCode solutionCode = new SolutionCode();
-                String code = problemSubmission.getCode();
-                if (!codeList.contains(code)) {
-                    solutionCode.setCode(code);
-                    codeList.add(code);
-                } else {
-                    throw new BadRequestException(
-                            "There are duplicate code in the solution you trying to post. Please try again",
-                            "There are duplicate code in the solution you trying to post. Please try again");
-                }
-                solutionCode.setLanguage(problemSubmission.getLanguage());
-                solutionCode.setProblem(problemSubmission.getProblem());
-                solutionCode.setSolution(problemSolution);
-                solutionCodes.add(solutionCode);
-            }
-            problemSolution.setSolutionCodes(solutionCodes);
-            save(problemSolution);
+    public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user) {
+
+        if (shareSolutionRequestDto.getLink() == null) {
+            throw new BadRequestException("Link cannot be null", "Link cannot be null");
         }
+        if (shareSolutionRequestDto.getSubmissionId() == null || shareSolutionRequestDto.getSubmissionId().isEmpty()) {
+            throw new BadRequestException("Submission cannot be empty", "Submission cannot be empty");
+        }
+
+        Problem problem = shareSolutionRequestDto.getProblem();
+        String title = shareSolutionRequestDto.getTitle();
+        String textSolution = shareSolutionRequestDto.getTextSolution();
+        int noUpvote = 0;
+        int noComment = 0;
+        ProblemSolution problemSolution = ProblemSolution.builder()
+                .problem(problem)
+                .title(title)
+                .textSolution(textSolution)
+                .isProblemImplementation(false)
+                .noUpvote(noUpvote)
+                .noComment(noComment)
+                .createdBy(user)
+                .createdAt(Timestamp.from(Instant.now()))
+                .build();
+        Set<SolutionCode> solutionCodes = new HashSet();
+        List<String> codeList = new ArrayList();
+        List<ProblemSubmission> problemSubmissionList = shareSolutionRequestDto.getSubmissions();
+        for (int j = 0; j < problemSubmissionList.size(); j++) {
+            ProblemSubmission problemSubmission = problemSubmissionList.get(j);
+            if (!problemSubmission.isAccepted()) {
+                throw new BadRequestException(
+                        "You can't post a solution that has not been accepted yet",
+                        "You can't post a solution that has not been accepted yet");
+            }
+            SolutionCode solutionCode = new SolutionCode();
+            String code = problemSubmission.getCode();
+            if (!codeList.contains(code)) {
+                solutionCode.setCode(code);
+                codeList.add(code);
+            } else {
+                throw new BadRequestException(
+                        "There are duplicate code in the solution you trying to post. Please try again",
+                        "There are duplicate code in the solution you trying to post. Please try again");
+            }
+            SolutionLanguageId solutionLanguageId = new SolutionLanguageId();
+            solutionLanguageId.setLanguageId(problemSubmission.getLanguage().getId());
+            solutionLanguageId.setSolutionId(problemSolution.getId());
+
+            solutionCode.setId(solutionLanguageId);
+            solutionCode.setLanguage(problemSubmission.getLanguage());
+            solutionCode.setProblem(problemSubmission.getProblem());
+            solutionCode.setSolution(problemSolution);
+            solutionCodes.add(solutionCode);
+        }
+        problemSolution.setSolutionCodes(solutionCodes);
+        problemSolutionRepository.save(problemSolution);
+
+    }
+
+    @Override
+    public void editSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user, Long solutionId,
+            Set<Skill> skills) {
+        ProblemSolution problemSolution = findSolutionById(solutionId);
+        if (!problemSolution.getCreatedBy().getEmail().equals(user.getEmail())) {
+            throw new ForbiddenException("You are not the owner of this solution",
+                    "You are not the owner of this solution");
+        }
+        if (shareSolutionRequestDto.getSubmissionId() == null || shareSolutionRequestDto.getSubmissionId().isEmpty()) {
+            throw new BadRequestException("Submission cannot be empty", "Submission cannot be empty");
+        }
+        problemSolution.setTitle(shareSolutionRequestDto.getTitle());
+        problemSolution.setTextSolution(shareSolutionRequestDto.getTextSolution());
+        problemSolution.setSkills(skills);
+
+        Set<SolutionCode> solutionCodes = new HashSet();
+        List<String> codeList = new ArrayList();
+        List<ProblemSubmission> problemSubmissionList = shareSolutionRequestDto.getSubmissions();
+        for (int j = 0; j < problemSubmissionList.size(); j++) {
+            ProblemSubmission problemSubmission = problemSubmissionList.get(j);
+            if (!problemSubmission.isAccepted()) {
+                throw new BadRequestException(
+                        "You can't post a solution that has not been accepted yet",
+                        "You can't post a solution that has not been accepted yet");
+            }
+            SolutionCode solutionCode = new SolutionCode();
+            String code = problemSubmission.getCode();
+            if (!codeList.contains(code)) {
+                solutionCode.setCode(code);
+                codeList.add(code);
+            } else {
+                throw new BadRequestException(
+                        "There are duplicate code in the solution you trying to post. Please try again",
+                        "There are duplicate code in the solution you trying to post. Please try again");
+            }
+            SolutionLanguageId solutionLanguageId = new SolutionLanguageId();
+            solutionLanguageId.setLanguageId(problemSubmission.getLanguage().getId());
+            solutionLanguageId.setSolutionId(problemSolution.getId());
+
+            solutionCode.setId(solutionLanguageId);
+            solutionCode.setLanguage(problemSubmission.getLanguage());
+            solutionCode.setProblem(problemSubmission.getProblem());
+            solutionCode.setSolution(problemSolution);
+            solutionCodes.add(solutionCode);
+        }
+        Set<SolutionCode> solutionCodeList = problemSolution.getSolutionCodes();
+        solutionCodeList.retainAll(solutionCodes);
+        solutionCodeList.addAll(solutionCodes);
+        problemSolution.setSolutionCodes(solutionCodeList);
+        problemSolutionRepository.save(problemSolution);
     }
 
 }

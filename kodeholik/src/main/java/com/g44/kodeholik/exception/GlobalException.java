@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException.Forbidden;
+import org.springframework.web.client.HttpServerErrorException.InternalServerError;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
@@ -156,6 +157,14 @@ public class GlobalException {
         @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
         @ResponseBody
         public ResponseEntity<ErrorResponse> handleIOException(IOException ex) {
+                return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                                HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        @ExceptionHandler(Exception.class)
+        @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+        @ResponseBody
+        public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
                 return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
                                 HttpStatus.INTERNAL_SERVER_ERROR);
         }

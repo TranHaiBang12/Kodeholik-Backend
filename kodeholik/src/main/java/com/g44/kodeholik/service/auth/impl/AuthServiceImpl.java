@@ -181,8 +181,6 @@ public class AuthServiceImpl implements AuthService {
             redisService.deleteToken(user.getUsername(), TokenType.REFRESH);
             tokenService.deleteCookieFromResponse(response, TokenType.ACCESS);
             tokenService.deleteCookieFromResponse(response, TokenType.REFRESH);
-        } else {
-            throw new UnauthorizedException("User not logged in", "User not logged in");
         }
     }
 

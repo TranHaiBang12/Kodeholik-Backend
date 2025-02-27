@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.problem.impl;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -1035,23 +1036,25 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public ProblemEditorialResponseDto getProblemEditorialDtoList(String link) {
         Problem problem = getActivePublicProblemByLink(link);
-        List<EditorialResponseDto> responseDtoList = new ArrayList();
         ProblemEditorialResponseDto problemEditorialResponseDto = new ProblemEditorialResponseDto();
         List<ProblemSolution> problemSolutions = problemSolutionService.findEditorialByProblem(problem);
-        for (ProblemSolution problemSolution : problemSolutions) {
+        if (!problemSolutions.isEmpty()) {
+            ProblemSolution problemSolution = problemSolutions.get(0);
             EditorialResponseDto editorialResponseDto = new EditorialResponseDto();
             List<String> skills = new ArrayList<>();
             for (Skill skill : problemSolution.getSkills()) {
                 skills.add(skill.getName());
             }
+            editorialResponseDto.setId(problemSolution.getId());
+            editorialResponseDto.setProblem(problemResponseMapper.mapFrom(problemSolution.getProblem()));
+
             editorialResponseDto.setEditorialSkills(skills);
             editorialResponseDto.setEditorialTitle(problemSolution.getTitle());
             editorialResponseDto.setEditorialTextSolution(problemSolution.getTextSolution());
             List<SolutionCodeDto> solutionCodeDtos = solutionCodeService.findBySolution(problemSolution);
             editorialResponseDto.setSolutionCodes(solutionCodeDtos);
-            responseDtoList.add(editorialResponseDto);
+            problemEditorialResponseDto.setEditorialDto(editorialResponseDto);
         }
-        problemEditorialResponseDto.setEditorialDtos(responseDtoList);
         return problemEditorialResponseDto;
     }
 
@@ -1107,15 +1110,18 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public Page<SolutionListResponseDto> getProblemListSolution(String link, int page, Integer size, String title,
             String languageName,
+            List<String> skillNames,
             String sortBy, Boolean ascending, Pageable pageable) {
         Problem problem = getActivePublicProblemByLink(link);
+        Set<Skill> skills = tagService.getSkillsByNameList(skillNames);
         if (languageName != null && languageName != "") {
             Language language = languageService.findByName(languageName);
-            return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, language, sortBy,
+            return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, skills, language,
+                    sortBy,
                     ascending,
                     pageable);
         } else {
-            return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, null, sortBy,
+            return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, skills, null, sortBy,
                     ascending,
                     pageable);
         }
@@ -1195,18 +1201,17 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void postSolution(List<ShareSolutionRequestDto> shareSolutionRequestDto) {
+    public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto) {
         Users user = userService.getCurrentUser();
-        for (ShareSolutionRequestDto shareSolution : shareSolutionRequestDto) {
-            List<ProblemSubmission> problemSubmissions = new ArrayList<>();
-            Problem problem = getActivePublicProblemByLink(shareSolution.getLink());
-            shareSolution.setProblem(problem);
-            List<Long> submissionIds = shareSolution.getSubmissionId();
-            for (int i = 0; i < submissionIds.size(); i++) {
-                problemSubmissions.add(problemSubmissionService.getProblemSubmissionById(submissionIds.get(i)));
-            }
-            shareSolution.setSubmissions(problemSubmissions);
+        List<ProblemSubmission> problemSubmissions = new ArrayList<>();
+        Problem problem = getActivePublicProblemByLink(shareSolutionRequestDto.getLink());
+        shareSolutionRequestDto.setProblem(problem);
+        List<Long> submissionIds = shareSolutionRequestDto.getSubmissionId();
+        for (int i = 0; i < submissionIds.size(); i++) {
+            problemSubmissions.add(problemSubmissionService.getProblemSubmissionById(submissionIds.get(i)));
         }
+        shareSolutionRequestDto.setSubmissions(problemSubmissions);
+
         problemSolutionService.postSolution(shareSolutionRequestDto, user);
     }
 
@@ -1223,6 +1228,37 @@ public class ProblemServiceImpl implements ProblemService {
         Problem problem = getActivePublicProblemByLink(link);
         Users currentUser = userService.getCurrentUser();
         return problemSubmissionService.getSuccessSubmissionList(excludes, problem, currentUser);
+    }
+
+    @Override
+    public void editSolution(Long solutionId, ShareSolutionRequestDto shareSolutionRequestDto) {
+        Users user = userService.getCurrentUser();
+        Set<Skill> skills = tagService.getSkillsByNameList(shareSolutionRequestDto.getSkills());
+        List<ProblemSubmission> problemSubmissions = new ArrayList<>();
+        List<Long> submissionIds = shareSolutionRequestDto.getSubmissionId();
+        for (int i = 0; i < submissionIds.size(); i++) {
+            problemSubmissions.add(problemSubmissionService.getProblemSubmissionById(submissionIds.get(i)));
+        }
+        shareSolutionRequestDto.setSubmissions(problemSubmissions);
+        problemSolutionService.editSolution(shareSolutionRequestDto, user, solutionId, skills);
+    }
+
+    @Override
+    public Page<SubmissionListResponseDto> getListSubmission(String link, SubmissionStatus status, Date start,
+            Date end, int page, Integer size, String sortBy, Boolean ascending) {
+        Users user = userService.getCurrentUser();
+        Problem problem = null;
+        if (link != null) {
+            problem = getActivePublicProblemByLink(link);
+        }
+        return problemSubmissionService.getListSubmission(user, problem, status, start, end, page, size, sortBy,
+                ascending);
+    }
+
+    @Override
+    public Map<String, String> getAllProblemHasSubmitted() {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getAllProblemHasSubmitted(currentUser);
     }
 
 }

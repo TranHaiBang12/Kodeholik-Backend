@@ -4,17 +4,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ShareSolutionRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.service.problem.ProblemService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +31,7 @@ public class ProblemSolutionController {
 
     private final ProblemService problemService;
 
-    @GetMapping("/list/{link}")
+    @PostMapping("/list/{link}")
     public ResponseEntity<Page<SolutionListResponseDto>> getListSolutionBasedOnProblemLink(
             @PathVariable String link,
             @RequestParam int page,
@@ -35,9 +40,11 @@ public class ProblemSolutionController {
             @RequestParam(required = false) String languageName,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) Boolean ascending,
+            @RequestBody List<String> skillList,
             Pageable pageable) {
         Page<SolutionListResponseDto> solutionPage = problemService.getProblemListSolution(link, page, size, title,
                 languageName,
+                skillList,
                 sortBy, ascending, pageable);
 
         if (solutionPage.isEmpty()) {
@@ -61,6 +68,19 @@ public class ProblemSolutionController {
     @PutMapping("/unupvote/{id}")
     public ResponseEntity<Void> unupvoteSolution(@PathVariable Long id) {
         problemService.unupvoteSolution(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/post-solution")
+    public ResponseEntity<Void> postSolution(@RequestBody @Valid ShareSolutionRequestDto shareSolutionRequestDto) {
+        problemService.postSolution(shareSolutionRequestDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/edit-solution/{id}")
+    public ResponseEntity<Void> editSolution(@PathVariable Long id,
+            @RequestBody @Valid ShareSolutionRequestDto shareSolutionRequestDto) {
+        problemService.editSolution(id, shareSolutionRequestDto);
         return ResponseEntity.noContent().build();
     }
 }

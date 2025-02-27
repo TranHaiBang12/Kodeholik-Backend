@@ -3,9 +3,12 @@ package com.g44.kodeholik.handler;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException.InternalServerError;
 
 import com.g44.kodeholik.config.MessageProperties;
 
@@ -26,10 +29,16 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
         response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Trả về 401
-        response.getWriter()
-                .write("{\"error\": \"Unauthorized\", \"message\": " + messageProperties.getMessage("MSG03")
-                        + "}");
+        log.info(authException);
+        if (authException instanceof BadCredentialsException
+                || authException instanceof InsufficientAuthenticationException) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"Invalid credentials\"}");
+        } else {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter()
+                    .write("{\"error\": \"Internal Server Error\", \"message\": \"Unexpected error occurred\"}");
+        }
     }
 
 }

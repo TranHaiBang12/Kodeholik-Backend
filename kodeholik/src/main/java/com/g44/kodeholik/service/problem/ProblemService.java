@@ -1,6 +1,8 @@
 package com.g44.kodeholik.service.problem;
 
+import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +36,7 @@ import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
 import com.g44.kodeholik.model.entity.user.Users;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 
 public interface ProblemService {
 
@@ -105,6 +108,7 @@ public interface ProblemService {
 
         public Page<SolutionListResponseDto> getProblemListSolution(String link, int page, Integer size, String title,
                         String languageName,
+                        List<String> skillNames,
                         String sortBy, Boolean ascending, Pageable pageable);
 
         public ProblemSolutionDto getProblemSolutionDetail(Long solutionId);
@@ -119,9 +123,23 @@ public interface ProblemService {
 
         public List<SubmissionListResponseDto> getSubmissionListByUserAndProblem(String link);
 
-        public void postSolution(List<ShareSolutionRequestDto> shareSolutionRequestDto);
+        public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto);
+
+        public void editSolution(Long solutionId, ShareSolutionRequestDto shareSolutionRequestDto);
 
         public SubmissionResponseDto getSubmissionDetail(Long submissionId);
 
         public List<SuccessSubmissionListResponseDto> getSuccessSubmissionList(String link, List<Long> excludes);
+
+        public Page<SubmissionListResponseDto> getListSubmission(
+                        String link,
+                        SubmissionStatus status,
+                        Date start,
+                        Date end,
+                        int page,
+                        Integer size,
+                        String sortBy,
+                        Boolean ascending);
+
+        public Map<String, String> getAllProblemHasSubmitted();
 }

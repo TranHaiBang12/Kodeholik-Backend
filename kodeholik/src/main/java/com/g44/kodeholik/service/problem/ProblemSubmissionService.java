@@ -1,6 +1,9 @@
 package com.g44.kodeholik.service.problem;
 
+import java.security.Timestamp;
+import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +20,7 @@ import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
 import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 
 public interface ProblemSubmissionService {
         public SubmissionResponseDto submitProblem(Problem problem,
@@ -45,6 +49,17 @@ public interface ProblemSubmissionService {
                         Problem problem,
                         Users user);
 
+        public Page<SubmissionListResponseDto> getListSubmission(
+                        Users user,
+                        Problem problem,
+                        SubmissionStatus status,
+                        Date start,
+                        Date end,
+                        int page,
+                        Integer size,
+                        String sortBy,
+                        Boolean ascending);
+
         public List<SuccessSubmissionListResponseDto> getSuccessSubmissionList(
                         List<Long> excludes,
                         Problem problem,
@@ -52,4 +67,6 @@ public interface ProblemSubmissionService {
 
         public SubmissionResponseDto getSubmissionDetail(ProblemSubmission problemSubmission, int noTestCase,
                         Users currentUser);
+
+        public Map<String, String> getAllProblemHasSubmitted(Users currentUser);
 }

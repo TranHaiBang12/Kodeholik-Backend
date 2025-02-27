@@ -1,6 +1,7 @@
 package com.g44.kodeholik.service.problem;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListRespons
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
 import com.g44.kodeholik.model.entity.setting.Language;
+import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.user.Users;
 
 public interface ProblemSolutionService {
@@ -26,6 +28,7 @@ public interface ProblemSolutionService {
 
     public Page<SolutionListResponseDto> findOtherSolutionByProblem(Problem problem, int page, Integer size,
             String title,
+            Set<Skill> skillList,
             Language language,
             String sortBy, Boolean ascending, Pageable pageable);
 
@@ -37,5 +40,8 @@ public interface ProblemSolutionService {
 
     public void unupvoteSolution(Long solutionId, Users user);
 
-    public void postSolution(List<ShareSolutionRequestDto> shareSolutionRequestDto, Users user);
+    public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user);
+
+    public void editSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user, Long solutionId,
+            Set<Skill> skills);
 }

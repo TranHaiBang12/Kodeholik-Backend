@@ -33,6 +33,7 @@ public class SecurityConfig {
 
         private final String[] publicUrls = {
                         "/login/**",
+                        "/api/v1/auth/logout",
                         "/api/v1/auth/login",
                         "/api/v1/auth/login/**",
                         "/api/v1/problem/no-achieved-info",

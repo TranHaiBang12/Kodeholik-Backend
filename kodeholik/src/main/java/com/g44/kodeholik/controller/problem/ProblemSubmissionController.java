@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.search.FilterSubmission;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
@@ -18,7 +19,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,6 +69,33 @@ public class ProblemSubmissionController {
     public ResponseEntity<SubmissionResponseDto> getSubmissionDetail(@PathVariable Long id) {
         SubmissionResponseDto submissionDetail = problemService.getSubmissionDetail(id);
         return ResponseEntity.ok(submissionDetail);
+    }
+
+    @PostMapping("/my-submission")
+    public ResponseEntity<Page<SubmissionListResponseDto>> getMySubmission(
+            @RequestBody FilterSubmission filterSubmission) {
+        Page<SubmissionListResponseDto> mySubmission = problemService.getListSubmission(
+                filterSubmission.getLink(),
+                filterSubmission.getStatus(),
+                filterSubmission.getStart(),
+                filterSubmission.getEnd(),
+                filterSubmission.getPage(),
+                filterSubmission.getSize(),
+                filterSubmission.getSortBy(),
+                filterSubmission.getAscending());
+        if (mySubmission.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(mySubmission);
+    }
+
+    @GetMapping("/problem-submitted")
+    public ResponseEntity<Map<String, String>> getProblemSubmitted() {
+        Map<String, String> map = problemService.getAllProblemHasSubmitted();
+        if (map.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(map);
     }
 
 }

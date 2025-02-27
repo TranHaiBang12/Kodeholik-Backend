@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ProblemEditorialResponseDto {
-    private List<EditorialResponseDto> editorialDtos;
+    private EditorialResponseDto editorialDto;
 
 }

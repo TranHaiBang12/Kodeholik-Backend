@@ -19,6 +19,10 @@ public class SubmissionListResponseDto {
 
     private SubmissionStatus status;
 
+    private String problemTitle;
+
+    private String problemLink;
+
     private String languageName;
 
     private double executionTime;

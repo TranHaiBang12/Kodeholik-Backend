@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class UserResponseDto {
+
+    private Long id;
+
     private String avatar;
 
     private String username;
