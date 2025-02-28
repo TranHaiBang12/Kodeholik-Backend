@@ -11,4 +11,6 @@ import com.g44.kodeholik.model.entity.course.Lesson;
 
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
     Page<Lesson> findByStatus(LessonStatus status, Pageable pageable);
+    Page<Course> findById(Long id, Pageable pageable);
+
 }
