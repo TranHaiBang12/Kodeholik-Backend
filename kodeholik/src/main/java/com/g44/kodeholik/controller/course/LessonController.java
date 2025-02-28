@@ -1,5 +1,6 @@
 package com.g44.kodeholik.controller.course;
 
+import jakarta.validation.Valid;
 import org.apache.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,13 +40,13 @@ public class LessonController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addLesson(@RequestBody LessonRequestDto lessonRequestDto) {
+    public ResponseEntity<?> addLesson(@RequestBody @Valid LessonRequestDto lessonRequestDto) {
         lessonService.addLesson(lessonRequestDto);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateLesson(@PathVariable Long id, @RequestBody LessonRequestDto lessonRequestDto) {
+    public ResponseEntity<?> updateLesson(@PathVariable Long id, @RequestBody @Valid LessonRequestDto lessonRequestDto) {
         lessonService.editLesson(id, lessonRequestDto);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
