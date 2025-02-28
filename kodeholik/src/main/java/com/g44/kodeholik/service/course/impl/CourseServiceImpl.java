@@ -2,10 +2,7 @@ package com.g44.kodeholik.service.course.impl;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
@@ -14,15 +11,18 @@ import com.g44.kodeholik.model.entity.course.CourseUser;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
+import com.g44.kodeholik.model.enums.s3.FileNameType;
 import com.g44.kodeholik.repository.course.CourseUserRepository;
 import com.g44.kodeholik.repository.setting.TopicRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
+import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.setting.TopicService;
 import com.g44.kodeholik.util.mapper.response.course.CourseDetailResponseMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,11 +40,18 @@ import com.g44.kodeholik.util.mapper.request.course.CourseRequestMapper;
 import com.g44.kodeholik.util.mapper.response.course.CourseResponseMapper;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Log4j2
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
+
+    @Value("${aws.s3.region}")
+    private String region;
+
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
 
     private final CourseRepository courseRepository;
 
@@ -64,6 +71,8 @@ public class CourseServiceImpl implements CourseService {
 
     private final TopicService topicService;
 
+    private final S3Service s3Service;
+
     @Override
     public Page<CourseResponseDto> getAllCourse(Pageable pageable) {
         Page<Course> coursePage = courseRepository
@@ -79,22 +88,26 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void addCourse(CourseRequestDto requestDto) {
+    public void addCourse(CourseRequestDto requestDto, MultipartFile imageFile) {
         Course course = new Course();
         course.setTitle(requestDto.getTitle());
         course.setDescription(requestDto.getDescription());
-        course.setImage(requestDto.getImage());
         course.setStatus(requestDto.getStatus());
         course.setNumberOfParticipant(0);
         course.setRate(0.0);
         course.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-        Set<Topic> topics = requestDto.getTopicIds() != null ?
-                topicService.getTopicsByIds(requestDto.getTopicIds()) : new HashSet<>();
-
+        // Lấy danh sách topics
+        Set<Topic> topics = topicService.getTopicsByIds(requestDto.getTopicIds());
         course.setTopics(topics);
 
+        // Upload ảnh lên AWS S3 nếu có
+        if (imageFile != null && !imageFile.isEmpty()) {
+            course.setImage(s3Service.uploadFileNameTypeFile(List.of(imageFile), FileNameType.COURSE).getFirst());
+        }
+
+        // Cập nhật người tạo course
         Users currentUser = userService.getCurrentUser();
         course.setCreatedBy(currentUser);
         course.setUpdatedBy(currentUser);
@@ -103,37 +116,35 @@ public class CourseServiceImpl implements CourseService {
     }
 
 
+
     @Override
-    public void editCourse(Long courseId, CourseRequestDto courseRequestDto) {
+    public void editCourse(Long courseId, CourseRequestDto requestDto, MultipartFile imageFile) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new EntityNotFoundException("Course not found with id: " + courseId));
+                .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
-        // Cập nhật thông tin (chỉ cập nhật nếu requestDto có dữ liệu)
-        if (courseRequestDto.getTitle() != null) {
-            course.setTitle(courseRequestDto.getTitle());
-        }
-        if (courseRequestDto.getDescription() != null) {
-            course.setDescription(courseRequestDto.getDescription());
-        }
-        if (courseRequestDto.getImage() != null) {
-            course.setImage(courseRequestDto.getImage());
-        }
-        if (courseRequestDto.getStatus() != null) {
-            course.setStatus(courseRequestDto.getStatus());
-        }
-
-        if (courseRequestDto.getTopicIds() != null) {
-            Set<Topic> topics = topicService.getTopicsByIds(courseRequestDto.getTopicIds());
-            course.setTopics(topics);
-        }
-
-        Users currentUser = userService.getCurrentUser();
-        course.setUpdatedBy(currentUser);
+        // Cập nhật các thông tin course
+        course.setTitle(requestDto.getTitle());
+        course.setDescription(requestDto.getDescription());
+        course.setStatus(requestDto.getStatus());
         course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-        courseRepository.save(course);
+        // Cập nhật danh sách topics
+        Set<Topic> topics = topicService.getTopicsByIds(requestDto.getTopicIds());
+        course.setTopics(topics);
 
+        // Cập nhật ảnh nếu có ảnh mới
+        if (imageFile != null && !imageFile.isEmpty()) {
+            course.setImage(s3Service.uploadFileNameTypeFile(List.of(imageFile), FileNameType.COURSE).getFirst());
+        }
+
+        // Cập nhật người chỉnh sửa course
+        Users currentUser = userService.getCurrentUser();
+        course.setUpdatedBy(currentUser);
+
+        courseRepository.save(course);
     }
+
+
 
     @Override
     public void deleteCourse(Long courseId) {

@@ -2,25 +2,29 @@ package com.g44.kodeholik.model.dto.request.course;
 
 import com.g44.kodeholik.model.enums.course.CourseStatus;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 
+@Getter
+@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @Builder
 public class CourseRequestDto {
+    @NotBlank(message = "MSG34")
     private String title;
 
+    @NotBlank(message = "MSG35")
     private String description;
 
-    private String image;
-
+    @NotNull
     private CourseStatus status;
 
     private Set<Long> topicIds;
 }
+

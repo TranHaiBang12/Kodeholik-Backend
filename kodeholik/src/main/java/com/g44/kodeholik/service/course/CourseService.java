@@ -8,15 +8,16 @@ import org.springframework.data.domain.Pageable;
 
 import com.g44.kodeholik.model.dto.request.course.CourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface CourseService {
     public Page<CourseResponseDto> getAllCourse(Pageable pageable);
 
     public CourseDetailResponseDto getCourseById(Long courseId);
 
-    public void addCourse(CourseRequestDto courseRequestDto);
+    public void addCourse(CourseRequestDto courseRequestDto, MultipartFile imageFile);
 
-    public void editCourse(Long courseId, CourseRequestDto courseRequestDto);
+    public void editCourse(Long courseId, CourseRequestDto courseRequestDto, MultipartFile imageFile);
 
     public void deleteCourse(Long courseId);
 

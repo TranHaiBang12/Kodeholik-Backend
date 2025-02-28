@@ -13,8 +13,7 @@ import com.g44.kodeholik.service.course.CourseRatingService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.g44.kodeholik.model.dto.request.course.CourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
@@ -26,13 +25,7 @@ import org.apache.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -56,16 +49,25 @@ public class CourseController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addCourse(@RequestBody CourseRequestDto courseRequestDto) {
-        courseService.addCourse(courseRequestDto);
+    public ResponseEntity<?> addCourse(
+            @Valid @RequestPart("data") CourseRequestDto requestDto,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+
+        courseService.addCourse(requestDto, imageFile);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
 
+
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateCourse(@PathVariable Long id, @RequestBody CourseRequestDto courseRequestDto) {
-        courseService.editCourse(id, courseRequestDto);
-        return ResponseEntity.status(HttpStatus.SC_CREATED).build();
+    public ResponseEntity<?> editCourse(
+            @PathVariable Long id,
+            @Valid @RequestPart("data") CourseRequestDto requestDto,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+
+        courseService.editCourse(id, requestDto, imageFile);
+        return ResponseEntity.ok().build();
     }
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
@@ -110,8 +112,8 @@ public class CourseController {
     }
 
     @PostMapping("/comment/{courseId}")
-    public ResponseEntity<CommentResponseDto> addComment(@PathVariable Long courseId,
-                                                         @RequestBody @Valid AddCommentRequestDto request) {
+    public ResponseEntity<CommentResponseDto> addComment(@PathVariable Long courseId ,
+                                                         @RequestBody @Valid AddCommentRequestDto request ) {
         Comment comment = courseCommentService.addCommentToCourse(courseId, request);
         return ResponseEntity.ok(new CommentResponseDto(comment));
     }

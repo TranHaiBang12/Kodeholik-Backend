@@ -7,12 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class LessonRequestDto {
+
     private Long chapterId;
 
     private String title;
@@ -24,4 +26,6 @@ public class LessonRequestDto {
     private LessonType type;
 
     private LessonStatus status;
+
+    private MultipartFile attachedFile;
 }

@@ -15,6 +15,8 @@ import java.util.List;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
+    Page<Course> findByTitle(String title, Pageable pageable);
+
     Page<Course> findByStatus(CourseStatus status, Pageable pageable);
 
     Page<Course> findByTitleContainingIgnoreCaseAndStatus(String title, CourseStatus status, Pageable pageable);
