@@ -70,16 +70,21 @@ public class CommentServiceImpl implements CommentService {
         Page<CommentResponseDto> commentResponseDtos = commentPage.map(commentResponseMapper::mapFrom);
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
             commentResponseDto.setVoted(isUserVoteComment(commentResponseDto.getId()));
+            commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
+
         }
         return commentResponseDtos;
     }
 
-    private boolean isUserVoteComment(Long commentId) {
+    @Override
+    public boolean isUserVoteComment(Long commentId) {
         Users currentUser = userService.getCurrentUser();
-        Set<Users> usersVote = getCommentById(commentId).getUserVote();
-        for (Users userVote : usersVote) {
-            if (userVote.getEmail().equals(currentUser.getEmail())) {
-                return true;
+        if (currentUser != null) {
+            Set<Users> usersVote = getCommentById(commentId).getUserVote();
+            for (Users userVote : usersVote) {
+                if (userVote.getEmail().equals(currentUser.getEmail())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -131,6 +136,7 @@ public class CommentServiceImpl implements CommentService {
         Page<CommentResponseDto> commentResponseDtos = commentPage.map(commentResponseMapper::mapFrom);
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
             commentResponseDto.setVoted(isUserVoteComment(commentResponseDto.getId()));
+            commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
         }
         return commentResponseDtos;
     }
@@ -242,5 +248,20 @@ public class CommentServiceImpl implements CommentService {
                     "You have not vote this comment");
         }
 
+    }
+
+    @Override
+    public List<CommentResponseDto> getAllCommentReplyByComment(Long commentId) {
+        Comment comment = getCommentById(commentId);
+        List<Comment> comments = commentRepository.findByCommentReply(comment);
+        return comments.stream()
+                .map(commentResponseMapper::mapFrom)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public int countCommentReply(Long commentId) {
+        Comment comment = getCommentById(commentId);
+        return commentRepository.countByCommentReply(comment);
     }
 }

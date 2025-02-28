@@ -26,6 +26,8 @@ public class CommentResponseDto {
 
     private UserResponseDto createdBy;
 
+    private int noReply;
+
     @JsonSerialize(using = TimestampSerializer.class)
     private Long createdAt;
 

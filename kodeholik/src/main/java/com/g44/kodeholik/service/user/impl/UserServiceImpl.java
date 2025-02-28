@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,11 @@ import com.g44.kodeholik.model.dto.request.user.AddUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
 import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.EditProfileRequestDto;
+import com.g44.kodeholik.model.dto.response.user.NotificationResponseDto;
 import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.s3.FileNameType;
+import com.g44.kodeholik.model.enums.user.NotificationType;
 import com.g44.kodeholik.model.enums.user.UserStatus;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
@@ -58,6 +61,8 @@ public class UserServiceImpl implements UserService {
 
     private final MessageProperties messageProperties;
 
+    private final NotificationServiceImpl notificationService;
+
     @Override
     public Users getUserById(Long userId) {
         return userRepository.findById(userId)
@@ -66,9 +71,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails getCurrentUserDetails() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal != null && principal instanceof UserDetails userDetails) {
-            return userDetails;
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal != null && principal instanceof UserDetails userDetails) {
+                return userDetails;
+            }
         }
         return null;
     }
@@ -99,8 +106,10 @@ public class UserServiceImpl implements UserService {
     public Users addUserAfterLoginGoogle(AddUserRequestDto addUserRequestDto) {
         String password = PasswordUtils.generatePassword();
         Users user = addUser(addUserRequestDto, UserStatus.ACTIVATED, password);
-        emailService.sendEmailAddUser(user.getEmail(), "[KODEHOLIK] First Time Login", user.getUsername(),
+        emailService.sendEmailLoginGoogle(user.getEmail(), "[KODEHOLIK] First Time Login", user.getUsername(),
                 password);
+        notificationService.saveNotification(user, "Welcome to Kodeholik",
+                null, NotificationType.SYSTEM);
         return user;
     }
 
@@ -142,6 +151,9 @@ public class UserServiceImpl implements UserService {
 
         emailService.sendEmailAddUser(user.getEmail(), "[KODEHOLIK] Account Created", user.getUsername(),
                 password);
+        notificationService.saveNotification(getCurrentUser(), "Welcome to Kodeholik",
+                null, NotificationType.SYSTEM);
+
         return user;
     }
 
@@ -206,7 +218,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public ProfileResponseDto getProfileCurrentUser() {
         Users user = getCurrentUser();
-        return profileResponseMapper.mapFrom(user);
+        ProfileResponseDto profileResponseDto = profileResponseMapper.mapFrom(user);
+        if (profileResponseDto.getAvatar() == null) {
+            profileResponseDto.setAvatar(
+                    s3Service.getPresignedUrl("kodeholik-avatar-image-0e609cfa-d0dd-4cd8-8ce6-6c896389a724"));
+        } else if (profileResponseDto.getAvatar().contains("kodeholik")) {
+            profileResponseDto.setAvatar(s3Service.getPresignedUrl(profileResponseDto.getAvatar()));
+        }
+        return profileResponseDto;
     }
 
     @Override
@@ -217,6 +236,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isUserNotAllowed(String username) {
         return userRepository.isUserNotAllowed(username);
+    }
+
+    @Override
+    public Page<NotificationResponseDto> getNotifications(int page, Integer size) {
+        Users user = getCurrentUser();
+        return notificationService.getNotifications(user, page, size);
     }
 
 }

@@ -2,6 +2,7 @@ package com.g44.kodeholik.service.user;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,6 +10,7 @@ import com.g44.kodeholik.model.dto.request.user.AddUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
 import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.EditProfileRequestDto;
+import com.g44.kodeholik.model.dto.response.user.NotificationResponseDto;
 import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
 import com.g44.kodeholik.model.entity.user.Users;
 
@@ -41,5 +43,7 @@ public interface UserService {
     public ProfileResponseDto editProfile(EditProfileRequestDto editProfileRequestDto);
 
     public boolean isUserNotAllowed(String username);
+
+    public Page<NotificationResponseDto> getNotifications(int page, Integer size);
 
 }

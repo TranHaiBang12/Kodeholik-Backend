@@ -3,13 +3,15 @@ package com.g44.kodeholik.model.dto.response.problem.submission.submit;
 import java.sql.Timestamp;
 
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 
 public class CompileErrorResposneDto extends SubmissionResponseDto {
     private String message;
     private Timestamp createdAt;
 
-    public CompileErrorResposneDto(String message, String code, String languageName, Timestamp createdAt) {
-        super(code, languageName);
+    public CompileErrorResposneDto(String message, String code, String languageName, Timestamp createdAt,
+            SubmissionStatus status) {
+        super(code, languageName, status);
         this.message = message;
         this.createdAt = createdAt;
     }
@@ -48,6 +50,16 @@ public class CompileErrorResposneDto extends SubmissionResponseDto {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public SubmissionStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(SubmissionStatus status) {
+        this.status = status;
     }
 
 }

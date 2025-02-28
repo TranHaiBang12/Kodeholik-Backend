@@ -14,6 +14,10 @@ public interface TagService {
 
     public Set<Topic> getTopicsByNameList(List<String> names);
 
+    public List<String> getAllSkills();
+
+    public List<String> getAllTopics();
+
     public void addTag(AddTagRequestDto addTagRequestDto);
 
     public void editTag(EditTagRequestDto editTagRequestDto);

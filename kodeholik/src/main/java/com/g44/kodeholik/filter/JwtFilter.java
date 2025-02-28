@@ -43,6 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private static List<String> skipFilterUrls = Arrays.asList(
             "/login/**",
+            "/api/v1/auth/logout",
             "/api/v1/auth/login",
             "/api/v1/auth/login/**",
             "/api/v1/problem/no-achieved-info",
@@ -56,8 +57,10 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/problem/compile-information/**",
             "/api/v1/course/list/**",
             "/api/v1/course/detail/**",
-            "/api/v1/lesson/detail/**",
-            "/api/v1/course/search/**");
+            "/api/v1/comment/problem/**",
+            "/api/v1/course/search/**",
+            "/api/v1/tag/all-skill/**",
+            "/api/v1/tag/all-topic/**");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

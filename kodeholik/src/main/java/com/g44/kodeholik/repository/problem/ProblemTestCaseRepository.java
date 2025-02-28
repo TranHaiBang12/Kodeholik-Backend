@@ -12,5 +12,7 @@ public interface ProblemTestCaseRepository extends JpaRepository<ProblemTestCase
 
     List<ProblemTestCase> findByProblem(Problem problem);
 
+    int countByProblem(Problem problem);
+
     void deleteAllByProblem(Problem problem);
 }

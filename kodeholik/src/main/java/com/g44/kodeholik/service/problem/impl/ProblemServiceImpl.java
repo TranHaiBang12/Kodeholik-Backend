@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.problem.impl;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +39,7 @@ import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ShareSolutionRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.SolutionCodeDto;
 import com.g44.kodeholik.model.dto.request.problem.add.TemplateCode;
 import com.g44.kodeholik.model.dto.request.problem.add.TestCaseDto;
@@ -57,6 +60,9 @@ import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemRes
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.AcceptedSubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.CompileErrorResposneDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.FailedSubmissionResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
@@ -74,6 +80,7 @@ import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.InputType;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
@@ -101,6 +108,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -162,7 +170,8 @@ public class ProblemServiceImpl implements ProblemService {
 
     private SubmissionResponseDto submissionResponseDto;
 
-    @Scheduled(fixedRate = 600000)
+    @Async("s3TaskExecutor")
+    @Override
     public void syncProblemsToElasticsearch() {
         List<ProblemElasticsearch> problems = problemRepository.findByStatusAndIsActive(ProblemStatus.PUBLIC, true)
                 .stream()
@@ -173,7 +182,7 @@ public class ProblemServiceImpl implements ProblemService {
                         .difficulty(problem.getDifficulty().toString())
                         .acceptanceRate(problem.getAcceptanceRate())
                         .noSubmission(problem.getNoSubmission())
-                        .link(problem.getTitle())
+                        .link(problem.getLink())
                         .topics(problem.getTopics().stream().map(Topic::getName).collect(Collectors.toList()))
                         .skills(problem.getSkills().stream().map(Skill::getName).collect(Collectors.toList()))
                         .solved(problemSubmissionService.checkIsCurrentUserSolvedProblem(problem))
@@ -290,7 +299,7 @@ public class ProblemServiceImpl implements ProblemService {
         } else {
             sizeN = size.intValue();
         }
-        syncProblemsToElasticsearch();
+        // syncProblemsToElasticsearch();
         Pageable pageable;
         if (sortBy != null && !sortBy.equals("")) {
             Sort sort = ascending.booleanValue() ? Sort.by(sortBy.toString()).ascending()
@@ -319,20 +328,22 @@ public class ProblemServiceImpl implements ProblemService {
                                     .must(m -> {
                                         if (searchProblemRequestDto.getTitle() != null
                                                 && !searchProblemRequestDto.getTitle().equals("")) {
-                                            return m.match(t -> t
-                                                    .field("title")
-                                                    .query(searchProblemRequestDto.getTitle())
-                                                    .fuzziness("AUTO"));
+                                            return m.wildcard(t -> t
+                                                    .field("title.keyword")
+                                                    .value("*" + searchProblemRequestDto.getTitle() + "*")
+                                                    .caseInsensitive(true));
                                         } else {
                                             return m.matchAll(ma -> ma);
                                         }
-                                    }) // Fuzzy Search
+                                    })
                                     .must(m -> {
                                         if (searchProblemRequestDto.getDifficulty() != null
                                                 && !searchProblemRequestDto.getDifficulty().isEmpty()) {
-                                            return m.match(t -> t
-                                                    .field("difficulty")
-                                                    .query(String.join(" ", searchProblemRequestDto.getDifficulty())));
+                                            return m.terms(t -> t
+                                                    .field("difficulty") // Tìm chính xác theo keyword
+                                                    .terms(v -> v.value(searchProblemRequestDto.getDifficulty().stream()
+                                                            .map(FieldValue::of)
+                                                            .collect(Collectors.toList()))));
                                         } else {
                                             return m.matchAll(ma -> ma);
                                         }
@@ -362,13 +373,18 @@ public class ProblemServiceImpl implements ProblemService {
             SearchResponse<ProblemElasticsearch> searchResponse = elasticsearchClient.search(searchRequest,
                     ProblemElasticsearch.class);
 
-            List<ProblemElasticsearch> content = searchResponse.hits().hits().stream()
-                    .map(h -> h.source())
-                    .toList();
-            log.info(content);
-            Problem problem = problemRepository.findById(24L).get();
-            log.info(problem.getLink());
-            long totalHits = searchResponse.hits().total() != null ? searchResponse.hits().total().value() : 0;
+            List<ProblemElasticsearch> content;
+            long totalHits;
+
+            if (searchResponse.hits() != null) {
+                content = searchResponse.hits().hits().stream()
+                        .map(h -> h.source())
+                        .toList();
+                totalHits = searchResponse.hits().total() != null ? searchResponse.hits().total().value() : 0;
+            } else {
+                content = new ArrayList<>();
+                totalHits = 0;
+            }
             return new PageImpl<>(content, pageable, totalHits);
 
         } catch (IOException e) {
@@ -380,7 +396,7 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public List<String> getAutocompleteSuggestionsForProblemTitle(String searchText) {
         try {
-            syncProblemsToElasticsearch();
+            // syncProblemsToElasticsearch();
             if (searchText != null) {
                 SearchRequest searchRequest = SearchRequest.of(s -> s
                         .index("problems") // Tên index của bạn
@@ -392,19 +408,21 @@ public class ProblemServiceImpl implements ProblemService {
                         .query(q -> q
                                 .bool(b -> b
                                         .must(m -> m
-                                                .prefix(p -> p
+                                                .wildcard(p -> p
                                                         .field("titleSearchAndSort")
-                                                        .value(searchText) // Từ tìm kiếm từ người dùng
+                                                        .value("*" + searchText + "*")
+                                                        .caseInsensitive(true)// Từ tìm kiếm từ người dùng
                                                 )))));
 
                 // Thực hiện truy vấn Elasticsearch
                 SearchResponse<ProblemElasticsearch> searchResponse = elasticsearchClient.search(searchRequest,
                         ProblemElasticsearch.class);
-
-                // Lấy các gợi ý từ kết quả trả về
-                return searchResponse.hits().hits().stream()
-                        .map(hit -> hit.source().getTitle()) // Lấy title từ kết quả
-                        .collect(Collectors.toList());
+                if (searchResponse.hits() != null) {
+                    // Lấy các gợi ý từ kết quả trả về
+                    return searchResponse.hits().hits().stream()
+                            .map(hit -> hit.source().getTitle()) // Lấy title từ kết quả
+                            .collect(Collectors.toList());
+                }
             }
             return new ArrayList<>();
         } catch (Exception e) {
@@ -493,6 +511,7 @@ public class ProblemServiceImpl implements ProblemService {
         addProblemTemplate(problemInputParameterDto, problem);
         addProblemEditorial(problemEditorialDto, problem);
         addProblemTestCase(problemTestCaseDto, problem, problemInputParameterDto);
+        syncProblemsToElasticsearch();
     }
 
     private Problem addProblemBasic(ProblemBasicAddDto problemBasicAddDto) {
@@ -537,6 +556,7 @@ public class ProblemServiceImpl implements ProblemService {
 
         problem.setTopics(topics);
         problem.setSkills(skills);
+        syncProblemsToElasticsearch();
 
         return problemRepository.save(problem);
     }
@@ -844,7 +864,8 @@ public class ProblemServiceImpl implements ProblemService {
                                 solutionCodes.get(j).getSolutionCode(),
                                 solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
                                 responseResult.getNoSuccessTestcase(),
-                                Timestamp.from(Instant.now()));
+                                Timestamp.from(Instant.now()),
+                                SubmissionStatus.SUCCESS);
                         break;
                     case "FAILED":
                         submissionResponseDto = new FailedSubmissionResponseDto(
@@ -853,14 +874,16 @@ public class ProblemServiceImpl implements ProblemService {
                                 responseResult.getInputWrong(),
                                 solutionCodes.get(j).getSolutionCode(),
                                 solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
-                                Timestamp.from(Instant.now()));
+                                Timestamp.from(Instant.now()),
+                                SubmissionStatus.FAILED);
                         return false;
                     default:
                         submissionResponseDto = new CompileErrorResposneDto(
                                 status,
                                 solutionCodes.get(j).getSolutionCode(),
                                 solutionCodes.get(j).getSolutionLanguage().toLowerCase(),
-                                Timestamp.from(Instant.now()));
+                                Timestamp.from(Instant.now()),
+                                SubmissionStatus.FAILED);
                         return false;
                 }
             }
@@ -1014,23 +1037,25 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public ProblemEditorialResponseDto getProblemEditorialDtoList(String link) {
         Problem problem = getActivePublicProblemByLink(link);
-        List<EditorialResponseDto> responseDtoList = new ArrayList();
         ProblemEditorialResponseDto problemEditorialResponseDto = new ProblemEditorialResponseDto();
         List<ProblemSolution> problemSolutions = problemSolutionService.findEditorialByProblem(problem);
-        for (ProblemSolution problemSolution : problemSolutions) {
+        if (!problemSolutions.isEmpty()) {
+            ProblemSolution problemSolution = problemSolutions.get(0);
             EditorialResponseDto editorialResponseDto = new EditorialResponseDto();
             List<String> skills = new ArrayList<>();
             for (Skill skill : problemSolution.getSkills()) {
                 skills.add(skill.getName());
             }
+            editorialResponseDto.setId(problemSolution.getId());
+            editorialResponseDto.setProblem(problemResponseMapper.mapFrom(problemSolution.getProblem()));
+
             editorialResponseDto.setEditorialSkills(skills);
             editorialResponseDto.setEditorialTitle(problemSolution.getTitle());
             editorialResponseDto.setEditorialTextSolution(problemSolution.getTextSolution());
             List<SolutionCodeDto> solutionCodeDtos = solutionCodeService.findBySolution(problemSolution);
             editorialResponseDto.setSolutionCodes(solutionCodeDtos);
-            responseDtoList.add(editorialResponseDto);
+            problemEditorialResponseDto.setEditorialDto(editorialResponseDto);
         }
-        problemEditorialResponseDto.setEditorialDtos(responseDtoList);
         return problemEditorialResponseDto;
     }
 
@@ -1086,15 +1111,18 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public Page<SolutionListResponseDto> getProblemListSolution(String link, int page, Integer size, String title,
             String languageName,
+            List<String> skillNames,
             String sortBy, Boolean ascending, Pageable pageable) {
         Problem problem = getActivePublicProblemByLink(link);
+        Set<Skill> skills = tagService.getSkillsByNameList(skillNames);
         if (languageName != null && languageName != "") {
             Language language = languageService.findByName(languageName);
-            return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, language, sortBy,
+            return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, skills, language,
+                    sortBy,
                     ascending,
                     pageable);
         } else {
-            return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, null, sortBy,
+            return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, skills, null, sortBy,
                     ascending,
                     pageable);
         }
@@ -1119,8 +1147,8 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void tagFavouriteProblem(Long problemId) {
-        Problem problem = getProblemById(problemId);
+    public void tagFavouriteProblem(String link) {
+        Problem problem = getActivePublicProblemByLink(link);
         Set<Users> userFavourite = problem.getUsersFavourite();
         Users currentUser = userService.getCurrentUser();
         for (Users user : userFavourite) {
@@ -1134,8 +1162,8 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void untagFavouriteProblem(Long problemId) {
-        Problem problem = getProblemById(problemId);
+    public void untagFavouriteProblem(String link) {
+        Problem problem = getActivePublicProblemByLink(link);
         Set<Users> userFavourite = problem.getUsersFavourite();
         Users currentUser = userService.getCurrentUser();
         boolean isInFavourite = false;
@@ -1164,6 +1192,92 @@ public class ProblemServiceImpl implements ProblemService {
     public void unupvoteSolution(Long solutionId) {
         Users user = userService.getCurrentUser();
         problemSolutionService.unupvoteSolution(solutionId, user);
+    }
+
+    @Override
+    public List<SubmissionListResponseDto> getSubmissionListByUserAndProblem(String link) {
+        Problem problem = getActivePublicProblemByLink(link);
+        Users user = userService.getCurrentUser();
+        return problemSubmissionService.getListSubmission(problem, user);
+    }
+
+    @Override
+    public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto) {
+        Users user = userService.getCurrentUser();
+        List<ProblemSubmission> problemSubmissions = new ArrayList<>();
+        Problem problem = getActivePublicProblemByLink(shareSolutionRequestDto.getLink());
+        shareSolutionRequestDto.setProblem(problem);
+        List<Long> submissionIds = shareSolutionRequestDto.getSubmissionId();
+        for (int i = 0; i < submissionIds.size(); i++) {
+            problemSubmissions.add(problemSubmissionService.getProblemSubmissionById(submissionIds.get(i)));
+        }
+        shareSolutionRequestDto.setSubmissions(problemSubmissions);
+
+        problemSolutionService.postSolution(shareSolutionRequestDto, user);
+    }
+
+    @Override
+    public SubmissionResponseDto getSubmissionDetail(Long submissionId) {
+        Users currentUser = userService.getCurrentUser();
+        ProblemSubmission problemSubmission = problemSubmissionService.getProblemSubmissionById(submissionId);
+        int noTestCase = problemTestCaseService.getNoTestCaseByProblem(problemSubmission.getProblem());
+        return problemSubmissionService.getSubmissionDetail(problemSubmission, noTestCase, currentUser);
+    }
+
+    @Override
+    public List<SuccessSubmissionListResponseDto> getSuccessSubmissionList(String link, List<Long> excludes) {
+        Problem problem = getActivePublicProblemByLink(link);
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getSuccessSubmissionList(excludes, problem, currentUser);
+    }
+
+    @Override
+    public void editSolution(Long solutionId, ShareSolutionRequestDto shareSolutionRequestDto) {
+        Users user = userService.getCurrentUser();
+        Set<Skill> skills = tagService.getSkillsByNameList(shareSolutionRequestDto.getSkills());
+        List<ProblemSubmission> problemSubmissions = new ArrayList<>();
+        List<Long> submissionIds = shareSolutionRequestDto.getSubmissionId();
+        for (int i = 0; i < submissionIds.size(); i++) {
+            problemSubmissions.add(problemSubmissionService.getProblemSubmissionById(submissionIds.get(i)));
+        }
+        shareSolutionRequestDto.setSubmissions(problemSubmissions);
+        problemSolutionService.editSolution(shareSolutionRequestDto, user, solutionId, skills);
+    }
+
+    @Override
+    public Page<SubmissionListResponseDto> getListSubmission(String link, SubmissionStatus status, Date start,
+            Date end, int page, Integer size, String sortBy, Boolean ascending) {
+        Users user = userService.getCurrentUser();
+        Problem problem = null;
+        if (link != null) {
+            problem = getActivePublicProblemByLink(link);
+        }
+        return problemSubmissionService.getListSubmission(user, problem, status, start, end, page, size, sortBy,
+                ascending);
+    }
+
+    @Override
+    public Map<String, String> getAllProblemHasSubmitted() {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getAllProblemHasSubmitted(currentUser);
+    }
+
+    @Override
+    public Page<ProblemResponseDto> findAllProblemUserFavourite(int page, Integer size) {
+        if (page < 0) {
+            throw new BadRequestException("Page must be greater than 0", "Page must be greater than 0");
+        }
+        Pageable pageable = PageRequest.of(page, size != null ? size.intValue() : 5);
+        Users currentUser = userService.getCurrentUser();
+        Page<Problem> problems = problemRepository.findByUsersFavouriteContains(currentUser, pageable);
+        return problems.map(problemResponseMapper::mapFrom);
+    }
+
+    @Override
+    public Page<ProblemProgressResponseDto> findLastSubmittedByUser(int page,
+            SubmissionStatus status, Integer size, String sortBy, Boolean ascending) {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.findLastSubmittedByUser(currentUser, status, page, size, sortBy, ascending);
     }
 
 }

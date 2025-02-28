@@ -14,6 +14,11 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class EditorialResponseDto {
+
+    private Long id;
+
+    private ProblemResponseDto problem;
+
     private String editorialTitle;
 
     private String editorialTextSolution;

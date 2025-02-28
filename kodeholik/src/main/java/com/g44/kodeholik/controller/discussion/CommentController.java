@@ -20,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -77,6 +78,14 @@ public class CommentController {
     public ResponseEntity<Void> unupvoteComment(@PathVariable Long id) {
         commentService.unupvoteComment(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/list-reply/{id}")
+    public ResponseEntity<List<CommentResponseDto>> getListReplyByCommentId(@PathVariable Long id) {
+        if (commentService.getAllCommentReplyByComment(id).isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(commentService.getAllCommentReplyByComment(id));
     }
 
 }

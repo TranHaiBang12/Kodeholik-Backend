@@ -33,7 +33,7 @@ public class ProblemElasticsearch {
     @Field(type = FieldType.Keyword)
     private String titleSearchAndSort;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Keyword)
     private String difficulty;
 
     private float acceptanceRate;

@@ -1,7 +1,9 @@
 package com.g44.kodeholik.model.entity.problem;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.g44.kodeholik.model.entity.setting.Language;
 
@@ -14,7 +16,10 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 
 @Entity
@@ -23,7 +28,8 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Data
+@Getter
+@Setter
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class SolutionCode {
     @EmbeddedId
@@ -32,7 +38,7 @@ public class SolutionCode {
     @ManyToOne
     @MapsId("solutionId")
     @JoinColumn(name = "solution_id", referencedColumnName = "id")
-    @JsonIgnore
+    @JsonBackReference
     private ProblemSolution solution;
 
     @ManyToOne

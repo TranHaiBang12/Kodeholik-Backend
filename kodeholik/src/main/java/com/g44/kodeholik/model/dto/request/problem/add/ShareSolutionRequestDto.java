@@ -2,6 +2,13 @@ package com.g44.kodeholik.model.dto.request.problem.add;
 
 import java.util.List;
 
+import com.g44.kodeholik.model.entity.problem.Problem;
+import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,16 +19,21 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ShareSolutionRequestDto {
+    private String link;
 
-    private Long problemId;
+    private Problem problem;
 
+    @NotNull(message = "MSG34")
+    @Size(min = 10, max = 200, message = "MSG34")
     private String title;
 
+    @NotNull(message = "MSG29")
+    @Size(min = 10, max = 5000, message = "MSG29")
     private String textSolution;
-
-    private boolean isProblemImplementation;
 
     private List<String> skills;
 
-    private List<SolutionCodeDto> solutionCodes;
+    private List<Long> submissionId;
+
+    private List<ProblemSubmission> submissions;
 }

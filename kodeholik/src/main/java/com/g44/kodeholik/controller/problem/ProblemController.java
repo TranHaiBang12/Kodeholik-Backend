@@ -189,17 +189,27 @@ public class ProblemController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/tag-favourite/{id}")
+    @PutMapping("/tag-favourite/{link}")
 
-    public ResponseEntity<Void> tagFavouriteProblem(@PathVariable Long id) {
-        problemService.tagFavouriteProblem(id);
+    public ResponseEntity<Void> tagFavouriteProblem(@PathVariable String link) {
+        problemService.tagFavouriteProblem(link);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/untag-favourite/{id}")
-    public ResponseEntity<Void> untagFavouriteProblem(@PathVariable Long id) {
-        problemService.untagFavouriteProblem(id);
+    @PutMapping("/untag-favourite/{link}")
+    public ResponseEntity<Void> untagFavouriteProblem(@PathVariable String link) {
+        problemService.untagFavouriteProblem(link);
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/list-favourite")
+    public ResponseEntity<Page<ProblemResponseDto>> listFavouriteProblems(
+            @RequestParam Integer page,
+            @RequestParam(required = false) Integer size) {
+        Page<ProblemResponseDto> problemResponsePage = problemService.findAllProblemUserFavourite(page, size);
+        if (problemResponsePage.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(problemResponsePage);
+    }
 }

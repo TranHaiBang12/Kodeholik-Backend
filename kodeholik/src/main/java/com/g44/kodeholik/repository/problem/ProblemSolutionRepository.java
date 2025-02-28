@@ -8,22 +8,32 @@ import org.springframework.data.jpa.repository.Query;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
 import com.g44.kodeholik.model.entity.setting.Language;
+import com.g44.kodeholik.model.entity.setting.Skill;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ProblemSolutionRepository extends JpaRepository<ProblemSolution, Long> {
 
-    List<ProblemSolution> findByProblemAndIsProblemImplementation(Problem problem, boolean isProblemImplementation);
+        List<ProblemSolution> findByProblemAndIsProblemImplementation(Problem problem, boolean isProblemImplementation);
 
-    void deleteAllByProblemAndIsProblemImplementation(Problem problem, boolean isProblemImplementation);
+        void deleteAllByProblemAndIsProblemImplementation(Problem problem, boolean isProblemImplementation);
 
-    Page<ProblemSolution> findByProblem(Problem problem, Pageable pageable);
+        Page<ProblemSolution> findByProblem(Problem problem, Pageable pageable);
 
-    @Query("SELECT p FROM ProblemSolution p JOIN SolutionCode s ON p = s.solution WHERE (cast(:title as text) IS NULL OR (p.title LIKE '%' || cast(:title as text) || '%')) AND (:language IS NULL OR s.language= :language) AND p.isProblemImplementation = :isProblemImplementation")
-    Page<ProblemSolution> findByProblemAndIsProblemImplementationAndTitleContain(Problem problem,
-            String title,
-            Language language,
-            boolean isProblemImplementation,
-            Pageable pageable);
+        @Query("SELECT p FROM ProblemSolution p JOIN SolutionCode s ON p = s.solution JOIN p.skills sk WHERE (sk IN :skills) AND p.problem = :problem AND (cast(:title as text) IS NULL OR (p.title LIKE '%' || cast(:title as text) || '%')) AND (:language IS NULL OR s.language= :language) AND p.isProblemImplementation = :isProblemImplementation")
+        Page<ProblemSolution> findByProblemAndIsProblemImplementationAndTitleContainAndSkillsIn(Problem problem,
+                        String title,
+                        Language language,
+                        boolean isProblemImplementation,
+                        Set<Skill> skills,
+                        Pageable pageable);
+
+        @Query("SELECT p FROM ProblemSolution p JOIN SolutionCode s ON p = s.solution WHERE p.problem = :problem AND (cast(:title as text) IS NULL OR (p.title LIKE '%' || cast(:title as text) || '%')) AND (:language IS NULL OR s.language= :language) AND p.isProblemImplementation = :isProblemImplementation")
+        Page<ProblemSolution> findByProblemAndIsProblemImplementationAndTitleContain(Problem problem,
+                        String title,
+                        Language language,
+                        boolean isProblemImplementation,
+                        Pageable pageable);
 
 }

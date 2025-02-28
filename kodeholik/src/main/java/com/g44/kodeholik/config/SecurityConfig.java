@@ -33,6 +33,7 @@ public class SecurityConfig {
 
         private final String[] publicUrls = {
                         "/login/**",
+                        "/api/v1/auth/logout",
                         "/api/v1/auth/login",
                         "/api/v1/auth/login/**",
                         "/api/v1/problem/no-achieved-info",
@@ -47,6 +48,9 @@ public class SecurityConfig {
                         "/api/v1/course/list/**",
                         "/api/v1/course/detail/**",
                         "/api/v1/course/search/**",
+                        "/api/v1/comment/problem/**",
+                        "/api/v1/tag/all-skill/**",
+                        "/api/v1/tag/all-topic/**"
         };
 
         private final String[] teacherUrls = {
