@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,6 +33,7 @@ import com.g44.kodeholik.model.dto.response.problem.submission.submit.CompileErr
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.FailedSubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
@@ -39,6 +41,7 @@ import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.InputType;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.model.enums.user.ProgressType;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
@@ -227,6 +230,10 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         return !(problemSubmissionRepository.findByUserAndProblemAndIsAccepted(currentUser, problem, true).isEmpty());
     }
 
+    public boolean checkIsUserSolvedProblem(Users user, Problem problem) {
+        return !(problemSubmissionRepository.findByUserAndProblemAndIsAccepted(user, problem, true).isEmpty());
+    }
+
     @Override
     public Long countByIsAcceptedAndProblem(boolean isAccepted, Problem problem) {
         return problemSubmissionRepository.countByIsAcceptedAndProblem(isAccepted, problem);
@@ -364,7 +371,6 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         Timestamp startTimestamp = start != null ? new Timestamp(start.getTime())
                 : Timestamp.valueOf("1970-01-01 00:00:00");
         Timestamp endTimestamp = end != null ? new Timestamp(end.getTime()) : Timestamp.valueOf("2100-01-01 00:00:00");
-        log.info(startTimestamp + " " + endTimestamp);
         Page<ProblemSubmission> problemSubmissions = problemSubmissionRepository
                 .findByUserAndTimeBetween(
                         user,
@@ -385,6 +391,55 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
             problemHasSubmitted.put(problems.get(i).getTitle(), problems.get(i).getLink());
         }
         return problemHasSubmitted;
+    }
+
+    @Override
+    public Page<ProblemProgressResponseDto> findLastSubmittedByUser(
+            Users user,
+            SubmissionStatus status, int page, Integer size, String sortBy, Boolean ascending) {
+        if (page < 0) {
+            throw new BadRequestException("Page must be greater than 0", "Page must be greater than 0");
+        }
+        Pageable pageable;
+        if (sortBy != null
+                && (sortBy.equals("createdAt") || sortBy.equals("noSubmission"))) {
+            if (sortBy.equals("noSubmission"))
+                sortBy = "problem.noSubmission";
+            Sort sort = ascending.booleanValue() ? Sort.by(sortBy.toString()).ascending()
+                    : Sort.by(sortBy.toString()).descending();
+            pageable = PageRequest.of(page, size == null ? 5 : size.intValue(), sort);
+        } else {
+            pageable = PageRequest.of(page, size == null ? 5 : size.intValue());
+        }
+        Page<Object[]> lastSubmitted;
+        if (status == null) {
+            lastSubmitted = problemSubmissionRepository.findLastSubmittedByUserAndProblemIn(user, pageable);
+        } else {
+            if (status == SubmissionStatus.SUCCESS) {
+                lastSubmitted = problemSubmissionRepository.findLastSubmittedByUserAndProblemInAndSuccessStatus(user,
+                        pageable);
+            } else {
+                lastSubmitted = problemSubmissionRepository.findLastSubmittedByUserAndProblemInAndFailedStatus(user,
+                        pageable);
+            }
+        }
+        List<ProblemProgressResponseDto> problemProgressResponseDtos = new ArrayList<>();
+        for (Object[] obj : lastSubmitted) {
+            ProblemProgressResponseDto problemProgressResponseDto = new ProblemProgressResponseDto();
+            Problem problem = (Problem) obj[0];
+            if (checkIsUserSolvedProblem(user, problem)) {
+                problemProgressResponseDto.setProgressType(ProgressType.SOLVED);
+            } else {
+                problemProgressResponseDto.setProgressType(ProgressType.ATTEMPTED);
+            }
+            problemProgressResponseDto.setProblemTitle(problem.getTitle());
+            problemProgressResponseDto.setProblemLink(problem.getLink());
+            problemProgressResponseDto.setDifficulty(problem.getDifficulty());
+            problemProgressResponseDto.setLastSubmitted(((Timestamp) obj[2]).getTime());
+            problemProgressResponseDto.setNoSubmission(problem.getNoSubmission());
+            problemProgressResponseDtos.add(problemProgressResponseDto);
+        }
+        return new PageImpl<>(problemProgressResponseDtos, pageable, lastSubmitted.getTotalElements());
     }
 
 }

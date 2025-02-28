@@ -2,6 +2,7 @@ package com.g44.kodeholik.repository.problem;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,33 +16,59 @@ import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 
 public interface ProblemSubmissionRepository extends JpaRepository<ProblemSubmission, Long> {
-    public long countByIsAcceptedAndProblem(boolean isAccepted, Problem problem);
+        public long countByIsAcceptedAndProblem(boolean isAccepted, Problem problem);
 
-    @Query("SELECT COUNT(DISTINCT p.problem) FROM ProblemSubmission p WHERE p.user = :user AND p.isAccepted = :isAccepted AND p.problem IN :problems")
-    public long countByUserAndIsAcceptedAndProblemIn(
-            Users user,
-            boolean isAccepted,
-            List<Problem> problems);
+        @Query("SELECT COUNT(DISTINCT p.problem) FROM ProblemSubmission p WHERE p.user = :user AND p.isAccepted = :isAccepted AND p.problem IN :problems")
+        public long countByUserAndIsAcceptedAndProblemIn(
+                        Users user,
+                        boolean isAccepted,
+                        List<Problem> problems);
 
-    public List<ProblemSubmission> findByUserAndProblemAndIsAccepted(
-            Users user,
-            Problem problem,
-            boolean isAccepted);
+        public List<ProblemSubmission> findByUserAndProblemAndIsAccepted(
+                        Users user,
+                        Problem problem,
+                        boolean isAccepted);
 
-    public List<ProblemSubmission> findByUserAndProblem(Users user, Problem problem);
+        public List<ProblemSubmission> findByUserAndProblem(Users user, Problem problem);
 
-    @Query("SELECT p FROM ProblemSubmission p WHERE p.user = :user AND (:problem IS NULL OR p.problem = :problem) AND (COALESCE(:status, p.status) = p.status) AND (p.createdAt >= :start AND p.createdAt <= :end)")
-    public Page<ProblemSubmission> findByUserAndTimeBetween(
-            @Param("user") Users user,
-            @Param("problem") Problem problem,
-            @Param("status") SubmissionStatus status,
-            @Param("start") Timestamp start,
-            @Param("end") Timestamp end,
-            Pageable pageable);
+        @Query("SELECT p FROM ProblemSubmission p WHERE p.user = :user AND (:problem IS NULL OR p.problem = :problem) AND (COALESCE(:status, p.status) = p.status) AND (p.createdAt >= :start AND p.createdAt <= :end)")
+        public Page<ProblemSubmission> findByUserAndTimeBetween(
+                        @Param("user") Users user,
+                        @Param("problem") Problem problem,
+                        @Param("status") SubmissionStatus status,
+                        @Param("start") Timestamp start,
+                        @Param("end") Timestamp end,
+                        Pageable pageable);
 
-    public Page<ProblemSubmission> findByProblem(Problem problem, Pageable pageable);
+        public Page<ProblemSubmission> findByProblem(Problem problem, Pageable pageable);
 
-    @Query("SELECT DISTINCT p.problem FROM ProblemSubmission p WHERE p.user = :user")
-    public List<Problem> findByUserAndProblemDistinct(Users user);
+        @Query("SELECT DISTINCT p.problem FROM ProblemSubmission p WHERE p.user = :user")
+        public List<Problem> findByUserAndProblemDistinct(Users user);
+
+        @Query("SELECT p.problem, p.problem.noSubmission, MAX(p.createdAt) AS createdAt  FROM ProblemSubmission p WHERE p.user = :user  GROUP BY p.problem")
+        public Page<Object[]> findLastSubmittedByUserAndProblemIn(Users user,
+                        Pageable pageable);
+
+        @Query("SELECT p.problem, p.problem.noSubmission, MAX(p.createdAt) AS createdAt " +
+                        "FROM ProblemSubmission p " +
+                        "WHERE p.user = :user AND " +
+                        "(p.problem IN " +
+                        "(SELECT ps.problem FROM ProblemSubmission ps WHERE 'SUCCESS' = ps.status)) "
+                        +
+                        "GROUP BY p.problem")
+        Page<Object[]> findLastSubmittedByUserAndProblemInAndSuccessStatus(
+                        @Param("user") Users user,
+                        Pageable pageable);
+
+        @Query("SELECT p.problem, p.problem.noSubmission, MAX(p.createdAt) AS createdAt " +
+                        "FROM ProblemSubmission p " +
+                        "WHERE p.user = :user AND " +
+                        "(p.problem NOT IN " +
+                        "(SELECT ps.problem FROM ProblemSubmission ps WHERE 'SUCCESS' = ps.status)) "
+                        +
+                        "GROUP BY p.problem")
+        Page<Object[]> findLastSubmittedByUserAndProblemInAndFailedStatus(
+                        @Param("user") Users user,
+                        Pageable pageable);
 
 }

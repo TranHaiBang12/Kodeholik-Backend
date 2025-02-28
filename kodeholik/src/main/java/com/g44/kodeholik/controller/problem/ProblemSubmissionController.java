@@ -4,11 +4,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.search.FilterProgress;
 import com.g44.kodeholik.model.dto.request.problem.search.FilterSubmission;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 
@@ -96,6 +98,18 @@ public class ProblemSubmissionController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(map);
+    }
+
+    @PostMapping("/my-progress")
+    public ResponseEntity<Page<ProblemProgressResponseDto>> getMyProgress(
+            @RequestBody FilterProgress filterProgress) {
+        Page<ProblemProgressResponseDto> myProgress = problemService.findLastSubmittedByUser(filterProgress.getPage(),
+                filterProgress.getStatus(), filterProgress.getSize(), filterProgress.getSortBy(),
+                filterProgress.getAscending());
+        if (myProgress.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(myProgress);
     }
 
 }

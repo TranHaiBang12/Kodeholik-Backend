@@ -62,6 +62,7 @@ import com.g44.kodeholik.model.dto.response.problem.submission.submit.CompileErr
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.FailedSubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
@@ -1270,6 +1271,13 @@ public class ProblemServiceImpl implements ProblemService {
         Users currentUser = userService.getCurrentUser();
         Page<Problem> problems = problemRepository.findByUsersFavouriteContains(currentUser, pageable);
         return problems.map(problemResponseMapper::mapFrom);
+    }
+
+    @Override
+    public Page<ProblemProgressResponseDto> findLastSubmittedByUser(int page,
+            SubmissionStatus status, Integer size, String sortBy, Boolean ascending) {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.findLastSubmittedByUser(currentUser, status, page, size, sortBy, ascending);
     }
 
 }

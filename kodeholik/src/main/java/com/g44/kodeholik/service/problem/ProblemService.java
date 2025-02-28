@@ -31,6 +31,7 @@ import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionRespons
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
@@ -144,4 +145,8 @@ public interface ProblemService {
         public Map<String, String> getAllProblemHasSubmitted();
 
         public Page<ProblemResponseDto> findAllProblemUserFavourite(int page, Integer size);
+
+        public Page<ProblemProgressResponseDto> findLastSubmittedByUser(
+                        int page,
+                        SubmissionStatus status, Integer size, String sortBy, Boolean ascending);
 }

@@ -1,6 +1,6 @@
 package com.g44.kodeholik.service.problem;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 import java.sql.Date;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +15,7 @@ import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionRespons
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
@@ -69,4 +70,10 @@ public interface ProblemSubmissionService {
                         Users currentUser);
 
         public Map<String, String> getAllProblemHasSubmitted(Users currentUser);
+
+        public Page<ProblemProgressResponseDto> findLastSubmittedByUser(
+                        Users user,
+                        SubmissionStatus status,
+                        int page,
+                        Integer size, String sortBy, Boolean ascending);
 }

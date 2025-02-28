@@ -30,4 +30,5 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
     public boolean isTitleExisted(@Param("title") String title);
 
     public Page<Problem> findByUsersFavouriteContains(Users user, Pageable pageable);
+
 }
