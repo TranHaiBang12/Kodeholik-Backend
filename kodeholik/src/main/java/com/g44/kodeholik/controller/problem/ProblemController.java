@@ -202,4 +202,14 @@ public class ProblemController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/list-favourite")
+    public ResponseEntity<Page<ProblemResponseDto>> listFavouriteProblems(
+            @RequestParam Integer page,
+            @RequestParam(required = false) Integer size) {
+        Page<ProblemResponseDto> problemResponsePage = problemService.findAllProblemUserFavourite(page, size);
+        if (problemResponsePage.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(problemResponsePage);
+    }
 }

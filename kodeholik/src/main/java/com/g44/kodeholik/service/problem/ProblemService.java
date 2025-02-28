@@ -142,4 +142,6 @@ public interface ProblemService {
                         Boolean ascending);
 
         public Map<String, String> getAllProblemHasSubmitted();
+
+        public Page<ProblemResponseDto> findAllProblemUserFavourite(int page, Integer size);
 }

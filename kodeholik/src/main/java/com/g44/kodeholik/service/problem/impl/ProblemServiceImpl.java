@@ -1261,4 +1261,15 @@ public class ProblemServiceImpl implements ProblemService {
         return problemSubmissionService.getAllProblemHasSubmitted(currentUser);
     }
 
+    @Override
+    public Page<ProblemResponseDto> findAllProblemUserFavourite(int page, Integer size) {
+        if (page < 0) {
+            throw new BadRequestException("Page must be greater than 0", "Page must be greater than 0");
+        }
+        Pageable pageable = PageRequest.of(page, size != null ? size.intValue() : 5);
+        Users currentUser = userService.getCurrentUser();
+        Page<Problem> problems = problemRepository.findByUsersFavouriteContains(currentUser, pageable);
+        return problems.map(problemResponseMapper::mapFrom);
+    }
+
 }

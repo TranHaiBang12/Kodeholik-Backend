@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -167,6 +168,16 @@ public class GlobalException {
         public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
                 return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
                                 HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        @ExceptionHandler(BadCredentialsException.class)
+        @ResponseStatus(HttpStatus.UNAUTHORIZED)
+        @ResponseBody
+        public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+                return new ResponseEntity(
+                                new ErrorResponse(messageProperties.getMessage("MSG03"),
+                                                messageProperties.getMessage("MSG03")),
+                                HttpStatus.UNAUTHORIZED);
         }
 
         @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
