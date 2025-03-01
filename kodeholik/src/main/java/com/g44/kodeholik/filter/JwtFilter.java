@@ -43,6 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private static List<String> skipFilterUrls = Arrays.asList(
             "/login/**",
+            "/api/v1/lambda/**",
             "/api/v1/auth/logout",
             "/api/v1/auth/login",
             "/api/v1/auth/login/**",

@@ -141,8 +141,9 @@ public class AuthServiceImpl implements AuthService {
             throw new ForbiddenException("This account is not allowed to do this action",
                     "This account is not allowed to do this action");
         }
-        if (userRepository.existsByUsernameOrEmail(username).isPresent()) {
-            String savedToken = redisService.getToken(username, TokenType.FORGOT);
+        Optional<Users> user = userRepository.existsByUsernameOrEmail(username);
+        if (user.isPresent()) {
+            String savedToken = redisService.getToken(user.get().getUsername(), TokenType.FORGOT);
             if (savedToken != null) {
                 if (tokenService.validateToken(token) &&
                         token.equals(savedToken.trim())) {

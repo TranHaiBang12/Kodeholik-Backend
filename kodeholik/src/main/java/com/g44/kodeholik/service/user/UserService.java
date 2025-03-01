@@ -12,6 +12,7 @@ import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.EditProfileRequestDto;
 import com.g44.kodeholik.model.dto.response.user.NotificationResponseDto;
 import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.user.Users;
 
 public interface UserService {
@@ -45,5 +46,7 @@ public interface UserService {
     public boolean isUserNotAllowed(String username);
 
     public Page<NotificationResponseDto> getNotifications(int page, Integer size);
+
+    public UserResponseDto getOtherProfile(Long userId);
 
 }

@@ -22,6 +22,7 @@ import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.EditProfileRequestDto;
 import com.g44.kodeholik.model.dto.response.user.NotificationResponseDto;
 import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.s3.FileNameType;
 import com.g44.kodeholik.model.enums.user.NotificationType;
@@ -34,6 +35,7 @@ import com.g44.kodeholik.util.mapper.request.user.AddUserAvatarFileMapper;
 import com.g44.kodeholik.util.mapper.request.user.AddUserRequestMapper;
 import com.g44.kodeholik.util.mapper.request.user.EditProfileRequestMapper;
 import com.g44.kodeholik.util.mapper.response.user.ProfileResponseMapper;
+import com.g44.kodeholik.util.mapper.response.user.UserResponseMapper;
 import com.g44.kodeholik.util.password.PasswordUtils;
 import com.g44.kodeholik.util.validation.Validation;
 
@@ -58,6 +60,8 @@ public class UserServiceImpl implements UserService {
     private final EditProfileRequestMapper editProfileRequestMapper;
 
     private final ProfileResponseMapper profileResponseMapper;
+
+    private final UserResponseMapper userResponseMapper;
 
     private final MessageProperties messageProperties;
 
@@ -242,6 +246,16 @@ public class UserServiceImpl implements UserService {
     public Page<NotificationResponseDto> getNotifications(int page, Integer size) {
         Users user = getCurrentUser();
         return notificationService.getNotifications(user, page, size);
+    }
+
+    @Override
+    public UserResponseDto getOtherProfile(Long userId) {
+        Users currentUser = getCurrentUser();
+        if (currentUser.getId().intValue() == userId) {
+            throw new BadRequestException("Cannot get your own profile", "Cannot get your own profile");
+        }
+        Users user = getUserById(userId);
+        return userResponseMapper.mapFrom(user);
     }
 
 }

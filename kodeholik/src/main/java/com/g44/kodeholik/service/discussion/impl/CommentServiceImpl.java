@@ -61,11 +61,12 @@ public class CommentServiceImpl implements CommentService {
         Problem problem = problemService.getActivePublicProblemByLink(link);
         Set<Comment> comments = problem.getComments();
         Page<Comment> commentPage;
-        if (sortBy != null && ascending != null) {
+        if (sortBy != null && ascending != null && (sortBy.equals("noUpvote") || sortBy.equals("createdAt"))) {
             Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
             commentPage = getCommentsPage(comments, page, 5, sort);
         } else {
-            commentPage = getCommentsPage(comments, page, 5, null);
+            Sort sort = ascending ? Sort.by("createdAt").ascending() : Sort.by("createdAt").descending();
+            commentPage = getCommentsPage(comments, page, 5, sort);
         }
         Page<CommentResponseDto> commentResponseDtos = commentPage.map(commentResponseMapper::mapFrom);
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
@@ -127,11 +128,12 @@ public class CommentServiceImpl implements CommentService {
         ProblemSolution problemSolution = problemSolutionService.findSolutionById(solutionId);
         Set<Comment> comments = problemSolution.getComments();
         Page<Comment> commentPage;
-        if (sortBy != null && ascending != null) {
+        if (sortBy != null && ascending != null && (sortBy.equals("noUpvote") || sortBy.equals("createdAt"))) {
             Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
             commentPage = getCommentsPage(comments, page, 5, sort);
         } else {
-            commentPage = getCommentsPage(comments, page, 5, null);
+            Sort sort = ascending ? Sort.by("createdAt").ascending() : Sort.by("createdAt").descending();
+            commentPage = getCommentsPage(comments, page, 5, sort);
         }
         Page<CommentResponseDto> commentResponseDtos = commentPage.map(commentResponseMapper::mapFrom);
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {

@@ -64,11 +64,12 @@ public class ProblemController {
             @RequestPart(name = "problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
             @RequestPart(name = "problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
             @RequestPart(name = "problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
-            @RequestPart(name = "excelFile") MultipartFile excelFile) {
+            @RequestPart(name = "javaTestCaseFile") MultipartFile javaTestCaseFile,
+            @RequestPart(name = "cTestCaseFile") MultipartFile cTestCaseFile) {
         problemService.addProblem(problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
-                excelFile);
+                javaTestCaseFile);
 
         // problemService.addProblem(problemRequestDto.getProblemBasicAddDto(),
         // problemRequestDto.getProblemEditorialDto(),

@@ -1,4 +1,7 @@
 {
+  "settings": {
+    "index.refresh_interval": "30s"
+  },
     "analysis": {
       "analyzer": {
         "autocomplete": {

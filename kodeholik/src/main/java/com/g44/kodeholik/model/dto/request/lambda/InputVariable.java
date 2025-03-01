@@ -13,4 +13,5 @@ public class InputVariable {
     private String name;
     private String type;
     private Object value;
+
 }

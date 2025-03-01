@@ -44,6 +44,7 @@ import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 import com.g44.kodeholik.model.enums.user.ProgressType;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
+import com.g44.kodeholik.service.CompileService;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
 import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 import com.g44.kodeholik.service.setting.LanguageService;
@@ -84,12 +85,12 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         }
         String languageName = problemCompileRequestDto.getLanguageName();
         String functionSignature = problemTemplate.getFunctionSignature();
-        InputType inputType = problemTemplate.getReturnType();
+        String inputType = getReturnForJava(problemTemplate);
         LambdaRequest lambdaRequest = new LambdaRequest(
                 languageName,
                 problemCompileRequestDto.getCode(),
                 functionSignature,
-                inputType.toString(),
+                inputType,
                 testCases);
         String result = lambdaService.invokeLambdaFunction(lambdaRequest);
         String status = "";
@@ -169,6 +170,11 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         return submissionResponseDto;
     }
 
+    private String getReturnForJava(ProblemTemplate problemTemplate) {
+        String[] words = problemTemplate.getTemplateCode().split(" ");
+        return words[2];
+    }
+
     @Override
     public RunProblemResponseDto run(Problem problem, ProblemCompileRequestDto problemCompileRequestDto,
             List<TestCase> testCases, ProblemTemplate problemTemplate) {
@@ -177,46 +183,56 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         }
         String languageName = problemCompileRequestDto.getLanguageName();
         String functionSignature = problemTemplate.getFunctionSignature();
-        InputType inputType = problemTemplate.getReturnType();
+        String inputType = getReturnForJava(problemTemplate);
         LambdaRequest lambdaRequest = new LambdaRequest(
                 languageName,
                 problemCompileRequestDto.getCode(),
                 functionSignature,
-                inputType.toString(),
+                inputType,
                 testCases);
-        String result = lambdaService.invokeLambdaFunction(lambdaRequest);
-        String status = "";
-        ResponseResult responseResult = new ResponseResult();
-        RunProblemResponseDto runProblemResponseDto = new RunProblemResponseDto();
+        log.info(lambdaRequest);
         try {
-            responseResult = gson.fromJson(result, ResponseResult.class);
-            if (responseResult.isAccepted()) {
-                status = "ACCEPTED";
-            } else {
-                status = "FAILED";
-            }
+            String result = CompileService.compileAndRun(problemCompileRequestDto.getCode(), testCases, languageName,
+                    functionSignature, inputType.toString());
+            log.info(result);
         } catch (Exception e) {
-            status = result;
+            log.info(e);
         }
-        log.info(responseResult.getResults());
+        return null;
 
-        runProblemResponseDto.setResults(responseResult.getResults());
-        switch (status) {
-            case "ACCEPTED":
-                runProblemResponseDto.setStatus(SubmissionStatus.SUCCESS);
-                runProblemResponseDto.setAccepted(true);
-                break;
-            case "FAILED":
-                runProblemResponseDto.setStatus(SubmissionStatus.FAILED);
-                runProblemResponseDto.setAccepted(true);
-                break;
-            default:
-                runProblemResponseDto.setMessage(status);
-                runProblemResponseDto.setStatus(SubmissionStatus.FAILED);
-                runProblemResponseDto.setAccepted(false);
-                break;
-        }
-        return runProblemResponseDto;
+        // String result = lambdaService.invokeLambdaFunction(lambdaRequest);
+        // String status = "";
+        // ResponseResult responseResult = new ResponseResult();
+        // RunProblemResponseDto runProblemResponseDto = new RunProblemResponseDto();
+        // try {
+        // responseResult = gson.fromJson(result, ResponseResult.class);
+        // if (responseResult.isAccepted()) {
+        // status = "ACCEPTED";
+        // } else {
+        // status = "FAILED";
+        // }
+        // } catch (Exception e) {
+        // status = result;
+        // }
+        // log.info(responseResult.getResults());
+
+        // runProblemResponseDto.setResults(responseResult.getResults());
+        // switch (status) {
+        // case "ACCEPTED":
+        // runProblemResponseDto.setStatus(SubmissionStatus.SUCCESS);
+        // runProblemResponseDto.setAccepted(true);
+        // break;
+        // case "FAILED":
+        // runProblemResponseDto.setStatus(SubmissionStatus.FAILED);
+        // runProblemResponseDto.setAccepted(true);
+        // break;
+        // default:
+        // runProblemResponseDto.setMessage(status);
+        // runProblemResponseDto.setStatus(SubmissionStatus.FAILED);
+        // runProblemResponseDto.setAccepted(false);
+        // break;
+        // }
+        // return runProblemResponseDto;
     }
 
     @Override

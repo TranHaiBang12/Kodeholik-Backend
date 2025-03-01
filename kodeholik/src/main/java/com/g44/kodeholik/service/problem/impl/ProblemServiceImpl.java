@@ -440,6 +440,7 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public RunProblemResponseDto run(String link, ProblemCompileRequestDto problemCompileRequestDto) {
+        log.info(link);
         Problem problem = getActivePublicProblemByLink(link);
         return problemSubmissionService.run(problem, problemCompileRequestDto, getSampleTestCaseByProblem(link),
                 findByProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()));

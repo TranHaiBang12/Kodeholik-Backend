@@ -11,7 +11,8 @@ import org.springframework.stereotype.Repository;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 
 @Repository
-public interface ProblemElasticsearchRepository extends ElasticsearchRepository<ProblemElasticsearch, Long> {
+public interface ProblemElasticsearchRepository
+    extends ElasticsearchRepository<ProblemElasticsearch, Long> {
 
   @Query("""
       {
