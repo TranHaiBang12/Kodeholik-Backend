@@ -85,7 +85,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         }
         String languageName = problemCompileRequestDto.getLanguageName();
         String functionSignature = problemTemplate.getFunctionSignature();
-        String inputType = getReturnForJava(problemTemplate);
+        String inputType = getReturn(problemTemplate, languageName);
         LambdaRequest lambdaRequest = new LambdaRequest(
                 languageName,
                 problemCompileRequestDto.getCode(),
@@ -170,9 +170,14 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         return submissionResponseDto;
     }
 
-    private String getReturnForJava(ProblemTemplate problemTemplate) {
-        String[] words = problemTemplate.getTemplateCode().split(" ");
-        return words[2];
+    private String getReturn(ProblemTemplate problemTemplate, String language) {
+        if (language.equals("Java")) {
+            String[] words = problemTemplate.getTemplateCode().trim().split(" ");
+            return words[2];
+        } else {
+            String[] words = problemTemplate.getTemplateCode().trim().split(" ");
+            return words[0];
+        }
     }
 
     @Override
@@ -183,7 +188,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         }
         String languageName = problemCompileRequestDto.getLanguageName();
         String functionSignature = problemTemplate.getFunctionSignature();
-        String inputType = getReturnForJava(problemTemplate);
+        String inputType = getReturn(problemTemplate, languageName);
         LambdaRequest lambdaRequest = new LambdaRequest(
                 languageName,
                 problemCompileRequestDto.getCode(),

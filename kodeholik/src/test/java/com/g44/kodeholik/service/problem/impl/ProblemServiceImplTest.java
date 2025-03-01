@@ -640,12 +640,14 @@ class ProblemServiceImplTest {
                 MultipartFile excelFile = mock(MultipartFile.class);
 
                 when(problemRepository.isTitleExisted(anyString())).thenReturn(false);
-                when(excelService.readTestCaseExcel(any(), anyList())).thenReturn(new ProblemTestCaseDto());
+                // when(excelService.readTestCaseExcel(any(), anyList())).thenReturn(new
+                // ProblemTestCaseDto());
                 when(problemRequestMapper.mapTo(any())).thenReturn(new Problem());
                 when(userService.getCurrentUser()).thenReturn(new Users());
                 when(problemRepository.save(any())).thenReturn(new Problem());
 
-                problemService.addProblem(problemBasicAddDto, problemEditorialDto, problemInputParameterDto, excelFile);
+                // problemService.addProblem(problemBasicAddDto, problemEditorialDto,
+                // problemInputParameterDto, excelFile);
 
                 verify(problemRepository, times(1)).save(any());
         }

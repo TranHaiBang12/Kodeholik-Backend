@@ -17,4 +17,8 @@ public class InputParameterDto {
     private String inputName;
 
     private InputType inputType;
+
+    private String otherInputType;
+
+    private Integer noDimension;
 }

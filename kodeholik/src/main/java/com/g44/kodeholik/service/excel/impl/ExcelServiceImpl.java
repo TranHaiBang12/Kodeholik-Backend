@@ -37,11 +37,11 @@ public class ExcelServiceImpl implements ExcelService {
     private Gson gson = new Gson();
 
     @Override
-    public Sheet readExcelSheet(MultipartFile file) {
+    public Sheet readExcelSheet(MultipartFile file, String languageName) {
         try (InputStream inputStream = file.getInputStream();
                 Workbook workbook = new XSSFWorkbook(inputStream)) {
-
-            Sheet sheet = workbook.getSheet("TestCase");
+            log.info(languageName + "TestCase");
+            Sheet sheet = workbook.getSheet(languageName + "TestCase");
             return sheet;
         } catch (Exception ex) {
             log.info(ex.getMessage());
@@ -50,70 +50,76 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
-    public ProblemTestCaseDto readTestCaseExcel(MultipartFile file, List<String> inputNames) {
-        Sheet sheet = readExcelSheet(file);
-        ProblemTestCaseDto problemTestCaseDto = new ProblemTestCaseDto();
-        List<TestCaseDto> testCases = new ArrayList();
-        Row headerRow = sheet.getRow(0);
-        Map<String, Integer> columnIndexMap = new HashMap<>();
+    public List<ProblemTestCaseDto> readTestCaseExcel(MultipartFile[] file, List<String> inputNames,
+            List<String> languageName) {
+        List<ProblemTestCaseDto> problemTestCaseDtoList = new ArrayList<>();
+        for (int j = 0; j < languageName.size(); j++) {
+            Sheet sheet = readExcelSheet(file[j], languageName.get(j));
+            ProblemTestCaseDto problemTestCaseDto = new ProblemTestCaseDto();
+            problemTestCaseDto.setLanguage(languageName.get(j));
+            List<TestCaseDto> testCases = new ArrayList();
+            Row headerRow = sheet.getRow(0);
+            Map<String, Integer> columnIndexMap = new HashMap<>();
 
-        for (Cell cell : headerRow) {
-            columnIndexMap.put(cell.getStringCellValue(), cell.getColumnIndex());
-        }
-
-        // Kiểm tra nếu có các cột cần thiết
-        if (!columnIndexMap.containsKey("Expected Output") ||
-                !columnIndexMap.containsKey("Is Sample")) {
-            throw new BadRequestException("Excel file in wrong format",
-                    "Please define a column name Expected Output and Is Sample");
-        }
-        for (int i = 0; i < inputNames.size(); i++) {
-            if (!columnIndexMap.containsKey(inputNames.get(i))) {
-                throw new BadRequestException("Excel file in wrong format", "Please define column for each input");
+            for (Cell cell : headerRow) {
+                columnIndexMap.put(cell.getStringCellValue(), cell.getColumnIndex());
             }
-        }
-        List<Integer> inputIndexList = new ArrayList();
-        for (int i = 0; i < inputNames.size(); i++) {
-            int inputIndex = columnIndexMap.get(inputNames.get(i));
-            inputIndexList.add(inputIndex);
-        }
-        int expectedOutputIndex = columnIndexMap.get("Expected Output");
-        int isSampleIndex = columnIndexMap.get("Is Sample");
 
-        // Duyệt các dòng dữ liệu (bỏ qua header - row 0)
-        Iterator<Row> rowIterator = sheet.iterator();
-        rowIterator.next(); // Bỏ qua header
-
-        while (rowIterator.hasNext()) {
-            Row row = rowIterator.next();
-            Map<String, String> inputMap = new HashMap();
-            for (int i = 0; i < inputIndexList.size(); i++) {
-                Cell inputCell = row.getCell(inputIndexList.get(i));
-                String input;
-                if (inputCell.getCellType() == CellType.NUMERIC) {
-                    DecimalFormat df = new DecimalFormat("#");
-                    input = df.format(inputCell.getNumericCellValue());
-                } else {
-                    input = inputCell.toString();
+            // Kiểm tra nếu có các cột cần thiết
+            if (!columnIndexMap.containsKey("Expected Output") ||
+                    !columnIndexMap.containsKey("Is Sample")) {
+                throw new BadRequestException("Excel file in wrong format",
+                        "Please define a column name Expected Output and Is Sample");
+            }
+            for (int i = 0; i < inputNames.size(); i++) {
+                if (!columnIndexMap.containsKey(inputNames.get(i))) {
+                    throw new BadRequestException("Excel file in wrong format", "Please define column for each input");
                 }
-                inputMap.put(inputNames.get(i), input);
             }
-            Cell cell = row.getCell(expectedOutputIndex);
-            String expectedOutput;
-            if (cell.getCellType() == CellType.NUMERIC) {
-                DecimalFormat df = new DecimalFormat("#");
-                expectedOutput = df.format(cell.getNumericCellValue());
-            } else {
-                expectedOutput = cell.toString();
+            List<Integer> inputIndexList = new ArrayList();
+            for (int i = 0; i < inputNames.size(); i++) {
+                int inputIndex = columnIndexMap.get(inputNames.get(i));
+                inputIndexList.add(inputIndex);
             }
-            boolean isSample = row.getCell(isSampleIndex).getBooleanCellValue();
+            int expectedOutputIndex = columnIndexMap.get("Expected Output");
+            int isSampleIndex = columnIndexMap.get("Is Sample");
 
-            TestCaseDto testCaseDto = new TestCaseDto(inputMap, expectedOutput, isSample);
-            testCases.add(testCaseDto);
+            // Duyệt các dòng dữ liệu (bỏ qua header - row 0)
+            Iterator<Row> rowIterator = sheet.iterator();
+            rowIterator.next(); // Bỏ qua header
+
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                Map<String, String> inputMap = new HashMap();
+                for (int i = 0; i < inputIndexList.size(); i++) {
+                    Cell inputCell = row.getCell(inputIndexList.get(i));
+                    String input;
+                    if (inputCell.getCellType() == CellType.NUMERIC) {
+                        DecimalFormat df = new DecimalFormat("#");
+                        input = df.format(inputCell.getNumericCellValue());
+                    } else {
+                        input = inputCell.toString();
+                    }
+                    inputMap.put(inputNames.get(i), input);
+                }
+                Cell cell = row.getCell(expectedOutputIndex);
+                String expectedOutput;
+                if (cell.getCellType() == CellType.NUMERIC) {
+                    DecimalFormat df = new DecimalFormat("#");
+                    expectedOutput = df.format(cell.getNumericCellValue());
+                } else {
+                    expectedOutput = cell.toString();
+                }
+                boolean isSample = row.getCell(isSampleIndex).getBooleanCellValue();
+
+                TestCaseDto testCaseDto = new TestCaseDto(inputMap, expectedOutput, isSample);
+                testCases.add(testCaseDto);
+            }
+
+            problemTestCaseDto.setTestCases(testCases);
+            problemTestCaseDtoList.add(problemTestCaseDto);
         }
-
-        problemTestCaseDto.setTestCases(testCases);
-        return problemTestCaseDto;
+        return problemTestCaseDtoList;
     }
 
     @Override

@@ -64,12 +64,11 @@ public class ProblemController {
             @RequestPart(name = "problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
             @RequestPart(name = "problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
             @RequestPart(name = "problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
-            @RequestPart(name = "javaTestCaseFile") MultipartFile javaTestCaseFile,
-            @RequestPart(name = "cTestCaseFile") MultipartFile cTestCaseFile) {
+            @RequestPart(name = "testCaseFile") MultipartFile[] testCaseFile) {
         problemService.addProblem(problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
-                javaTestCaseFile);
+                testCaseFile);
 
         // problemService.addProblem(problemRequestDto.getProblemBasicAddDto(),
         // problemRequestDto.getProblemEditorialDto(),
@@ -84,12 +83,12 @@ public class ProblemController {
             @RequestPart("problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
             @RequestPart("problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
             @RequestPart("problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
-            @RequestPart("testcaseFile") MultipartFile testcaseFile) {
+            @RequestPart(name = "testCaseFile") MultipartFile[] testCaseFile) {
         // TODO: process POST request
         problemService.editProblem(link, problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
-                testcaseFile);
+                testCaseFile);
         return ResponseEntity.noContent().build();
     }
 

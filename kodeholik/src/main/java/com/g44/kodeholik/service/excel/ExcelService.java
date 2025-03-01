@@ -9,9 +9,9 @@ import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
 import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
 
 public interface ExcelService {
-    public Sheet readExcelSheet(MultipartFile file);
+    public Sheet readExcelSheet(MultipartFile file, String languageName);
 
-    public ProblemTestCaseDto readTestCaseExcel(MultipartFile file, List<String> inputName);
+    public List<ProblemTestCaseDto> readTestCaseExcel(MultipartFile[] file, List<String> inputName, List<String> languageName);
 
     public byte[] generateExcelFile(List<ProblemTestCase> problemTestCases);
 

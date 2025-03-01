@@ -1,5 +1,7 @@
 package com.g44.kodeholik.model.entity.problem;
 
+import com.g44.kodeholik.model.entity.setting.Language;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,4 +39,8 @@ public class ProblemTestCase {
 
     @Column(name = "is_sample")
     private boolean isSample;
+
+    @ManyToOne
+    @JoinColumn(name = "language_id", referencedColumnName = "id")
+    private Language language;
 }

@@ -5,7 +5,7 @@
 -- Dumped from database version 17.2
 -- Dumped by pg_dump version 17.2
 
--- Started on 2025-02-25 12:20:59
+-- Started on 2025-03-02 01:18:56
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -21,7 +21,7 @@ SET row_security = off;
 
 DROP DATABASE IF EXISTS kodeholik;
 --
--- TOC entry 5232 (class 1262 OID 16517)
+-- TOC entry 5236 (class 1262 OID 16517)
 -- Name: kodeholik; Type: DATABASE; Schema: -; Owner: postgres
 --
 
@@ -203,7 +203,8 @@ CREATE TYPE schema_problem.input_type AS ENUM (
     'ARR_OBJECT',
     'STRING',
     'ARR_STRING',
-    'OBJECT'
+    'OBJECT',
+    'SET'
 );
 
 
@@ -236,7 +237,7 @@ CREATE TYPE schema_problem.submission_status AS ENUM (
 ALTER TYPE schema_problem.submission_status OWNER TO postgres;
 
 --
--- TOC entry 1039 (class 1247 OID 17677)
+-- TOC entry 1042 (class 1247 OID 17677)
 -- Name: level; Type: TYPE; Schema: schema_setting; Owner: postgres
 --
 
@@ -248,6 +249,19 @@ CREATE TYPE schema_setting.level AS ENUM (
 
 
 ALTER TYPE schema_setting.level OWNER TO postgres;
+
+--
+-- TOC entry 1039 (class 1247 OID 18591)
+-- Name: notification_type; Type: TYPE; Schema: schema_user; Owner: postgres
+--
+
+CREATE TYPE schema_user.notification_type AS ENUM (
+    'USER',
+    'SYSTEM'
+);
+
+
+ALTER TYPE schema_user.notification_type OWNER TO postgres;
 
 --
 -- TOC entry 967 (class 1247 OID 17230)
@@ -892,7 +906,8 @@ CREATE TABLE schema_problem.test_case (
     problem_id integer,
     input text NOT NULL,
     expected_output text NOT NULL,
-    is_sample boolean
+    is_sample boolean,
+    language_id integer
 );
 
 
@@ -1037,7 +1052,8 @@ CREATE TABLE schema_user.notification (
     user_id integer NOT NULL,
     content character varying(300) NOT NULL,
     link character varying(200),
-    date timestamp without time zone NOT NULL
+    date timestamp without time zone NOT NULL,
+    type schema_user.notification_type NOT NULL
 );
 
 
@@ -1129,7 +1145,7 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 5208 (class 0 OID 17264)
+-- TOC entry 5212 (class 0 OID 17264)
 -- Dependencies: 254
 -- Data for Name: contest; Type: TABLE DATA; Schema: schema_contest; Owner: postgres
 --
@@ -1137,7 +1153,7 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 5209 (class 0 OID 17281)
+-- TOC entry 5213 (class 0 OID 17281)
 -- Dependencies: 255
 -- Data for Name: contest_coworker; Type: TABLE DATA; Schema: schema_contest; Owner: postgres
 --
@@ -1145,7 +1161,7 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 5210 (class 0 OID 17296)
+-- TOC entry 5214 (class 0 OID 17296)
 -- Dependencies: 256
 -- Data for Name: contest_participant; Type: TABLE DATA; Schema: schema_contest; Owner: postgres
 --
@@ -1153,7 +1169,7 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 5211 (class 0 OID 17311)
+-- TOC entry 5215 (class 0 OID 17311)
 -- Dependencies: 257
 -- Data for Name: contest_problem_point; Type: TABLE DATA; Schema: schema_contest; Owner: postgres
 --
@@ -1161,7 +1177,7 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 5217 (class 0 OID 18457)
+-- TOC entry 5221 (class 0 OID 18457)
 -- Dependencies: 263
 -- Data for Name: chapter; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1169,7 +1185,7 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 5219 (class 0 OID 18463)
+-- TOC entry 5223 (class 0 OID 18463)
 -- Dependencies: 265
 -- Data for Name: course; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1181,7 +1197,7 @@ INSERT INTO schema_course.course (id, title, description, image, status, created
 
 
 --
--- TOC entry 5220 (class 0 OID 18469)
+-- TOC entry 5224 (class 0 OID 18469)
 -- Dependencies: 266
 -- Data for Name: course_comment; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1189,7 +1205,7 @@ INSERT INTO schema_course.course (id, title, description, image, status, created
 
 
 --
--- TOC entry 5222 (class 0 OID 18473)
+-- TOC entry 5226 (class 0 OID 18473)
 -- Dependencies: 268
 -- Data for Name: course_topic; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1197,7 +1213,7 @@ INSERT INTO schema_course.course (id, title, description, image, status, created
 
 
 --
--- TOC entry 5223 (class 0 OID 18476)
+-- TOC entry 5227 (class 0 OID 18476)
 -- Dependencies: 269
 -- Data for Name: course_user; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1206,7 +1222,7 @@ INSERT INTO schema_course.course_user (course_id, user_id, enrolled_at) VALUES (
 
 
 --
--- TOC entry 5224 (class 0 OID 18480)
+-- TOC entry 5228 (class 0 OID 18480)
 -- Dependencies: 270
 -- Data for Name: lesson; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1214,7 +1230,7 @@ INSERT INTO schema_course.course_user (course_id, user_id, enrolled_at) VALUES (
 
 
 --
--- TOC entry 5226 (class 0 OID 18486)
+-- TOC entry 5230 (class 0 OID 18486)
 -- Dependencies: 272
 -- Data for Name: lesson_problem; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1222,7 +1238,7 @@ INSERT INTO schema_course.course_user (course_id, user_id, enrolled_at) VALUES (
 
 
 --
--- TOC entry 5202 (class 0 OID 17050)
+-- TOC entry 5206 (class 0 OID 17050)
 -- Dependencies: 248
 -- Data for Name: comment; Type: TABLE DATA; Schema: schema_discussion; Owner: postgres
 --
@@ -1252,7 +1268,7 @@ INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_
 
 
 --
--- TOC entry 5203 (class 0 OID 17103)
+-- TOC entry 5207 (class 0 OID 17103)
 -- Dependencies: 249
 -- Data for Name: comment_vote; Type: TABLE DATA; Schema: schema_discussion; Owner: postgres
 --
@@ -1262,7 +1278,7 @@ INSERT INTO schema_discussion.comment_vote (user_id, comment_id) VALUES (1, 4);
 
 
 --
--- TOC entry 5188 (class 0 OID 16730)
+-- TOC entry 5192 (class 0 OID 16730)
 -- Dependencies: 234
 -- Data for Name: problem; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1277,8 +1293,7 @@ Note: Assume we are dealing with an environment that could only store integers w
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (62, 'Valid Parentheses', 'Given an array nums of n integers, return an array of all the unique quadruplets [nums[a], nums[b], nums[c], nums[d]] such that: 0 <= a, b, c, d < n 
  a, b, c, and d are distinct.
 nums[a] + nums[b] + nums[c] + nums[d] == target.
-You may return the answer in any order.', 'EASY', 0.00, 0, 'PUBLIC', '2025-02-13 20:36:04.908291', 1, '2025-02-17 22:23:57.104682', 1, true, 'valid-parentheses');
-INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (96, 'Multiply Strings', 'Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string. Note: You must not use any built-in BigInteger library or convert the inputs to integer directly.', 'MEDIUM', 100.00, 4, 'PUBLIC', '2025-02-17 19:33:03.092842', 1, '2025-02-18 13:48:42.126348', 1, true, 'multiply-strings');
+You may return the answer in any order.', 'EASY', 50.00, 20, 'PUBLIC', '2025-02-13 20:36:04.908291', 1, '2025-02-17 22:23:57.104682', 1, true, 'valid-parentheses');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (97, 'Edit Distance', 'Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.You have the following three operations permitted on a word: Insert a character 
  Delete a character 
  Replace a character', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-02-18 16:46:29.310675', 1, NULL, NULL, true, 'edit-distance');
@@ -1309,7 +1324,8 @@ The array result is formed by concatenating the arrays arr1 and arr2. For exampl
 Return the integer array result.', 'HARD', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'distribute-elements-into-two-arrays-ii');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (98, 'Edit Distance 1', 'Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.You have the following three operations permitted on a word: Insert a character 
  Delete a character 
- Replace a character', 'MEDIUM', 22.22, 9, 'PUBLIC', '2025-02-18 16:47:34.284482', 1, NULL, NULL, true, 'edit-distance-1');
+ Replace a character', 'MEDIUM', 30.00, 10, 'PUBLIC', '2025-02-18 16:47:34.284482', 1, NULL, NULL, true, 'edit-distance-1');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (96, 'Multiply Strings', 'Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string. Note: You must not use any built-in BigInteger library or convert the inputs to integer directly.', 'MEDIUM', 41.67, 12, 'PUBLIC', '2025-02-17 19:33:03.092842', 1, '2025-02-18 13:48:42.126348', 1, true, 'multiply-strings');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (88, 'First Missing Positive', 'Given an unsorted integer array nums. Return the smallest positive integer that is not present in nums. You must implement an algorithm that runs in O(n) time and uses O(1) auxiliary space.', 'HARD', 0.00, 0, 'PUBLIC', '2025-02-16 23:34:15.469431', 1, '2025-02-17 16:01:35.564458', 1, true, 'first-missing-positive');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (29, 'Largest Merge Of Two Strings', 'ou are given two strings word1 and word2. You want to construct a string merge in the following way: while either word1 or word2 are non-empty, choose one of the following options:
 
@@ -1357,6 +1373,7 @@ You should pack your words in a greedy approach; that is, pack as many words as 
 Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line does not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.
 
 For the last line of text, it should be left-justified, and no extra space is inserted between words.', 'HARD', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'text-justification');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (100, 'Palindrome Number', 'Given an integer x, return true if x is a palindrome, and false otherwise.', 'EASY', 60.00, 5, 'PUBLIC', '2025-03-02 00:58:22.13278', 1, NULL, NULL, true, 'palindrome-number');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (40, 'Power of Two', 'Given an integer n, return true if it is a power of two. Otherwise, return false.
 
 An integer n is a power of two, if there exists an integer x such that n == 2x.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'power-of-two');
@@ -1450,7 +1467,7 @@ Return the final value of original.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:
 
 
 --
--- TOC entry 5215 (class 0 OID 17620)
+-- TOC entry 5219 (class 0 OID 17620)
 -- Dependencies: 261
 -- Data for Name: problem_comment; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1469,7 +1486,7 @@ INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 
 
 
 --
--- TOC entry 5214 (class 0 OID 17556)
+-- TOC entry 5218 (class 0 OID 17556)
 -- Dependencies: 260
 -- Data for Name: problem_input_parameter; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1480,13 +1497,15 @@ INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, 
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (132, 96, '{"name":"num2","type":"STRING"}', 1);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (133, 98, '{"name":"word1","type":"STRING"}', 1);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (134, 98, '{"name":"word2","type":"STRING"}', 1);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (135, 100, '{"name":"x","type":"INT"}', 1);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (136, 100, '{"name":"x","type":"INT"}', 2);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (29, 62, NULL, NULL);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (30, 62, NULL, NULL);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (56, 88, NULL, NULL);
 
 
 --
--- TOC entry 5191 (class 0 OID 16777)
+-- TOC entry 5195 (class 0 OID 16777)
 -- Dependencies: 237
 -- Data for Name: problem_skill; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1509,13 +1528,15 @@ INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (98, 3);
 
 
 --
--- TOC entry 5193 (class 0 OID 16793)
+-- TOC entry 5197 (class 0 OID 16793)
 -- Dependencies: 239
 -- Data for Name: problem_solution; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (127, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, '2025-02-27 16:50:33.627593', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (14, 62, 'Kodeholik - Editorial', 'test', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (82, 98, 'Kodeholik - Editorial', 'The problem requires transforming one string into another using three operations: insert, delete, or replace. This is a classic Dynamic Programming problem, where we aim to minimize the cost of edits. The solution involves comparing prefixes of both strings to compute the minimum operations required.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (128, 96, 'Just a little hhihi code', 'We dont need to do this problem. This problem is so easy.', false, 0, '2025-02-27 17:09:44.072222', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (81, 96, 'Kodeholik - Editorial', 'We can solve the problem by iterating through the numbers 1 to n, and use linear search to determine whether each number is in the array. The first number we cannot find is the smallest missing integer. This approach would result in a quadratic time complexity.We need to determine whether an element is in the array in constant time. Array indexing provides constant lookup time. We need to check the existence of a relatively small range of values, positive numbers between 1 and n, so we can use an array like a hash table by using the index as a key and the value as a presence indicator. The default value is false, which represents a missing number, and we set the value to true for keys that exist in nums. Numbers not in the range 1 to n are not relevant in the search for the first missing positive, so we do not mark them in the seen array. To solve the problem, we can create an array of size n + 1. For each positive number less than n in nums, we set seen[num] to true. Then, we iterate through the integers 1 to n and return the first number that is not marked as seen in the array. If the array contains all of the elements 1 to n, we return n + 1.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (39, 88, 'Kodeholik - Editorial', 'We can solve the problem by iterating through the numbers 1 to n, and use linear search to determine whether each number is in the array. The first number we cannot find is the smallest missing integer. This approach would result in a quadratic time complexity.We need to determine whether an element is in the array in constant time. Array indexing provides constant lookup time. We need to check the existence of a relatively small range of values, positive numbers between 1 and n, so we can use an array like a hash table by using the index as a key and the value as a presence indicator. The default value is false, which represents a missing number, and we set the value to true for keys that exist in nums. Numbers not in the range 1 to n are not relevant in the search for the first missing positive, so we do not mark them in the seen array. To solve the problem, we can create an array of size n + 1. For each positive number less than n in nums, we set seen[num] to true. Then, we iterate through the integers 1 to n and return the first number that is not marked as seen in the array. If the array contains all of the elements 1 to n, we return n + 1.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (98, 96, 'Easiest solution', 'Remember how we do multiplication?
@@ -1526,12 +1547,16 @@ INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solutio
 Things to note:
 
 The product of two numbers cannot exceed the sum of the two lengths. (e.g. 99 * 99 cannot be five digit)', false, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (118, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, NULL, 1, NULL, 1, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (119, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, NULL, 1, NULL, 1, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (100, 96, 'Easy Java solution', 'Complexity
 Time complexity:
 The time complexity of the provided code is O(n * m), where n is the length of the num1 string and m is the length of the num2 string. This complexity arises from the nested loops iterating over each digit of both input strings to calculate the products.
 
 Space complexity:
 The space complexity is O(n + m), primarily due to the products array, which holds the intermediate results of the multiplication. The length of this array is equal to the sum of the lengths of the two input strings. Additionally, the StringBuilder sb also contributes to the space complexity, but its size is proportional to the number of digits in the final result, which can be at most n + m. Therefore, the dominant factor is the size of the products array.', false, 2, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (129, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, '2025-02-27 17:49:27.119516', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (134, 100, 'Kodeholik - Editorial', 'We can solve the problem by using remainder', true, 0, '2025-03-02 00:58:22.235648', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (101, 96, 'Multiply Strings Optimization', 'Facts You should know:
 
 Product of two number of length n and m will be atmax of length n+m.
@@ -1589,10 +1614,11 @@ INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solutio
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (115, 96, 'JAVA', '', false, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (116, 96, 'Simple and clear solution', 'I am using long multiplication technique from school program.', false, 0, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (117, 96, 'Try it if you are stuck in other solution', '', false, 0, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (133, 96, 'Just a funny code', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, '2025-02-27 21:38:27.874022', 1, NULL, NULL, 0);
 
 
 --
--- TOC entry 5216 (class 0 OID 17636)
+-- TOC entry 5220 (class 0 OID 17636)
 -- Dependencies: 262
 -- Data for Name: problem_solution_comment; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1609,7 +1635,7 @@ INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, commen
 
 
 --
--- TOC entry 5212 (class 0 OID 17327)
+-- TOC entry 5216 (class 0 OID 17327)
 -- Dependencies: 258
 -- Data for Name: problem_solution_skill; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1619,16 +1645,17 @@ INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (100, 1);
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (100, 3);
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (100, 11);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (127, 1);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (127, 11);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (134, 11);
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (39, 1);
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (39, 11);
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (14, 1);
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (14, 11);
-INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (81, 1);
-INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (81, 11);
 
 
 --
--- TOC entry 5200 (class 0 OID 17004)
+-- TOC entry 5204 (class 0 OID 17004)
 -- Dependencies: 246
 -- Data for Name: problem_submission; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1669,7 +1696,6 @@ main.c:15:1: error: expected declaration or statement at end of input
  }
  ^
 ', NULL, 0, 'FAILED');
-INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (76, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}public static int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 2.88, 4, '2025-02-20 14:21:39.655203', true, NULL, NULL, 2, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (66, 1, 96, 'char* multiply(char* num1, char* num2) {
 if (strcmp(num1,"0") == 0 || strcmp(num2, "0") == 0) {
 char* zero_result = (char*)malloc(2 * sizeof(char));
@@ -1744,6 +1770,7 @@ strcpy(result_str, "0");
 }
 return result_str;
 }', 2, NULL, 3.15, 4, '2025-02-18 16:22:57.949125', false, NULL, '{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2"},{"name":"num2","type":"STRING","value":"3"}],"expectedOutput":"6","status":"Failed","actualOutput":"60"}', 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (79, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0.26, 5, '2025-02-25 13:30:57.860046', true, NULL, NULL, 2, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (68, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
@@ -1783,6 +1810,7 @@ Main.java:61: error: <identifier> expected
                                                                                                                                                                                                                                                                                                                                                                            ^
 1 error
 ', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (80, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0.52, 5, '2025-02-25 13:33:15.674458', true, NULL, NULL, 2, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (71, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
@@ -1809,11 +1837,469 @@ return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)r
                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ^
 1 error
 ', NULL, 0, 'FAILED');
-INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (75, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1)return i + 1;if (i == -1)return j + 1;if (dp[i][j] != -1)return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}public static int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 2.62, 5, '2025-02-20 09:43:18.431181', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (78, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 2.88, 4, '2025-02-25 13:27:26.749118', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (81, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0.52, 5, '2025-02-25 13:35:19.491585', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (82, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0.52, 6, '2025-02-25 13:36:22.50588', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (83, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0.26, 6, '2025-02-25 13:37:23.832981', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (84, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (nums == null || nums.length < 4) return result;
+        
+        Arrays.sort(nums); // Sort the array to apply two-pointer technique
+        
+        int n = nums.length;
+        
+        for (int i = 0; i < n - 3; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) continue; // Skip duplicate values
+            
+            for (int j = i + 1; j < n - 2; j++) {
+                if (j > i + 1 && nums[j] == nums[j - 1]) continue; // Skip duplicate values
+                
+                int left = j + 1, right = n - 1;
+                while (left < right) {
+                    long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];
+                    if (sum == target) {
+                        result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));
+                        
+                        while (left < right && nums[left] == nums[left + 1]) left++; // Skip duplicates
+                        while (left < right && nums[right] == nums[right - 1]) right--; // Skip duplicates
+                        
+                        left++;
+                        right--;
+                    } else if (sum < target) {
+                        left++;
+                    } else {
+                        right--;
+                    }
+                }
+            }
+        }
+        return result;
+    }', 1, NULL, 0.52, 7, '2025-02-25 13:42:42.956689', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (85, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 3.15, 4, '2025-02-25 19:49:22.893207', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (86, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {while(){}List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0, 0, '2025-02-25 19:49:35.439774', false, 'Compilation Error:
+Main.java:57: error: illegal start of expression
+public static List<List<Integer>> fourSum(int[] nums, int target) {while(){}List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}
+                                                                         ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (98, 1, 62, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:08:26.227075', false, 'Compilation Error:
+Main.java:9: error: cannot find symbol
+         List<List<Integer>> result = fourSum(new int[]{1, 0, -1, 0, -2, 2}, 0);
+                                      ^
+  symbol:   method fourSum(int[],int)
+  location: class Main
+Main.java:33: error: cannot find symbol
+         List<List<Integer>> result = fourSum(new int[]{2, 2, 2, 2, 2}, 8);
+                                      ^
+  symbol:   method fourSum(int[],int)
+  location: class Main
+2 errors
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (87, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return 1;}', 1, NULL, 0, 0, '2025-02-25 19:49:46.338118', false, 'Compilation Error:
+Main.java:57: error: incompatible types: int cannot be converted to List<List<Integer>>
+public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return 1;}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (88, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return null;}', 1, NULL, 1.05, 5, '2025-02-25 19:49:55.97581', false, NULL, '{"id":1,"inputs":[{"name":"nums","type":"ARR_INT","value":[1.0,0.0,-1.0,0.0,-2.0,2.0]},{"name":"target","type":"INT","value":0.0}],"expectedOutput":"[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]","status":"Failed","actualOutput":"null"}', 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (89, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0, 0, '2025-02-28 23:53:35.496667', false, 'Compilation Error:
+Main.java:9: error: cannot find symbol
+         BOOLEAN result = fourSum(new int[]{1, 0, -1, 0, -2, 2}, 0);
+         ^
+  symbol:   class BOOLEAN
+  location: class Main
+Main.java:33: error: cannot find symbol
+         BOOLEAN result = fourSum(new int[]{2, 2, 2, 2, 2}, 8);
+         ^
+  symbol:   class BOOLEAN
+  location: class Main
+2 errors
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (90, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 3.15, 4, '2025-03-01 00:09:23.397744', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (91, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0, 0, '2025-03-01 21:52:13.626735', false, '"errorMessage":"2025-03-01T14:52:22.222Z bec72701-e18f-49a7-b346-0ececbb6506a Task timed out after 10.01 seconds"', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (92, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0.52, 5, '2025-03-01 21:56:30.350235', false, NULL, '{"id":1,"inputs":[{"name":"nums","type":"ARR_INT","value":[1.0,0.0,-1.0,0.0,-2.0,2.0]},{"name":"target","type":"INT","value":0.0}],"expectedOutput":"[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]","status":"Failed","actualOutput":"[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]"}', 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (107, 1, 100, 'bool isPalindrome(int x){ 
+ if(x<0 || x!=0 && x%10 ==0 ) return false; 
+ int check=0; 
+ while(x>check){ 
+ check = check*10 + x%10; 
+ x/=10; 
+ } 
+ return (x==check || x==check/10); 
+ }', 2, NULL, 0, 0, '2025-03-02 01:02:31.669398', false, 'Compilation Error:
+main.c: In function ‘main’:
+main.c:19:5: error: ‘x’ undeclared (first use in this function)
+     x) result;
+     ^
+main.c:19:5: note: each undeclared identifier is reported only once for each function it appears in
+main.c:19:6: error: expected ‘;’ before ‘)’ token
+     x) result;
+      ^
+main.c:19:6: error: expected statement before ‘)’ token
+main.c:19:8: error: ‘result’ undeclared (first use in this function)
+     x) result;
+        ^~~~~~
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (93, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:01:12.957243', false, 'Compilation Error:
+Main.java:9: error: illegal start of expression
+         static result = multiply("2", "3");
+         ^
+Main.java:8: error: ''try'' without ''catch'', ''finally'' or resource declarations
+ try {
+ ^
+Main.java:9: error: <identifier> expected
+         static result = multiply("2", "3");
+                      ^
+Main.java:10: error: <identifier> expected
+            System.out.println("[Test Case 1] Output: " + gson.toJson(result));
+                              ^
+Main.java:10: error: illegal start of type
+            System.out.println("[Test Case 1] Output: " + gson.toJson(result));
+                               ^
+Main.java:11: error: class, interface, enum, or record expected
+ } catch (Exception e) {
+   ^
+Main.java:13: error: class, interface, enum, or record expected
+     StackTraceElement[] stackTrace = e.getStackTrace();
+     ^
+Main.java:14: error: class, interface, enum, or record expected
+     if (stackTrace.length > 0) {
+     ^
+Main.java:16: error: class, interface, enum, or record expected
+         System.out.print(". Error at line: " + errorLine);
+         ^
+Main.java:17: error: class, interface, enum, or record expected
+         try (BufferedReader br = new BufferedReader(new FileReader("Main.java"))) {
+         ^
+Main.java:19: error: class, interface, enum, or record expected
+             String line;
+             ^
+Main.java:20: error: class, interface, enum, or record expected
+             while ((line = br.readLine()) != null) {
+             ^
+Main.java:22: error: class, interface, enum, or record expected
+                 if (currentLine == errorLine) {
+                 ^
+Main.java:24: error: class, interface, enum, or record expected
+                     break;
+                     ^
+Main.java:25: error: class, interface, enum, or record expected
+                 }
+                 ^
+Main.java:29: error: class, interface, enum, or record expected
+         }
+         ^
+Main.java:34: error: class, interface, enum, or record expected
+            System.out.println("[Test Case 2] Output: " + gson.toJson(result));
+            ^
+Main.java:35: error: class, interface, enum, or record expected
+ } catch (Exception e) {
+ ^
+Main.java:37: error: class, interface, enum, or record expected
+     StackTraceElement[] stackTrace = e.getStackTrace();
+     ^
+Main.java:38: error: class, interface, enum, or record expected
+     if (stackTrace.length > 0) {
+     ^
+Main.java:40: error: class, interface, enum, or record expected
+         System.out.print(". Error at line: " + errorLine);
+         ^
+Main.java:41: error: class, interface, enum, or record expected
+         try (BufferedReader br = new BufferedReader(new FileReader("Main.java"))) {
+         ^
+Main.java:43: error: class, interface, enum, or record expected
+             String line;
+             ^
+Main.java:44: error: class, interface, enum, or record expected
+             while ((line = br.readLine()) != null) {
+             ^
+Main.java:46: error: class, interface, enum, or record expected
+                 if (currentLine == errorLine) {
+                 ^
+Main.java:48: error: class, interface, enum, or record expected
+                     break;
+                     ^
+Main.java:49: error: class, interface, enum, or record expected
+                 }
+                 ^
+Main.java:53: error: class, interface, enum, or record expected
+         }
+         ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+              ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                  ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                             ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                        ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                 ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                         ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                         ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                         ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                 ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                                     ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                                                          ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                                                                                                    ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ^
+43 errors
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (94, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:02:55.058432', false, 'Compilation Error:
+Main.java:9: error: illegal start of expression
+         static result = multiply("2", "3");
+         ^
+Main.java:8: error: ''try'' without ''catch'', ''finally'' or resource declarations
+ try {
+ ^
+Main.java:9: error: <identifier> expected
+         static result = multiply("2", "3");
+                      ^
+Main.java:10: error: <identifier> expected
+            System.out.println("[Test Case 1] Output: " + gson.toJson(result));
+                              ^
+Main.java:10: error: illegal start of type
+            System.out.println("[Test Case 1] Output: " + gson.toJson(result));
+                               ^
+Main.java:11: error: class, interface, enum, or record expected
+ } catch (Exception e) {
+   ^
+Main.java:13: error: class, interface, enum, or record expected
+     StackTraceElement[] stackTrace = e.getStackTrace();
+     ^
+Main.java:14: error: class, interface, enum, or record expected
+     if (stackTrace.length > 0) {
+     ^
+Main.java:16: error: class, interface, enum, or record expected
+         System.out.print(". Error at line: " + errorLine);
+         ^
+Main.java:17: error: class, interface, enum, or record expected
+         try (BufferedReader br = new BufferedReader(new FileReader("Main.java"))) {
+         ^
+Main.java:19: error: class, interface, enum, or record expected
+             String line;
+             ^
+Main.java:20: error: class, interface, enum, or record expected
+             while ((line = br.readLine()) != null) {
+             ^
+Main.java:22: error: class, interface, enum, or record expected
+                 if (currentLine == errorLine) {
+                 ^
+Main.java:24: error: class, interface, enum, or record expected
+                     break;
+                     ^
+Main.java:25: error: class, interface, enum, or record expected
+                 }
+                 ^
+Main.java:29: error: class, interface, enum, or record expected
+         }
+         ^
+Main.java:34: error: class, interface, enum, or record expected
+            System.out.println("[Test Case 2] Output: " + gson.toJson(result));
+            ^
+Main.java:35: error: class, interface, enum, or record expected
+ } catch (Exception e) {
+ ^
+Main.java:37: error: class, interface, enum, or record expected
+     StackTraceElement[] stackTrace = e.getStackTrace();
+     ^
+Main.java:38: error: class, interface, enum, or record expected
+     if (stackTrace.length > 0) {
+     ^
+Main.java:40: error: class, interface, enum, or record expected
+         System.out.print(". Error at line: " + errorLine);
+         ^
+Main.java:41: error: class, interface, enum, or record expected
+         try (BufferedReader br = new BufferedReader(new FileReader("Main.java"))) {
+         ^
+Main.java:43: error: class, interface, enum, or record expected
+             String line;
+             ^
+Main.java:44: error: class, interface, enum, or record expected
+             while ((line = br.readLine()) != null) {
+             ^
+Main.java:46: error: class, interface, enum, or record expected
+                 if (currentLine == errorLine) {
+                 ^
+Main.java:48: error: class, interface, enum, or record expected
+                     break;
+                     ^
+Main.java:49: error: class, interface, enum, or record expected
+                 }
+                 ^
+Main.java:53: error: class, interface, enum, or record expected
+         }
+         ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+              ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                  ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                             ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                        ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                 ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                         ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                         ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                         ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                 ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                                     ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                                                          ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                                                                                                    ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ^
+Main.java:57: error: class, interface, enum, or record expected
+public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ^
+43 errors
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (95, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:04:53.455497', false, '{"isAccepted":false,"results":[{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"},{"id":2,"inputs":[{"name":"num1","type":"STRING","value":"123","isSample":false},{"name":"num2","type":"STRING","value":"456","isSample":false}],"expectedOutput":""56088"","status":"Failed","actualOutput":"56088"}],"time":"0.52","memoryUsage":6.0,"noSuccessTestcase":0,"inputWrong":{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"}}', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (96, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0.52, 7, '2025-03-01 22:05:48.26489', false, NULL, '{"id":1,"inputs":[{"name":"nums","type":"ARR_INT","value":[1.0,0.0,-1.0,0.0,-2.0,2.0]},{"name":"target","type":"INT","value":0.0}],"expectedOutput":"[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]","status":"Failed","actualOutput":"[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]"}', 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (97, 1, 62, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:08:01.182812', false, 'Compilation Error:
+Main.java:9: error: cannot find symbol
+         List<List<Integer>> result = fourSum(new int[]{1, 0, -1, 0, -2, 2}, 0);
+                                      ^
+  symbol:   method fourSum(int[],int)
+  location: class Main
+Main.java:33: error: cannot find symbol
+         List<List<Integer>> result = fourSum(new int[]{2, 2, 2, 2, 2}, 8);
+                                      ^
+  symbol:   method fourSum(int[],int)
+  location: class Main
+2 errors
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (108, 1, 100, 'bool isPalindrome(int x){ 
+ if(x<0 || x!=0 && x%10 ==0 ) return false; 
+ int check=0; 
+ while(x>check){ 
+ check = check*10 + x%10; 
+ x/=10; 
+ } 
+ return (x==check || x==check/10); 
+ }', 2, NULL, 1.57, 7, '2025-03-02 01:07:30.08449', true, NULL, NULL, 18, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (99, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:08:34.94852', false, '{"isAccepted":false,"results":[{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"},{"id":2,"inputs":[{"name":"num1","type":"STRING","value":"123","isSample":false},{"name":"num2","type":"STRING","value":"456","isSample":false}],"expectedOutput":""56088"","status":"Failed","actualOutput":"56088"}],"time":"0.52","memoryUsage":7.0,"noSuccessTestcase":0,"inputWrong":{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"}}', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (100, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0.52, 7, '2025-03-01 22:09:29.732473', false, NULL, '{"id":1,"inputs":[{"name":"nums","type":"ARR_INT","value":[1.0,0.0,-1.0,0.0,-2.0,2.0]},{"name":"target","type":"INT","value":0.0}],"expectedOutput":"[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]","status":"Failed","actualOutput":"[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]"}', 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (101, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:14:28.148606', false, '{"isAccepted":false,"results":[{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"},{"id":2,"inputs":[{"name":"num1","type":"STRING","value":"123","isSample":false},{"name":"num2","type":"STRING","value":"456","isSample":false}],"expectedOutput":""56088"","status":"Failed","actualOutput":"56088"}],"time":"0.52","memoryUsage":8.0,"noSuccessTestcase":0,"inputWrong":{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"}}', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (102, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:23:37.586352', false, '{"isAccepted":false,"results":[{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"},{"id":2,"inputs":[{"name":"num1","type":"STRING","value":"123","isSample":false},{"name":"num2","type":"STRING","value":"456","isSample":false}],"expectedOutput":""56088"","status":"Failed","actualOutput":"56088"}],"time":"7.86","memoryUsage":4.0,"noSuccessTestcase":0,"inputWrong":{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"}}', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (103, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 9.24, 4, '2025-03-01 22:36:33.021889', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (104, 1, 96, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0, 0, '2025-03-01 22:36:40.686883', false, 'Compilation Error:
+Main.java:9: error: cannot find symbol
+         String result = multiply("2", "3");
+                         ^
+  symbol:   method multiply(String,String)
+  location: class Main
+Main.java:33: error: cannot find symbol
+         String result = multiply("123", "456");
+                         ^
+  symbol:   method multiply(String,String)
+  location: class Main
+2 errors
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (105, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 6.09, 5, '2025-03-01 22:36:52.513696', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (106, 1, 100, 'public static boolean isPalindrome(int x) {
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.57, 6, '2025-03-02 01:01:08.770627', true, NULL, NULL, 18, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (109, 1, 100, 'public static boolean isPalindrome(int x) {
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 2, NULL, 0, 0, '2025-03-02 01:07:33.431597', false, 'Compilation Error:
+main.c:8:8: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘static’
+ public static boolean isPalindrome(int x) {
+        ^~~~~~
+main.c:8:15: error: unknown type name ‘boolean’
+ public static boolean isPalindrome(int x) {
+               ^~~~~~~
+main.c: In function ‘main’:
+main.c:23:14: warning: implicit declaration of function ‘isPalindrome’; did you mean ‘isalnum’? [-Wimplicit-function-declaration]
+     result = isPalindrome(121);
+              ^~~~~~~~~~~~
+              isalnum
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (110, 1, 100, 'public static boolean isPalindrome(int x) {
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.05, 7, '2025-03-02 01:07:40.122353', true, NULL, NULL, 18, 'SUCCESS');
 
 
 --
--- TOC entry 5196 (class 0 OID 16868)
+-- TOC entry 5200 (class 0 OID 16868)
 -- Dependencies: 242
 -- Data for Name: problem_template; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1821,25 +2307,25 @@ INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, la
 INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (2, 25, 1, 'public int[] twoSum(int[] nums, int target) {}', 'twoSum', 'ARR_INT');
 INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (3, 25, 2, 'int* twoSum(int* nums, int numsSize, int target, int* returnSize) {}', 'twoSum', 'ARR_INT');
 INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (18, 62, 1, 'public static List<List<Integer>> fourSum(int[] nums, int target) {
-}', 'fourSum', 'BOOLEAN');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (88, 96, 1, '
- public static String multiply(String num1, String num2) {
-}', 'multiply', 'STRING');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (89, 96, 2, '
- public char* multiply(char* num1, char* num2) {
-}', 'multiply', 'STRING');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (90, 98, 1, '
- public static int minDistance(String word1, String word2) {
-}', 'minDistance', 'INT');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (91, 98, 2, '
- public int minDistance(char* word1, char* word2) {
-}', 'minDistance', 'INT');
+}', 'fourSum', 'ARR_INT');
 INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (44, 88, 1, 'public int firstMissingPositive(int[] nums) {
 }', 'firstMissingPositive', 'INT');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (88, 96, 1, 'public static String multiply(String num1, String num2) {
+}', 'multiply', 'STRING');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (89, 96, 2, 'public char* multiply(char* num1, char* num2) {
+}', 'multiply', 'STRING');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (90, 98, 1, 'public static int minDistance(String word1, String word2) {
+}', 'minDistance', 'INT');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (91, 98, 2, 'public int minDistance(char* word1, char* word2) {
+}', 'minDistance', 'INT');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (93, 100, 2, 'bool isPalindrome(int x) {
+}', 'isPalindrome', 'BOOLEAN');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (92, 100, 1, 'public static boolean isPalindrome(int x) {
+}', 'isPalindrome', 'BOOLEAN');
 
 
 --
--- TOC entry 5190 (class 0 OID 16762)
+-- TOC entry 5194 (class 0 OID 16762)
 -- Dependencies: 236
 -- Data for Name: problem_topic; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1858,10 +2344,11 @@ INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (97, 6);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (97, 9);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (98, 6);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (98, 9);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (100, 9);
 
 
 --
--- TOC entry 5194 (class 0 OID 16840)
+-- TOC entry 5198 (class 0 OID 16840)
 -- Dependencies: 240
 -- Data for Name: solution_code; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1955,6 +2442,27 @@ boolean[] seen = new boolean[n + 1];
  return n + 1; 
  }');
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (109, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (134, 100, 1, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (134, 100, 2, 'bool isPalindrome(int x){ 
+ if(x<0 || x!=0 && x%10 ==0 ) return false; 
+ int check=0; 
+ while(x>check){ 
+ check = check*10 + x%10; 
+ x/=10; 
+ } 
+ return (x==check || x==check/10); 
+ }');
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (110, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }');
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (112, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (113, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
@@ -1965,10 +2473,14 @@ INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, 
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (98, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (99, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }');
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (111, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (127, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (128, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (129, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (133, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
 
 
 --
--- TOC entry 5204 (class 0 OID 17133)
+-- TOC entry 5208 (class 0 OID 17133)
 -- Dependencies: 250
 -- Data for Name: solution_vote; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1978,12 +2490,12 @@ INSERT INTO schema_problem.solution_vote (user_id, solution_id) VALUES (1, 100);
 
 
 --
--- TOC entry 5198 (class 0 OID 16887)
+-- TOC entry 5202 (class 0 OID 16887)
 -- Dependencies: 244
 -- Data for Name: test_case; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (2, 25, '[
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (2, 25, '[
         {
             "name": "nums",
             "type": "ARR_INT",
@@ -1994,8 +2506,8 @@ INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is
             "type": "INT",
             "value": 6
         }
-    ]', '[1,2]', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (3, 25, '[
+    ]', '[1,2]', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (3, 25, '[
         {
             "name": "nums",
             "type": "ARR_INT",
@@ -2006,8 +2518,8 @@ INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is
             "type": "INT",
             "value": 6
         }
-    ]', '[0,1]', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (4, 25, '[
+    ]', '[0,1]', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (4, 25, '[
         {
             "name": "nums",
             "type": "ARR_INT",
@@ -2018,8 +2530,8 @@ INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is
             "type": "INT",
             "value": 12
         }
-    ]', '[0,3]', false);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (5, 25, '[
+    ]', '[0,3]', false, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (5, 25, '[
         {
             "name":"nums",
             "type": "ARR_INT",
@@ -2030,8 +2542,8 @@ INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is
             "type": "INT",
             "value": 7
         }
-    ]', '[0,2]', false);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (1, 25, '[
+    ]', '[0,2]', false, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (1, 25, '[
         {
             "name": "nums",
             "type": "ARR_INT",
@@ -2042,20 +2554,38 @@ INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is
             "type": "INT",
             "value": 9
         }
-    ]', '[0,1]', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (22, 62, '[{"name": "nums","type": "ARR_INT","value": [1,0,-1,0,-2,2]},{"name": "target","type": "INT","value": 0}]', '[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (23, 62, '[{"name": "nums","type": "ARR_INT","value": [2,2,2,2,2]},{"name": "target","type": "INT","value": 8}]', '[[2,2,2,2]]', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (81, 88, '[{"name":"nums","type":"ARR_INT","value":[1,2,0]}]', '3', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (82, 88, '[{"name":"nums","type":"ARR_INT","value":[3,4,-1,1]}]', '2', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (83, 88, '[{"name":"nums","type":"ARR_INT","value":[7,8,9,11,12]}]', '1', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (164, 96, '[{"name":"num1","type":"STRING","value":"2"},{"name":"num2","type":"STRING","value":"3"}]', '"6"', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (165, 96, '[{"name":"num1","type":"STRING","value":"123"},{"name":"num2","type":"STRING","value":"456"}]', '"56088"', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (166, 98, '[{"name":"word1","type":"STRING","value":"horse"},{"name":"word2","type":"STRING","value":"ros"}]', '3', true);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample) OVERRIDING SYSTEM VALUE VALUES (167, 98, '[{"name":"word1","type":"STRING","value":"intention"},{"name":"word2","type":"STRING","value":"execution"}]', '5', true);
+    ]', '[0,1]', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (22, 62, '[{"name": "nums","type": "ARR_INT","value": [1,0,-1,0,-2,2]},{"name": "target","type": "INT","value": 0}]', '[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (23, 62, '[{"name": "nums","type": "ARR_INT","value": [2,2,2,2,2]},{"name": "target","type": "INT","value": 8}]', '[[2,2,2,2]]', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (81, 88, '[{"name":"nums","type":"ARR_INT","value":[1,2,0]}]', '3', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (82, 88, '[{"name":"nums","type":"ARR_INT","value":[3,4,-1,1]}]', '2', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (83, 88, '[{"name":"nums","type":"ARR_INT","value":[7,8,9,11,12]}]', '1', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (168, 100, '[{"name":"x","type":"INT","value":121}]', 'true', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (169, 100, '[{"name":"x","type":"INT","value":-121}]', 'false', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (170, 100, '[{"name":"x","type":"INT","value":10}]', 'false', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (171, 100, '[{"name":"x","type":"INT","value":13000}]', 'false', false, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (172, 100, '[{"name":"x","type":"INT","value":151}]', 'true', false, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (173, 100, '[{"name":"x","type":"INT","value":1221}]', 'true', false, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (174, 100, '[{"name":"x","type":"INT","value":0}]', 'true', false, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (175, 100, '[{"name":"x","type":"INT","value":9}]', 'true', false, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (176, 100, '[{"name":"x","type":"INT","value":30213}]', 'false', false, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (177, 100, '[{"name":"x","type":"INT","value":121}]', 'true', true, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (178, 100, '[{"name":"x","type":"INT","value":-121}]', 'false', true, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (179, 100, '[{"name":"x","type":"INT","value":10}]', 'false', true, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (180, 100, '[{"name":"x","type":"INT","value":13000}]', 'false', false, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (181, 100, '[{"name":"x","type":"INT","value":151}]', 'true', false, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (182, 100, '[{"name":"x","type":"INT","value":1221}]', 'true', false, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (183, 100, '[{"name":"x","type":"INT","value":0}]', 'true', false, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (184, 100, '[{"name":"x","type":"INT","value":9}]', 'true', false, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (185, 100, '[{"name":"x","type":"INT","value":30213}]', 'false', false, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (164, 96, '[{"name":"num1","type":"STRING","value":"2"},{"name":"num2","type":"STRING","value":"3"}]', '"6"', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (165, 96, '[{"name":"num1","type":"STRING","value":"123"},{"name":"num2","type":"STRING","value":"456"}]', '"56088"', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (166, 98, '[{"name":"word1","type":"STRING","value":"horse"},{"name":"word2","type":"STRING","value":"ros"}]', '3', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (167, 98, '[{"name":"word1","type":"STRING","value":"intention"},{"name":"word2","type":"STRING","value":"execution"}]', '5', true, NULL);
 
 
 --
--- TOC entry 5189 (class 0 OID 16747)
+-- TOC entry 5193 (class 0 OID 16747)
 -- Dependencies: 235
 -- Data for Name: user_favourite; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2068,7 +2598,7 @@ INSERT INTO schema_problem.user_favourite (user_id, problem_id) VALUES (1, 25);
 
 
 --
--- TOC entry 5184 (class 0 OID 16686)
+-- TOC entry 5188 (class 0 OID 16686)
 -- Dependencies: 230
 -- Data for Name: language; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
@@ -2078,7 +2608,7 @@ INSERT INTO schema_setting.language (id, name, created_at, created_by, updated_a
 
 
 --
--- TOC entry 5180 (class 0 OID 16650)
+-- TOC entry 5184 (class 0 OID 16650)
 -- Dependencies: 226
 -- Data for Name: skill; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
@@ -2102,7 +2632,7 @@ INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updat
 
 
 --
--- TOC entry 5182 (class 0 OID 16668)
+-- TOC entry 5186 (class 0 OID 16668)
 -- Dependencies: 228
 -- Data for Name: topic; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
@@ -2120,15 +2650,16 @@ INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, 
 
 
 --
--- TOC entry 5186 (class 0 OID 16704)
+-- TOC entry 5190 (class 0 OID 16704)
 -- Dependencies: 232
 -- Data for Name: notification; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
 
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (1, 76, 'Welcome to Kodeholik', NULL, '2025-02-28 08:43:02.924344', 'SYSTEM');
 
 
 --
--- TOC entry 5206 (class 0 OID 17244)
+-- TOC entry 5210 (class 0 OID 17244)
 -- Dependencies: 252
 -- Data for Name: transaction; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
@@ -2136,7 +2667,7 @@ INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, 
 
 
 --
--- TOC entry 5178 (class 0 OID 16570)
+-- TOC entry 5182 (class 0 OID 16570)
 -- Dependencies: 224
 -- Data for Name: users; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
@@ -2150,12 +2681,12 @@ INSERT INTO schema_user.users (id, username, fullname, password, email, role, st
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (68, 'baotq', 'Tran Quoc Bao', '$2a$10$4T5KVE1i8E3ExtT9uRX1s.IL5d6P.VnGym8oXlt/J7kT.YY8PEOUi', 'baotq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sas');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (2, 'Phong', 'Pham Duy Phong', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'phongk72tp@gmail.com', 'ADMIN', 'ACTIVATED', '2024-05-01', NULL);
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (70, 'haitq', 'Tran Quoc Hai', '$2a$10$DqXH5YDKXQD35XrztK1SeudCH5g1boI1z22pUuSPMYgxqaQ6vSlHa', '12', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sas');
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (75, 'mast12', 'Tran Hoang Hai', '$2a$10$Xmlb7nvVBqU9TvLCndVsSulhZxZQY0YY6eC6knMXdz1mHCGIECKBK', 'basihamedical@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-15', 'kodeholik-avatar-image-0e609cfa-d0dd-4cd8-8ce6-6c896389a724');
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$3VrCnF11UcTUaRejqZ7yDuJQ81i6nEBzEtItoLyWwZ9CR3V/LRpfW', 'tranhaibang665@gmail.com', 'TEACHER', 'ACTIVATED', '2024-03-20', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (76, 'Near Me', 'Near Me', '$2a$10$PZx/L7GM.CxA6FOvnvgalOBVrtxvbWLyi9T4QTV6bdIn3mZahQ.HW', 'basihamedical@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-28', 'https://lh3.googleusercontent.com/a/ACg8ocIArfWVqGfDK0hMAdne8ZWCuGRZvwnHDsDhQFIDdU3f2JVwfA=s96-c');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$38pqPB3j/vnGRxidhOcBP.jxeCWgGSKMdL3/SjBFF265iPQTa6JDu', 'tranhaibang665@gmail.com', 'TEACHER', 'ACTIVATED', '2024-03-20', NULL);
 
 
 --
--- TOC entry 5233 (class 0 OID 0)
+-- TOC entry 5237 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: contest_id_seq; Type: SEQUENCE SET; Schema: schema_contest; Owner: postgres
 --
@@ -2164,7 +2695,7 @@ SELECT pg_catalog.setval('schema_contest.contest_id_seq', 1, false);
 
 
 --
--- TOC entry 5234 (class 0 OID 0)
+-- TOC entry 5238 (class 0 OID 0)
 -- Dependencies: 264
 -- Name: chapter_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -2173,7 +2704,7 @@ SELECT pg_catalog.setval('schema_course.chapter_id_seq', 1, false);
 
 
 --
--- TOC entry 5235 (class 0 OID 0)
+-- TOC entry 5239 (class 0 OID 0)
 -- Dependencies: 267
 -- Name: course_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -2182,7 +2713,7 @@ SELECT pg_catalog.setval('schema_course.course_id_seq', 1, true);
 
 
 --
--- TOC entry 5236 (class 0 OID 0)
+-- TOC entry 5240 (class 0 OID 0)
 -- Dependencies: 271
 -- Name: lesson_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -2191,7 +2722,7 @@ SELECT pg_catalog.setval('schema_course.lesson_id_seq', 1, false);
 
 
 --
--- TOC entry 5237 (class 0 OID 0)
+-- TOC entry 5241 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: discussion_id_seq; Type: SEQUENCE SET; Schema: schema_discussion; Owner: postgres
 --
@@ -2200,61 +2731,61 @@ SELECT pg_catalog.setval('schema_discussion.discussion_id_seq', 23, true);
 
 
 --
--- TOC entry 5238 (class 0 OID 0)
+-- TOC entry 5242 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: problem_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_problem.problem_id_seq', 98, true);
-
-
---
--- TOC entry 5239 (class 0 OID 0)
--- Dependencies: 259
--- Name: problem_input_parameter_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
---
-
-SELECT pg_catalog.setval('schema_problem.problem_input_parameter_id_seq', 134, true);
-
-
---
--- TOC entry 5240 (class 0 OID 0)
--- Dependencies: 245
--- Name: problem_submission_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
---
-
-SELECT pg_catalog.setval('schema_problem.problem_submission_id_seq', 76, true);
-
-
---
--- TOC entry 5241 (class 0 OID 0)
--- Dependencies: 238
--- Name: problemsolution_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
---
-
-SELECT pg_catalog.setval('schema_problem.problemsolution_id_seq', 117, true);
-
-
---
--- TOC entry 5242 (class 0 OID 0)
--- Dependencies: 241
--- Name: problemtemplate_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
---
-
-SELECT pg_catalog.setval('schema_problem.problemtemplate_id_seq', 91, true);
+SELECT pg_catalog.setval('schema_problem.problem_id_seq', 100, true);
 
 
 --
 -- TOC entry 5243 (class 0 OID 0)
--- Dependencies: 243
--- Name: testcase_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
+-- Dependencies: 259
+-- Name: problem_input_parameter_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_problem.testcase_id_seq', 167, true);
+SELECT pg_catalog.setval('schema_problem.problem_input_parameter_id_seq', 136, true);
 
 
 --
 -- TOC entry 5244 (class 0 OID 0)
+-- Dependencies: 245
+-- Name: problem_submission_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
+--
+
+SELECT pg_catalog.setval('schema_problem.problem_submission_id_seq', 110, true);
+
+
+--
+-- TOC entry 5245 (class 0 OID 0)
+-- Dependencies: 238
+-- Name: problemsolution_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
+--
+
+SELECT pg_catalog.setval('schema_problem.problemsolution_id_seq', 134, true);
+
+
+--
+-- TOC entry 5246 (class 0 OID 0)
+-- Dependencies: 241
+-- Name: problemtemplate_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
+--
+
+SELECT pg_catalog.setval('schema_problem.problemtemplate_id_seq', 93, true);
+
+
+--
+-- TOC entry 5247 (class 0 OID 0)
+-- Dependencies: 243
+-- Name: testcase_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
+--
+
+SELECT pg_catalog.setval('schema_problem.testcase_id_seq', 185, true);
+
+
+--
+-- TOC entry 5248 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: language_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
@@ -2263,7 +2794,7 @@ SELECT pg_catalog.setval('schema_setting.language_id_seq', 19, true);
 
 
 --
--- TOC entry 5245 (class 0 OID 0)
+-- TOC entry 5249 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: skill_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
@@ -2272,7 +2803,7 @@ SELECT pg_catalog.setval('schema_setting.skill_id_seq', 30, true);
 
 
 --
--- TOC entry 5246 (class 0 OID 0)
+-- TOC entry 5250 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: topic_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
@@ -2281,16 +2812,16 @@ SELECT pg_catalog.setval('schema_setting.topic_id_seq', 16, true);
 
 
 --
--- TOC entry 5247 (class 0 OID 0)
+-- TOC entry 5251 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: notification_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_user.notification_id_seq', 1, false);
+SELECT pg_catalog.setval('schema_user.notification_id_seq', 1, true);
 
 
 --
--- TOC entry 5248 (class 0 OID 0)
+-- TOC entry 5252 (class 0 OID 0)
 -- Dependencies: 251
 -- Name: transaction_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
@@ -2299,18 +2830,18 @@ SELECT pg_catalog.setval('schema_user.transaction_id_seq', 1, false);
 
 
 --
--- TOC entry 5249 (class 0 OID 0)
+-- TOC entry 5253 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_user.users_id_seq', 75, true);
+SELECT pg_catalog.setval('schema_user.users_id_seq', 76, true);
 
 
 SET default_tablespace = '';
 
 --
--- TOC entry 4938 (class 2606 OID 17285)
+-- TOC entry 4941 (class 2606 OID 17285)
 -- Name: contest_coworker contest_coworker_pkey; Type: CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2319,7 +2850,7 @@ ALTER TABLE ONLY schema_contest.contest_coworker
 
 
 --
--- TOC entry 4940 (class 2606 OID 17300)
+-- TOC entry 4943 (class 2606 OID 17300)
 -- Name: contest_participant contest_participant_pkey; Type: CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2328,7 +2859,7 @@ ALTER TABLE ONLY schema_contest.contest_participant
 
 
 --
--- TOC entry 4936 (class 2606 OID 17270)
+-- TOC entry 4939 (class 2606 OID 17270)
 -- Name: contest contest_pkey; Type: CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2337,7 +2868,7 @@ ALTER TABLE ONLY schema_contest.contest
 
 
 --
--- TOC entry 4942 (class 2606 OID 17315)
+-- TOC entry 4945 (class 2606 OID 17315)
 -- Name: contest_problem_point contest_problem_point_pkey; Type: CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2346,7 +2877,7 @@ ALTER TABLE ONLY schema_contest.contest_problem_point
 
 
 --
--- TOC entry 4952 (class 2606 OID 18490)
+-- TOC entry 4955 (class 2606 OID 18490)
 -- Name: chapter chapter_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2355,7 +2886,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 4956 (class 2606 OID 18492)
+-- TOC entry 4959 (class 2606 OID 18492)
 -- Name: course_comment course_comment_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2364,7 +2895,7 @@ ALTER TABLE ONLY schema_course.course_comment
 
 
 --
--- TOC entry 4954 (class 2606 OID 18494)
+-- TOC entry 4957 (class 2606 OID 18494)
 -- Name: course course_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2373,7 +2904,7 @@ ALTER TABLE ONLY schema_course.course
 
 
 --
--- TOC entry 4958 (class 2606 OID 18496)
+-- TOC entry 4961 (class 2606 OID 18496)
 -- Name: course_topic course_topic_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2382,7 +2913,7 @@ ALTER TABLE ONLY schema_course.course_topic
 
 
 --
--- TOC entry 4960 (class 2606 OID 18498)
+-- TOC entry 4963 (class 2606 OID 18498)
 -- Name: course_user course_user_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2391,7 +2922,7 @@ ALTER TABLE ONLY schema_course.course_user
 
 
 --
--- TOC entry 4962 (class 2606 OID 18500)
+-- TOC entry 4965 (class 2606 OID 18500)
 -- Name: lesson lesson_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2400,7 +2931,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 4964 (class 2606 OID 18502)
+-- TOC entry 4967 (class 2606 OID 18502)
 -- Name: lesson_problem lesson_problem_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2409,7 +2940,7 @@ ALTER TABLE ONLY schema_course.lesson_problem
 
 
 --
--- TOC entry 4930 (class 2606 OID 17107)
+-- TOC entry 4933 (class 2606 OID 17107)
 -- Name: comment_vote comment_vote_pkey; Type: CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -2418,7 +2949,7 @@ ALTER TABLE ONLY schema_discussion.comment_vote
 
 
 --
--- TOC entry 4928 (class 2606 OID 17056)
+-- TOC entry 4931 (class 2606 OID 17056)
 -- Name: comment discussion_pkey; Type: CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -2429,7 +2960,7 @@ ALTER TABLE ONLY schema_discussion.comment
 SET default_tablespace = kodeholik_problem_data;
 
 --
--- TOC entry 4920 (class 2606 OID 18360)
+-- TOC entry 4923 (class 2606 OID 18360)
 -- Name: solution_code pk; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres; Tablespace: kodeholik_problem_data
 --
 
@@ -2440,7 +2971,7 @@ ALTER TABLE ONLY schema_problem.solution_code
 SET default_tablespace = '';
 
 --
--- TOC entry 4948 (class 2606 OID 17624)
+-- TOC entry 4951 (class 2606 OID 17624)
 -- Name: problem_comment problem_comment_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2449,7 +2980,7 @@ ALTER TABLE ONLY schema_problem.problem_comment
 
 
 --
--- TOC entry 4946 (class 2606 OID 17560)
+-- TOC entry 4949 (class 2606 OID 17560)
 -- Name: problem_input_parameter problem_input_parameter_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2458,7 +2989,7 @@ ALTER TABLE ONLY schema_problem.problem_input_parameter
 
 
 --
--- TOC entry 4910 (class 2606 OID 17397)
+-- TOC entry 4913 (class 2606 OID 17397)
 -- Name: problem problem_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2467,7 +2998,7 @@ ALTER TABLE ONLY schema_problem.problem
 
 
 --
--- TOC entry 4950 (class 2606 OID 17640)
+-- TOC entry 4953 (class 2606 OID 17640)
 -- Name: problem_solution_comment problem_solution_comment_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2476,7 +3007,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_comment
 
 
 --
--- TOC entry 4944 (class 2606 OID 17331)
+-- TOC entry 4947 (class 2606 OID 17331)
 -- Name: problem_solution_skill problem_solution_skill_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2485,7 +3016,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_skill
 
 
 --
--- TOC entry 4926 (class 2606 OID 17010)
+-- TOC entry 4929 (class 2606 OID 17010)
 -- Name: problem_submission problem_submission_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2494,7 +3025,7 @@ ALTER TABLE ONLY schema_problem.problem_submission
 
 
 --
--- TOC entry 4916 (class 2606 OID 16781)
+-- TOC entry 4919 (class 2606 OID 16781)
 -- Name: problem_skill problemskill_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2503,7 +3034,7 @@ ALTER TABLE ONLY schema_problem.problem_skill
 
 
 --
--- TOC entry 4918 (class 2606 OID 16799)
+-- TOC entry 4921 (class 2606 OID 16799)
 -- Name: problem_solution problemsolution_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2512,7 +3043,7 @@ ALTER TABLE ONLY schema_problem.problem_solution
 
 
 --
--- TOC entry 4922 (class 2606 OID 16874)
+-- TOC entry 4925 (class 2606 OID 16874)
 -- Name: problem_template problemtemplate_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2521,7 +3052,7 @@ ALTER TABLE ONLY schema_problem.problem_template
 
 
 --
--- TOC entry 4914 (class 2606 OID 16766)
+-- TOC entry 4917 (class 2606 OID 16766)
 -- Name: problem_topic problemtopic_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2530,7 +3061,7 @@ ALTER TABLE ONLY schema_problem.problem_topic
 
 
 --
--- TOC entry 4932 (class 2606 OID 17137)
+-- TOC entry 4935 (class 2606 OID 17137)
 -- Name: solution_vote solution_vote_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2539,7 +3070,7 @@ ALTER TABLE ONLY schema_problem.solution_vote
 
 
 --
--- TOC entry 4924 (class 2606 OID 16893)
+-- TOC entry 4927 (class 2606 OID 16893)
 -- Name: test_case testcase_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2548,7 +3079,7 @@ ALTER TABLE ONLY schema_problem.test_case
 
 
 --
--- TOC entry 4912 (class 2606 OID 16751)
+-- TOC entry 4915 (class 2606 OID 16751)
 -- Name: user_favourite userfavourite_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2557,7 +3088,7 @@ ALTER TABLE ONLY schema_problem.user_favourite
 
 
 --
--- TOC entry 4904 (class 2606 OID 16692)
+-- TOC entry 4907 (class 2606 OID 16692)
 -- Name: language language_name_key; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -2566,7 +3097,7 @@ ALTER TABLE ONLY schema_setting.language
 
 
 --
--- TOC entry 4906 (class 2606 OID 16690)
+-- TOC entry 4909 (class 2606 OID 16690)
 -- Name: language language_pkey; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -2575,7 +3106,7 @@ ALTER TABLE ONLY schema_setting.language
 
 
 --
--- TOC entry 4896 (class 2606 OID 16656)
+-- TOC entry 4899 (class 2606 OID 16656)
 -- Name: skill skill_name_key; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -2584,7 +3115,7 @@ ALTER TABLE ONLY schema_setting.skill
 
 
 --
--- TOC entry 4898 (class 2606 OID 16654)
+-- TOC entry 4901 (class 2606 OID 16654)
 -- Name: skill skill_pkey; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -2593,7 +3124,7 @@ ALTER TABLE ONLY schema_setting.skill
 
 
 --
--- TOC entry 4900 (class 2606 OID 16674)
+-- TOC entry 4903 (class 2606 OID 16674)
 -- Name: topic topic_name_key; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -2602,7 +3133,7 @@ ALTER TABLE ONLY schema_setting.topic
 
 
 --
--- TOC entry 4902 (class 2606 OID 16672)
+-- TOC entry 4905 (class 2606 OID 16672)
 -- Name: topic topic_pkey; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -2611,7 +3142,7 @@ ALTER TABLE ONLY schema_setting.topic
 
 
 --
--- TOC entry 4908 (class 2606 OID 16710)
+-- TOC entry 4911 (class 2606 OID 16710)
 -- Name: notification notification_pkey; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -2620,7 +3151,7 @@ ALTER TABLE ONLY schema_user.notification
 
 
 --
--- TOC entry 4934 (class 2606 OID 17250)
+-- TOC entry 4937 (class 2606 OID 17250)
 -- Name: transaction transaction_pkey; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -2629,7 +3160,7 @@ ALTER TABLE ONLY schema_user.transaction
 
 
 --
--- TOC entry 4890 (class 2606 OID 16578)
+-- TOC entry 4893 (class 2606 OID 16578)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -2638,7 +3169,7 @@ ALTER TABLE ONLY schema_user.users
 
 
 --
--- TOC entry 4892 (class 2606 OID 16574)
+-- TOC entry 4895 (class 2606 OID 16574)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -2647,7 +3178,7 @@ ALTER TABLE ONLY schema_user.users
 
 
 --
--- TOC entry 4894 (class 2606 OID 16576)
+-- TOC entry 4897 (class 2606 OID 16576)
 -- Name: users users_username_key; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -2656,7 +3187,7 @@ ALTER TABLE ONLY schema_user.users
 
 
 --
--- TOC entry 5002 (class 2606 OID 17286)
+-- TOC entry 5006 (class 2606 OID 17286)
 -- Name: contest_coworker contest_coworker_contest_id_fkey; Type: FK CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2665,7 +3196,7 @@ ALTER TABLE ONLY schema_contest.contest_coworker
 
 
 --
--- TOC entry 5003 (class 2606 OID 17291)
+-- TOC entry 5007 (class 2606 OID 17291)
 -- Name: contest_coworker contest_coworker_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2674,7 +3205,7 @@ ALTER TABLE ONLY schema_contest.contest_coworker
 
 
 --
--- TOC entry 5000 (class 2606 OID 17271)
+-- TOC entry 5004 (class 2606 OID 17271)
 -- Name: contest contest_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2683,7 +3214,7 @@ ALTER TABLE ONLY schema_contest.contest
 
 
 --
--- TOC entry 5004 (class 2606 OID 17301)
+-- TOC entry 5008 (class 2606 OID 17301)
 -- Name: contest_participant contest_participant_contest_id_fkey; Type: FK CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2692,7 +3223,7 @@ ALTER TABLE ONLY schema_contest.contest_participant
 
 
 --
--- TOC entry 5005 (class 2606 OID 17306)
+-- TOC entry 5009 (class 2606 OID 17306)
 -- Name: contest_participant contest_participant_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2701,7 +3232,7 @@ ALTER TABLE ONLY schema_contest.contest_participant
 
 
 --
--- TOC entry 5006 (class 2606 OID 17321)
+-- TOC entry 5010 (class 2606 OID 17321)
 -- Name: contest_problem_point contest_problem_point_contest_id_fkey; Type: FK CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2710,7 +3241,7 @@ ALTER TABLE ONLY schema_contest.contest_problem_point
 
 
 --
--- TOC entry 5007 (class 2606 OID 17443)
+-- TOC entry 5011 (class 2606 OID 17443)
 -- Name: contest_problem_point contest_problem_point_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2719,7 +3250,7 @@ ALTER TABLE ONLY schema_contest.contest_problem_point
 
 
 --
--- TOC entry 5001 (class 2606 OID 17276)
+-- TOC entry 5005 (class 2606 OID 17276)
 -- Name: contest contest_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_contest; Owner: postgres
 --
 
@@ -2728,7 +3259,7 @@ ALTER TABLE ONLY schema_contest.contest
 
 
 --
--- TOC entry 5016 (class 2606 OID 18503)
+-- TOC entry 5020 (class 2606 OID 18503)
 -- Name: chapter chapter_course_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2737,7 +3268,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 5017 (class 2606 OID 18508)
+-- TOC entry 5021 (class 2606 OID 18508)
 -- Name: chapter chapter_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2746,7 +3277,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 5018 (class 2606 OID 18513)
+-- TOC entry 5022 (class 2606 OID 18513)
 -- Name: chapter chapter_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2755,7 +3286,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 5021 (class 2606 OID 18518)
+-- TOC entry 5025 (class 2606 OID 18518)
 -- Name: course_comment course_comment_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2764,7 +3295,7 @@ ALTER TABLE ONLY schema_course.course_comment
 
 
 --
--- TOC entry 5022 (class 2606 OID 18523)
+-- TOC entry 5026 (class 2606 OID 18523)
 -- Name: course_comment course_comment_course_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2773,7 +3304,7 @@ ALTER TABLE ONLY schema_course.course_comment
 
 
 --
--- TOC entry 5019 (class 2606 OID 18528)
+-- TOC entry 5023 (class 2606 OID 18528)
 -- Name: course course_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2782,7 +3313,7 @@ ALTER TABLE ONLY schema_course.course
 
 
 --
--- TOC entry 5020 (class 2606 OID 18533)
+-- TOC entry 5024 (class 2606 OID 18533)
 -- Name: course course_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2791,7 +3322,7 @@ ALTER TABLE ONLY schema_course.course
 
 
 --
--- TOC entry 5025 (class 2606 OID 18538)
+-- TOC entry 5029 (class 2606 OID 18538)
 -- Name: course_user course_user_course_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2800,7 +3331,7 @@ ALTER TABLE ONLY schema_course.course_user
 
 
 --
--- TOC entry 5026 (class 2606 OID 18543)
+-- TOC entry 5030 (class 2606 OID 18543)
 -- Name: course_user course_user_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2809,7 +3340,7 @@ ALTER TABLE ONLY schema_course.course_user
 
 
 --
--- TOC entry 5023 (class 2606 OID 18548)
+-- TOC entry 5027 (class 2606 OID 18548)
 -- Name: course_topic fk_course; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2818,7 +3349,7 @@ ALTER TABLE ONLY schema_course.course_topic
 
 
 --
--- TOC entry 5024 (class 2606 OID 18553)
+-- TOC entry 5028 (class 2606 OID 18553)
 -- Name: course_topic fk_topic; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2827,7 +3358,7 @@ ALTER TABLE ONLY schema_course.course_topic
 
 
 --
--- TOC entry 5027 (class 2606 OID 18558)
+-- TOC entry 5031 (class 2606 OID 18558)
 -- Name: lesson lesson_chapter_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2836,7 +3367,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 5028 (class 2606 OID 18563)
+-- TOC entry 5032 (class 2606 OID 18563)
 -- Name: lesson lesson_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2845,7 +3376,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 5030 (class 2606 OID 18568)
+-- TOC entry 5034 (class 2606 OID 18568)
 -- Name: lesson_problem lesson_problem_lesson_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2854,7 +3385,7 @@ ALTER TABLE ONLY schema_course.lesson_problem
 
 
 --
--- TOC entry 5031 (class 2606 OID 18573)
+-- TOC entry 5035 (class 2606 OID 18573)
 -- Name: lesson_problem lesson_problem_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2863,7 +3394,7 @@ ALTER TABLE ONLY schema_course.lesson_problem
 
 
 --
--- TOC entry 5029 (class 2606 OID 18578)
+-- TOC entry 5033 (class 2606 OID 18578)
 -- Name: lesson lesson_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2872,7 +3403,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 4995 (class 2606 OID 17113)
+-- TOC entry 4999 (class 2606 OID 17113)
 -- Name: comment_vote comment_vote_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -2881,7 +3412,7 @@ ALTER TABLE ONLY schema_discussion.comment_vote
 
 
 --
--- TOC entry 4996 (class 2606 OID 17108)
+-- TOC entry 5000 (class 2606 OID 17108)
 -- Name: comment_vote comment_vote_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -2890,7 +3421,7 @@ ALTER TABLE ONLY schema_discussion.comment_vote
 
 
 --
--- TOC entry 4992 (class 2606 OID 18405)
+-- TOC entry 4996 (class 2606 OID 18405)
 -- Name: comment discussion_comment_reply_fk; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -2899,7 +3430,7 @@ ALTER TABLE ONLY schema_discussion.comment
 
 
 --
--- TOC entry 4993 (class 2606 OID 17062)
+-- TOC entry 4997 (class 2606 OID 17062)
 -- Name: comment discussion_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -2908,7 +3439,7 @@ ALTER TABLE ONLY schema_discussion.comment
 
 
 --
--- TOC entry 4994 (class 2606 OID 17067)
+-- TOC entry 4998 (class 2606 OID 17067)
 -- Name: comment discussion_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -2917,7 +3448,7 @@ ALTER TABLE ONLY schema_discussion.comment
 
 
 --
--- TOC entry 4980 (class 2606 OID 18399)
+-- TOC entry 4983 (class 2606 OID 18399)
 -- Name: problem_solution created_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2926,7 +3457,7 @@ ALTER TABLE ONLY schema_problem.problem_solution
 
 
 --
--- TOC entry 5010 (class 2606 OID 18387)
+-- TOC entry 5014 (class 2606 OID 18387)
 -- Name: problem_input_parameter language_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2935,7 +3466,16 @@ ALTER TABLE ONLY schema_problem.problem_input_parameter
 
 
 --
--- TOC entry 5012 (class 2606 OID 17630)
+-- TOC entry 4991 (class 2606 OID 18607)
+-- Name: test_case language_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
+--
+
+ALTER TABLE ONLY schema_problem.test_case
+    ADD CONSTRAINT language_fk FOREIGN KEY (language_id) REFERENCES schema_setting.language(id) NOT VALID;
+
+
+--
+-- TOC entry 5016 (class 2606 OID 17630)
 -- Name: problem_comment problem_comment_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2944,7 +3484,7 @@ ALTER TABLE ONLY schema_problem.problem_comment
 
 
 --
--- TOC entry 5013 (class 2606 OID 17625)
+-- TOC entry 5017 (class 2606 OID 17625)
 -- Name: problem_comment problem_comment_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2953,7 +3493,7 @@ ALTER TABLE ONLY schema_problem.problem_comment
 
 
 --
--- TOC entry 4972 (class 2606 OID 16737)
+-- TOC entry 4975 (class 2606 OID 16737)
 -- Name: problem problem_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2962,7 +3502,7 @@ ALTER TABLE ONLY schema_problem.problem
 
 
 --
--- TOC entry 5011 (class 2606 OID 17561)
+-- TOC entry 5015 (class 2606 OID 17561)
 -- Name: problem_input_parameter problem_input_parameter_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2971,7 +3511,7 @@ ALTER TABLE ONLY schema_problem.problem_input_parameter
 
 
 --
--- TOC entry 5014 (class 2606 OID 17646)
+-- TOC entry 5018 (class 2606 OID 17646)
 -- Name: problem_solution_comment problem_solution_comment_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2980,7 +3520,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_comment
 
 
 --
--- TOC entry 5015 (class 2606 OID 17641)
+-- TOC entry 5019 (class 2606 OID 17641)
 -- Name: problem_solution_comment problem_solution_comment_problem_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2989,7 +3529,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_comment
 
 
 --
--- TOC entry 5008 (class 2606 OID 17332)
+-- TOC entry 5012 (class 2606 OID 17332)
 -- Name: problem_solution_skill problem_solution_skill_problem_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -2998,7 +3538,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_skill
 
 
 --
--- TOC entry 5009 (class 2606 OID 17337)
+-- TOC entry 5013 (class 2606 OID 17337)
 -- Name: problem_solution_skill problem_solution_skill_skill_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3007,7 +3547,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_skill
 
 
 --
--- TOC entry 4989 (class 2606 OID 17021)
+-- TOC entry 4993 (class 2606 OID 17021)
 -- Name: problem_submission problem_submission_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3016,7 +3556,7 @@ ALTER TABLE ONLY schema_problem.problem_submission
 
 
 --
--- TOC entry 4990 (class 2606 OID 17433)
+-- TOC entry 4994 (class 2606 OID 17433)
 -- Name: problem_submission problem_submission_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3025,7 +3565,7 @@ ALTER TABLE ONLY schema_problem.problem_submission
 
 
 --
--- TOC entry 4991 (class 2606 OID 17011)
+-- TOC entry 4995 (class 2606 OID 17011)
 -- Name: problem_submission problem_submission_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3034,7 +3574,7 @@ ALTER TABLE ONLY schema_problem.problem_submission
 
 
 --
--- TOC entry 4973 (class 2606 OID 16742)
+-- TOC entry 4976 (class 2606 OID 16742)
 -- Name: problem problem_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3043,7 +3583,7 @@ ALTER TABLE ONLY schema_problem.problem
 
 
 --
--- TOC entry 4978 (class 2606 OID 17408)
+-- TOC entry 4981 (class 2606 OID 17408)
 -- Name: problem_skill problemskill_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3052,7 +3592,7 @@ ALTER TABLE ONLY schema_problem.problem_skill
 
 
 --
--- TOC entry 4979 (class 2606 OID 16787)
+-- TOC entry 4982 (class 2606 OID 16787)
 -- Name: problem_skill problemskill_skill_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3061,7 +3601,7 @@ ALTER TABLE ONLY schema_problem.problem_skill
 
 
 --
--- TOC entry 4981 (class 2606 OID 17413)
+-- TOC entry 4984 (class 2606 OID 17413)
 -- Name: problem_solution problemsolution_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3070,7 +3610,7 @@ ALTER TABLE ONLY schema_problem.problem_solution
 
 
 --
--- TOC entry 4986 (class 2606 OID 16880)
+-- TOC entry 4989 (class 2606 OID 16880)
 -- Name: problem_template problemtemplate_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3079,7 +3619,7 @@ ALTER TABLE ONLY schema_problem.problem_template
 
 
 --
--- TOC entry 4987 (class 2606 OID 17423)
+-- TOC entry 4990 (class 2606 OID 17423)
 -- Name: problem_template problemtemplate_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3088,7 +3628,7 @@ ALTER TABLE ONLY schema_problem.problem_template
 
 
 --
--- TOC entry 4976 (class 2606 OID 17403)
+-- TOC entry 4979 (class 2606 OID 17403)
 -- Name: problem_topic problemtopic_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3097,7 +3637,7 @@ ALTER TABLE ONLY schema_problem.problem_topic
 
 
 --
--- TOC entry 4977 (class 2606 OID 16772)
+-- TOC entry 4980 (class 2606 OID 16772)
 -- Name: problem_topic problemtopic_topic_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3106,7 +3646,7 @@ ALTER TABLE ONLY schema_problem.problem_topic
 
 
 --
--- TOC entry 4997 (class 2606 OID 17143)
+-- TOC entry 5001 (class 2606 OID 17143)
 -- Name: solution_vote solution_vote_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3115,7 +3655,7 @@ ALTER TABLE ONLY schema_problem.solution_vote
 
 
 --
--- TOC entry 4998 (class 2606 OID 17138)
+-- TOC entry 5002 (class 2606 OID 17138)
 -- Name: solution_vote solution_vote_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3124,7 +3664,7 @@ ALTER TABLE ONLY schema_problem.solution_vote
 
 
 --
--- TOC entry 4983 (class 2606 OID 16857)
+-- TOC entry 4986 (class 2606 OID 16857)
 -- Name: solution_code solutioncode_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3133,7 +3673,7 @@ ALTER TABLE ONLY schema_problem.solution_code
 
 
 --
--- TOC entry 4984 (class 2606 OID 17418)
+-- TOC entry 4987 (class 2606 OID 17418)
 -- Name: solution_code solutioncode_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3142,7 +3682,7 @@ ALTER TABLE ONLY schema_problem.solution_code
 
 
 --
--- TOC entry 4985 (class 2606 OID 16847)
+-- TOC entry 4988 (class 2606 OID 16847)
 -- Name: solution_code solutioncode_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3151,7 +3691,7 @@ ALTER TABLE ONLY schema_problem.solution_code
 
 
 --
--- TOC entry 4988 (class 2606 OID 17428)
+-- TOC entry 4992 (class 2606 OID 17428)
 -- Name: test_case testcase_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3160,7 +3700,7 @@ ALTER TABLE ONLY schema_problem.test_case
 
 
 --
--- TOC entry 4982 (class 2606 OID 18394)
+-- TOC entry 4985 (class 2606 OID 18394)
 -- Name: problem_solution updated_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3169,7 +3709,7 @@ ALTER TABLE ONLY schema_problem.problem_solution
 
 
 --
--- TOC entry 4974 (class 2606 OID 17398)
+-- TOC entry 4977 (class 2606 OID 17398)
 -- Name: user_favourite userfavourite_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3178,7 +3718,7 @@ ALTER TABLE ONLY schema_problem.user_favourite
 
 
 --
--- TOC entry 4975 (class 2606 OID 16752)
+-- TOC entry 4978 (class 2606 OID 16752)
 -- Name: user_favourite userfavourite_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3187,7 +3727,7 @@ ALTER TABLE ONLY schema_problem.user_favourite
 
 
 --
--- TOC entry 4969 (class 2606 OID 16693)
+-- TOC entry 4972 (class 2606 OID 16693)
 -- Name: language language_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3196,7 +3736,7 @@ ALTER TABLE ONLY schema_setting.language
 
 
 --
--- TOC entry 4970 (class 2606 OID 16698)
+-- TOC entry 4973 (class 2606 OID 16698)
 -- Name: language language_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3205,7 +3745,7 @@ ALTER TABLE ONLY schema_setting.language
 
 
 --
--- TOC entry 4965 (class 2606 OID 16657)
+-- TOC entry 4968 (class 2606 OID 16657)
 -- Name: skill skill_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3214,7 +3754,7 @@ ALTER TABLE ONLY schema_setting.skill
 
 
 --
--- TOC entry 4966 (class 2606 OID 16662)
+-- TOC entry 4969 (class 2606 OID 16662)
 -- Name: skill skill_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3223,7 +3763,7 @@ ALTER TABLE ONLY schema_setting.skill
 
 
 --
--- TOC entry 4967 (class 2606 OID 16675)
+-- TOC entry 4970 (class 2606 OID 16675)
 -- Name: topic topic_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3232,7 +3772,7 @@ ALTER TABLE ONLY schema_setting.topic
 
 
 --
--- TOC entry 4968 (class 2606 OID 16680)
+-- TOC entry 4971 (class 2606 OID 16680)
 -- Name: topic topic_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3241,7 +3781,7 @@ ALTER TABLE ONLY schema_setting.topic
 
 
 --
--- TOC entry 4971 (class 2606 OID 16711)
+-- TOC entry 4974 (class 2606 OID 16711)
 -- Name: notification notification_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -3250,7 +3790,7 @@ ALTER TABLE ONLY schema_user.notification
 
 
 --
--- TOC entry 4999 (class 2606 OID 17251)
+-- TOC entry 5003 (class 2606 OID 17251)
 -- Name: transaction transaction_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -3258,7 +3798,7 @@ ALTER TABLE ONLY schema_user.transaction
     ADD CONSTRAINT transaction_user_id_fkey FOREIGN KEY (user_id) REFERENCES schema_user.users(id);
 
 
--- Completed on 2025-02-25 12:20:59
+-- Completed on 2025-03-02 01:18:56
 
 --
 -- PostgreSQL database dump complete

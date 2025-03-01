@@ -10,6 +10,8 @@ public interface ProblemTemplateService {
 
     public void addListTemplate(List<ProblemTemplate> templates);
 
+    public void addTemplate(ProblemTemplate template);
+
     public List<ProblemTemplate> getAllTemplatesByProblem(Problem problem);
 
     public void deleteTemplatesByProblem(Problem problem);

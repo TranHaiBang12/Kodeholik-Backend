@@ -44,4 +44,9 @@ public class ProblemTemplateServiceImpl implements ProblemTemplateService {
         // problemTemplateRepository.deleteAllByProblem(problem);
     }
 
+    @Override
+    public void addTemplate(ProblemTemplate template) {
+        problemTemplateRepository.save(template);
+    }
+
 }

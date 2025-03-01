@@ -13,6 +13,7 @@ import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.model.InvokeRequest;
 import com.amazonaws.services.lambda.model.InvokeResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
 
@@ -44,10 +45,7 @@ public class LambdaServiceImpl implements LambdaService {
     @Override
     public String invokeLambdaFunction(LambdaRequest codeRequest) {
         try {
-            log.info(codeRequest);
-            // Chuyen du lieu request thanh JSON
             String payload = objectMapper.writeValueAsString(codeRequest);
-
             InvokeRequest invokeRequest = new InvokeRequest()
                     .withFunctionName(arn)
                     .withPayload(payload);

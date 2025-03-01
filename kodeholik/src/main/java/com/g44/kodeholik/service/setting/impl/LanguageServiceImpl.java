@@ -1,5 +1,8 @@
 package com.g44.kodeholik.service.setting.impl;
 
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.NotFoundException;
@@ -18,6 +21,11 @@ public class LanguageServiceImpl implements LanguageService {
     public Language findByName(String name) {
         return languageRepository.findByName(name)
                 .orElseThrow(() -> new NotFoundException("Language name not found", "Language name not found"));
+    }
+
+    @Override
+    public Set<Language> getLanguagesByNameList(List<String> names) {
+        return languageRepository.findByNameIn(names);
     }
 
 }

@@ -80,14 +80,14 @@ public interface ProblemService {
                         ProblemBasicAddDto problemBasicAddDto,
                         ProblemEditorialDto problemEditorialDto,
                         List<ProblemInputParameterDto> problemInputParameterDto,
-                        MultipartFile excelFile);
+                        MultipartFile[] excelFile);
 
         public void editProblem(
                         String link,
                         ProblemBasicAddDto problemBasicAddDto,
                         ProblemEditorialDto problemEditorialDto,
                         List<ProblemInputParameterDto> problemInputParameterDto,
-                        MultipartFile excelFile);
+                        MultipartFile[] excelFile);
 
         public void activateProblem(String link);
 
