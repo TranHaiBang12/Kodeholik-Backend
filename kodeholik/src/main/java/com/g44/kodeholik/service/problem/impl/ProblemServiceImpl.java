@@ -427,16 +427,18 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public SubmissionResponseDto submitProblem(String link, ProblemCompileRequestDto problemCompileRequestDto) {
         Problem problem = getActivePublicProblemByLink(link);
+        Language language = languageService.findByName(problemCompileRequestDto.getLanguageName());
         return problemSubmissionService.submitProblem(problem, problemCompileRequestDto,
-                getTestCaseByProblem(link),
+                problemTestCaseService.getTestCaseByProblemAndLanguage(problem, language),
                 findByProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()));
     }
 
     @Override
     public RunProblemResponseDto run(String link, ProblemCompileRequestDto problemCompileRequestDto) {
-        log.info(link);
         Problem problem = getActivePublicProblemByLink(link);
-        return problemSubmissionService.run(problem, problemCompileRequestDto, getSampleTestCaseByProblem(link),
+        Language language = languageService.findByName(problemCompileRequestDto.getLanguageName());
+        return problemSubmissionService.run(problem, problemCompileRequestDto,
+                problemTestCaseService.getSampleTestCaseByProblemAndLanguage(problem, language),
                 findByProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()));
     }
 
@@ -447,22 +449,23 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public List<TestCase> getTestCaseByProblem(String link) {
+    public List<List<TestCase>> getTestCaseByProblem(String link, List<Language> languages) {
         Problem problem = getActivePublicProblemByLink(link);
-        return problemTestCaseService.getTestCaseByProblem(problem);
+        return problemTestCaseService.getTestCaseByProblem(problem, languages);
     }
 
     @Override
-    public List<TestCase> getSampleTestCaseByProblem(String link) {
+    public List<List<TestCase>> getSampleTestCaseByProblem(String link, List<Language> languages) {
         Problem problem = getActivePublicProblemByLink(link);
-        return problemTestCaseService.getSampleTestCaseByProblem(problem);
+        return problemTestCaseService.getSampleTestCaseByProblem(problem, languages);
 
     }
 
     @Override
     public ProblemCompileResponseDto getProblemCompileInformationById(String link, String languageName) {
+        Language language = languageService.findByName(languageName);
         Problem problem = getActivePublicProblemByLink(link);
-        return problemTestCaseService.getProblemCompileInformationByProblem(problem, languageName);
+        return problemTestCaseService.getProblemCompileInformationByProblem(problem, language);
     }
 
     @Override
@@ -491,26 +494,31 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public void addProblem(ProblemBasicAddDto problemBasicAddDto, ProblemEditorialDto problemEditorialDto,
-            List<ProblemInputParameterDto> problemInputParameterDto, MultipartFile[] excelFile) {
+            List<ProblemInputParameterDto> problemInputParameterDto, MultipartFile excelFile) {
         if (checkTitleExisted(problemBasicAddDto.getTitle())) {
             throw new BadRequestException("Title has already existed", "Title has already existed");
         }
-        List<String> inputNames = getInputName(problemInputParameterDto);
+
         Set<Language> languages = languageService.getLanguagesByNameList(problemBasicAddDto.getLanguageSupport());
-        List<ProblemTestCaseDto> problemTestCaseDtos = excelService.readTestCaseExcel(excelFile, inputNames,
-                problemBasicAddDto.getLanguageSupport());
-        if (!checkTestCase(problemEditorialDto, problemTestCaseDtos, problemInputParameterDto)) {
+        List<ProblemTestCaseDto> problemTestCaseDtos = new ArrayList();
+        for (Language language : languages) {
+            List<String> inputNames = getInputName(problemInputParameterDto, language.getName());
+            problemTestCaseDtos.addAll(excelService.readTestCaseExcel(excelFile, inputNames,
+                    language.getName()));
+        }
+        if (!checkTestCase(problemEditorialDto, problemTestCaseDtos,
+                problemInputParameterDto)) {
             throw new TestCaseNotPassedException("Your solution code doesn't pass all test case. Please check again",
                     submissionResponseDto);
         }
-        Problem problem = addProblemBasic(problemBasicAddDto);
-        addProblemInputParameter(problemInputParameterDto, problem);
-        addProblemEditorial(problemEditorialDto, problem);
+        Problem problem = addProblemBasic(problemBasicAddDto, languages);
+        addProblemInputParameter(problemInputParameterDto, problem, problemBasicAddDto.getLanguageSupport());
+        addProblemEditorial(problemEditorialDto, problem, problemBasicAddDto.getLanguageSupport());
         addProblemTestCase(problemTestCaseDtos, problem, problemInputParameterDto);
         // syncProblemsToElasticsearch();
     }
 
-    private Problem addProblemBasic(ProblemBasicAddDto problemBasicAddDto) {
+    private Problem addProblemBasic(ProblemBasicAddDto problemBasicAddDto, Set<Language> languages) {
         Users currentUsers = userService.getCurrentUser();
 
         Problem problem = new Problem();
@@ -524,6 +532,7 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setStatus(problemBasicAddDto.getStatus());
         problem.setLink(getLinkForTitle(problemBasicAddDto.getTitle()));
         problem.setActive(problemBasicAddDto.getIsActive().booleanValue());
+        problem.setLanguageSupport(languages);
         Set<Topic> topics = tagService.getTopicsByNameList(problemBasicAddDto.getTopics());
         Set<Skill> skills = tagService.getSkillsByNameList(problemBasicAddDto.getSkills());
 
@@ -533,9 +542,10 @@ public class ProblemServiceImpl implements ProblemService {
         return problemRepository.save(problem);
     }
 
-    private Problem editProblemBasic(ProblemBasicAddDto problemBasicAddDto, Problem problem) {
+    private Problem editProblemBasic(ProblemBasicAddDto problemBasicAddDto, Problem problem, Set<Language> languages) {
         Users currentUsers = userService.getCurrentUser();
 
+        problem.setLanguageSupport(languages);
         problem.setTitle(problemBasicAddDto.getTitle());
         problem.setDifficulty(problemBasicAddDto.getDifficulty());
         problem.setDescription(problemBasicAddDto.getDescription());
@@ -558,9 +568,13 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     private void addProblemTemplate(ProblemInputParameterDto problemInputParameterDto, TemplateCode templateCode,
-            Problem problem) {
+            Problem problem, List<String> languageSupports) {
         problemInputParameterDto = generateTemplate(problemInputParameterDto);
         ProblemTemplate template = new ProblemTemplate();
+        if (!languageSupports.contains(templateCode.getLanguage().toString())) {
+            throw new BadRequestException("Your problem doesn't support this language",
+                    "Your problem doesn't support this language");
+        }
         template.setProblem(problem);
         template.setLanguage(languageService.findByName(templateCode.getLanguage()));
         template.setTemplateCode(templateCode.getCode());
@@ -571,26 +585,38 @@ public class ProblemServiceImpl implements ProblemService {
 
     }
 
-    private List<String> getInputName(List<ProblemInputParameterDto> problemInputParameterDtos) {
+    private List<String> getInputName(List<ProblemInputParameterDto> problemInputParameterDtos, String languageName) {
         List<String> inputNames = new ArrayList<>();
         for (int i = 0; i < problemInputParameterDtos.size(); i++) {
-            List<InputParameterDto> inputParameters = problemInputParameterDtos.get(i).getParameters();
-            for (InputParameterDto inputParameterDto : inputParameters) {
-                if (!inputNames.contains(inputParameterDto.getInputName())) {
-                    inputNames.add(inputParameterDto.getInputName());
+            if (problemInputParameterDtos.get(i).getLanguage().equals(languageName)) {
+                List<InputParameterDto> inputParameters = problemInputParameterDtos.get(i).getParameters();
+                for (InputParameterDto inputParameterDto : inputParameters) {
+                    if (!inputNames.contains(inputParameterDto.getInputName())) {
+                        inputNames.add(inputParameterDto.getInputName());
+                    }
                 }
             }
         }
         return inputNames;
     }
 
-    private void addProblemInputParameter(List<ProblemInputParameterDto> problemInputParameterDto, Problem problem) {
+    private void addProblemInputParameter(List<ProblemInputParameterDto> problemInputParameterDto, Problem problem,
+            List<String> languageSupports) {
         List<ProblemInputParameter> problemInputParameters = new ArrayList();
+        if (languageSupports.size() != problemInputParameterDto.size()) {
+            throw new BadRequestException(
+                    "Please define a list parameter for each of language that your problem support",
+                    "Please define a list parameter for each of language that your problem support");
+        }
         for (int j = 0; j < problemInputParameterDto.size(); j++) {
+            if (!languageSupports.contains(problemInputParameterDto.get(j).getLanguage())) {
+                throw new BadRequestException("Your problem doesn't support this language",
+                        "Your problem doesn't support this language");
+            }
             List<InputParameterDto> inputParameters = problemInputParameterDto.get(j).getParameters();
+            addProblemTemplate(problemInputParameterDto.get(j), problemInputParameterDto.get(j).getTemplateCode(),
+                    problem, languageSupports);
             for (int i = 0; i < inputParameters.size(); i++) {
-                addProblemTemplate(problemInputParameterDto.get(j), problemInputParameterDto.get(j).getTemplateCode(),
-                        problem);
                 Language language = languageService.findByName(problemInputParameterDto.get(j).getLanguage());
                 ProblemInputParameter problemInputParameter = new ProblemInputParameter();
                 problemInputParameter.setProblem(problem);
@@ -607,7 +633,8 @@ public class ProblemServiceImpl implements ProblemService {
         problemInputParameterService.addListInputParameters(problemInputParameters);
     }
 
-    public List<ProblemSolution> addProblemEditorial(ProblemEditorialDto problemEditorialDto, Problem problem) {
+    public List<ProblemSolution> addProblemEditorial(ProblemEditorialDto problemEditorialDto, Problem problem,
+            List<String> languageSupports) {
         List<ProblemSolution> problemSolutions = new ArrayList();
         ProblemSolution problemSolution = new ProblemSolution();
         problemSolution.setProblem(problem);
@@ -620,16 +647,26 @@ public class ProblemServiceImpl implements ProblemService {
         problemSolution.setCreatedBy(userService.getCurrentUser());
         problemSolutions.add(problemSolution);
         problemSolutionService.save(problemSolution);
-        addProblemEditorialCode(problemEditorialDto.getEditorialDtos(), problemSolution);
+        addProblemEditorialCode(problemEditorialDto.getEditorialDtos(), problemSolution, languageSupports);
 
         return problemSolutions;
     }
 
-    public void addProblemEditorialCode(EditorialDto editorialDto, ProblemSolution problemSolution) {
+    public void addProblemEditorialCode(EditorialDto editorialDto, ProblemSolution problemSolution,
+            List<String> languageSupports) {
         List<SolutionCodeDto> solutionCodeDtos = editorialDto.getSolutionCodes();
+        if (languageSupports.size() != solutionCodeDtos.size()) {
+            throw new BadRequestException(
+                    "Please define a solution code for each of language that your problem support",
+                    "Please define a solution code for each of language that your problem support");
+        }
         List<SolutionCode> solutionCodes = new ArrayList();
         for (int i = 0; i < solutionCodeDtos.size(); i++) {
             SolutionCode solutionCode = new SolutionCode();
+            if (!languageSupports.contains(solutionCodeDtos.get(i).getSolutionLanguage().toString())) {
+                throw new BadRequestException("Your problem doesn't support this language",
+                        "Your problem doesn't support this language");
+            }
             solutionCode.setCode(solutionCodeDtos.get(i).getSolutionCode());
             Language language = languageService.findByName(solutionCodeDtos.get(i).getSolutionLanguage());
             solutionCode.setLanguage(language);
@@ -645,6 +682,7 @@ public class ProblemServiceImpl implements ProblemService {
     public void addProblemTestCase(List<ProblemTestCaseDto> problemTestCaseDtos,
             Problem problem,
             List<ProblemInputParameterDto> problemInputParameterDtos) {
+        int k = 0;
         for (int j = 0; j < problemTestCaseDtos.size(); j++) {
             ProblemTestCaseDto problemTestCaseDto = problemTestCaseDtos.get(j);
             List<TestCaseDto> testCaseDtos = problemTestCaseDto.getTestCases();
@@ -653,7 +691,8 @@ public class ProblemServiceImpl implements ProblemService {
                 ProblemTestCase problemTestCase = new ProblemTestCase();
                 problemTestCase.setLanguage(languageService.findByName(problemTestCaseDto.getLanguage()));
                 problemTestCase
-                        .setInput(generateInputJson(problemInputParameterDtos, problemTestCaseDto, i));
+                        .setInput(generateInputJson(problemInputParameterDtos, problemTestCaseDto, k));
+                k++;
                 if (problemInputParameterDtos.get(0).getReturnType() == InputType.STRING) {
                     problemTestCase.setExpectedOutput("\"" + testCaseDtos.get(i).getExpectedOutput() + "\"");
                 } else {
@@ -673,7 +712,7 @@ public class ProblemServiceImpl implements ProblemService {
         String template = "";
         templateBuilder = new StringBuilder();
         if (templateCode.getLanguage().equals("Java")) {
-            templateBuilder.append(templateCode.getCode()).append("\n public static ");
+            templateBuilder.append(templateCode.getCode()).append("public static ");
             templateBuilder
                     .append(getJavaStringForReturnType(
                             problemInputParameterDto.getReturnType() == null
@@ -934,6 +973,7 @@ public class ProblemServiceImpl implements ProblemService {
     private String generateInputJson(List<ProblemInputParameterDto> problemInputParameterDto,
             ProblemTestCaseDto problemTestCaseDto,
             int index) {
+        log.info("Inputs: " + inputs);
         return gson.toJson(inputs.get(index));
 
     }
@@ -980,24 +1020,27 @@ public class ProblemServiceImpl implements ProblemService {
     public void editProblem(String link, ProblemBasicAddDto problemBasicAddDto,
             ProblemEditorialDto problemEditorialDto,
             List<ProblemInputParameterDto> problemInputParameterDto,
-            MultipartFile[] excelFile) {
+            MultipartFile excelFile) {
         Problem problem = getProblemByLink(link);
         if (checkTitleExistedForUpdate(problemBasicAddDto.getTitle(), problem.getTitle())) {
             throw new BadRequestException("Title has already existed", "Title has already existed");
         }
-        List<String> inputNames = getInputName(problemInputParameterDto);
         Set<Language> languages = languageService.getLanguagesByNameList(problemBasicAddDto.getLanguageSupport());
-        List<ProblemTestCaseDto> problemTestCaseDto = excelService.readTestCaseExcel(excelFile, inputNames,
-                problemBasicAddDto.getLanguageSupport());
-        if (!checkTestCase(problemEditorialDto, problemTestCaseDto, problemInputParameterDto)) {
+        List<ProblemTestCaseDto> problemTestCaseDtos = new ArrayList();
+        for (Language language : languages) {
+            List<String> inputNames = getInputName(problemInputParameterDto, language.getName());
+            problemTestCaseDtos.addAll(excelService.readTestCaseExcel(excelFile, inputNames,
+                    language.getName()));
+        }
+        if (!checkTestCase(problemEditorialDto, problemTestCaseDtos, problemInputParameterDto)) {
             throw new TestCaseNotPassedException("Your solution code doesn't pass all test case. Please check again",
                     submissionResponseDto);
         }
         deleteProblemDependency(problem);
-        editProblemBasic(problemBasicAddDto, problem);
-        addProblemInputParameter(problemInputParameterDto, problem);
-        addProblemEditorial(problemEditorialDto, problem);
-        addProblemTestCase(problemTestCaseDto, problem, problemInputParameterDto);
+        editProblemBasic(problemBasicAddDto, problem, languages);
+        addProblemInputParameter(problemInputParameterDto, problem, problemBasicAddDto.getLanguageSupport());
+        addProblemEditorial(problemEditorialDto, problem, problemBasicAddDto.getLanguageSupport());
+        addProblemTestCase(problemTestCaseDtos, problem, problemInputParameterDto);
     }
 
     private boolean checkTitleExistedForUpdate(String newTitle, String oldTitle) {
@@ -1144,8 +1187,8 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public byte[] getExcelFile(String link) {
         Problem problem = getProblemByLink(link);
-        List<ProblemTestCase> problemTestCases = problemTestCaseService.getProblemTestCaseByProblem(problem);
-        return excelService.generateExcelFile(problemTestCases);
+        List<ProblemTestCase> problemTestCases = problemTestCaseService.getTestCaseByProblemAndAllLanguage(problem);
+        return excelService.generateExcelFile(problemTestCases, problem);
     }
 
     @Override
@@ -1318,6 +1361,20 @@ public class ProblemServiceImpl implements ProblemService {
             SubmissionStatus status, Integer size, String sortBy, Boolean ascending) {
         Users currentUser = userService.getCurrentUser();
         return problemSubmissionService.findLastSubmittedByUser(currentUser, status, page, size, sortBy, ascending);
+    }
+
+    @Override
+    public List<String> getLanguageSupportByProblem(String link) {
+        List<String> languageSupport = new ArrayList();
+        Problem problem = null;
+        if (link != null) {
+            problem = getActivePublicProblemByLink(link);
+            Set<Language> languageSet = problem.getLanguageSupport();
+            for (Language language : languageSet) {
+                languageSupport.add(language.getName());
+            }
+        }
+        return languageSupport;
     }
 
 }

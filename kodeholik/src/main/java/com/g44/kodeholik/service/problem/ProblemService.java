@@ -36,6 +36,7 @@ import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 
@@ -68,9 +69,9 @@ public interface ProblemService {
 
         public ProblemTemplate findByProblemAndLanguage(String link, String languageName);
 
-        public List<TestCase> getTestCaseByProblem(String link);
+        public List<List<TestCase>> getTestCaseByProblem(String link, List<Language> languages);
 
-        public List<TestCase> getSampleTestCaseByProblem(String link);
+        public List<List<TestCase>> getSampleTestCaseByProblem(String link, List<Language> languages);
 
         public ProblemCompileResponseDto getProblemCompileInformationById(String link, String languageName);
 
@@ -80,14 +81,14 @@ public interface ProblemService {
                         ProblemBasicAddDto problemBasicAddDto,
                         ProblemEditorialDto problemEditorialDto,
                         List<ProblemInputParameterDto> problemInputParameterDto,
-                        MultipartFile[] excelFile);
+                        MultipartFile excelFile);
 
         public void editProblem(
                         String link,
                         ProblemBasicAddDto problemBasicAddDto,
                         ProblemEditorialDto problemEditorialDto,
                         List<ProblemInputParameterDto> problemInputParameterDto,
-                        MultipartFile[] excelFile);
+                        MultipartFile excelFile);
 
         public void activateProblem(String link);
 
@@ -149,4 +150,6 @@ public interface ProblemService {
         public Page<ProblemProgressResponseDto> findLastSubmittedByUser(
                         int page,
                         SubmissionStatus status, Integer size, String sortBy, Boolean ascending);
+
+        public List<String> getLanguageSupportByProblem(String link);
 }

@@ -46,18 +46,19 @@ public class LambdaServiceImpl implements LambdaService {
     public String invokeLambdaFunction(LambdaRequest codeRequest) {
         try {
             String payload = objectMapper.writeValueAsString(codeRequest);
+            log.info(payload);
             InvokeRequest invokeRequest = new InvokeRequest()
                     .withFunctionName(arn)
                     .withPayload(payload);
 
             InvokeResult invokeResult = awsLambda.invoke(invokeRequest);
             String result = new String(invokeResult.getPayload().array());
-            log.info(result);
+            // log.info(result);
             result = StringEscapeUtils.unescapeJson(result);
             result = result.replace("\\", "");
             result = result.replace("\"\"", "\"");
             result = result.substring(1, result.length() - 1);
-            log.info(result);
+            // log.info(result);
             return result;
         } catch (Exception e) {
             log.info(e.getMessage());

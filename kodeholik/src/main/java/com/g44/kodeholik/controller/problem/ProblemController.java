@@ -64,7 +64,7 @@ public class ProblemController {
             @RequestPart(name = "problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
             @RequestPart(name = "problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
             @RequestPart(name = "problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
-            @RequestPart(name = "testCaseFile") MultipartFile[] testCaseFile) {
+            @RequestPart(name = "testCaseFile") MultipartFile testCaseFile) {
         problemService.addProblem(problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
@@ -83,7 +83,7 @@ public class ProblemController {
             @RequestPart("problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
             @RequestPart("problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
             @RequestPart("problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
-            @RequestPart(name = "testCaseFile") MultipartFile[] testCaseFile) {
+            @RequestPart(name = "testCaseFile") MultipartFile testCaseFile) {
         // TODO: process POST request
         problemService.editProblem(link, problemBasicAddDto,
                 problemEditorialDto,
@@ -160,6 +160,12 @@ public class ProblemController {
             @PathVariable String link,
             @RequestParam String languageName) {
         return ResponseEntity.ok(problemService.getProblemCompileInformationById(link, languageName));
+    }
+
+    @GetMapping("/language-support/{link}")
+    public ResponseEntity<List<String>> getLanguageSupportForProblemByLink(
+            @PathVariable String link) {
+        return ResponseEntity.ok(problemService.getLanguageSupportByProblem(link));
     }
 
     @GetMapping("/description/{link}")

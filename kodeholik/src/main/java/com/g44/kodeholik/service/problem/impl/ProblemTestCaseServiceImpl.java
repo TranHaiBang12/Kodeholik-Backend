@@ -13,6 +13,7 @@ import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.repository.problem.ProblemTestCaseRepository;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemTemplateService;
@@ -31,57 +32,69 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public ProblemCompileResponseDto getProblemCompileInformationByProblem(Problem problem, String languageName) {
+    public ProblemCompileResponseDto getProblemCompileInformationByProblem(Problem problem, Language language) {
         ProblemCompileResponseDto problemCompileResponseDto = new ProblemCompileResponseDto();
         problemCompileResponseDto
-                .setTemplate(problemTemplateService.findByProblemAndLanguage(problem, languageName).getTemplateCode());
-        List<TestCase> testCases = getSampleTestCaseByProblemWithFormat(problem);
+                .setTemplate(
+                        problemTemplateService.findByProblemAndLanguage(problem, language.getName()).getTemplateCode());
+        List<TestCase> testCases = getSampleTestCaseByProblemWithFormat(problem, language);
         problemCompileResponseDto.setTestCases(testCases);
         return problemCompileResponseDto;
     }
 
     @Override
-    public List<TestCase> getTestCaseByProblem(Problem problem) {
-        List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblem(problem);
-        List<TestCase> testCases = new ArrayList<>();
-        for (int i = 0; i < problemTestCase.size(); i++) {
-            List<InputVariable> inputs = new ArrayList<>();
-            try {
-                inputs = objectMapper.readValue(
-                        problemTestCase.get(i).getInput(),
-                        new TypeReference<List<InputVariable>>() {
-                        });
-            } catch (Exception e) {
-                log.info(e.getMessage());
+    public List<List<TestCase>> getTestCaseByProblem(Problem problem, List<Language> language) {
+        List<List<TestCase>> listTestCase = new ArrayList();
+        for (int j = 0; j < language.size(); j++) {
+            List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblemAndLanguage(problem,
+                    language.get(j));
+            List<TestCase> testCases = new ArrayList<>();
+            for (int i = 0; i < problemTestCase.size(); i++) {
+                List<InputVariable> inputs = new ArrayList<>();
+                try {
+                    inputs = objectMapper.readValue(
+                            problemTestCase.get(i).getInput(),
+                            new TypeReference<List<InputVariable>>() {
+                            });
+                } catch (Exception e) {
+                    log.info(e.getMessage());
+                }
+                testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
             }
-            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+            listTestCase.add(testCases);
         }
-        return testCases;
+        return listTestCase;
     }
 
     @Override
-    public List<TestCase> getSampleTestCaseByProblem(Problem problem) {
-        List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblemAndIsSample(problem, true);
-        List<TestCase> testCases = new ArrayList<>();
-        for (int i = 0; i < problemTestCase.size(); i++) {
-            List<InputVariable> inputs = new ArrayList<>();
-            Object output = null;
-            try {
-                inputs = objectMapper.readValue(
-                        problemTestCase.get(i).getInput(),
-                        new TypeReference<List<InputVariable>>() {
-                        });
-            } catch (Exception e) {
-                log.info(e.getMessage());
+    public List<List<TestCase>> getSampleTestCaseByProblem(Problem problem, List<Language> language) {
+        List<List<TestCase>> listTestCase = new ArrayList();
+        for (int j = 0; j < language.size(); j++) {
+            List<ProblemTestCase> problemTestCase = problemTestCaseRepository
+                    .findByProblemAndIsSampleAndLanguage(problem, true, language.get(j));
+            List<TestCase> testCases = new ArrayList<>();
+            for (int i = 0; i < problemTestCase.size(); i++) {
+                List<InputVariable> inputs = new ArrayList<>();
+                Object output = null;
+                try {
+                    inputs = objectMapper.readValue(
+                            problemTestCase.get(i).getInput(),
+                            new TypeReference<List<InputVariable>>() {
+                            });
+                } catch (Exception e) {
+                    log.info(e.getMessage());
+                }
+                testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
             }
-            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+            listTestCase.add(testCases);
         }
-        return testCases;
+        return listTestCase;
     }
 
     @Override
-    public List<TestCase> getSampleTestCaseByProblemWithFormat(Problem problem) {
-        List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblemAndIsSample(problem, true);
+    public List<TestCase> getSampleTestCaseByProblemWithFormat(Problem problem, Language language) {
+        List<ProblemTestCase> problemTestCase = problemTestCaseRepository.findByProblemAndIsSampleAndLanguage(problem,
+                true, language);
         List<TestCase> testCases = new ArrayList<>();
         for (int i = 0; i < problemTestCase.size(); i++) {
             List<InputVariable> inputs = new ArrayList<>();
@@ -115,13 +128,61 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     }
 
     @Override
-    public List<ProblemTestCase> getProblemTestCaseByProblem(Problem problem) {
-        return problemTestCaseRepository.findByProblem(problem);
+    public List<ProblemTestCase> getProblemTestCaseByProblem(Problem problem, Language language) {
+        return problemTestCaseRepository.findByProblemAndLanguage(problem, language);
     }
 
     @Override
     public int getNoTestCaseByProblem(Problem problem) {
         return problemTestCaseRepository.countByProblem(problem);
+    }
+
+    @Override
+    public List<TestCase> getTestCaseByProblemAndLanguage(Problem problem, Language language) {
+        List<ProblemTestCase> problemTestCase = problemTestCaseRepository
+                .findByProblemAndLanguage(problem, language);
+        List<TestCase> testCases = new ArrayList<>();
+        for (int i = 0; i < problemTestCase.size(); i++) {
+            List<InputVariable> inputs = new ArrayList<>();
+            Object output = null;
+            try {
+                inputs = objectMapper.readValue(
+                        problemTestCase.get(i).getInput(),
+                        new TypeReference<List<InputVariable>>() {
+                        });
+            } catch (Exception e) {
+                log.info(e.getMessage());
+            }
+            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+        }
+        return testCases;
+    }
+
+    @Override
+    public List<TestCase> getSampleTestCaseByProblemAndLanguage(Problem problem, Language language) {
+        List<ProblemTestCase> problemTestCase = problemTestCaseRepository
+                .findByProblemAndIsSampleAndLanguage(problem, true, language);
+        List<TestCase> testCases = new ArrayList<>();
+        for (int i = 0; i < problemTestCase.size(); i++) {
+            List<InputVariable> inputs = new ArrayList<>();
+            Object output = null;
+            try {
+                inputs = objectMapper.readValue(
+                        problemTestCase.get(i).getInput(),
+                        new TypeReference<List<InputVariable>>() {
+                        });
+            } catch (Exception e) {
+                log.info(e.getMessage());
+            }
+            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+        }
+        return testCases;
+    }
+
+    @Override
+    public List<ProblemTestCase> getTestCaseByProblemAndAllLanguage(Problem problem) {
+        return problemTestCaseRepository
+                .findByProblem(problem);
     }
 
 }

@@ -2,14 +2,17 @@ package com.g44.kodeholik.model.dto.response.problem.submission.submit;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
 public class AcceptedSubmissionResponseDto extends SubmissionResponseDto {
     private String executionTime;
     private double memoryUsage;
     private int noTestcase;
-    private Timestamp createdAt;
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long createdAt;
 
     public AcceptedSubmissionResponseDto(String executionTime, double memoryUsage, String code, String languageName,
             int noTestcase, Timestamp createdAt, SubmissionStatus status) {
@@ -17,7 +20,7 @@ public class AcceptedSubmissionResponseDto extends SubmissionResponseDto {
         this.executionTime = executionTime;
         this.memoryUsage = memoryUsage;
         this.noTestcase = noTestcase;
-        this.createdAt = createdAt;
+        this.createdAt = createdAt.getTime();
     }
 
     public String getExecutionTime() {
@@ -44,11 +47,11 @@ public class AcceptedSubmissionResponseDto extends SubmissionResponseDto {
         this.noTestcase = noTestcase;
     }
 
-    public Timestamp getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
     }
 

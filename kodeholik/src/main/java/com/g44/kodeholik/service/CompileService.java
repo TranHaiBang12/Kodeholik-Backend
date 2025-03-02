@@ -505,6 +505,7 @@ public class CompileService {
 
         log.info(functionType + " " + returnType);
         // Xác định kiểu dữ liệu của hàm
+        sb.append("    " + (returnType.equals("string") ? "char*" : returnType) + " result;\n");
 
         for (int i = 0; i < testCases.size(); i++) {
             List<InputVariable> inputs = testCases.get(i).getInput();
@@ -517,7 +518,6 @@ public class CompileService {
                     row = Integer.parseInt(inputs.get(j).getValue().toString());
                 }
             }
-            sb.append("    " + (returnType.equals("string") ? "char*" : returnType) + " result;\n");
 
             // Chuyển đổi danh sách tham số thành chuỗi đầu vào
             String inputString = inputs.stream()
