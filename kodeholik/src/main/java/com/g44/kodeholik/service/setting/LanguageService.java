@@ -10,4 +10,6 @@ public interface LanguageService {
     public Language findByName(String name);
 
     public Set<Language> getLanguagesByNameList(List<String> names);
+
+    public Language findById(Long id);
 }

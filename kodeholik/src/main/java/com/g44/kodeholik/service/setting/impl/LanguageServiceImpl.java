@@ -28,4 +28,10 @@ public class LanguageServiceImpl implements LanguageService {
         return languageRepository.findByNameIn(names);
     }
 
+    @Override
+    public Language findById(Long id) {
+        return languageRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Language id not found", "Language id not found"));
+    }
+
 }

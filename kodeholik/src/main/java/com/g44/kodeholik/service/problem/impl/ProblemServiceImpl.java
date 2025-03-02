@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -569,6 +570,7 @@ public class ProblemServiceImpl implements ProblemService {
 
     private void addProblemTemplate(ProblemInputParameterDto problemInputParameterDto, TemplateCode templateCode,
             Problem problem, List<String> languageSupports) {
+        log.info("Template Called");
         problemInputParameterDto = generateTemplate(problemInputParameterDto);
         ProblemTemplate template = new ProblemTemplate();
         if (!languageSupports.contains(templateCode.getLanguage().toString())) {
