@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.exception.TestCaseNotPassedException;
+import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
 import com.g44.kodeholik.model.dto.request.lambda.ResponseResult;
@@ -51,6 +52,7 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDt
 import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemShortResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
@@ -1377,6 +1379,27 @@ public class ProblemServiceImpl implements ProblemService {
             }
         }
         return languageSupport;
+    }
+
+    @Override
+    public List<ProblemShortResponseDto> getPrivateProblemShortResponseDto(String link) {
+        List<ProblemShortResponseDto> result = new ArrayList();
+        List<Problem> problems = problemRepository.findByStatusAndIsActive(ProblemStatus.PRIVATE, true);
+        for (int i = 0; i < problems.size(); i++) {
+            ProblemShortResponseDto problemShortResponseDto = new ProblemShortResponseDto();
+            problemShortResponseDto.setId(problems.get(i).getId());
+            problemShortResponseDto.setLink(problems.get(i).getLink());
+            problemShortResponseDto.setTitle(problems.get(i).getTitle());
+            result.add(problemShortResponseDto);
+        }
+        return result;
+    }
+
+    @Override
+    public Problem getProblemByExamProblemRequest(ExamProblemRequestDto request) {
+        return problemRepository.findByLinkAndStatusAndIsActive(request.getProblemLink(),
+                ProblemStatus.PRIVATE, true)
+                .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
     }
 
 }

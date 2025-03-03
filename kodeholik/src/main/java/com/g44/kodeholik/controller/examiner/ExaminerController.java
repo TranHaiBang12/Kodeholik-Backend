@@ -1,0 +1,65 @@
+package com.g44.kodeholik.controller.examiner;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.g44.kodeholik.model.dto.request.exam.AddExamRequestDto;
+import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
+import com.g44.kodeholik.model.dto.response.exam.ExamListResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.ExamResponseDto;
+import com.g44.kodeholik.service.exam.ExamService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/examiner")
+public class ExaminerController {
+
+    private final ExamService examService;
+
+    @PostMapping("/create")
+    public ResponseEntity<ExamResponseDto> createExam(@RequestBody @Valid AddExamRequestDto addExamRequestDto) {
+        return new ResponseEntity<>(examService.createExam(addExamRequestDto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/edit/{code}")
+    public ResponseEntity<ExamResponseDto> editExam(@RequestBody @Valid AddExamRequestDto addExamRequestDto,
+            @PathVariable String code) {
+        return new ResponseEntity<>(examService.editExam(addExamRequestDto, code), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{code}")
+    public ResponseEntity<Void> deleteExam(@PathVariable String code) {
+        examService.deleteExam(code);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/list")
+    public ResponseEntity<Page<ExamListResponseDto>> getListExam(
+            @RequestBody @Valid FilterExamRequestDto filterExamRequestDto) {
+        Page<ExamListResponseDto> ePage = examService.getListOfExam(filterExamRequestDto);
+        if (ePage.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(ePage);
+    }
+
+    @GetMapping("/detail/{code}")
+    public ResponseEntity<ExamResponseDto> getExamDetail(@PathVariable String code) {
+        return ResponseEntity.ok(examService.getExamDetailByCode(code));
+    }
+
+}

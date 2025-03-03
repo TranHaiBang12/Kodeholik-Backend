@@ -59,6 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/course/list/**",
             "/api/v1/course/detail/**",
             "/api/v1/comment/problem/**",
+            "/api/v1/comment/list-reply/**",
             "/api/v1/course/search/**",
             "/api/v1/tag/all-skill/**",
             "/api/v1/tag/all-topic/**",

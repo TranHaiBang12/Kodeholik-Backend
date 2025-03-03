@@ -12,4 +12,6 @@ public interface LanguageService {
     public Set<Language> getLanguagesByNameList(List<String> names);
 
     public Language findById(Long id);
+
+    public List<String> getLanguageNamesByList(Set<Language> languages);
 }

@@ -196,48 +196,50 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                 inputType,
                 testCases);
         log.info(lambdaRequest);
-        try {
-            String result = CompileService.compileAndRun(problemCompileRequestDto.getCode(), testCases, languageName,
-                    functionSignature, inputType.toString());
-            log.info(result);
-        } catch (Exception e) {
-            log.info(e);
-        }
-        return null;
-
-        // String result = lambdaService.invokeLambdaFunction(lambdaRequest);
-        // String status = "";
-        // ResponseResult responseResult = new ResponseResult();
-        // RunProblemResponseDto runProblemResponseDto = new RunProblemResponseDto();
         // try {
-        // responseResult = gson.fromJson(result, ResponseResult.class);
-        // if (responseResult.isAccepted()) {
-        // status = "ACCEPTED";
-        // } else {
-        // status = "FAILED";
-        // }
+        // String result =
+        // CompileService.compileAndRun(problemCompileRequestDto.getCode(), testCases,
+        // languageName,
+        // functionSignature, inputType.toString());
+        // log.info(result);
         // } catch (Exception e) {
-        // status = result;
+        // log.info(e);
         // }
-        // log.info(responseResult.getResults());
+        // return null;
 
-        // runProblemResponseDto.setResults(responseResult.getResults());
-        // switch (status) {
-        // case "ACCEPTED":
-        // runProblemResponseDto.setStatus(SubmissionStatus.SUCCESS);
-        // runProblemResponseDto.setAccepted(true);
-        // break;
-        // case "FAILED":
-        // runProblemResponseDto.setStatus(SubmissionStatus.FAILED);
-        // runProblemResponseDto.setAccepted(true);
-        // break;
-        // default:
-        // runProblemResponseDto.setMessage(status);
-        // runProblemResponseDto.setStatus(SubmissionStatus.FAILED);
-        // runProblemResponseDto.setAccepted(false);
-        // break;
-        // }
-        // return runProblemResponseDto;
+        String result = lambdaService.invokeLambdaFunction(lambdaRequest);
+        String status = "";
+        ResponseResult responseResult = new ResponseResult();
+        RunProblemResponseDto runProblemResponseDto = new RunProblemResponseDto();
+        try {
+            responseResult = gson.fromJson(result, ResponseResult.class);
+            if (responseResult.isAccepted()) {
+                status = "ACCEPTED";
+            } else {
+                status = "FAILED";
+            }
+        } catch (Exception e) {
+            status = result;
+        }
+        log.info(responseResult.getResults());
+
+        runProblemResponseDto.setResults(responseResult.getResults());
+        switch (status) {
+            case "ACCEPTED":
+                runProblemResponseDto.setStatus(SubmissionStatus.SUCCESS);
+                runProblemResponseDto.setAccepted(true);
+                break;
+            case "FAILED":
+                runProblemResponseDto.setStatus(SubmissionStatus.FAILED);
+                runProblemResponseDto.setAccepted(true);
+                break;
+            default:
+                runProblemResponseDto.setMessage(status);
+                runProblemResponseDto.setStatus(SubmissionStatus.FAILED);
+                runProblemResponseDto.setAccepted(false);
+                break;
+        }
+        return runProblemResponseDto;
     }
 
     @Override

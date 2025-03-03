@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.setting.Language;
@@ -88,6 +89,7 @@ public class Problem {
 
     @ManyToMany
     @JoinTable(name = "problem_comment", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    @JsonManagedReference
     private Set<Comment> comments = new HashSet<>();
 
     @ManyToMany

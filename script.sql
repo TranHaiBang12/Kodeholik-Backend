@@ -5,7 +5,7 @@
 -- Dumped from database version 17.2
 -- Dumped by pg_dump version 17.2
 
--- Started on 2025-03-03 00:14:02
+-- Started on 2025-03-03 19:31:41
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -21,7 +21,7 @@ SET row_security = off;
 
 DROP DATABASE IF EXISTS kodeholik;
 --
--- TOC entry 5248 (class 1262 OID 16517)
+-- TOC entry 5257 (class 1262 OID 16517)
 -- Name: kodeholik; Type: DATABASE; Schema: -; Owner: postgres
 --
 
@@ -105,7 +105,7 @@ CREATE SCHEMA schema_user;
 ALTER SCHEMA schema_user OWNER TO postgres;
 
 --
--- TOC entry 939 (class 1247 OID 18433)
+-- TOC entry 940 (class 1247 OID 18433)
 -- Name: chapter_status; Type: TYPE; Schema: schema_course; Owner: postgres
 --
 
@@ -118,7 +118,7 @@ CREATE TYPE schema_course.chapter_status AS ENUM (
 ALTER TYPE schema_course.chapter_status OWNER TO postgres;
 
 --
--- TOC entry 942 (class 1247 OID 18438)
+-- TOC entry 943 (class 1247 OID 18438)
 -- Name: course_status; Type: TYPE; Schema: schema_course; Owner: postgres
 --
 
@@ -131,7 +131,7 @@ CREATE TYPE schema_course.course_status AS ENUM (
 ALTER TYPE schema_course.course_status OWNER TO postgres;
 
 --
--- TOC entry 945 (class 1247 OID 18444)
+-- TOC entry 946 (class 1247 OID 18444)
 -- Name: lesson_status; Type: TYPE; Schema: schema_course; Owner: postgres
 --
 
@@ -143,7 +143,7 @@ CREATE TYPE schema_course.lesson_status AS ENUM (
 ALTER TYPE schema_course.lesson_status OWNER TO postgres;
 
 --
--- TOC entry 948 (class 1247 OID 18448)
+-- TOC entry 949 (class 1247 OID 18448)
 -- Name: lesson_type; Type: TYPE; Schema: schema_course; Owner: postgres
 --
 
@@ -158,7 +158,7 @@ CREATE TYPE schema_course.lesson_type AS ENUM (
 ALTER TYPE schema_course.lesson_type OWNER TO postgres;
 
 --
--- TOC entry 902 (class 1247 OID 18631)
+-- TOC entry 903 (class 1247 OID 18631)
 -- Name: exam_status; Type: TYPE; Schema: schema_exam; Owner: postgres
 --
 
@@ -172,7 +172,7 @@ CREATE TYPE schema_exam.exam_status AS ENUM (
 ALTER TYPE schema_exam.exam_status OWNER TO postgres;
 
 --
--- TOC entry 1016 (class 1247 OID 17382)
+-- TOC entry 1020 (class 1247 OID 17382)
 -- Name: difficulty; Type: TYPE; Schema: schema_problem; Owner: postgres
 --
 
@@ -186,7 +186,7 @@ CREATE TYPE schema_problem.difficulty AS ENUM (
 ALTER TYPE schema_problem.difficulty OWNER TO postgres;
 
 --
--- TOC entry 1025 (class 1247 OID 17534)
+-- TOC entry 1029 (class 1247 OID 17534)
 -- Name: input_type; Type: TYPE; Schema: schema_problem; Owner: postgres
 --
 
@@ -211,7 +211,7 @@ CREATE TYPE schema_problem.input_type AS ENUM (
 ALTER TYPE schema_problem.input_type OWNER TO postgres;
 
 --
--- TOC entry 1010 (class 1247 OID 17350)
+-- TOC entry 1011 (class 1247 OID 17350)
 -- Name: problem_status; Type: TYPE; Schema: schema_problem; Owner: postgres
 --
 
@@ -224,7 +224,7 @@ CREATE TYPE schema_problem.problem_status AS ENUM (
 ALTER TYPE schema_problem.problem_status OWNER TO postgres;
 
 --
--- TOC entry 1037 (class 1247 OID 18584)
+-- TOC entry 1041 (class 1247 OID 18584)
 -- Name: submission_status; Type: TYPE; Schema: schema_problem; Owner: postgres
 --
 
@@ -237,7 +237,7 @@ CREATE TYPE schema_problem.submission_status AS ENUM (
 ALTER TYPE schema_problem.submission_status OWNER TO postgres;
 
 --
--- TOC entry 1046 (class 1247 OID 17677)
+-- TOC entry 1050 (class 1247 OID 17677)
 -- Name: level; Type: TYPE; Schema: schema_setting; Owner: postgres
 --
 
@@ -251,7 +251,7 @@ CREATE TYPE schema_setting.level AS ENUM (
 ALTER TYPE schema_setting.level OWNER TO postgres;
 
 --
--- TOC entry 1040 (class 1247 OID 18591)
+-- TOC entry 1044 (class 1247 OID 18591)
 -- Name: notification_type; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
@@ -264,7 +264,7 @@ CREATE TYPE schema_user.notification_type AS ENUM (
 ALTER TYPE schema_user.notification_type OWNER TO postgres;
 
 --
--- TOC entry 983 (class 1247 OID 17230)
+-- TOC entry 984 (class 1247 OID 17230)
 -- Name: transaction_status; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
@@ -277,7 +277,7 @@ CREATE TYPE schema_user.transaction_status AS ENUM (
 ALTER TYPE schema_user.transaction_status OWNER TO postgres;
 
 --
--- TOC entry 980 (class 1247 OID 17224)
+-- TOC entry 981 (class 1247 OID 17224)
 -- Name: transaction_type; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
@@ -290,7 +290,7 @@ CREATE TYPE schema_user.transaction_type AS ENUM (
 ALTER TYPE schema_user.transaction_type OWNER TO postgres;
 
 --
--- TOC entry 1022 (class 1247 OID 17494)
+-- TOC entry 1026 (class 1247 OID 17494)
 -- Name: user_role; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
@@ -305,7 +305,7 @@ CREATE TYPE schema_user.user_role AS ENUM (
 ALTER TYPE schema_user.user_role OWNER TO postgres;
 
 --
--- TOC entry 1019 (class 1247 OID 17504)
+-- TOC entry 1023 (class 1247 OID 17504)
 -- Name: user_status; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
@@ -549,16 +549,17 @@ SET default_tablespace = kodeholik_exam_data;
 
 CREATE TABLE schema_exam.exam (
     id bigint NOT NULL,
-    code character varying(30) NOT NULL,
+    code text NOT NULL,
     title character varying(50) NOT NULL,
     description text NOT NULL,
     start_time timestamp without time zone NOT NULL,
     end_time timestamp without time zone NOT NULL,
     status schema_exam.exam_status NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    created_by integer,
-    updated_at timestamp without time zone NOT NULL,
-    updated_by integer
+    created_by integer NOT NULL,
+    updated_at timestamp without time zone,
+    updated_by integer,
+    no_participant integer
 );
 
 
@@ -578,6 +579,19 @@ ALTER TABLE schema_exam.exam ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     CACHE 1
 );
 
+
+--
+-- TOC entry 274 (class 1259 OID 18723)
+-- Name: exam_language_support; Type: TABLE; Schema: schema_exam; Owner: postgres; Tablespace: kodeholik_exam_data
+--
+
+CREATE TABLE schema_exam.exam_language_support (
+    exam_id integer NOT NULL,
+    language_id integer NOT NULL
+);
+
+
+ALTER TABLE schema_exam.exam_language_support OWNER TO postgres;
 
 --
 -- TOC entry 271 (class 1259 OID 18672)
@@ -1162,7 +1176,7 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 5227 (class 0 OID 18457)
+-- TOC entry 5235 (class 0 OID 18457)
 -- Dependencies: 258
 -- Data for Name: chapter; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1170,7 +1184,7 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 5229 (class 0 OID 18463)
+-- TOC entry 5237 (class 0 OID 18463)
 -- Dependencies: 260
 -- Data for Name: course; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1182,7 +1196,7 @@ INSERT INTO schema_course.course (id, title, description, image, status, created
 
 
 --
--- TOC entry 5230 (class 0 OID 18469)
+-- TOC entry 5238 (class 0 OID 18469)
 -- Dependencies: 261
 -- Data for Name: course_comment; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1190,7 +1204,7 @@ INSERT INTO schema_course.course (id, title, description, image, status, created
 
 
 --
--- TOC entry 5232 (class 0 OID 18473)
+-- TOC entry 5240 (class 0 OID 18473)
 -- Dependencies: 263
 -- Data for Name: course_topic; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1198,7 +1212,7 @@ INSERT INTO schema_course.course (id, title, description, image, status, created
 
 
 --
--- TOC entry 5233 (class 0 OID 18476)
+-- TOC entry 5241 (class 0 OID 18476)
 -- Dependencies: 264
 -- Data for Name: course_user; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1207,7 +1221,7 @@ INSERT INTO schema_course.course_user (course_id, user_id, enrolled_at) VALUES (
 
 
 --
--- TOC entry 5234 (class 0 OID 18480)
+-- TOC entry 5242 (class 0 OID 18480)
 -- Dependencies: 265
 -- Data for Name: lesson; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1215,7 +1229,7 @@ INSERT INTO schema_course.course_user (course_id, user_id, enrolled_at) VALUES (
 
 
 --
--- TOC entry 5236 (class 0 OID 18486)
+-- TOC entry 5244 (class 0 OID 18486)
 -- Dependencies: 267
 -- Data for Name: lesson_problem; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1223,7 +1237,7 @@ INSERT INTO schema_course.course_user (course_id, user_id, enrolled_at) VALUES (
 
 
 --
--- TOC entry 5217 (class 0 OID 17050)
+-- TOC entry 5225 (class 0 OID 17050)
 -- Dependencies: 248
 -- Data for Name: comment; Type: TABLE DATA; Schema: schema_discussion; Owner: postgres
 --
@@ -1253,7 +1267,7 @@ INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_
 
 
 --
--- TOC entry 5218 (class 0 OID 17103)
+-- TOC entry 5226 (class 0 OID 17103)
 -- Dependencies: 249
 -- Data for Name: comment_vote; Type: TABLE DATA; Schema: schema_discussion; Owner: postgres
 --
@@ -1263,15 +1277,34 @@ INSERT INTO schema_discussion.comment_vote (user_id, comment_id) VALUES (1, 4);
 
 
 --
--- TOC entry 5239 (class 0 OID 18648)
+-- TOC entry 5247 (class 0 OID 18648)
 -- Dependencies: 270
 -- Data for Name: exam; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
 
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (12, 'a4768a1f-67e1-448a-84a8-a441013c4396', 'Exam for Java. Trial #1', 'Trial test for Java in FPT University', '2025-04-04 23:25:00', '2025-04-07 01:25:00', 'NOT_STARTED', '2025-03-03 18:48:46.883106', 76, '2025-03-03 18:58:39.160939', 76, 0);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (14, 'df64708b-4872-4fd7-913d-030ee5dfef78', 'Exam for Java. Trial #2', 'Trial test for java', '2025-04-03 23:25:00', '2025-04-06 01:25:00', 'NOT_STARTED', '2025-03-03 18:56:14.865331', 76, NULL, NULL, 0);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (15, 'code1', 'Test 1', 'Test 1', '2024-04-04 23:25:00', '2024-04-05 01:25:00', 'IN_PROGRESS', '2024-02-05 01:25:00', 76, NULL, NULL, 212);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (16, 'code2', 'Test 2', 'Test 2', '2024-02-02 23:25:00', '2024-02-05 01:25:00', 'IN_PROGRESS', '2023-02-05 01:25:00', 76, NULL, NULL, 160);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (17, 'code3', 'Test for C 1', 'Test 3', '2024-01-04 23:25:00', '2024-01-05 01:25:00', 'IN_PROGRESS', '2020-02-05 01:25:00', 76, NULL, NULL, 125);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (18, 'code4', 'Test for C 2', 'Test 4', '2024-02-04 23:25:00', '2024-02-05 01:25:00', 'IN_PROGRESS', '2020-02-05 01:25:00', 76, NULL, NULL, 467);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (19, 'code5', 'Test 3', 'Test 5', '2023-04-04 23:25:00', '2023-04-05 01:25:00', 'END', '2020-02-05 01:25:00', 76, NULL, NULL, 300);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (20, 'code6', 'Test 4', 'Test 6', '2023-04-04 23:25:00', '2023-04-05 01:25:00', 'END', '2020-02-05 01:25:00', 76, NULL, NULL, 1000);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (21, 'code7', 'Test 5', 'Test 7', '2023-04-04 23:25:00', '2023-04-05 01:25:00', 'END', '2020-02-05 01:25:00', 76, NULL, NULL, 250);
 
 
 --
--- TOC entry 5240 (class 0 OID 18672)
+-- TOC entry 5251 (class 0 OID 18723)
+-- Dependencies: 274
+-- Data for Name: exam_language_support; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
+--
+
+INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (12, 1);
+INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (14, 1);
+
+
+--
+-- TOC entry 5248 (class 0 OID 18672)
 -- Dependencies: 271
 -- Data for Name: exam_participant; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
@@ -1279,15 +1312,21 @@ INSERT INTO schema_discussion.comment_vote (user_id, comment_id) VALUES (1, 4);
 
 
 --
--- TOC entry 5241 (class 0 OID 18688)
+-- TOC entry 5249 (class 0 OID 18688)
 -- Dependencies: 272
 -- Data for Name: exam_problem; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
 
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (14, 51, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (14, 48, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (14, 29, 4);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (12, 51, 4);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (12, 48, 4);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (12, 29, 2);
 
 
 --
--- TOC entry 5242 (class 0 OID 18703)
+-- TOC entry 5250 (class 0 OID 18703)
 -- Dependencies: 273
 -- Data for Name: exam_submission; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
@@ -1295,7 +1334,7 @@ INSERT INTO schema_discussion.comment_vote (user_id, comment_id) VALUES (1, 4);
 
 
 --
--- TOC entry 5237 (class 0 OID 18615)
+-- TOC entry 5245 (class 0 OID 18615)
 -- Dependencies: 268
 -- Data for Name: language_support; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1342,7 +1381,7 @@ INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (11
 
 
 --
--- TOC entry 5203 (class 0 OID 16730)
+-- TOC entry 5211 (class 0 OID 16730)
 -- Dependencies: 234
 -- Data for Name: problem; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1390,7 +1429,6 @@ INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptan
  Delete a character 
  Replace a character', 'MEDIUM', 30.00, 10, 'PUBLIC', '2025-02-18 16:47:34.284482', 1, NULL, NULL, true, 'edit-distance-1');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (96, 'Multiply Strings', 'Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string. Note: You must not use any built-in BigInteger library or convert the inputs to integer directly.', 'MEDIUM', 41.67, 12, 'PUBLIC', '2025-02-17 19:33:03.092842', 1, '2025-02-18 13:48:42.126348', 1, true, 'multiply-strings');
-INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (88, 'First Missing Positive', 'Given an unsorted integer array nums. Return the smallest positive integer that is not present in nums. You must implement an algorithm that runs in O(n) time and uses O(1) auxiliary space.', 'HARD', 0.00, 0, 'PUBLIC', '2025-02-16 23:34:15.469431', 1, '2025-02-17 16:01:35.564458', 1, true, 'first-missing-positive');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (29, 'Largest Merge Of Two Strings', 'ou are given two strings word1 and word2. You want to construct a string merge in the following way: while either word1 or word2 are non-empty, choose one of the following options:
 
 If word1 is non-empty, append the first character in word1 to merge and delete it from word1.
@@ -1399,19 +1437,20 @@ If word2 is non-empty, append the first character in word2 to merge and delete i
 For example, if word2 = "abc" and merge = "", then after choosing this operation, word2 = "bc" and merge = "a".
 Return the lexicographically largest merge you can construct.
 
-A string a is lexicographically larger than a string b (of the same length) if in the first position where a and b differ, a has a character strictly larger than the corresponding character in b. For example, "abcd" is lexicographically larger than "abcc" because the first position they differ is at the fourth character, and d is greater than c.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'largest-merge-of-two-strings');
+A string a is lexicographically larger than a string b (of the same length) if in the first position where a and b differ, a has a character strictly larger than the corresponding character in b. For example, "abcd" is lexicographically larger than "abcc" because the first position they differ is at the fourth character, and d is greater than c.', 'MEDIUM', 0.00, 0, 'PRIVATE', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'largest-merge-of-two-strings');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (88, 'First Missing Positive', 'Given an unsorted integer array nums. Return the smallest positive integer that is not present in nums. You must implement an algorithm that runs in O(n) time and uses O(1) auxiliary space.', 'HARD', 0.00, 0, 'PUBLIC', '2025-02-16 23:34:15.469431', 1, '2025-02-17 16:01:35.564458', 1, true, 'first-missing-positive');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (51, 'Candy', 'There are n children standing in a line. Each child is assigned a rating value given in the integer array ratings.
 
 You are giving candies to these children subjected to the following requirements:
 
 Each child must have at least one candy.
 Children with a higher rating get more candies than their neighbors.
-Return the minimum number of candies you need to have to distribute the candies to the children.', 'HARD', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'candy');
+Return the minimum number of candies you need to have to distribute the candies to the children.', 'HARD', 0.00, 0, 'PRIVATE', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'candy');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (48, 'Buy Two Chocolates', 'You are given an integer array prices representing the prices of various chocolates in a store. You are also given a single integer money, which represents your initial amount of money.
 
 You must buy exactly two chocolates in such a way that you still have some non-negative leftover money. You would like to minimize the sum of the prices of the two chocolates you buy.
 
-Return the amount of money you will have leftover after buying the two chocolates. If there is no way for you to buy two chocolates without ending up in debt, return money. Note that the leftover must be non-negative.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'buy-two-chocolates');
+Return the amount of money you will have leftover after buying the two chocolates. If there is no way for you to buy two chocolates without ending up in debt, return money. Note that the leftover must be non-negative.', 'EASY', 0.00, 0, 'PRIVATE', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'buy-two-chocolates');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (49, 'Valid Number', 'Given a string s, return whether s is a valid number.
 
 For example, all the following are valid numbers: "2", "0089", "-0.1", "+3.14", "4.", "-.9", "2e10", "-90E3", "3e+7", "+6e-1", "53.5e93", "-123.456e789", while the following are not valid numbers: "abc", "1a", "1e", "e3", "99e2.5", "--6", "-+3", "95a54e53".
@@ -1532,7 +1571,7 @@ Return the final value of original.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:
 
 
 --
--- TOC entry 5225 (class 0 OID 17620)
+-- TOC entry 5233 (class 0 OID 17620)
 -- Dependencies: 256
 -- Data for Name: problem_comment; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1551,7 +1590,7 @@ INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 
 
 
 --
--- TOC entry 5224 (class 0 OID 17556)
+-- TOC entry 5232 (class 0 OID 17556)
 -- Dependencies: 255
 -- Data for Name: problem_input_parameter; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1576,7 +1615,7 @@ INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, 
 
 
 --
--- TOC entry 5206 (class 0 OID 16777)
+-- TOC entry 5214 (class 0 OID 16777)
 -- Dependencies: 237
 -- Data for Name: problem_skill; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1599,7 +1638,7 @@ INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (98, 3);
 
 
 --
--- TOC entry 5208 (class 0 OID 16793)
+-- TOC entry 5216 (class 0 OID 16793)
 -- Dependencies: 239
 -- Data for Name: problem_solution; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1690,7 +1729,7 @@ INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solutio
 
 
 --
--- TOC entry 5226 (class 0 OID 17636)
+-- TOC entry 5234 (class 0 OID 17636)
 -- Dependencies: 257
 -- Data for Name: problem_solution_comment; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1707,7 +1746,7 @@ INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, commen
 
 
 --
--- TOC entry 5222 (class 0 OID 17327)
+-- TOC entry 5230 (class 0 OID 17327)
 -- Dependencies: 253
 -- Data for Name: problem_solution_skill; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1725,7 +1764,7 @@ INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id
 
 
 --
--- TOC entry 5215 (class 0 OID 17004)
+-- TOC entry 5223 (class 0 OID 17004)
 -- Dependencies: 246
 -- Data for Name: problem_submission; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2369,7 +2408,7 @@ INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, la
 
 
 --
--- TOC entry 5211 (class 0 OID 16868)
+-- TOC entry 5219 (class 0 OID 16868)
 -- Dependencies: 242
 -- Data for Name: problem_template; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2399,7 +2438,7 @@ INSERT INTO schema_problem.problem_template (id, problem_id, language_id, templa
 
 
 --
--- TOC entry 5205 (class 0 OID 16762)
+-- TOC entry 5213 (class 0 OID 16762)
 -- Dependencies: 236
 -- Data for Name: problem_topic; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2425,7 +2464,7 @@ INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (100, 9);
 
 
 --
--- TOC entry 5209 (class 0 OID 16840)
+-- TOC entry 5217 (class 0 OID 16840)
 -- Dependencies: 240
 -- Data for Name: solution_code; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2591,7 +2630,7 @@ INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, 
 
 
 --
--- TOC entry 5219 (class 0 OID 17133)
+-- TOC entry 5227 (class 0 OID 17133)
 -- Dependencies: 250
 -- Data for Name: solution_vote; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2601,7 +2640,7 @@ INSERT INTO schema_problem.solution_vote (user_id, solution_id) VALUES (1, 100);
 
 
 --
--- TOC entry 5213 (class 0 OID 16887)
+-- TOC entry 5221 (class 0 OID 16887)
 -- Dependencies: 244
 -- Data for Name: test_case; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2700,7 +2739,7 @@ INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is
 
 
 --
--- TOC entry 5204 (class 0 OID 16747)
+-- TOC entry 5212 (class 0 OID 16747)
 -- Dependencies: 235
 -- Data for Name: user_favourite; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2713,7 +2752,7 @@ INSERT INTO schema_problem.user_favourite (user_id, problem_id) VALUES (1, 25);
 
 
 --
--- TOC entry 5199 (class 0 OID 16686)
+-- TOC entry 5207 (class 0 OID 16686)
 -- Dependencies: 230
 -- Data for Name: language; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
@@ -2723,7 +2762,7 @@ INSERT INTO schema_setting.language (id, name, created_at, created_by, updated_a
 
 
 --
--- TOC entry 5195 (class 0 OID 16650)
+-- TOC entry 5203 (class 0 OID 16650)
 -- Dependencies: 226
 -- Data for Name: skill; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
@@ -2747,7 +2786,7 @@ INSERT INTO schema_setting.skill (id, name, level, created_at, created_by, updat
 
 
 --
--- TOC entry 5197 (class 0 OID 16668)
+-- TOC entry 5205 (class 0 OID 16668)
 -- Dependencies: 228
 -- Data for Name: topic; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
@@ -2768,7 +2807,7 @@ INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, 
 
 
 --
--- TOC entry 5201 (class 0 OID 16704)
+-- TOC entry 5209 (class 0 OID 16704)
 -- Dependencies: 232
 -- Data for Name: notification; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
@@ -2777,7 +2816,7 @@ INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OV
 
 
 --
--- TOC entry 5221 (class 0 OID 17244)
+-- TOC entry 5229 (class 0 OID 17244)
 -- Dependencies: 252
 -- Data for Name: transaction; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
@@ -2785,7 +2824,7 @@ INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OV
 
 
 --
--- TOC entry 5193 (class 0 OID 16570)
+-- TOC entry 5201 (class 0 OID 16570)
 -- Dependencies: 224
 -- Data for Name: users; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
@@ -2799,12 +2838,12 @@ INSERT INTO schema_user.users (id, username, fullname, password, email, role, st
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (68, 'baotq', 'Tran Quoc Bao', '$2a$10$4T5KVE1i8E3ExtT9uRX1s.IL5d6P.VnGym8oXlt/J7kT.YY8PEOUi', 'baotq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sas');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (2, 'Phong', 'Pham Duy Phong', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'phongk72tp@gmail.com', 'ADMIN', 'ACTIVATED', '2024-05-01', NULL);
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (70, 'haitq', 'Tran Quoc Hai', '$2a$10$DqXH5YDKXQD35XrztK1SeudCH5g1boI1z22pUuSPMYgxqaQ6vSlHa', '12', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sas');
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (76, 'Near Me', 'Near Me', '$2a$10$PZx/L7GM.CxA6FOvnvgalOBVrtxvbWLyi9T4QTV6bdIn3mZahQ.HW', 'basihamedical@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-28', 'https://lh3.googleusercontent.com/a/ACg8ocIArfWVqGfDK0hMAdne8ZWCuGRZvwnHDsDhQFIDdU3f2JVwfA=s96-c');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$38pqPB3j/vnGRxidhOcBP.jxeCWgGSKMdL3/SjBFF265iPQTa6JDu', 'tranhaibang665@gmail.com', 'TEACHER', 'ACTIVATED', '2024-03-20', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (76, 'Near Me', 'Near Me', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'basihamedical@gmail.com', 'EXAMINER', 'ACTIVATED', '2025-02-28', 'https://lh3.googleusercontent.com/a/ACg8ocIArfWVqGfDK0hMAdne8ZWCuGRZvwnHDsDhQFIDdU3f2JVwfA=s96-c');
 
 
 --
--- TOC entry 5249 (class 0 OID 0)
+-- TOC entry 5258 (class 0 OID 0)
 -- Dependencies: 259
 -- Name: chapter_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -2813,7 +2852,7 @@ SELECT pg_catalog.setval('schema_course.chapter_id_seq', 1, false);
 
 
 --
--- TOC entry 5250 (class 0 OID 0)
+-- TOC entry 5259 (class 0 OID 0)
 -- Dependencies: 262
 -- Name: course_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -2822,7 +2861,7 @@ SELECT pg_catalog.setval('schema_course.course_id_seq', 1, true);
 
 
 --
--- TOC entry 5251 (class 0 OID 0)
+-- TOC entry 5260 (class 0 OID 0)
 -- Dependencies: 266
 -- Name: lesson_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -2831,7 +2870,7 @@ SELECT pg_catalog.setval('schema_course.lesson_id_seq', 1, false);
 
 
 --
--- TOC entry 5252 (class 0 OID 0)
+-- TOC entry 5261 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: discussion_id_seq; Type: SEQUENCE SET; Schema: schema_discussion; Owner: postgres
 --
@@ -2840,16 +2879,16 @@ SELECT pg_catalog.setval('schema_discussion.discussion_id_seq', 23, true);
 
 
 --
--- TOC entry 5253 (class 0 OID 0)
+-- TOC entry 5262 (class 0 OID 0)
 -- Dependencies: 269
 -- Name: exam_id_seq; Type: SEQUENCE SET; Schema: schema_exam; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_exam.exam_id_seq', 1, false);
+SELECT pg_catalog.setval('schema_exam.exam_id_seq', 21, true);
 
 
 --
--- TOC entry 5254 (class 0 OID 0)
+-- TOC entry 5263 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: problem_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -2858,7 +2897,7 @@ SELECT pg_catalog.setval('schema_problem.problem_id_seq', 112, true);
 
 
 --
--- TOC entry 5255 (class 0 OID 0)
+-- TOC entry 5264 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: problem_input_parameter_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -2867,7 +2906,7 @@ SELECT pg_catalog.setval('schema_problem.problem_input_parameter_id_seq', 214, t
 
 
 --
--- TOC entry 5256 (class 0 OID 0)
+-- TOC entry 5265 (class 0 OID 0)
 -- Dependencies: 245
 -- Name: problem_submission_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -2876,7 +2915,7 @@ SELECT pg_catalog.setval('schema_problem.problem_submission_id_seq', 118, true);
 
 
 --
--- TOC entry 5257 (class 0 OID 0)
+-- TOC entry 5266 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: problemsolution_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -2885,7 +2924,7 @@ SELECT pg_catalog.setval('schema_problem.problemsolution_id_seq', 149, true);
 
 
 --
--- TOC entry 5258 (class 0 OID 0)
+-- TOC entry 5267 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: problemtemplate_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -2894,7 +2933,7 @@ SELECT pg_catalog.setval('schema_problem.problemtemplate_id_seq', 132, true);
 
 
 --
--- TOC entry 5259 (class 0 OID 0)
+-- TOC entry 5268 (class 0 OID 0)
 -- Dependencies: 243
 -- Name: testcase_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -2903,7 +2942,7 @@ SELECT pg_catalog.setval('schema_problem.testcase_id_seq', 267, true);
 
 
 --
--- TOC entry 5260 (class 0 OID 0)
+-- TOC entry 5269 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: language_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
@@ -2912,7 +2951,7 @@ SELECT pg_catalog.setval('schema_setting.language_id_seq', 19, true);
 
 
 --
--- TOC entry 5261 (class 0 OID 0)
+-- TOC entry 5270 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: skill_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
@@ -2921,7 +2960,7 @@ SELECT pg_catalog.setval('schema_setting.skill_id_seq', 30, true);
 
 
 --
--- TOC entry 5262 (class 0 OID 0)
+-- TOC entry 5271 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: topic_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
@@ -2930,7 +2969,7 @@ SELECT pg_catalog.setval('schema_setting.topic_id_seq', 19, true);
 
 
 --
--- TOC entry 5263 (class 0 OID 0)
+-- TOC entry 5272 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: notification_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
@@ -2939,7 +2978,7 @@ SELECT pg_catalog.setval('schema_user.notification_id_seq', 1, true);
 
 
 --
--- TOC entry 5264 (class 0 OID 0)
+-- TOC entry 5273 (class 0 OID 0)
 -- Dependencies: 251
 -- Name: transaction_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
@@ -2948,7 +2987,7 @@ SELECT pg_catalog.setval('schema_user.transaction_id_seq', 1, false);
 
 
 --
--- TOC entry 5265 (class 0 OID 0)
+-- TOC entry 5274 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
@@ -2959,7 +2998,7 @@ SELECT pg_catalog.setval('schema_user.users_id_seq', 76, true);
 SET default_tablespace = '';
 
 --
--- TOC entry 4951 (class 2606 OID 18490)
+-- TOC entry 4955 (class 2606 OID 18490)
 -- Name: chapter chapter_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2968,7 +3007,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 4955 (class 2606 OID 18492)
+-- TOC entry 4959 (class 2606 OID 18492)
 -- Name: course_comment course_comment_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2977,7 +3016,7 @@ ALTER TABLE ONLY schema_course.course_comment
 
 
 --
--- TOC entry 4953 (class 2606 OID 18494)
+-- TOC entry 4957 (class 2606 OID 18494)
 -- Name: course course_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2986,7 +3025,7 @@ ALTER TABLE ONLY schema_course.course
 
 
 --
--- TOC entry 4957 (class 2606 OID 18496)
+-- TOC entry 4961 (class 2606 OID 18496)
 -- Name: course_topic course_topic_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -2995,7 +3034,7 @@ ALTER TABLE ONLY schema_course.course_topic
 
 
 --
--- TOC entry 4959 (class 2606 OID 18498)
+-- TOC entry 4963 (class 2606 OID 18498)
 -- Name: course_user course_user_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3004,7 +3043,7 @@ ALTER TABLE ONLY schema_course.course_user
 
 
 --
--- TOC entry 4961 (class 2606 OID 18500)
+-- TOC entry 4965 (class 2606 OID 18500)
 -- Name: lesson lesson_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3013,7 +3052,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 4963 (class 2606 OID 18502)
+-- TOC entry 4967 (class 2606 OID 18502)
 -- Name: lesson_problem lesson_problem_pkey; Type: CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3022,7 +3061,7 @@ ALTER TABLE ONLY schema_course.lesson_problem
 
 
 --
--- TOC entry 4937 (class 2606 OID 17107)
+-- TOC entry 4941 (class 2606 OID 17107)
 -- Name: comment_vote comment_vote_pkey; Type: CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -3031,7 +3070,7 @@ ALTER TABLE ONLY schema_discussion.comment_vote
 
 
 --
--- TOC entry 4935 (class 2606 OID 17056)
+-- TOC entry 4939 (class 2606 OID 17056)
 -- Name: comment discussion_pkey; Type: CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -3040,7 +3079,7 @@ ALTER TABLE ONLY schema_discussion.comment
 
 
 --
--- TOC entry 4967 (class 2606 OID 18656)
+-- TOC entry 4971 (class 2606 OID 18739)
 -- Name: exam exam_code_key; Type: CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3049,7 +3088,16 @@ ALTER TABLE ONLY schema_exam.exam
 
 
 --
--- TOC entry 4971 (class 2606 OID 18676)
+-- TOC entry 4981 (class 2606 OID 18727)
+-- Name: exam_language_support exam_language_support_pkey; Type: CONSTRAINT; Schema: schema_exam; Owner: postgres
+--
+
+ALTER TABLE ONLY schema_exam.exam_language_support
+    ADD CONSTRAINT exam_language_support_pkey PRIMARY KEY (exam_id, language_id);
+
+
+--
+-- TOC entry 4975 (class 2606 OID 18676)
 -- Name: exam_participant exam_participant_pkey; Type: CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3058,7 +3106,7 @@ ALTER TABLE ONLY schema_exam.exam_participant
 
 
 --
--- TOC entry 4969 (class 2606 OID 18654)
+-- TOC entry 4973 (class 2606 OID 18654)
 -- Name: exam exam_pkey; Type: CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3067,7 +3115,7 @@ ALTER TABLE ONLY schema_exam.exam
 
 
 --
--- TOC entry 4973 (class 2606 OID 18692)
+-- TOC entry 4977 (class 2606 OID 18692)
 -- Name: exam_problem exam_problem_pkey; Type: CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3076,7 +3124,7 @@ ALTER TABLE ONLY schema_exam.exam_problem
 
 
 --
--- TOC entry 4975 (class 2606 OID 18707)
+-- TOC entry 4979 (class 2606 OID 18707)
 -- Name: exam_submission exam_submission_pkey; Type: CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3085,7 +3133,7 @@ ALTER TABLE ONLY schema_exam.exam_submission
 
 
 --
--- TOC entry 4965 (class 2606 OID 18619)
+-- TOC entry 4969 (class 2606 OID 18619)
 -- Name: language_support language_support_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3096,7 +3144,7 @@ ALTER TABLE ONLY schema_problem.language_support
 SET default_tablespace = kodeholik_problem_data;
 
 --
--- TOC entry 4927 (class 2606 OID 18360)
+-- TOC entry 4931 (class 2606 OID 18360)
 -- Name: solution_code pk; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres; Tablespace: kodeholik_problem_data
 --
 
@@ -3107,7 +3155,7 @@ ALTER TABLE ONLY schema_problem.solution_code
 SET default_tablespace = '';
 
 --
--- TOC entry 4947 (class 2606 OID 17624)
+-- TOC entry 4951 (class 2606 OID 17624)
 -- Name: problem_comment problem_comment_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3116,7 +3164,7 @@ ALTER TABLE ONLY schema_problem.problem_comment
 
 
 --
--- TOC entry 4945 (class 2606 OID 17560)
+-- TOC entry 4949 (class 2606 OID 17560)
 -- Name: problem_input_parameter problem_input_parameter_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3125,7 +3173,7 @@ ALTER TABLE ONLY schema_problem.problem_input_parameter
 
 
 --
--- TOC entry 4917 (class 2606 OID 17397)
+-- TOC entry 4921 (class 2606 OID 17397)
 -- Name: problem problem_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3134,7 +3182,7 @@ ALTER TABLE ONLY schema_problem.problem
 
 
 --
--- TOC entry 4949 (class 2606 OID 17640)
+-- TOC entry 4953 (class 2606 OID 17640)
 -- Name: problem_solution_comment problem_solution_comment_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3143,7 +3191,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_comment
 
 
 --
--- TOC entry 4943 (class 2606 OID 17331)
+-- TOC entry 4947 (class 2606 OID 17331)
 -- Name: problem_solution_skill problem_solution_skill_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3152,7 +3200,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_skill
 
 
 --
--- TOC entry 4933 (class 2606 OID 17010)
+-- TOC entry 4937 (class 2606 OID 17010)
 -- Name: problem_submission problem_submission_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3161,7 +3209,7 @@ ALTER TABLE ONLY schema_problem.problem_submission
 
 
 --
--- TOC entry 4923 (class 2606 OID 16781)
+-- TOC entry 4927 (class 2606 OID 16781)
 -- Name: problem_skill problemskill_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3170,7 +3218,7 @@ ALTER TABLE ONLY schema_problem.problem_skill
 
 
 --
--- TOC entry 4925 (class 2606 OID 16799)
+-- TOC entry 4929 (class 2606 OID 16799)
 -- Name: problem_solution problemsolution_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3179,7 +3227,7 @@ ALTER TABLE ONLY schema_problem.problem_solution
 
 
 --
--- TOC entry 4929 (class 2606 OID 16874)
+-- TOC entry 4933 (class 2606 OID 16874)
 -- Name: problem_template problemtemplate_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3188,7 +3236,7 @@ ALTER TABLE ONLY schema_problem.problem_template
 
 
 --
--- TOC entry 4921 (class 2606 OID 16766)
+-- TOC entry 4925 (class 2606 OID 16766)
 -- Name: problem_topic problemtopic_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3197,7 +3245,7 @@ ALTER TABLE ONLY schema_problem.problem_topic
 
 
 --
--- TOC entry 4939 (class 2606 OID 17137)
+-- TOC entry 4943 (class 2606 OID 17137)
 -- Name: solution_vote solution_vote_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3206,7 +3254,7 @@ ALTER TABLE ONLY schema_problem.solution_vote
 
 
 --
--- TOC entry 4931 (class 2606 OID 16893)
+-- TOC entry 4935 (class 2606 OID 16893)
 -- Name: test_case testcase_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3215,7 +3263,7 @@ ALTER TABLE ONLY schema_problem.test_case
 
 
 --
--- TOC entry 4919 (class 2606 OID 16751)
+-- TOC entry 4923 (class 2606 OID 16751)
 -- Name: user_favourite userfavourite_pkey; Type: CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3224,7 +3272,7 @@ ALTER TABLE ONLY schema_problem.user_favourite
 
 
 --
--- TOC entry 4911 (class 2606 OID 16692)
+-- TOC entry 4915 (class 2606 OID 16692)
 -- Name: language language_name_key; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3233,7 +3281,7 @@ ALTER TABLE ONLY schema_setting.language
 
 
 --
--- TOC entry 4913 (class 2606 OID 16690)
+-- TOC entry 4917 (class 2606 OID 16690)
 -- Name: language language_pkey; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3242,7 +3290,7 @@ ALTER TABLE ONLY schema_setting.language
 
 
 --
--- TOC entry 4903 (class 2606 OID 16656)
+-- TOC entry 4907 (class 2606 OID 16656)
 -- Name: skill skill_name_key; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3251,7 +3299,7 @@ ALTER TABLE ONLY schema_setting.skill
 
 
 --
--- TOC entry 4905 (class 2606 OID 16654)
+-- TOC entry 4909 (class 2606 OID 16654)
 -- Name: skill skill_pkey; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3260,7 +3308,7 @@ ALTER TABLE ONLY schema_setting.skill
 
 
 --
--- TOC entry 4907 (class 2606 OID 16674)
+-- TOC entry 4911 (class 2606 OID 16674)
 -- Name: topic topic_name_key; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3269,7 +3317,7 @@ ALTER TABLE ONLY schema_setting.topic
 
 
 --
--- TOC entry 4909 (class 2606 OID 16672)
+-- TOC entry 4913 (class 2606 OID 16672)
 -- Name: topic topic_pkey; Type: CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3278,7 +3326,7 @@ ALTER TABLE ONLY schema_setting.topic
 
 
 --
--- TOC entry 4915 (class 2606 OID 16710)
+-- TOC entry 4919 (class 2606 OID 16710)
 -- Name: notification notification_pkey; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -3287,7 +3335,7 @@ ALTER TABLE ONLY schema_user.notification
 
 
 --
--- TOC entry 4941 (class 2606 OID 17250)
+-- TOC entry 4945 (class 2606 OID 17250)
 -- Name: transaction transaction_pkey; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -3296,7 +3344,7 @@ ALTER TABLE ONLY schema_user.transaction
 
 
 --
--- TOC entry 4897 (class 2606 OID 16578)
+-- TOC entry 4901 (class 2606 OID 16578)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -3305,7 +3353,7 @@ ALTER TABLE ONLY schema_user.users
 
 
 --
--- TOC entry 4899 (class 2606 OID 16574)
+-- TOC entry 4903 (class 2606 OID 16574)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -3314,7 +3362,7 @@ ALTER TABLE ONLY schema_user.users
 
 
 --
--- TOC entry 4901 (class 2606 OID 16576)
+-- TOC entry 4905 (class 2606 OID 16576)
 -- Name: users users_username_key; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -3323,7 +3371,7 @@ ALTER TABLE ONLY schema_user.users
 
 
 --
--- TOC entry 5020 (class 2606 OID 18503)
+-- TOC entry 5026 (class 2606 OID 18503)
 -- Name: chapter chapter_course_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3332,7 +3380,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 5021 (class 2606 OID 18508)
+-- TOC entry 5027 (class 2606 OID 18508)
 -- Name: chapter chapter_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3341,7 +3389,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 5022 (class 2606 OID 18513)
+-- TOC entry 5028 (class 2606 OID 18513)
 -- Name: chapter chapter_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3350,7 +3398,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 5025 (class 2606 OID 18518)
+-- TOC entry 5031 (class 2606 OID 18518)
 -- Name: course_comment course_comment_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3359,7 +3407,7 @@ ALTER TABLE ONLY schema_course.course_comment
 
 
 --
--- TOC entry 5026 (class 2606 OID 18523)
+-- TOC entry 5032 (class 2606 OID 18523)
 -- Name: course_comment course_comment_course_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3368,7 +3416,7 @@ ALTER TABLE ONLY schema_course.course_comment
 
 
 --
--- TOC entry 5023 (class 2606 OID 18528)
+-- TOC entry 5029 (class 2606 OID 18528)
 -- Name: course course_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3377,7 +3425,7 @@ ALTER TABLE ONLY schema_course.course
 
 
 --
--- TOC entry 5024 (class 2606 OID 18533)
+-- TOC entry 5030 (class 2606 OID 18533)
 -- Name: course course_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3386,7 +3434,7 @@ ALTER TABLE ONLY schema_course.course
 
 
 --
--- TOC entry 5029 (class 2606 OID 18538)
+-- TOC entry 5035 (class 2606 OID 18538)
 -- Name: course_user course_user_course_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3395,7 +3443,7 @@ ALTER TABLE ONLY schema_course.course_user
 
 
 --
--- TOC entry 5030 (class 2606 OID 18543)
+-- TOC entry 5036 (class 2606 OID 18543)
 -- Name: course_user course_user_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3404,7 +3452,7 @@ ALTER TABLE ONLY schema_course.course_user
 
 
 --
--- TOC entry 5027 (class 2606 OID 18548)
+-- TOC entry 5033 (class 2606 OID 18548)
 -- Name: course_topic fk_course; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3413,7 +3461,7 @@ ALTER TABLE ONLY schema_course.course_topic
 
 
 --
--- TOC entry 5028 (class 2606 OID 18553)
+-- TOC entry 5034 (class 2606 OID 18553)
 -- Name: course_topic fk_topic; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3422,7 +3470,7 @@ ALTER TABLE ONLY schema_course.course_topic
 
 
 --
--- TOC entry 5031 (class 2606 OID 18558)
+-- TOC entry 5037 (class 2606 OID 18558)
 -- Name: lesson lesson_chapter_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3431,7 +3479,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 5032 (class 2606 OID 18563)
+-- TOC entry 5038 (class 2606 OID 18563)
 -- Name: lesson lesson_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3440,7 +3488,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 5034 (class 2606 OID 18568)
+-- TOC entry 5040 (class 2606 OID 18568)
 -- Name: lesson_problem lesson_problem_lesson_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3449,7 +3497,7 @@ ALTER TABLE ONLY schema_course.lesson_problem
 
 
 --
--- TOC entry 5035 (class 2606 OID 18573)
+-- TOC entry 5041 (class 2606 OID 18573)
 -- Name: lesson_problem lesson_problem_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3458,7 +3506,7 @@ ALTER TABLE ONLY schema_course.lesson_problem
 
 
 --
--- TOC entry 5033 (class 2606 OID 18578)
+-- TOC entry 5039 (class 2606 OID 18578)
 -- Name: lesson lesson_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -3467,7 +3515,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 5007 (class 2606 OID 17113)
+-- TOC entry 5013 (class 2606 OID 17113)
 -- Name: comment_vote comment_vote_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -3476,7 +3524,7 @@ ALTER TABLE ONLY schema_discussion.comment_vote
 
 
 --
--- TOC entry 5008 (class 2606 OID 17108)
+-- TOC entry 5014 (class 2606 OID 17108)
 -- Name: comment_vote comment_vote_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -3485,7 +3533,7 @@ ALTER TABLE ONLY schema_discussion.comment_vote
 
 
 --
--- TOC entry 5004 (class 2606 OID 18405)
+-- TOC entry 5010 (class 2606 OID 18405)
 -- Name: comment discussion_comment_reply_fk; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -3494,7 +3542,7 @@ ALTER TABLE ONLY schema_discussion.comment
 
 
 --
--- TOC entry 5005 (class 2606 OID 17062)
+-- TOC entry 5011 (class 2606 OID 17062)
 -- Name: comment discussion_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -3503,7 +3551,7 @@ ALTER TABLE ONLY schema_discussion.comment
 
 
 --
--- TOC entry 5006 (class 2606 OID 17067)
+-- TOC entry 5012 (class 2606 OID 17067)
 -- Name: comment discussion_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -3512,7 +3560,7 @@ ALTER TABLE ONLY schema_discussion.comment
 
 
 --
--- TOC entry 5038 (class 2606 OID 18657)
+-- TOC entry 5044 (class 2606 OID 18657)
 -- Name: exam exam_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3521,7 +3569,25 @@ ALTER TABLE ONLY schema_exam.exam
 
 
 --
--- TOC entry 5040 (class 2606 OID 18677)
+-- TOC entry 5053 (class 2606 OID 18728)
+-- Name: exam_language_support exam_language_support_exam_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
+--
+
+ALTER TABLE ONLY schema_exam.exam_language_support
+    ADD CONSTRAINT exam_language_support_exam_id_fkey FOREIGN KEY (exam_id) REFERENCES schema_exam.exam(id);
+
+
+--
+-- TOC entry 5054 (class 2606 OID 18733)
+-- Name: exam_language_support exam_language_support_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
+--
+
+ALTER TABLE ONLY schema_exam.exam_language_support
+    ADD CONSTRAINT exam_language_support_language_id_fkey FOREIGN KEY (language_id) REFERENCES schema_setting.language(id);
+
+
+--
+-- TOC entry 5046 (class 2606 OID 18677)
 -- Name: exam_participant exam_participant_exam_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3530,7 +3596,7 @@ ALTER TABLE ONLY schema_exam.exam_participant
 
 
 --
--- TOC entry 5041 (class 2606 OID 18682)
+-- TOC entry 5047 (class 2606 OID 18682)
 -- Name: exam_participant exam_participant_participant_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3539,7 +3605,7 @@ ALTER TABLE ONLY schema_exam.exam_participant
 
 
 --
--- TOC entry 5042 (class 2606 OID 18693)
+-- TOC entry 5048 (class 2606 OID 18693)
 -- Name: exam_problem exam_problem_exam_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3548,7 +3614,7 @@ ALTER TABLE ONLY schema_exam.exam_problem
 
 
 --
--- TOC entry 5043 (class 2606 OID 18698)
+-- TOC entry 5049 (class 2606 OID 18698)
 -- Name: exam_problem exam_problem_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3557,7 +3623,7 @@ ALTER TABLE ONLY schema_exam.exam_problem
 
 
 --
--- TOC entry 5044 (class 2606 OID 18708)
+-- TOC entry 5050 (class 2606 OID 18708)
 -- Name: exam_submission exam_submission_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3566,7 +3632,7 @@ ALTER TABLE ONLY schema_exam.exam_submission
 
 
 --
--- TOC entry 5045 (class 2606 OID 18713)
+-- TOC entry 5051 (class 2606 OID 18713)
 -- Name: exam_submission exam_submission_submission_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3575,7 +3641,7 @@ ALTER TABLE ONLY schema_exam.exam_submission
 
 
 --
--- TOC entry 5039 (class 2606 OID 18662)
+-- TOC entry 5045 (class 2606 OID 18662)
 -- Name: exam exam_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3584,7 +3650,7 @@ ALTER TABLE ONLY schema_exam.exam
 
 
 --
--- TOC entry 5046 (class 2606 OID 18718)
+-- TOC entry 5052 (class 2606 OID 18718)
 -- Name: exam_submission fk_exam_participant; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -3593,7 +3659,7 @@ ALTER TABLE ONLY schema_exam.exam_submission
 
 
 --
--- TOC entry 4991 (class 2606 OID 18399)
+-- TOC entry 4997 (class 2606 OID 18399)
 -- Name: problem_solution created_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3602,7 +3668,7 @@ ALTER TABLE ONLY schema_problem.problem_solution
 
 
 --
--- TOC entry 5014 (class 2606 OID 18387)
+-- TOC entry 5020 (class 2606 OID 18387)
 -- Name: problem_input_parameter language_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3611,7 +3677,7 @@ ALTER TABLE ONLY schema_problem.problem_input_parameter
 
 
 --
--- TOC entry 4999 (class 2606 OID 18607)
+-- TOC entry 5005 (class 2606 OID 18607)
 -- Name: test_case language_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3620,7 +3686,7 @@ ALTER TABLE ONLY schema_problem.test_case
 
 
 --
--- TOC entry 5036 (class 2606 OID 18625)
+-- TOC entry 5042 (class 2606 OID 18625)
 -- Name: language_support language_support_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3629,7 +3695,7 @@ ALTER TABLE ONLY schema_problem.language_support
 
 
 --
--- TOC entry 5037 (class 2606 OID 18620)
+-- TOC entry 5043 (class 2606 OID 18620)
 -- Name: language_support language_support_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3638,7 +3704,7 @@ ALTER TABLE ONLY schema_problem.language_support
 
 
 --
--- TOC entry 5016 (class 2606 OID 17630)
+-- TOC entry 5022 (class 2606 OID 17630)
 -- Name: problem_comment problem_comment_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3647,7 +3713,7 @@ ALTER TABLE ONLY schema_problem.problem_comment
 
 
 --
--- TOC entry 5017 (class 2606 OID 17625)
+-- TOC entry 5023 (class 2606 OID 17625)
 -- Name: problem_comment problem_comment_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3656,7 +3722,7 @@ ALTER TABLE ONLY schema_problem.problem_comment
 
 
 --
--- TOC entry 4983 (class 2606 OID 16737)
+-- TOC entry 4989 (class 2606 OID 16737)
 -- Name: problem problem_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3665,7 +3731,7 @@ ALTER TABLE ONLY schema_problem.problem
 
 
 --
--- TOC entry 5015 (class 2606 OID 17561)
+-- TOC entry 5021 (class 2606 OID 17561)
 -- Name: problem_input_parameter problem_input_parameter_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3674,7 +3740,7 @@ ALTER TABLE ONLY schema_problem.problem_input_parameter
 
 
 --
--- TOC entry 5018 (class 2606 OID 17646)
+-- TOC entry 5024 (class 2606 OID 17646)
 -- Name: problem_solution_comment problem_solution_comment_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3683,7 +3749,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_comment
 
 
 --
--- TOC entry 5019 (class 2606 OID 17641)
+-- TOC entry 5025 (class 2606 OID 17641)
 -- Name: problem_solution_comment problem_solution_comment_problem_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3692,7 +3758,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_comment
 
 
 --
--- TOC entry 5012 (class 2606 OID 17332)
+-- TOC entry 5018 (class 2606 OID 17332)
 -- Name: problem_solution_skill problem_solution_skill_problem_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3701,7 +3767,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_skill
 
 
 --
--- TOC entry 5013 (class 2606 OID 17337)
+-- TOC entry 5019 (class 2606 OID 17337)
 -- Name: problem_solution_skill problem_solution_skill_skill_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3710,7 +3776,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_skill
 
 
 --
--- TOC entry 5001 (class 2606 OID 17021)
+-- TOC entry 5007 (class 2606 OID 17021)
 -- Name: problem_submission problem_submission_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3719,7 +3785,7 @@ ALTER TABLE ONLY schema_problem.problem_submission
 
 
 --
--- TOC entry 5002 (class 2606 OID 17433)
+-- TOC entry 5008 (class 2606 OID 17433)
 -- Name: problem_submission problem_submission_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3728,7 +3794,7 @@ ALTER TABLE ONLY schema_problem.problem_submission
 
 
 --
--- TOC entry 5003 (class 2606 OID 17011)
+-- TOC entry 5009 (class 2606 OID 17011)
 -- Name: problem_submission problem_submission_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3737,7 +3803,7 @@ ALTER TABLE ONLY schema_problem.problem_submission
 
 
 --
--- TOC entry 4984 (class 2606 OID 16742)
+-- TOC entry 4990 (class 2606 OID 16742)
 -- Name: problem problem_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3746,7 +3812,7 @@ ALTER TABLE ONLY schema_problem.problem
 
 
 --
--- TOC entry 4989 (class 2606 OID 17408)
+-- TOC entry 4995 (class 2606 OID 17408)
 -- Name: problem_skill problemskill_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3755,7 +3821,7 @@ ALTER TABLE ONLY schema_problem.problem_skill
 
 
 --
--- TOC entry 4990 (class 2606 OID 16787)
+-- TOC entry 4996 (class 2606 OID 16787)
 -- Name: problem_skill problemskill_skill_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3764,7 +3830,7 @@ ALTER TABLE ONLY schema_problem.problem_skill
 
 
 --
--- TOC entry 4992 (class 2606 OID 17413)
+-- TOC entry 4998 (class 2606 OID 17413)
 -- Name: problem_solution problemsolution_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3773,7 +3839,7 @@ ALTER TABLE ONLY schema_problem.problem_solution
 
 
 --
--- TOC entry 4997 (class 2606 OID 16880)
+-- TOC entry 5003 (class 2606 OID 16880)
 -- Name: problem_template problemtemplate_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3782,7 +3848,7 @@ ALTER TABLE ONLY schema_problem.problem_template
 
 
 --
--- TOC entry 4998 (class 2606 OID 17423)
+-- TOC entry 5004 (class 2606 OID 17423)
 -- Name: problem_template problemtemplate_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3791,7 +3857,7 @@ ALTER TABLE ONLY schema_problem.problem_template
 
 
 --
--- TOC entry 4987 (class 2606 OID 17403)
+-- TOC entry 4993 (class 2606 OID 17403)
 -- Name: problem_topic problemtopic_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3800,7 +3866,7 @@ ALTER TABLE ONLY schema_problem.problem_topic
 
 
 --
--- TOC entry 4988 (class 2606 OID 16772)
+-- TOC entry 4994 (class 2606 OID 16772)
 -- Name: problem_topic problemtopic_topic_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3809,7 +3875,7 @@ ALTER TABLE ONLY schema_problem.problem_topic
 
 
 --
--- TOC entry 5009 (class 2606 OID 17143)
+-- TOC entry 5015 (class 2606 OID 17143)
 -- Name: solution_vote solution_vote_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3818,7 +3884,7 @@ ALTER TABLE ONLY schema_problem.solution_vote
 
 
 --
--- TOC entry 5010 (class 2606 OID 17138)
+-- TOC entry 5016 (class 2606 OID 17138)
 -- Name: solution_vote solution_vote_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3827,7 +3893,7 @@ ALTER TABLE ONLY schema_problem.solution_vote
 
 
 --
--- TOC entry 4994 (class 2606 OID 16857)
+-- TOC entry 5000 (class 2606 OID 16857)
 -- Name: solution_code solutioncode_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3836,7 +3902,7 @@ ALTER TABLE ONLY schema_problem.solution_code
 
 
 --
--- TOC entry 4995 (class 2606 OID 17418)
+-- TOC entry 5001 (class 2606 OID 17418)
 -- Name: solution_code solutioncode_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3845,7 +3911,7 @@ ALTER TABLE ONLY schema_problem.solution_code
 
 
 --
--- TOC entry 4996 (class 2606 OID 16847)
+-- TOC entry 5002 (class 2606 OID 16847)
 -- Name: solution_code solutioncode_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3854,7 +3920,7 @@ ALTER TABLE ONLY schema_problem.solution_code
 
 
 --
--- TOC entry 5000 (class 2606 OID 17428)
+-- TOC entry 5006 (class 2606 OID 17428)
 -- Name: test_case testcase_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3863,7 +3929,7 @@ ALTER TABLE ONLY schema_problem.test_case
 
 
 --
--- TOC entry 4993 (class 2606 OID 18394)
+-- TOC entry 4999 (class 2606 OID 18394)
 -- Name: problem_solution updated_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3872,7 +3938,7 @@ ALTER TABLE ONLY schema_problem.problem_solution
 
 
 --
--- TOC entry 4985 (class 2606 OID 17398)
+-- TOC entry 4991 (class 2606 OID 17398)
 -- Name: user_favourite userfavourite_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3881,7 +3947,7 @@ ALTER TABLE ONLY schema_problem.user_favourite
 
 
 --
--- TOC entry 4986 (class 2606 OID 16752)
+-- TOC entry 4992 (class 2606 OID 16752)
 -- Name: user_favourite userfavourite_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -3890,7 +3956,7 @@ ALTER TABLE ONLY schema_problem.user_favourite
 
 
 --
--- TOC entry 4980 (class 2606 OID 16693)
+-- TOC entry 4986 (class 2606 OID 16693)
 -- Name: language language_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3899,7 +3965,7 @@ ALTER TABLE ONLY schema_setting.language
 
 
 --
--- TOC entry 4981 (class 2606 OID 16698)
+-- TOC entry 4987 (class 2606 OID 16698)
 -- Name: language language_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3908,7 +3974,7 @@ ALTER TABLE ONLY schema_setting.language
 
 
 --
--- TOC entry 4976 (class 2606 OID 16657)
+-- TOC entry 4982 (class 2606 OID 16657)
 -- Name: skill skill_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3917,7 +3983,7 @@ ALTER TABLE ONLY schema_setting.skill
 
 
 --
--- TOC entry 4977 (class 2606 OID 16662)
+-- TOC entry 4983 (class 2606 OID 16662)
 -- Name: skill skill_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3926,7 +3992,7 @@ ALTER TABLE ONLY schema_setting.skill
 
 
 --
--- TOC entry 4978 (class 2606 OID 16675)
+-- TOC entry 4984 (class 2606 OID 16675)
 -- Name: topic topic_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3935,7 +4001,7 @@ ALTER TABLE ONLY schema_setting.topic
 
 
 --
--- TOC entry 4979 (class 2606 OID 16680)
+-- TOC entry 4985 (class 2606 OID 16680)
 -- Name: topic topic_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_setting; Owner: postgres
 --
 
@@ -3944,7 +4010,7 @@ ALTER TABLE ONLY schema_setting.topic
 
 
 --
--- TOC entry 4982 (class 2606 OID 16711)
+-- TOC entry 4988 (class 2606 OID 16711)
 -- Name: notification notification_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -3953,7 +4019,7 @@ ALTER TABLE ONLY schema_user.notification
 
 
 --
--- TOC entry 5011 (class 2606 OID 17251)
+-- TOC entry 5017 (class 2606 OID 17251)
 -- Name: transaction transaction_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -3961,7 +4027,7 @@ ALTER TABLE ONLY schema_user.transaction
     ADD CONSTRAINT transaction_user_id_fkey FOREIGN KEY (user_id) REFERENCES schema_user.users(id);
 
 
--- Completed on 2025-03-03 00:14:03
+-- Completed on 2025-03-03 19:31:41
 
 --
 -- PostgreSQL database dump complete

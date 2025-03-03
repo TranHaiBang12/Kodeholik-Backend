@@ -50,6 +50,7 @@ public class SecurityConfig {
                         "/api/v1/course/detail/**",
                         "/api/v1/course/search/**",
                         "/api/v1/comment/problem/**",
+                        "/api/v1/comment/list-reply/**",
                         "/api/v1/tag/all-skill/**",
                         "/api/v1/tag/all-topic/**",
                         "/api/v1/s3/presigned-url"
@@ -78,6 +79,8 @@ public class SecurityConfig {
                                                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                                 .requestMatchers("/api/v1/admin/**")
                                                                 .hasAuthority(UserRole.ADMIN.toString())
+                                                                .requestMatchers("/api/v1/examiner/**")
+                                                                .hasAuthority(UserRole.EXAMINER.toString())
                                                                 .requestMatchers(teacherUrls)
                                                                 .hasAuthority(UserRole.TEACHER.toString())
                                                                 .requestMatchers(publicUrls).permitAll()

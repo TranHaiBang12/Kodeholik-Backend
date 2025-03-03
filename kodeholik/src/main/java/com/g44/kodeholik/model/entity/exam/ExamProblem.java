@@ -40,4 +40,5 @@ public class ExamProblem {
     private Problem problem;
 
     private double point;
+
 }

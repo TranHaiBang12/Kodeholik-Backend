@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
@@ -25,6 +26,7 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDt
 import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemShortResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
@@ -152,4 +154,8 @@ public interface ProblemService {
                         SubmissionStatus status, Integer size, String sortBy, Boolean ascending);
 
         public List<String> getLanguageSupportByProblem(String link);
+
+        public List<ProblemShortResponseDto> getPrivateProblemShortResponseDto(String link);
+
+        public Problem getProblemByExamProblemRequest(ExamProblemRequestDto request);
 }

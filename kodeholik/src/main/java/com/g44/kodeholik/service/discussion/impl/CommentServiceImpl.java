@@ -59,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Page<CommentResponseDto> getCommentsByProblemLink(String link, int page, String sortBy, Boolean ascending) {
         Problem problem = problemService.getActivePublicProblemByLink(link);
-        Set<Comment> comments = problem.getComments();
+        List<Comment> comments = commentRepository.findByCommentReplyAndProblemsContains(null, problem);
         Page<Comment> commentPage;
         if (sortBy != null && ascending != null && (sortBy.equals("noUpvote") || sortBy.equals("createdAt"))) {
             Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -91,9 +91,8 @@ public class CommentServiceImpl implements CommentService {
         return false;
     }
 
-    public Page<Comment> getCommentsPage(Set<Comment> comments, int page, int size, Sort sort) {
+    public Page<Comment> getCommentsPage(List<Comment> comments, int page, int size, Sort sort) {
         // Chuyển Set thành List
-        List<Comment> commentList = comments.stream().collect(Collectors.toList());
 
         // Tạo Pageable
         Pageable pageable;
@@ -104,11 +103,11 @@ public class CommentServiceImpl implements CommentService {
         }
         // Tính toán giới hạn trang (pagination)
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), commentList.size());
-        List<Comment> pagedComments = commentList.subList(start, end);
+        int end = Math.min((start + pageable.getPageSize()), comments.size());
+        List<Comment> pagedComments = comments.subList(start, end);
 
         // Trả về Page<Comment> sử dụng PageImpl
-        return new PageImpl<>(pagedComments, pageable, commentList.size());
+        return new PageImpl<>(pagedComments, pageable, comments.size());
     }
 
     @Override
@@ -126,7 +125,9 @@ public class CommentServiceImpl implements CommentService {
     public Page<CommentResponseDto> getCommentsByProblemSolutionId(Long solutionId, int page, String sortBy,
             Boolean ascending) {
         ProblemSolution problemSolution = problemSolutionService.findSolutionById(solutionId);
-        Set<Comment> comments = problemSolution.getComments();
+        // Set<Comment> comments = problemSolution.getComments();
+        List<Comment> comments = commentRepository.findByCommentReplyAndProblemSolutionsContains(null, problemSolution);
+
         Page<Comment> commentPage;
         if (sortBy != null && ascending != null && (sortBy.equals("noUpvote") || sortBy.equals("createdAt"))) {
             Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();

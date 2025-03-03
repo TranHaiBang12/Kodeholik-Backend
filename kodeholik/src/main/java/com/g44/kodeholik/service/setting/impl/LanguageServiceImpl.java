@@ -1,5 +1,6 @@
 package com.g44.kodeholik.service.setting.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +33,15 @@ public class LanguageServiceImpl implements LanguageService {
     public Language findById(Long id) {
         return languageRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Language id not found", "Language id not found"));
+    }
+
+    @Override
+    public List<String> getLanguageNamesByList(Set<Language> languages) {
+        List<String> result = new ArrayList<>();
+        for (Language language : languages) {
+            result.add(language.getName());
+        }
+        return result;
     }
 
 }

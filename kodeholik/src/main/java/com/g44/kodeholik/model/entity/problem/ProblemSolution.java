@@ -89,6 +89,7 @@ public class ProblemSolution {
 
     @ManyToMany
     @JoinTable(name = "problem_solution_comment", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_solution_id"), inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    @JsonManagedReference
     private Set<Comment> comments = new HashSet<>();
 
     @ManyToMany
