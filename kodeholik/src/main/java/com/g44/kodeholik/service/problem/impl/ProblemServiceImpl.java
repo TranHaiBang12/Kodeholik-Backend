@@ -63,6 +63,7 @@ import com.g44.kodeholik.model.dto.response.problem.submission.submit.FailedSubm
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
 import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemInputParameter;
@@ -80,6 +81,7 @@ import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.InputType;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
@@ -160,6 +162,8 @@ public class ProblemServiceImpl implements ProblemService {
     private final ProblemBasicResponseMapper problemBasicResponseMapper;
 
     private final SolutionCodeMapper solutionCodeMapper;
+
+    private final CommentRepository commentRepository;
 
     private List<List<InputVariable>> inputs = new ArrayList<>();
 
@@ -249,7 +253,7 @@ public class ProblemServiceImpl implements ProblemService {
         }
 
         problemDescriptionResponseDto = problemDescriptionMapper.mapFrom(problem);
-        problemDescriptionResponseDto.setNoComment(problem.getComments().size());
+        problemDescriptionResponseDto.setNoComment(commentRepository.countByProblemsContains(problem));
         problemDescriptionResponseDto.setTopicList(topics);
         problemDescriptionResponseDto
                 .setNoAccepted(problemSubmissionService.countByIsAcceptedAndProblem(true, problem));
@@ -1201,22 +1205,24 @@ public class ProblemServiceImpl implements ProblemService {
             List<String> skillNames,
             String sortBy, Boolean ascending, Pageable pageable) {
         Problem problem = getActivePublicProblemByLink(link);
+        Users currentUser = userService.getCurrentUser();
         Set<Skill> skills = tagService.getSkillsByNameList(skillNames);
         if (languageName != null && languageName != "") {
             Language language = languageService.findByName(languageName);
             return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, skills, language,
                     sortBy,
                     ascending,
-                    pageable);
+                    pageable, currentUser);
         } else {
             return problemSolutionService.findOtherSolutionByProblem(problem, page, size, title, skills, null, sortBy,
                     ascending,
-                    pageable);
+                    pageable, currentUser);
         }
     }
 
     @Override
     public ProblemSolutionDto getProblemSolutionDetail(Long solutionId) {
+        Users currentUser = userService.getCurrentUser();
         ProblemSolution problemSolution = problemSolutionService.findSolutionById(solutionId);
         ProblemSolutionDto problemSolutionDto = new ProblemSolutionDto();
         List<String> skills = new ArrayList<>();
@@ -1230,6 +1236,12 @@ public class ProblemServiceImpl implements ProblemService {
         problemSolutionDto.setTextSolution(problemSolution.getTextSolution());
         List<SolutionCodeDto> solutionCodeDtos = solutionCodeService.findBySolution(problemSolution);
         problemSolutionDto.setSolutionCodes(solutionCodeDtos);
+        problemSolutionDto.setCurrentUserCreated(currentUser.getId() == problemSolution.getCreatedBy().getId());
+
+        UserResponseDto userResponseDto = new UserResponseDto();
+        userResponseDto.setId(problemSolution.getCreatedBy().getId());
+        userResponseDto.setAvatar(problemSolution.getCreatedBy().getAvatar());
+        userResponseDto.setUsername(problemSolution.getCreatedBy().getUsername());
         return problemSolutionDto;
     }
 

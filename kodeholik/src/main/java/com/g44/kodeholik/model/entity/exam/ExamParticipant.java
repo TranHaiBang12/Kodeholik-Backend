@@ -36,7 +36,7 @@ public class ExamParticipant {
     @ManyToOne
     @MapsId("participantId")
     @JoinColumn(name = "participant_id", referencedColumnName = "id")
-    private Users participantId;
+    private Users participant;
 
     private double grade;
 }

@@ -87,10 +87,12 @@ public class ProblemSolution {
     @JsonManagedReference
     private Set<SolutionCode> solutionCodes;
 
-    @ManyToMany
-    @JoinTable(name = "problem_solution_comment", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_solution_id"), inverseJoinColumns = @JoinColumn(name = "comment_id"))
-    @JsonManagedReference
-    private Set<Comment> comments = new HashSet<>();
+    // @ManyToMany
+    // @JoinTable(name = "problem_solution_comment", schema = "schema_problem",
+    // joinColumns = @JoinColumn(name = "problem_solution_id"), inverseJoinColumns =
+    // @JoinColumn(name = "comment_id"))
+    // @JsonManagedReference
+    // private Set<Comment> comments = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "solution_vote", schema = "schema_problem", joinColumns = @JoinColumn(name = "solution_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))

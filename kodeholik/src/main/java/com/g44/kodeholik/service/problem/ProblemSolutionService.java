@@ -16,32 +16,32 @@ import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.user.Users;
 
 public interface ProblemSolutionService {
-    public ProblemSolution save(ProblemSolution problemSolution);
+        public ProblemSolution save(ProblemSolution problemSolution);
 
-    public List<ProblemSolution> saveAll(List<ProblemSolution> problemSolutions);
+        public List<ProblemSolution> saveAll(List<ProblemSolution> problemSolutions);
 
-    public List<ProblemSolution> findEditorialByProblem(Problem problem);
+        public List<ProblemSolution> findEditorialByProblem(Problem problem);
 
-    public void deleteEditorialByProblem(Problem problem);
+        public void deleteEditorialByProblem(Problem problem);
 
-    public Page<ProblemSolutionDto> findListSolutionByProblem(Problem problem, Pageable pageable);
+        public Page<ProblemSolutionDto> findListSolutionByProblem(Problem problem, Pageable pageable);
 
-    public Page<SolutionListResponseDto> findOtherSolutionByProblem(Problem problem, int page, Integer size,
-            String title,
-            Set<Skill> skillList,
-            Language language,
-            String sortBy, Boolean ascending, Pageable pageable);
+        public Page<SolutionListResponseDto> findOtherSolutionByProblem(Problem problem, int page, Integer size,
+                        String title,
+                        Set<Skill> skillList,
+                        Language language,
+                        String sortBy, Boolean ascending, Pageable pageable, Users currentUser);
 
-    public ProblemSolutionDto findSolutionDtoById(Long id);
+        public ProblemSolutionDto findSolutionDtoById(Long id);
 
-    public ProblemSolution findSolutionById(Long id);
+        public ProblemSolution findSolutionById(Long id);
 
-    public void upvoteSolution(Long solutionId, Users user);
+        public void upvoteSolution(Long solutionId, Users user);
 
-    public void unupvoteSolution(Long solutionId, Users user);
+        public void unupvoteSolution(Long solutionId, Users user);
 
-    public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user);
+        public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user);
 
-    public void editSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user, Long solutionId,
-            Set<Skill> skills);
+        public void editSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user, Long solutionId,
+                        Set<Skill> skills);
 }

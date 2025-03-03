@@ -5,7 +5,7 @@
 -- Dumped from database version 17.2
 -- Dumped by pg_dump version 17.2
 
--- Started on 2025-03-03 19:31:41
+-- Started on 2025-03-03 23:02:23
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1264,6 +1264,13 @@ INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_
 INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (22, 'First comment', 0, '2025-02-21 22:15:56.461285', 1, NULL, NULL, NULL);
 INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (23, 'Sorry, actually third comment', 3, '2025-02-21 22:16:04.051995', 1, '2025-02-21 22:30:43.575884', 1, NULL);
 INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (4, 'This problem actually has many ways to solve.', 1, '2025-01-02 12:56:21.718047', 4, NULL, NULL, 1);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (24, 'Sixth comment', 0, '2025-03-03 22:46:02.348017', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (25, 'Sixth comment', 0, '2025-03-03 22:49:13.902679', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (26, 'Sixth comment', 0, '2025-03-03 22:57:17.602091', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (27, 'Seventh comment', 0, '2025-03-03 22:57:22.765554', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (28, 'Ahaha', 0, '2025-03-03 22:57:28.809864', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (29, 'Please gúy, dont post any solution in this section. It is only used for any questions about the title', 0, '2025-03-03 22:58:49.800098', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (30, 'Please gúy, dont post any solution in this section. It is only used for any questions about the title', 0, '2025-03-03 22:59:25.193033', 1, NULL, NULL, NULL);
 
 
 --
@@ -1587,6 +1594,10 @@ INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 
 INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 14);
 INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 15);
 INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 23);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 26);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 27);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 28);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 29);
 
 
 --
@@ -1643,7 +1654,7 @@ INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (98, 3);
 -- Data for Name: problem_solution; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (127, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, '2025-02-27 16:50:33.627593', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (127, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, '2025-02-27 16:50:33.627593', 1, NULL, NULL, 1);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (14, 62, 'Kodeholik - Editorial', 'test', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (82, 98, 'Kodeholik - Editorial', 'The problem requires transforming one string into another using three operations: insert, delete, or replace. This is a classic Dynamic Programming problem, where we aim to minimize the cost of edits. The solution involves comparing prefixes of both strings to compute the minimum operations required.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (128, 96, 'Just a little hhihi code', 'We dont need to do this problem. This problem is so easy.', false, 0, '2025-02-27 17:09:44.072222', 1, NULL, NULL, 0);
@@ -1743,6 +1754,7 @@ INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, commen
 INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 19);
 INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 20);
 INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (82, 21);
+INSERT INTO schema_problem.problem_solution_comment (problem_solution_id, comment_id) VALUES (127, 30);
 
 
 --
@@ -2830,16 +2842,16 @@ INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OV
 --
 
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (22, '27 - Trần Hải Bằng', '27 - Trần Hải Bằng', '$2a$10$VS.SuPBGxhmF6LMckxvnauCcZeRYQ/Jzf4WOuhJM9KS.myVT2oY.C', 'bangthhe170871@fpt.edu.vn', 'STUDENT', 'ACTIVATED', '2025-02-10', 'https://lh3.googleusercontent.com/a/ACg8ocLUGVSI7vY8J1U-dedYf6BNl_pub8sHys0YFcbHGUSToW5ihw=s96-c');
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (3, 'Thai', 'Pham Hong Thai', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thaiph@gmail.com', 'STUDENT', 'ACTIVATED', '2024-06-02', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (4, 'Duy', 'Dang Nguyen Quang Duy', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'duydnq123@gmail.com', 'STUDENT', 'ACTIVATED', '2024-07-03', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (5, 'HngThng', 'Dang Hong Thang', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thangdh1557@gmail.com', 'STUDENT', 'ACTIVATED', '2024-09-06', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (6, 'Jasmine Milk', 'Vu Tuan Hung', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'hungvt321@gmail.com', 'STUDENT', 'BANNED', '2024-10-12', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (67, 'binhtq', 'Tran Quoc Binh', '$2a$10$P2Y3FTKGIoMtXqNfLYQ95OjXfplOACRVoJc/tcXdzdVqCcfmjCSf2', 'binhtq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sa');
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (68, 'baotq', 'Tran Quoc Bao', '$2a$10$4T5KVE1i8E3ExtT9uRX1s.IL5d6P.VnGym8oXlt/J7kT.YY8PEOUi', 'baotq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sas');
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (2, 'Phong', 'Pham Duy Phong', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'phongk72tp@gmail.com', 'ADMIN', 'ACTIVATED', '2024-05-01', NULL);
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (70, 'haitq', 'Tran Quoc Hai', '$2a$10$DqXH5YDKXQD35XrztK1SeudCH5g1boI1z22pUuSPMYgxqaQ6vSlHa', '12', 'STUDENT', 'ACTIVATED', '2025-02-13', 'sas');
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$38pqPB3j/vnGRxidhOcBP.jxeCWgGSKMdL3/SjBFF265iPQTa6JDu', 'tranhaibang665@gmail.com', 'TEACHER', 'ACTIVATED', '2024-03-20', NULL);
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (5, 'HngThng', 'Dang Hong Thang', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thangdh1557@gmail.com', 'STUDENT', 'ACTIVATED', '2024-09-06', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (6, 'Jasmine Milk', 'Vu Tuan Hung', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'hungvt321@gmail.com', 'STUDENT', 'BANNED', '2024-10-12', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (67, 'binhtq', 'Tran Quoc Binh', '$2a$10$P2Y3FTKGIoMtXqNfLYQ95OjXfplOACRVoJc/tcXdzdVqCcfmjCSf2', 'binhtq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (68, 'baotq', 'Tran Quoc Bao', '$2a$10$4T5KVE1i8E3ExtT9uRX1s.IL5d6P.VnGym8oXlt/J7kT.YY8PEOUi', 'baotq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (2, 'Phong', 'Pham Duy Phong', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'phongk72tp@gmail.com', 'ADMIN', 'ACTIVATED', '2024-05-01', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (70, 'haitq', 'Tran Quoc Hai', '$2a$10$DqXH5YDKXQD35XrztK1SeudCH5g1boI1z22pUuSPMYgxqaQ6vSlHa', '12', 'STUDENT', 'ACTIVATED', '2025-02-13', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$38pqPB3j/vnGRxidhOcBP.jxeCWgGSKMdL3/SjBFF265iPQTa6JDu', 'tranhaibang665@gmail.com', 'TEACHER', 'ACTIVATED', '2024-03-20', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (76, 'Near Me', 'Near Me', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'basihamedical@gmail.com', 'EXAMINER', 'ACTIVATED', '2025-02-28', 'https://lh3.googleusercontent.com/a/ACg8ocIArfWVqGfDK0hMAdne8ZWCuGRZvwnHDsDhQFIDdU3f2JVwfA=s96-c');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (3, 'Thai', 'Pham Hong Thai', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thaiph@gmail.com', 'STUDENT', 'ACTIVATED', '2024-06-02', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (4, 'Duy', 'Dang Nguyen Quang Duy', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'duydnq123@gmail.com', 'STUDENT', 'ACTIVATED', '2024-07-03', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
 
 
 --
@@ -2875,7 +2887,7 @@ SELECT pg_catalog.setval('schema_course.lesson_id_seq', 1, false);
 -- Name: discussion_id_seq; Type: SEQUENCE SET; Schema: schema_discussion; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_discussion.discussion_id_seq', 23, true);
+SELECT pg_catalog.setval('schema_discussion.discussion_id_seq', 30, true);
 
 
 --
@@ -4027,7 +4039,7 @@ ALTER TABLE ONLY schema_user.transaction
     ADD CONSTRAINT transaction_user_id_fkey FOREIGN KEY (user_id) REFERENCES schema_user.users(id);
 
 
--- Completed on 2025-03-03 19:31:41
+-- Completed on 2025-03-03 23:02:23
 
 --
 -- PostgreSQL database dump complete

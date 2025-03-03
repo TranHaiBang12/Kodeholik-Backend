@@ -254,7 +254,7 @@ class ProblemServiceImplTest {
                 Problem problem = new Problem();
                 problem.setTopics(new HashSet<>());
                 problem.setSkills(new HashSet<>());
-                problem.setComments(new HashSet());
+                // problem.setComments(new HashSet());
 
                 when(problemRepository.findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean()))
                                 .thenReturn(Optional.of(problem));
@@ -272,7 +272,7 @@ class ProblemServiceImplTest {
                 Problem problem = new Problem();
                 problem.setTopics(new HashSet<>());
                 problem.setSkills(new HashSet<>());
-                problem.setComments(new HashSet());
+                // problem.setComments(new HashSet());
 
                 when(problemRepository.findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean()))
                                 .thenReturn(Optional.empty());

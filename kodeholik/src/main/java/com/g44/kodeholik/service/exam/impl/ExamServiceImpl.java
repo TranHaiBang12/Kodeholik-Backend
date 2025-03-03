@@ -23,12 +23,16 @@ import com.g44.kodeholik.model.dto.response.exam.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.ExamProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.ExamResponseDto;
 import com.g44.kodeholik.model.entity.exam.Exam;
+import com.g44.kodeholik.model.entity.exam.ExamParticipant;
+import com.g44.kodeholik.model.entity.exam.ExamParticipantId;
 import com.g44.kodeholik.model.entity.exam.ExamProblem;
 import com.g44.kodeholik.model.entity.exam.ExamProblemId;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.setting.Language;
+import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
+import com.g44.kodeholik.repository.exam.ExamParticipantRepository;
 import com.g44.kodeholik.repository.exam.ExamProblemRepository;
 import com.g44.kodeholik.repository.exam.ExamRepository;
 import com.g44.kodeholik.service.exam.ExamService;
@@ -51,6 +55,8 @@ public class ExamServiceImpl implements ExamService {
     private final ExamRepository examRepository;
 
     private final ExamProblemRepository examProblemRepository;
+
+    private final ExamParticipantRepository examParticipantRepository;
 
     private final AddExamRequestMapper addExamRequestMapper;
 
@@ -240,7 +246,20 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public void enrollExam(String code) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'enrollExam'");
+        Users currentUser = userService.getCurrentUser();
+        ExamParticipant examParticipant = new ExamParticipant();
+        Exam exam = getExamByCode(code);
+
+        if (exam.getStatus() != ExamStatus.NOT_STARTED) {
+            throw new BadRequestException("This exam is already started or ended",
+                    "This exam is already started or ended");
+        }
+
+        ExamParticipantId examParticipantId = new ExamParticipantId(exam.getId(), currentUser.getId());
+        examParticipant.setId(examParticipantId);
+        examParticipant.setExam(exam);
+        examParticipant.setParticipant(currentUser);
+
+        examParticipantRepository.save(examParticipant);
     }
 }

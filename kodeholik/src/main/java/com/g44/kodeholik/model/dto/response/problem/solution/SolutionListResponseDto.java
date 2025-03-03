@@ -29,4 +29,6 @@ public class SolutionListResponseDto {
     private Long createdAt;
 
     private UserResponseDto createdBy;
+
+    private boolean isCurrentUserCreated;
 }

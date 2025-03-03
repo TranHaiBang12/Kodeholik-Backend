@@ -22,4 +22,5 @@ public interface ExamService {
     public ExamResponseDto getExamDetailByCode(String code);
 
     public void enrollExam(String code);
+
 }

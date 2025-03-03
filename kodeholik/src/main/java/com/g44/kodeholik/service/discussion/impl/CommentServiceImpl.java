@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,12 +23,14 @@ import com.g44.kodeholik.exception.UnauthorizedException;
 import com.g44.kodeholik.model.dto.request.comment.AddCommentRequestDto;
 import com.g44.kodeholik.model.dto.request.comment.CommentLocation;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
+import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.discussion.CommentService;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemSolutionService;
@@ -56,23 +59,26 @@ public class CommentServiceImpl implements CommentService {
 
     private final MessageProperties messageProperties;
 
+    private final S3Service s3Service;
+
     @Override
     public Page<CommentResponseDto> getCommentsByProblemLink(String link, int page, String sortBy, Boolean ascending) {
+        Sort sort;
         Problem problem = problemService.getActivePublicProblemByLink(link);
-        List<Comment> comments = commentRepository.findByCommentReplyAndProblemsContains(null, problem);
-        Page<Comment> commentPage;
         if (sortBy != null && ascending != null && (sortBy.equals("noUpvote") || sortBy.equals("createdAt"))) {
-            Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-            commentPage = getCommentsPage(comments, page, 5, sort);
+            sort = ascending.booleanValue() ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         } else {
-            Sort sort = ascending ? Sort.by("createdAt").ascending() : Sort.by("createdAt").descending();
-            commentPage = getCommentsPage(comments, page, 5, sort);
+            sort = Sort.by("createdAt").descending();
         }
-        Page<CommentResponseDto> commentResponseDtos = commentPage.map(commentResponseMapper::mapFrom);
+        Pageable pageable = PageRequest.of(page, 5, sort);
+        Page<Comment> comments = commentRepository.findByCommentReplyAndProblemsContains(null, problem, pageable);
+        Page<CommentResponseDto> commentResponseDtos = comments.map(commentResponseMapper::mapFrom);
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
-            commentResponseDto.setVoted(isUserVoteComment(commentResponseDto.getId()));
-            commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
-
+            UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
+            if (userResponseDto != null) {
+                userResponseDto.setAvatar(s3Service.getPresignedUrl(userResponseDto.getAvatar()));
+            }
+            commentResponseDto.setCreatedBy(userResponseDto);
         }
         return commentResponseDtos;
     }
@@ -93,7 +99,6 @@ public class CommentServiceImpl implements CommentService {
 
     public Page<Comment> getCommentsPage(List<Comment> comments, int page, int size, Sort sort) {
         // Chuyển Set thành List
-
         // Tạo Pageable
         Pageable pageable;
         if (sort != null) {
@@ -125,21 +130,22 @@ public class CommentServiceImpl implements CommentService {
     public Page<CommentResponseDto> getCommentsByProblemSolutionId(Long solutionId, int page, String sortBy,
             Boolean ascending) {
         ProblemSolution problemSolution = problemSolutionService.findSolutionById(solutionId);
-        // Set<Comment> comments = problemSolution.getComments();
-        List<Comment> comments = commentRepository.findByCommentReplyAndProblemSolutionsContains(null, problemSolution);
-
-        Page<Comment> commentPage;
+        Sort sort;
         if (sortBy != null && ascending != null && (sortBy.equals("noUpvote") || sortBy.equals("createdAt"))) {
-            Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-            commentPage = getCommentsPage(comments, page, 5, sort);
+            sort = ascending.booleanValue() ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         } else {
-            Sort sort = ascending ? Sort.by("createdAt").ascending() : Sort.by("createdAt").descending();
-            commentPage = getCommentsPage(comments, page, 5, sort);
+            sort = Sort.by("createdAt").descending();
         }
-        Page<CommentResponseDto> commentResponseDtos = commentPage.map(commentResponseMapper::mapFrom);
+        Pageable pageable = PageRequest.of(page, 5, sort);
+        Page<Comment> comments = commentRepository.findByCommentReplyAndProblemSolutionsContains(null, problemSolution,
+                pageable);
+        Page<CommentResponseDto> commentResponseDtos = comments.map(commentResponseMapper::mapFrom);
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
-            commentResponseDto.setVoted(isUserVoteComment(commentResponseDto.getId()));
-            commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
+            UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
+            if (userResponseDto != null) {
+                userResponseDto.setAvatar(s3Service.getPresignedUrl(userResponseDto.getAvatar()));
+            }
+            commentResponseDto.setCreatedBy(userResponseDto);
         }
         return commentResponseDtos;
     }
@@ -164,8 +170,13 @@ public class CommentServiceImpl implements CommentService {
     private void addCommentProblem(AddCommentRequestDto addCommentRequestDto, Comment comment) {
         if (addCommentRequestDto.getLocationId() != null) {
             Problem problem = problemService.getProblemById(addCommentRequestDto.getLocationId());
-            problem.getComments().add(comment);
-            problemRepository.save(problem);
+            Set<Problem> commentProblems = comment.getProblems() != null
+                    ? new HashSet<>(comment.getProblems())
+                    : new HashSet<>();
+            commentProblems.add(problem);
+
+            comment.setProblems(commentProblems);
+            commentRepository.save(comment);
         }
     }
 
@@ -174,8 +185,14 @@ public class CommentServiceImpl implements CommentService {
             ProblemSolution problemSolution = problemSolutionService
                     .findSolutionById(addCommentRequestDto.getLocationId());
             problemSolution.setNoComment(problemSolution.getNoComment() + 1);
-            problemSolution.getComments().add(comment);
+            Set<ProblemSolution> commentSolutions = comment.getProblemSolutions() != null
+                    ? new HashSet<>(comment.getProblemSolutions())
+                    : new HashSet<>();
+            commentSolutions.add(problemSolution);
+            comment.setProblemSolutions(commentSolutions);
             problemSolutionService.save(problemSolution);
+            commentRepository.save(comment);
+
         }
     }
 
@@ -257,9 +274,17 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentResponseDto> getAllCommentReplyByComment(Long commentId) {
         Comment comment = getCommentById(commentId);
         List<Comment> comments = commentRepository.findByCommentReply(comment);
-        return comments.stream()
+        List<CommentResponseDto> commentResponseDtos = comments.stream()
                 .map(commentResponseMapper::mapFrom)
                 .collect(Collectors.toList());
+        for (CommentResponseDto commentResponseDto : commentResponseDtos) {
+            UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
+            if (userResponseDto != null) {
+                userResponseDto.setAvatar(s3Service.getPresignedUrl(userResponseDto.getAvatar()));
+            }
+            commentResponseDto.setCreatedBy(userResponseDto);
+        }
+        return commentResponseDtos;
     }
 
     @Override

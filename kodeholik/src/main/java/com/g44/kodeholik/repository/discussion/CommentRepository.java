@@ -1,5 +1,7 @@
 package com.g44.kodeholik.repository.discussion;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.g44.kodeholik.model.entity.discussion.Comment;
@@ -15,9 +17,16 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     public List<Comment> findByCommentReply(Comment commentReply);
 
-    public List<Comment> findByCommentReplyAndProblemsContains(Comment commentReply, Problem problem);
+    public Page<Comment> findByCommentReplyAndProblemsContains(Comment commentReply, Problem problem,
+            Pageable pageable);
 
-    public List<Comment> findByCommentReplyAndProblemSolutionsContains(Comment commentReply, ProblemSolution solution);
+    public Page<Comment> findByCommentReplyAndProblemSolutionsContains(Comment commentReply, ProblemSolution solution,
+            Pageable pageable);
 
     public int countByCommentReply(Comment commentReply);
+
+    public int countByProblemsContains(Problem problem);
+
+    public int countByProblemSolutionsContains(ProblemSolution solution);
+
 }
