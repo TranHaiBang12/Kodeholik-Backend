@@ -146,6 +146,7 @@ public class TagServiceImpl implements TagService {
         List<Topic> topics = topicRepository.findAll();
         for (Topic topic : topics) {
             topicList.add(topic.getName());
+
         }
         return topicList;
     }

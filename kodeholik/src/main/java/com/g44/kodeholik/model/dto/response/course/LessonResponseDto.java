@@ -14,22 +14,16 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LessonResponseDto {
     private Long id;
-
     private Long chapterId;
-
     private String title;
-
     private String description;
-
     private int displayOrder;
-
     private LessonType type;
-
+    private LessonStatus status;
+    private String attachedFile;
     private String videoUrl;
 
-    private String attachedFile;
 
-    private LessonStatus status;
 
     //TODO: Thêm trường ifSolved
 }

@@ -4,6 +4,7 @@ import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.entity.course.Lesson;
 import com.g44.kodeholik.repository.course.LessonRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
+import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
 import jakarta.validation.Valid;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +39,8 @@ public class LessonController {
     private final S3Service s3Service;
 
     private final S3Client s3Client;
+
+    private final GoogleCloudStorageService gcsService;
 
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
@@ -95,4 +98,5 @@ public class LessonController {
             return ResponseEntity.notFound().build();
         }
     }
+
 }

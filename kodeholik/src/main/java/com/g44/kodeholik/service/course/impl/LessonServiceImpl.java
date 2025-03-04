@@ -1,5 +1,6 @@
 package com.g44.kodeholik.service.course.impl;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
@@ -7,6 +8,7 @@ import java.util.UUID;
 import com.g44.kodeholik.model.entity.course.Chapter;
 import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.service.aws.s3.S3Service;
+import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +43,8 @@ public class LessonServiceImpl implements LessonService {
 
     private final S3Service s3Service;
 
+    private final GoogleCloudStorageService gcsService;
+
     @Override
     public Page<LessonResponseDto> getAllLesson(Pageable pageable) {
         Page<Lesson> lessonPage = lessonRepository.findByStatus(LessonStatus.ACTIVATED,pageable);
@@ -62,18 +66,30 @@ public class LessonServiceImpl implements LessonService {
         Chapter chapter = chapterRepository.findById(lessonRequestDto.getChapterId())
                 .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
         lesson.setChapter(chapter);
-
         lesson.setCreatedAt(Timestamp.from(Instant.now()));
         lesson.setCreatedBy(userService.getCurrentUser());
 
+        // Upload attached file to S3
         if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
-            String key = "lessons/" + UUID.randomUUID() + "-" + lessonRequestDto.getAttachedFile().getOriginalFilename();
-            s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), key);
-            lesson.setAttachedFile(key);
+            String s3Key = "lessons/" + UUID.randomUUID() + "-" + lessonRequestDto.getAttachedFile().getOriginalFilename();
+            s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
+            lesson.setAttachedFile(s3Key);
+        }
+
+        // Upload video to Google Cloud Storage
+        if (lessonRequestDto.getVideoFile() != null && !lessonRequestDto.getVideoFile().isEmpty()) {
+            try {
+                String gcsPath = gcsService.uploadVideo(lessonRequestDto.getVideoFile()); // Upload video
+                lesson.setVideoUrl(gcsPath); // Store the GCS object path in DB
+            } catch (IOException e) {
+                log.error("Error uploading video to Google Cloud Storage", e);
+                throw new RuntimeException("Failed to upload video");
+            }
         }
 
         lessonRepository.save(lesson);
     }
+
 
 
     @Override

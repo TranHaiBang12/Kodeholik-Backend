@@ -31,4 +31,6 @@ public class LessonRequestDto {
     private LessonStatus status;
 
     private MultipartFile attachedFile;
+
+    private MultipartFile videoFile;
 }
