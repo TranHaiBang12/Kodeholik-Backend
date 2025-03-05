@@ -5,7 +5,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.g44.kodeholik.model.dto.response.setting.TopicResponseDto;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.NotFoundException;
@@ -149,5 +151,13 @@ public class TagServiceImpl implements TagService {
 
         }
         return topicList;
+    }
+
+    @Override
+    public List<TopicResponseDto> getAllTopicsIdAndName() {
+        List<Topic> topics = topicRepository.findAll();
+        return topics.stream()
+                .map(topic -> new TopicResponseDto(topic.getId(), topic.getName()))
+                .collect(Collectors.toList());
     }
 }

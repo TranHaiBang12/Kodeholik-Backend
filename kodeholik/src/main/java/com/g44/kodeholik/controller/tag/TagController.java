@@ -1,5 +1,6 @@
 package com.g44.kodeholik.controller.tag;
 
+import com.g44.kodeholik.model.dto.response.setting.TopicResponseDto;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,5 +30,10 @@ public class TagController {
     @GetMapping("/all-topic")
     public ResponseEntity<List<String>> getAllTopic() {
         return ResponseEntity.ok(tagService.getAllTopics());
+    }
+
+    @GetMapping("/topic")
+    public ResponseEntity<List<TopicResponseDto>> getAllTopicIdAndName() {
+        return ResponseEntity.ok(tagService.getAllTopicsIdAndName());
     }
 }

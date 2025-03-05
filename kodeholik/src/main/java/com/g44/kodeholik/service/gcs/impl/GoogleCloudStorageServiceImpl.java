@@ -38,7 +38,7 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
     public String generateSignedUrl(String fileName) {
         BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, fileName).build();
 
-        URL signedUrl = storage.signUrl(blobInfo, 1, TimeUnit.HOURS, Storage.SignUrlOption.withV4Signature());
+        URL signedUrl = storage.signUrl(blobInfo, 30, TimeUnit.MINUTES, Storage.SignUrlOption.withV4Signature());
 
         return signedUrl.toString();
     }
