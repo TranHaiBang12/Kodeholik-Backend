@@ -1,17 +1,58 @@
 package com.g44.kodeholik.service.schedule.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
+import com.g44.kodeholik.service.exam.ExamService;
+import com.g44.kodeholik.service.exam.publisher.ExamPublisher;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.schedule.ScheduleService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
 
     private final ProblemService problemService;
+
+    private final ExamPublisher examPublisher;
+
+    private final ExamService examService;
+
+    private final SimpMessagingTemplate messagingTemplate;
+
+    @Transactional
+    @Scheduled(fixedRate = 5000)
+    @Override
+    public void startExam() {
+        List<String> codes = examService.getCodeFromExamReadyToStarted();
+        if (!codes.isEmpty()) {
+            for (int i = 0; i < codes.size(); i++) {
+                List<ExamProblemDetailResponseDto> examProblemDetailResponseDtos = examService.startExam(codes.get(i));
+                // examPublisher.startExam(codes.get(i));
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("code", codes.get(i));
+                map.put("problems", examProblemDetailResponseDtos);
+                examPublisher.startExam(map);
+            }
+        }
+    }
+
+    @Transactional
+    @Scheduled(fixedRate = 5000)
+    @Override
+    public void endExam() {
+        examService.endExam();
+    }
 
 }

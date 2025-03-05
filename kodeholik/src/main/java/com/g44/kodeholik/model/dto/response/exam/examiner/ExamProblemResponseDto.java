@@ -1,4 +1,4 @@
-package com.g44.kodeholik.model.dto.response.exam;
+package com.g44.kodeholik.model.dto.response.exam.examiner;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

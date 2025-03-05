@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.exam.AddExamRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
-import com.g44.kodeholik.model.dto.response.exam.ExamListResponseDto;
-import com.g44.kodeholik.model.dto.response.exam.ExamResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
 import com.g44.kodeholik.service.exam.ExamService;
 
 import jakarta.validation.Valid;

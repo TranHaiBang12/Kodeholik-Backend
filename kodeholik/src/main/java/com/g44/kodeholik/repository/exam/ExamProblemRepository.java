@@ -8,7 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.g44.kodeholik.model.entity.exam.Exam;
 import com.g44.kodeholik.model.entity.exam.ExamProblem;
 import com.g44.kodeholik.model.entity.exam.ExamProblemId;
+import com.g44.kodeholik.model.entity.problem.Problem;
+
 import java.util.List;
+import java.util.Optional;
 
 public interface ExamProblemRepository extends JpaRepository<ExamProblem, ExamProblemId> {
 
@@ -18,4 +21,6 @@ public interface ExamProblemRepository extends JpaRepository<ExamProblem, ExamPr
     public void deleteByExam(Exam exam);
 
     public List<ExamProblem> findByExam(Exam exam);
+
+    public Optional<ExamProblem> findByExamAndProblem(Exam exam, Problem problem);
 }

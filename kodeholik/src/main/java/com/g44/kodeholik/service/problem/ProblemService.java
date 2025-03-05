@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
@@ -19,6 +20,7 @@ import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ShareSolutionRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemBasicResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
@@ -37,6 +39,7 @@ import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
+import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
 import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
@@ -158,4 +161,8 @@ public interface ProblemService {
         public List<ProblemShortResponseDto> getPrivateProblemShortResponseDto(String link);
 
         public Problem getProblemByExamProblemRequest(ExamProblemRequestDto request);
+
+        public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto);
+
+        public RunProblemResponseDto runExam(String link, ProblemCompileRequestDto problemCompileRequestDto);
 }

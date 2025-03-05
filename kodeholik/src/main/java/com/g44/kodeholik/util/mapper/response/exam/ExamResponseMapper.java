@@ -3,7 +3,7 @@ package com.g44.kodeholik.util.mapper.response.exam;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import com.g44.kodeholik.model.dto.response.exam.ExamResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
 import com.g44.kodeholik.model.entity.exam.Exam;
 import com.g44.kodeholik.util.mapper.Mapper;
 

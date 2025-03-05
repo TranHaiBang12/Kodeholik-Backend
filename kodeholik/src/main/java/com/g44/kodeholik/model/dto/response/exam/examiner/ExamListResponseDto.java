@@ -1,8 +1,7 @@
-package com.g44.kodeholik.model.dto.response.exam;
-
-import java.util.List;
+package com.g44.kodeholik.model.dto.response.exam.examiner;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
 import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
@@ -15,15 +14,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class ExamResponseDto {
-
-    private Long id;
+public class ExamListResponseDto {
+    private String link;
 
     private String code;
 
     private String title;
-
-    private String description;
 
     private int noParticipant;
 
@@ -35,7 +31,8 @@ public class ExamResponseDto {
 
     private ExamStatus status;
 
-    private List<String> languageSupports;
+    private UserResponseDto createdBy;
 
-    private List<ExamProblemResponseDto> problems;
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long createdAt;
 }

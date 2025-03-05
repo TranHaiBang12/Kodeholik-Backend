@@ -26,6 +26,7 @@ import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.exception.TestCaseNotPassedException;
 import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
 import com.g44.kodeholik.model.dto.request.lambda.ResponseResult;
@@ -44,6 +45,8 @@ import com.g44.kodeholik.model.dto.request.problem.add.TemplateCode;
 import com.g44.kodeholik.model.dto.request.problem.add.TestCaseDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.student.ProblemResultOverviewResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.EditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemBasicResponseDto;
@@ -1412,6 +1415,45 @@ public class ProblemServiceImpl implements ProblemService {
         return problemRepository.findByLinkAndStatusAndIsActive(request.getProblemLink(),
                 ProblemStatus.PRIVATE, true)
                 .orElseThrow(() -> new NotFoundException("Problem not found", "Problem not found"));
+    }
+
+    public ProblemTemplate findByAllProblemAndLanguage(String link, String languageName) {
+        Problem problem = getProblemByLink(link);
+        return problemTemplateService.findByProblemAndLanguage(problem, languageName);
+    }
+
+    @Override
+    public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto) {
+        ExamResultOverviewResponseDto result = new ExamResultOverviewResponseDto();
+        double grade = 0;
+        List<ProblemResultOverviewResponseDto> problemResultDetails = new ArrayList();
+        for (int i = 0; i < submitExamRequestDto.size(); i++) {
+            ProblemCompileRequestDto problemCompileRequestDto = new ProblemCompileRequestDto();
+            problemCompileRequestDto.setCode(submitExamRequestDto.get(i).getCode());
+            problemCompileRequestDto.setLanguageName(submitExamRequestDto.get(i).getLanguageName());
+            Problem problem = getProblemByLink(submitExamRequestDto.get(i).getProblemLink());
+            ProblemResultOverviewResponseDto problemResultDetailResponseDto = problemSubmissionService.submitExam(
+                    problem,
+                    problemCompileRequestDto,
+                    problemTestCaseService.getTestCaseByProblemAndLanguage(problem,
+                            languageService.findByName(submitExamRequestDto.get(i).getLanguageName())),
+                    findByAllProblemAndLanguage(problem.getLink(), submitExamRequestDto.get(i).getLanguageName()),
+                    submitExamRequestDto.get(i).getPoint());
+            grade += problemResultDetailResponseDto.getPoint();
+            problemResultDetails.add(problemResultDetailResponseDto);
+        }
+        result.setGrade(grade);
+        result.setProblemResults(problemResultDetails);
+        return result;
+    }
+
+    @Override
+    public RunProblemResponseDto runExam(String link, ProblemCompileRequestDto problemCompileRequestDto) {
+        Problem problem = getProblemByLink(link);
+        Language language = languageService.findByName(problemCompileRequestDto.getLanguageName());
+        return problemSubmissionService.run(problem, problemCompileRequestDto,
+                problemTestCaseService.getSampleTestCaseByProblemAndLanguage(problem, language),
+                findByAllProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()));
     }
 
 }

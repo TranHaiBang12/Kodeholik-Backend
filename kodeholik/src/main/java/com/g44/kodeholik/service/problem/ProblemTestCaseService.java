@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.problem;
 import java.util.List;
 
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
@@ -22,6 +23,9 @@ public interface ProblemTestCaseService {
     public List<TestCase> getSampleTestCaseByProblemAndLanguage(Problem problem, Language language);
 
     public ProblemCompileResponseDto getProblemCompileInformationByProblem(Problem problem, Language language);
+
+    public ExamCompileInformationResponseDto getExamProblemCompileInformationByProblem(Problem problem,
+            Language language);
 
     public void saveListTestCase(List<ProblemTestCase> problemTestCases);
 

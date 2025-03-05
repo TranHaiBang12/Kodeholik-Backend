@@ -48,4 +48,6 @@ public class ExamSubmission {
     @ManyToOne
     @JoinColumn(name = "submission_id", referencedColumnName = "id")
     private ProblemSubmission problemSubmission;
+
+    private double point;
 }

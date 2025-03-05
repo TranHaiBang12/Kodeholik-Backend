@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
@@ -183,6 +184,19 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     public List<ProblemTestCase> getTestCaseByProblemAndAllLanguage(Problem problem) {
         return problemTestCaseRepository
                 .findByProblem(problem);
+    }
+
+    @Override
+    public ExamCompileInformationResponseDto getExamProblemCompileInformationByProblem(Problem problem,
+            Language language) {
+        ExamCompileInformationResponseDto examCompileInformationResponseDto = new ExamCompileInformationResponseDto();
+        examCompileInformationResponseDto.setLanguage(language.getName());
+        examCompileInformationResponseDto
+                .setTemplate(
+                        problemTemplateService.findByProblemAndLanguage(problem, language.getName()).getTemplateCode());
+        List<TestCase> testCases = getSampleTestCaseByProblemWithFormat(problem, language);
+        examCompileInformationResponseDto.setTestCases(testCases);
+        return examCompileInformationResponseDto;
     }
 
 }
