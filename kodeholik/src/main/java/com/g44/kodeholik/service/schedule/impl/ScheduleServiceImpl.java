@@ -10,8 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
 import com.g44.kodeholik.service.exam.ExamService;
-import com.g44.kodeholik.service.exam.publisher.ExamPublisher;
+import com.g44.kodeholik.service.publisher.Publisher;
 import com.g44.kodeholik.service.problem.ProblemService;
+import com.g44.kodeholik.service.publisher.Publisher;
 import com.g44.kodeholik.service.schedule.ScheduleService;
 
 import jakarta.transaction.Transactional;
@@ -25,7 +26,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private final ProblemService problemService;
 
-    private final ExamPublisher examPublisher;
+    private final Publisher publisher;
 
     private final ExamService examService;
 
@@ -43,7 +44,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("code", codes.get(i));
                 map.put("problems", examProblemDetailResponseDtos);
-                examPublisher.startExam(map);
+                publisher.startExam(map);
             }
         }
     }
@@ -53,6 +54,14 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public void endExam() {
         examService.endExam();
+    }
+
+    @Transactional
+    @Scheduled(fixedRate = 5000)
+    @Override
+    public void remindExam() {
+        examService.sendNotiToUserExamAboutToStart();
+        ;
     }
 
 }

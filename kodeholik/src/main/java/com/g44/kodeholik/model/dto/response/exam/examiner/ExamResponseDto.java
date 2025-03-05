@@ -27,6 +27,8 @@ public class ExamResponseDto {
 
     private int noParticipant;
 
+    private int noSubmission;
+
     @JsonSerialize(using = TimestampSerializer.class)
     private Long startTime;
 

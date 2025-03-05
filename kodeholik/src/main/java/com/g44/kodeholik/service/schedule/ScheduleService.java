@@ -4,4 +4,6 @@ public interface ScheduleService {
     public void startExam();
 
     public void endExam();
+
+    public void remindExam();
 }

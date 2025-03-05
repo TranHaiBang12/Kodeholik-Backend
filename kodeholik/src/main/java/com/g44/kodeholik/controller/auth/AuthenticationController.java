@@ -102,4 +102,9 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/get-token-noti")
+    public ResponseEntity<String> getTokenNotification() {
+        return ResponseEntity.ok(authService.generateTokenForNotification());
+    }
+
 }

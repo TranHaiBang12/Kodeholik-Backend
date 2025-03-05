@@ -30,4 +30,6 @@ public interface AuthService {
 
     public void changePassword(ChangePasswordRequestDto ChangePasswordRequestDto);
 
+    public String generateTokenForNotification();
+
 }

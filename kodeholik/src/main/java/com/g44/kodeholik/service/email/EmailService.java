@@ -6,4 +6,6 @@ public interface EmailService {
     public void sendEmailLoginGoogle(String to, String subject, String username, String password);
 
     public void sendEmailAddUser(String to, String subject, String username, String password);
+
+    public void sendEmailNotifyExam(String to, String subject, String username, String date, String code);
 }

@@ -13,7 +13,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import com.g44.kodeholik.service.exam.subscriber.ExamSubscriber;
+import com.g44.kodeholik.service.subscriber.Subscriber;
 
 @Configuration
 public class RedisConfig {
@@ -31,7 +31,7 @@ public class RedisConfig {
 
     @Bean
     public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connectionFactory,
-            ExamSubscriber subscriber) {
+            Subscriber subscriber) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.addMessageListener(new MessageListenerAdapter(subscriber), topic());

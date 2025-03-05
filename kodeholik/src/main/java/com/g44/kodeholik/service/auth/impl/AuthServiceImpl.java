@@ -253,4 +253,10 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Override
+    public String generateTokenForNotification() {
+        Users user = userService.getCurrentUser();
+        return tokenService.generateAccessToken(user.getUsername());
+    }
+
 }

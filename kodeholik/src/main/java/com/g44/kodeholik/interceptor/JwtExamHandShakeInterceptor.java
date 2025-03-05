@@ -17,13 +17,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class JwtHandShakeInterceptor implements HandshakeInterceptor {
+public class JwtExamHandShakeInterceptor implements HandshakeInterceptor {
 
     private TokenService tokenService;
 
     private WebsocketSessionManager websocketSessionManager;
 
-    public JwtHandShakeInterceptor(TokenService tokenService, WebsocketSessionManager websocketSessionManager) {
+    public JwtExamHandShakeInterceptor(TokenService tokenService, WebsocketSessionManager websocketSessionManager) {
         this.tokenService = tokenService;
         this.websocketSessionManager = websocketSessionManager;
     }
@@ -40,7 +40,7 @@ public class JwtHandShakeInterceptor implements HandshakeInterceptor {
         if (request instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
             HttpServletRequest httpRequest = servletRequest.getServletRequest();
-
+            log.info(httpRequest.getRequestURI());
             String token = servletRequest.getServletRequest().getParameter("token"); // Lấy JWT từ query params
             if (token != null && validateToken(token)) {
                 String username = tokenService.extractUsername(token);
@@ -50,6 +50,8 @@ public class JwtHandShakeInterceptor implements HandshakeInterceptor {
                 if (!websocketSessionManager.registerSession(username, sessionId)) {
                     return false; // Từ chối kết nối nếu user đã đăng nhập
                 }
+            } else {
+                return false;
             }
         }
         return true;

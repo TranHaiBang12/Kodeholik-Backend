@@ -71,4 +71,14 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(to, subject, context, "add-user");
     }
 
+    @Async("emailTaskExecutor")
+    @Override
+    public void sendEmailNotifyExam(String to, String subject, String username, String date, String code) {
+        Context context = new Context();
+        context.setVariable("username", username);
+        context.setVariable("date", date);
+        context.setVariable("code", code);
+        sendEmail(to, subject, context, "exam-noti");
+    }
+
 }

@@ -17,4 +17,6 @@ public class ExamProblemResponseDto {
     private String problemLink;
 
     private double problemPoint;
+
+    private int noSubmission;
 }

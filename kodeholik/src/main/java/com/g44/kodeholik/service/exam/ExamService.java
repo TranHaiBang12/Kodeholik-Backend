@@ -1,6 +1,7 @@
 package com.g44.kodeholik.service.exam;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 
@@ -48,5 +49,11 @@ public interface ExamService {
         public ExamResultOverviewResponseDto viewResult(String code);
 
         public Page<ExamListStudentResponseDto> getListExam(ExamStatus status, int page, Integer size);
+
+        public List<Map<String, String>> getAllParticipantsInExam(String code);
+
+        public ExamResultOverviewResponseDto viewResultOfASpecificParticpant(String code, Long userId);
+
+        public void sendNotiToUserExamAboutToStart();
 
 }

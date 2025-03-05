@@ -7,10 +7,14 @@ import com.g44.kodeholik.model.dto.request.exam.AddExamRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
 import com.g44.kodeholik.service.exam.ExamService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -60,6 +64,21 @@ public class ExaminerController {
     @GetMapping("/detail/{code}")
     public ResponseEntity<ExamResponseDto> getExamDetail(@PathVariable String code) {
         return ResponseEntity.ok(examService.getExamDetailByCode(code));
+    }
+
+    @GetMapping("/list-participant/{code}")
+    public ResponseEntity<List<Map<String, String>>> getListParticipant(@PathVariable String code) {
+        List<Map<String, String>> results = examService.getAllParticipantsInExam(code);
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/result/{code}")
+    public ResponseEntity<ExamResultOverviewResponseDto> viewResultOfUser(@PathVariable String code,
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(examService.viewResultOfASpecificParticpant(code, userId));
     }
 
 }

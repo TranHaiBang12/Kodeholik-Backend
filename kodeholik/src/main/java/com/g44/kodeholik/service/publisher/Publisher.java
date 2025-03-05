@@ -1,4 +1,4 @@
-package com.g44.kodeholik.service.exam.publisher;
+package com.g44.kodeholik.service.publisher;
 
 import java.util.Map;
 
@@ -14,7 +14,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class ExamPublisher {
+public class Publisher {
     private final RedisTemplate<Object, Object> redisTemplate;
 
     private final ChannelTopic topic;
@@ -32,6 +32,14 @@ public class ExamPublisher {
     public void sendError(Map<String, Object> errorInfo) {
         try {
             redisTemplate.convertAndSend(topic.getTopic(), objectMapper.writeValueAsString(errorInfo));
+        } catch (Exception e) {
+            log.info(e.getMessage());
+        }
+    }
+
+    public void sendNotification(Map<String, Object> notifications) {
+        try {
+            redisTemplate.convertAndSend(topic.getTopic(), objectMapper.writeValueAsString(notifications));
         } catch (Exception e) {
             log.info(e.getMessage());
         }

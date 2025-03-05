@@ -1,4 +1,4 @@
-package com.g44.kodeholik.service.exam.subscriber;
+package com.g44.kodeholik.service.subscriber;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class ExamSubscriber implements MessageListener {
+public class Subscriber implements MessageListener {
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -34,6 +34,9 @@ public class ExamSubscriber implements MessageListener {
             if (map.get("error") != null) {
                 log.info(map.get("error") + " " + map.get("username"));
                 messagingTemplate.convertAndSend("/error/" + map.get("username"), map.get("error"));
+            } else if (map.get("notification") != null) {
+                log.info(map.get("notification") + " " + map.get("username"));
+                messagingTemplate.convertAndSend("/notification/" + map.get("username"), map.get("notification"));
             } else {
                 messagingTemplate.convertAndSend("/topic/exam/" + map.get("code"),
                         objectMapper.writeValueAsString(map));

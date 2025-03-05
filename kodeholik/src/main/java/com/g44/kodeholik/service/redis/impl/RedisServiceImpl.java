@@ -1,5 +1,7 @@
 package com.g44.kodeholik.service.redis.impl;
 
+import java.time.Duration;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,28 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void deleteToken(String username, TokenType tokenType) {
         redisTemplate.delete(getPrefix(username, tokenType));
+    }
+
+    @Override
+    public void saveKeyCheckExamReminder(String username, String code) {
+        redisTemplate.opsForValue().set(
+                getPrefixForExamReminder(username, code), code,
+                Duration.ofMinutes(30));
+    }
+
+    @Override
+    public String getKeyCheckExamReminder(String username, String code) {
+        return (String) redisTemplate.opsForValue()
+                .get(getPrefixForExamReminder(username, code));
+    }
+
+    @Override
+    public boolean isUserRemindedForExam(String username, String code) {
+        return redisTemplate.hasKey(getPrefixForExamReminder(username, code));
+    }
+
+    private String getPrefixForExamReminder(String username, String code) {
+        return "EXAM_REMINDER_" + username + "_" + code;
     }
 
 }

@@ -30,4 +30,7 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
         @Query("SELECT e FROM Exam e WHERE (e.status = 'NOT_STARTED' OR e.status = 'IN_PROGRESS') AND e.endTime <= :now")
         List<Exam> getExamAlreadyEnded(@Param("now") Timestamp now);
 
+        @Query("SELECT e FROM Exam e WHERE e.status = 'NOT_STARTED' AND (e.startTime >= :now AND e.startTime <= :maxTime)")
+        List<Exam> getExamAboutToStart(@Param("now") Timestamp now, @Param("maxTime") Timestamp maxTime);
+
 }

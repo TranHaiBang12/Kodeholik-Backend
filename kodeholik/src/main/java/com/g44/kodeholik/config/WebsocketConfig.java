@@ -18,7 +18,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
-import com.g44.kodeholik.interceptor.JwtHandShakeInterceptor;
+import com.g44.kodeholik.interceptor.JwtExamHandShakeInterceptor;
+import com.g44.kodeholik.interceptor.JwtNotiHandShakeInterceptor;
 import com.g44.kodeholik.service.token.TokenService;
 
 import lombok.RequiredArgsConstructor;
@@ -36,15 +37,22 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws") // API WebSocket cho client kết nối
 
-                .addInterceptors(new JwtHandShakeInterceptor(tokenService, websocketSessionManager))
+                .addInterceptors(new JwtExamHandShakeInterceptor(tokenService,
+                        websocketSessionManager))
                 .setAllowedOrigins("*")
 
-                .withSockJS(); // Hỗ trợ SockJS fallback nếu WebSocket không khả dụng
+                .withSockJS();
+        registry.addEndpoint("/ws/notification") // API WebSocket cho client kết nối
+
+                .addInterceptors(new JwtNotiHandShakeInterceptor(tokenService))
+                .setAllowedOrigins("*")
+
+                .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic/exam", "/error"); // Kênh gửi message đến client
+        registry.enableSimpleBroker("/topic/exam", "/error", "/notification"); // Kênh gửi message đến client
         registry.setApplicationDestinationPrefixes("/app"); // Prefix cho request từ client
     }
 

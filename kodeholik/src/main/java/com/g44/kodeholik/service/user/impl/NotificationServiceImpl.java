@@ -2,6 +2,8 @@ package com.g44.kodeholik.service.user.impl;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import com.g44.kodeholik.model.entity.user.Notification;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.user.NotificationType;
 import com.g44.kodeholik.repository.user.NotificationRepository;
+import com.g44.kodeholik.service.publisher.Publisher;
 import com.g44.kodeholik.service.user.NotificationService;
 import com.g44.kodeholik.util.mapper.response.user.NotificationResponseMapper;
 
@@ -29,6 +32,8 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
 
     private final NotificationResponseMapper notificationResponseMapper;
+
+    private final Publisher publisher;
 
     @Override
     public Page<NotificationResponseDto> getNotifications(Users user, int page, Integer size) {
@@ -52,6 +57,11 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setUser(user);
         notification.setDate(Timestamp.from(Instant.now()));
         notificationRepository.save(notification);
+
+        Map<String, Object> notifications = new HashMap();
+        notifications.put("notification", notificationResponseMapper.mapFrom(notification));
+        notifications.put("username", user.getUsername());
+        publisher.sendNotification(notifications);
     }
 
 }

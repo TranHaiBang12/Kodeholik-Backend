@@ -15,8 +15,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ExamListResponseDto {
-    private String link;
-
     private String code;
 
     private String title;
