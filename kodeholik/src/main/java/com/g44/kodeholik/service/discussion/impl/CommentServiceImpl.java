@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -254,20 +255,25 @@ public class CommentServiceImpl implements CommentService {
         Users currentUser = userService.getCurrentUser();
         boolean isVote = false;
 
-        for (Users userVote : usersVote) {
+        Iterator<Users> iterator = usersVote.iterator();
+        while (iterator.hasNext()) {
+            Users userVote = iterator.next();
             if (userVote.getEmail().equals(currentUser.getEmail())) {
                 isVote = true;
-                usersVote.remove(currentUser);
-                if (comment.getNoUpvote() > 0)
-                    comment.setNoUpvote(comment.getNoUpvote() + 1);
-                commentRepository.save(comment);
+                iterator.remove();
+                if (comment.getNoUpvote() > 0) {
+                    comment.setNoUpvote(comment.getNoUpvote() - 1);
+                }
+                break;
             }
         }
+
         if (!isVote) {
-            throw new BadRequestException("You have not vote this comment",
-                    "You have not vote this comment");
+            throw new BadRequestException("You have not voted for this comment",
+                    "You have not voted for this comment");
         }
 
+        commentRepository.save(comment);
     }
 
     @Override

@@ -34,9 +34,10 @@ public class JwtNotiHandShakeInterceptor implements HandshakeInterceptor {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
             String token = servletRequest.getServletRequest().getParameter("token"); // Lấy JWT từ query params
             if (!(token != null && validateToken(token))) {
-                log.info("sa");
                 return false;
             }
+            attributes.put("token", token);
+
         }
         return true;
     }

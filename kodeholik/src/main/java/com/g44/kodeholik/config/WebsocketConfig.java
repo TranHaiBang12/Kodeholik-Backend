@@ -20,6 +20,7 @@ import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
 import com.g44.kodeholik.interceptor.JwtExamHandShakeInterceptor;
 import com.g44.kodeholik.interceptor.JwtNotiHandShakeInterceptor;
+import com.g44.kodeholik.interceptor.WebsocketInterceptor;
 import com.g44.kodeholik.service.token.TokenService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,8 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     private final TokenService tokenService;
 
     private final WebsocketSessionManager websocketSessionManager;
+
+    private final WebsocketInterceptor websocketInterceptor;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -58,20 +61,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new ChannelInterceptor() {
-            @Override
-            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-                String username = (String) accessor.getSessionAttributes().get("username");
-
-                if (username != null) {
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null,
-                            List.of());
-                    accessor.setUser(auth); // Gán Principal cho WebSocket
-                }
-                return message;
-            }
-        });
+        registration.interceptors(websocketInterceptor); // Thêm interceptor vào hệ thống message broker
     }
 
 }

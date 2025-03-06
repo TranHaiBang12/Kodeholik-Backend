@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-    private void checkUsernameExisted(String username) {
+    public void checkUsernameExisted(String username) {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new BadRequestException("Username already exists", "Username already exists");
         }

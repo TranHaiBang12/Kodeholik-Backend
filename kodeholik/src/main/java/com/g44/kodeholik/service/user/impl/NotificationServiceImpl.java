@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.response.user.NotificationResponseDto;
 import com.g44.kodeholik.model.entity.user.Notification;
@@ -34,6 +36,8 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationResponseMapper notificationResponseMapper;
 
     private final Publisher publisher;
+
+    private final ObjectMapper mapper;
 
     @Override
     public Page<NotificationResponseDto> getNotifications(Users user, int page, Integer size) {
@@ -59,9 +63,14 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(notification);
 
         Map<String, Object> notifications = new HashMap();
-        notifications.put("notification", notificationResponseMapper.mapFrom(notification));
-        notifications.put("username", user.getUsername());
-        publisher.sendNotification(notifications);
+        try {
+            String json = mapper.writeValueAsString(notificationResponseMapper.mapFrom(notification));
+            notifications.put("notification", json);
+            notifications.put("username", user.getUsername());
+            publisher.sendNotification(notifications);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
 }

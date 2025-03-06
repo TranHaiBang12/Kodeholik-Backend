@@ -40,13 +40,12 @@ public class JwtExamHandShakeInterceptor implements HandshakeInterceptor {
         if (request instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
             HttpServletRequest httpRequest = servletRequest.getServletRequest();
-            log.info(httpRequest.getRequestURI());
             String token = servletRequest.getServletRequest().getParameter("token"); // Lấy JWT từ query params
             if (token != null && validateToken(token)) {
                 String username = tokenService.extractUsername(token);
                 String sessionId = UUID.randomUUID().toString();
                 attributes.put("username", username);
-                attributes.put("jwtToken", token);
+                attributes.put("token", token);
                 if (!websocketSessionManager.registerSession(username, sessionId)) {
                     return false; // Từ chối kết nối nếu user đã đăng nhập
                 }

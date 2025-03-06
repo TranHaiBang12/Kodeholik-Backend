@@ -16,42 +16,63 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.g44.kodeholik.exception.BadRequestException;
+import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
+import com.g44.kodeholik.exception.TestCaseNotPassedException;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.add.EditorialDto;
+import com.g44.kodeholik.model.dto.request.problem.add.InputParameterDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
+import com.g44.kodeholik.model.dto.request.problem.add.SolutionCodeDto;
+import com.g44.kodeholik.model.dto.request.problem.add.TemplateCode;
+import com.g44.kodeholik.model.dto.request.problem.add.TestCaseDto;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.problem.Problem;
+import com.g44.kodeholik.model.entity.problem.ProblemSolution;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
+import com.g44.kodeholik.model.entity.problem.SolutionCode;
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
+import com.g44.kodeholik.model.enums.problem.InputType;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
+import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
+import com.g44.kodeholik.repository.problem.ProblemSolutionRepository;
+import com.g44.kodeholik.repository.problem.SolutionCodeRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
 import com.g44.kodeholik.service.excel.ExcelService;
@@ -101,6 +122,9 @@ class ProblemServiceImplTest {
         private ProblemRepository problemRepository;
 
         @Mock
+        private CommentRepository commentRepository;
+
+        @Mock
         private UserRepository userRepository;
 
         @Mock
@@ -147,6 +171,12 @@ class ProblemServiceImplTest {
 
         @Mock
         private SolutionCodeMapper solutionCodeMapper;
+
+        @Spy
+        private ProblemSolutionRepository problemSolutionRepository;
+
+        @Spy
+        private SolutionCodeRepository solutionCodeRepository;
 
         private Gson gson = new Gson();
 
@@ -256,6 +286,7 @@ class ProblemServiceImplTest {
                 problem.setSkills(new HashSet<>());
                 // problem.setComments(new HashSet());
 
+                when(commentRepository.countByProblemsContains(any(Problem.class))).thenReturn(1);
                 when(problemRepository.findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean()))
                                 .thenReturn(Optional.of(problem));
                 when(problemDescriptionMapper.mapFrom(any())).thenReturn(new ProblemDescriptionResponseDto());
@@ -302,8 +333,6 @@ class ProblemServiceImplTest {
 
         @Test
         void testGetProblemByIdNotFound() {
-                Problem problem = new Problem();
-
                 when(problemRepository.findById(anyLong())).thenReturn(Optional.empty());
 
                 NotFoundException notFoundException = assertThrows(
@@ -312,6 +341,33 @@ class ProblemServiceImplTest {
                 assertEquals("Problem not found", notFoundException.getMessage());
                 assertEquals("Problem not found", notFoundException.getDetails());
                 verify(problemRepository, times(1)).findById(anyLong());
+        }
+
+        @Test
+        void testGetProblemEditorialDtoLis() {
+                String link = "test-link";
+
+                Problem problem = new Problem();
+                problem.setTitle("test");
+                problem.setLink(link);
+                problem.setTopics(new HashSet<>());
+                problem.setSkills(new HashSet<>());
+
+                ProblemResponseDto problemResponseDto = new ProblemResponseDto();
+                problemResponseDto.setTitle("test");
+
+                when(problemRepository.findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean()))
+                                .thenReturn(Optional.of(problem));
+                when(problemSolutionService.findEditorialByProblem(any(Problem.class)))
+                                .thenReturn(List.of(new ProblemSolution()));
+                when(problemResponseMapper.mapFrom(any(Problem.class))).thenReturn(problemResponseDto);
+                when(solutionCodeService.findBySolution(any(ProblemSolution.class)))
+                                .thenReturn(List.of(new SolutionCodeDto()));
+                ProblemEditorialResponseDto result = problemService.getProblemEditorialDtoList(link);
+
+                assertNotNull(result);
+                verify(problemSolutionService, times(1)).findEditorialByProblem(any(Problem.class));
+                verify(solutionCodeService, times(1)).findBySolution(any(ProblemSolution.class));
         }
 
         @Test
@@ -579,46 +635,50 @@ class ProblemServiceImplTest {
         void testGetTestCaseByProblem() {
                 Problem problem = new Problem();
 
+                Language language = new Language();
+                List<Language> languages = List.of(language);
+
                 when(problemRepository.findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean()))
                                 .thenReturn(Optional.of(problem));
-                // when(problemTestCaseService.getTestCaseByProblem(any())).thenReturn(new
-                // ArrayList<>());
+                when(problemTestCaseService.getTestCaseByProblem(any(), any())).thenReturn(new ArrayList<>());
 
-                // List<TestCase> result = problemService.getTestCaseByProblem("test-link");
+                List<List<TestCase>> result = problemService.getTestCaseByProblem("test-link", languages);
 
-                // assertNotNull(result);
+                assertNotNull(result);
         }
 
         @Test
         void testGetSampleTestCaseByProblem() {
                 Problem problem = new Problem();
 
+                Language language = new Language();
+                List<Language> languages = List.of(language);
+
                 when(problemRepository.findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean()))
                                 .thenReturn(Optional.of(problem));
-                // when(problemTestCaseService.getSampleTestCaseByProblem(any())).thenReturn(new
-                // ArrayList<>());
+                when(problemTestCaseService.getSampleTestCaseByProblem(any(), any())).thenReturn(new ArrayList<>());
 
-                // List<TestCase> result =
-                // problemService.getSampleTestCaseByProblem("test-link");
+                List<List<TestCase>> result = problemService.getSampleTestCaseByProblem("test-link", languages);
 
-                // assertNotNull(result);
+                assertNotNull(result);
         }
 
         @Test
         void testGetProblemCompileInformationById() {
                 Problem problem = new Problem();
 
-                // when(problemRepository.findByLinkAndStatusAndIsActive(anyString(), any(),
-                // anyBoolean()))
-                // .thenReturn(Optional.of(problem));
-                // when(problemTestCaseService.getProblemCompileInformationByProblem(any(),
-                // anyString()))
-                // .thenReturn(new ProblemCompileResponseDto());
+                Language language = new Language();
 
-                // ProblemCompileResponseDto result =
-                // problemService.getProblemCompileInformationById("test-link", "Java");
+                when(problemRepository.findByLinkAndStatusAndIsActive(anyString(), any(),
+                                anyBoolean()))
+                                .thenReturn(Optional.of(problem));
+                when(problemTestCaseService.getProblemCompileInformationByProblem(any(),
+                                any()))
+                                .thenReturn(new ProblemCompileResponseDto());
 
-                // assertNotNull(result);
+                ProblemCompileResponseDto result = problemService.getProblemCompileInformationById("test-link", "Java");
+
+                assertNotNull(result);
         }
 
         @Test
@@ -639,21 +699,527 @@ class ProblemServiceImplTest {
         }
 
         @Test
-        void testAddProblem() {
+        void testAddProblemSuccess() {
+                Language language = new Language();
+                language.setId(1L);
+                language.setName("Java");
+
                 ProblemBasicAddDto problemBasicAddDto = new ProblemBasicAddDto();
+                problemBasicAddDto.setTitle("test title");
+                problemBasicAddDto.setDescription("test description");
+                problemBasicAddDto.setDifficulty(Difficulty.EASY);
+                problemBasicAddDto.setIsActive(true);
+                problemBasicAddDto.setLanguageSupport(List.of("Java"));
+                problemBasicAddDto.setSkills(new ArrayList());
+                problemBasicAddDto.setStatus(ProblemStatus.PUBLIC);
+                problemBasicAddDto.setTopics(new ArrayList());
+
                 ProblemEditorialDto problemEditorialDto = new ProblemEditorialDto();
-                List<ProblemInputParameterDto> problemInputParameterDto = new ArrayList<>();
+                EditorialDto editorialDto = new EditorialDto();
+                editorialDto.setEditorialTitle("test editorial title");
+                editorialDto.setEditorialTextSolution("test editorial text solution");
+                editorialDto.setEditorialSkills(new ArrayList<>());
+                SolutionCodeDto solutionCodeDto = new SolutionCodeDto();
+                solutionCodeDto.setSolutionCode("test code");
+                solutionCodeDto.setSolutionLanguage("Java");
+                editorialDto.setSolutionCodes(List.of(solutionCodeDto));
+                problemEditorialDto.setEditorialDtos(editorialDto);
+
+                ProblemInputParameterDto problemInputParameterDto = new ProblemInputParameterDto();
+                problemInputParameterDto.setFunctionSignature("test function signature");
+                problemInputParameterDto.setLanguage("Java");
+                problemInputParameterDto.setReturnType(InputType.INT);
+                InputParameterDto inputParameterDto = new InputParameterDto();
+                inputParameterDto.setInputName("test");
+                inputParameterDto.setInputType(InputType.INT);
+                problemInputParameterDto.setParameters(List.of(inputParameterDto));
+                TemplateCode templateCode = new TemplateCode();
+                templateCode.setCode("test code");
+                templateCode.setLanguage("Java");
+                problemInputParameterDto.setTemplateCode(templateCode);
+                List<ProblemInputParameterDto> problemInputParameterDtoList = List.of(problemInputParameterDto);
+
+                TestCaseDto testCase = new TestCaseDto();
+                testCase.setInput(new HashMap());
+                testCase.setExpectedOutput("test output");
+                testCase.setIsSample(true);
+                List<TestCaseDto> testCaseList = List.of(testCase);
+                ProblemTestCaseDto problemTestCaseDto = new ProblemTestCaseDto();
+                problemTestCaseDto.setLanguage("Java");
+                problemTestCaseDto.setTestCases(testCaseList);
+                List<ProblemTestCaseDto> problemTestCaseDtoList = List.of(problemTestCaseDto);
+
                 MultipartFile excelFile = mock(MultipartFile.class);
 
+                when(problemRepository.findByLink(any())).thenReturn(Optional.empty());
+                when(languageService.findByName(any())).thenReturn(language);
+                when(languageService.getLanguagesByNameList(any())).thenReturn(Set.of(language));
                 when(problemRepository.isTitleExisted(anyString())).thenReturn(false);
-                // when(excelService.readTestCaseExcel(any(), anyList())).thenReturn(new
-                // ProblemTestCaseDto());
+                when(excelService.readTestCaseExcel(any(), anyList(), anyString()))
+                                .thenReturn(problemTestCaseDtoList);
                 when(problemRequestMapper.mapTo(any())).thenReturn(new Problem());
                 when(userService.getCurrentUser()).thenReturn(new Users());
                 when(problemRepository.save(any())).thenReturn(new Problem());
+                String lambdaResult = "{\"isAccepted\":true,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
+                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
 
-                // problemService.addProblem(problemBasicAddDto, problemEditorialDto,
-                // problemInputParameterDto, excelFile);
+                problemService.addProblem(problemBasicAddDto, problemEditorialDto,
+                                problemInputParameterDtoList, excelFile);
+
+                verify(problemRepository, times(1)).save(any());
+        }
+
+        @Test
+        void testAddProblemTitleExisted() {
+                Language language = new Language();
+                language.setId(1L);
+                language.setName("Java");
+
+                ProblemBasicAddDto problemBasicAddDto = new ProblemBasicAddDto();
+                problemBasicAddDto.setTitle("test title");
+                problemBasicAddDto.setDescription("test description");
+                problemBasicAddDto.setDifficulty(Difficulty.EASY);
+                problemBasicAddDto.setIsActive(true);
+                problemBasicAddDto.setLanguageSupport(List.of("Java"));
+                problemBasicAddDto.setSkills(new ArrayList());
+                problemBasicAddDto.setStatus(ProblemStatus.PUBLIC);
+                problemBasicAddDto.setTopics(new ArrayList());
+
+                ProblemEditorialDto problemEditorialDto = new ProblemEditorialDto();
+                EditorialDto editorialDto = new EditorialDto();
+                editorialDto.setEditorialTitle("test editorial title");
+                editorialDto.setEditorialTextSolution("test editorial text solution");
+                editorialDto.setEditorialSkills(new ArrayList<>());
+                SolutionCodeDto solutionCodeDto = new SolutionCodeDto();
+                solutionCodeDto.setSolutionCode("test code");
+                solutionCodeDto.setSolutionLanguage("Java");
+                editorialDto.setSolutionCodes(List.of(solutionCodeDto));
+                problemEditorialDto.setEditorialDtos(editorialDto);
+
+                ProblemInputParameterDto problemInputParameterDto = new ProblemInputParameterDto();
+                problemInputParameterDto.setFunctionSignature("test function signature");
+                problemInputParameterDto.setLanguage("Java");
+                problemInputParameterDto.setReturnType(InputType.INT);
+                InputParameterDto inputParameterDto = new InputParameterDto();
+                inputParameterDto.setInputName("test");
+                inputParameterDto.setInputType(InputType.INT);
+                problemInputParameterDto.setParameters(List.of(inputParameterDto));
+                TemplateCode templateCode = new TemplateCode();
+                templateCode.setCode("test code");
+                templateCode.setLanguage("Java");
+                problemInputParameterDto.setTemplateCode(templateCode);
+                List<ProblemInputParameterDto> problemInputParameterDtoList = List.of(problemInputParameterDto);
+
+                TestCaseDto testCase = new TestCaseDto();
+                testCase.setInput(new HashMap());
+                testCase.setExpectedOutput("test output");
+                testCase.setIsSample(true);
+                List<TestCaseDto> testCaseList = List.of(testCase);
+                ProblemTestCaseDto problemTestCaseDto = new ProblemTestCaseDto();
+                problemTestCaseDto.setLanguage("Java");
+                problemTestCaseDto.setTestCases(testCaseList);
+                List<ProblemTestCaseDto> problemTestCaseDtoList = List.of(problemTestCaseDto);
+
+                MultipartFile excelFile = mock(MultipartFile.class);
+
+                when(problemRepository.findByLink(any())).thenReturn(Optional.empty());
+                when(languageService.findByName(any())).thenReturn(language);
+                when(languageService.getLanguagesByNameList(any())).thenReturn(Set.of(language));
+                when(problemRepository.isTitleExisted(anyString())).thenReturn(true);
+                when(excelService.readTestCaseExcel(any(), anyList(), anyString()))
+                                .thenReturn(problemTestCaseDtoList);
+                when(problemRequestMapper.mapTo(any())).thenReturn(new Problem());
+                when(userService.getCurrentUser()).thenReturn(new Users());
+                when(problemRepository.save(any())).thenReturn(new Problem());
+                String lambdaResult = "{\"isAccepted\":true,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
+                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+
+                BadRequestException badRequestException = assertThrows(
+                                BadRequestException.class,
+                                () -> problemService.addProblem(problemBasicAddDto, problemEditorialDto,
+                                                problemInputParameterDtoList, excelFile));
+                assertEquals("Title has already existed", badRequestException.getMessage());
+                assertEquals("Title has already existed", badRequestException.getDetails());
+        }
+
+        @Test
+        void testAddProblemDuplicatedLink() {
+                Language language = new Language();
+                language.setId(1L);
+                language.setName("Java");
+
+                ProblemBasicAddDto problemBasicAddDto = new ProblemBasicAddDto();
+                problemBasicAddDto.setTitle("test title");
+                problemBasicAddDto.setDescription("test description");
+                problemBasicAddDto.setDifficulty(Difficulty.EASY);
+                problemBasicAddDto.setIsActive(true);
+                problemBasicAddDto.setLanguageSupport(List.of("Java"));
+                problemBasicAddDto.setSkills(new ArrayList());
+                problemBasicAddDto.setStatus(ProblemStatus.PUBLIC);
+                problemBasicAddDto.setTopics(new ArrayList());
+
+                ProblemEditorialDto problemEditorialDto = new ProblemEditorialDto();
+                EditorialDto editorialDto = new EditorialDto();
+                editorialDto.setEditorialTitle("test editorial title");
+                editorialDto.setEditorialTextSolution("test editorial text solution");
+                editorialDto.setEditorialSkills(new ArrayList<>());
+                SolutionCodeDto solutionCodeDto = new SolutionCodeDto();
+                solutionCodeDto.setSolutionCode("test code");
+                solutionCodeDto.setSolutionLanguage("Java");
+                editorialDto.setSolutionCodes(List.of(solutionCodeDto));
+                problemEditorialDto.setEditorialDtos(editorialDto);
+
+                ProblemInputParameterDto problemInputParameterDto = new ProblemInputParameterDto();
+                problemInputParameterDto.setFunctionSignature("test function signature");
+                problemInputParameterDto.setLanguage("Java");
+                problemInputParameterDto.setReturnType(InputType.INT);
+                InputParameterDto inputParameterDto = new InputParameterDto();
+                inputParameterDto.setInputName("test");
+                inputParameterDto.setInputType(InputType.INT);
+                problemInputParameterDto.setParameters(List.of(inputParameterDto));
+                TemplateCode templateCode = new TemplateCode();
+                templateCode.setCode("test code");
+                templateCode.setLanguage("Java");
+                problemInputParameterDto.setTemplateCode(templateCode);
+                List<ProblemInputParameterDto> problemInputParameterDtoList = List.of(problemInputParameterDto);
+
+                TestCaseDto testCase = new TestCaseDto();
+                testCase.setInput(new HashMap());
+                testCase.setExpectedOutput("test output");
+                testCase.setIsSample(true);
+                List<TestCaseDto> testCaseList = List.of(testCase);
+                ProblemTestCaseDto problemTestCaseDto = new ProblemTestCaseDto();
+                problemTestCaseDto.setLanguage("Java");
+                problemTestCaseDto.setTestCases(testCaseList);
+                List<ProblemTestCaseDto> problemTestCaseDtoList = List.of(problemTestCaseDto);
+
+                MultipartFile excelFile = mock(MultipartFile.class);
+
+                when(problemRepository.findByLink(any())).thenReturn(Optional.of(new Problem()));
+                when(languageService.findByName(any())).thenReturn(language);
+                when(languageService.getLanguagesByNameList(any())).thenReturn(Set.of(language));
+                when(problemRepository.isTitleExisted(anyString())).thenReturn(false);
+                when(excelService.readTestCaseExcel(any(), anyList(), anyString()))
+                                .thenReturn(problemTestCaseDtoList);
+                when(problemRequestMapper.mapTo(any())).thenReturn(new Problem());
+                when(userService.getCurrentUser()).thenReturn(new Users());
+                when(problemRepository.save(any())).thenReturn(new Problem());
+                String lambdaResult = "{\"isAccepted\":true,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
+                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+
+                BadRequestException badRequestException = assertThrows(
+                                BadRequestException.class,
+                                () -> problemService.addProblem(problemBasicAddDto, problemEditorialDto,
+                                                problemInputParameterDtoList, excelFile));
+                assertEquals("Title is not valid because the link is duplicated", badRequestException.getMessage());
+                assertEquals("Title is not valid because the link is duplicated", badRequestException.getDetails());
+        }
+
+        @Test
+        void testAddProblemEmptyTestCase() {
+                Language language = new Language();
+                language.setId(1L);
+                language.setName("Java");
+
+                ProblemBasicAddDto problemBasicAddDto = new ProblemBasicAddDto();
+                problemBasicAddDto.setTitle("test title");
+                problemBasicAddDto.setDescription("test description");
+                problemBasicAddDto.setDifficulty(Difficulty.EASY);
+                problemBasicAddDto.setIsActive(true);
+                problemBasicAddDto.setLanguageSupport(List.of("Java"));
+                problemBasicAddDto.setSkills(new ArrayList());
+                problemBasicAddDto.setStatus(ProblemStatus.PUBLIC);
+                problemBasicAddDto.setTopics(new ArrayList());
+
+                ProblemEditorialDto problemEditorialDto = new ProblemEditorialDto();
+                EditorialDto editorialDto = new EditorialDto();
+                editorialDto.setEditorialTitle("test editorial title");
+                editorialDto.setEditorialTextSolution("test editorial text solution");
+                editorialDto.setEditorialSkills(new ArrayList<>());
+                SolutionCodeDto solutionCodeDto = new SolutionCodeDto();
+                solutionCodeDto.setSolutionCode("test code");
+                solutionCodeDto.setSolutionLanguage("Java");
+                editorialDto.setSolutionCodes(List.of(solutionCodeDto));
+                problemEditorialDto.setEditorialDtos(editorialDto);
+
+                ProblemInputParameterDto problemInputParameterDto = new ProblemInputParameterDto();
+                problemInputParameterDto.setFunctionSignature("test function signature");
+                problemInputParameterDto.setLanguage("Java");
+                problemInputParameterDto.setReturnType(InputType.INT);
+                InputParameterDto inputParameterDto = new InputParameterDto();
+                inputParameterDto.setInputName("test");
+                inputParameterDto.setInputType(InputType.INT);
+                problemInputParameterDto.setParameters(List.of(inputParameterDto));
+                TemplateCode templateCode = new TemplateCode();
+                templateCode.setCode("test code");
+                templateCode.setLanguage("Java");
+                problemInputParameterDto.setTemplateCode(templateCode);
+                List<ProblemInputParameterDto> problemInputParameterDtoList = List.of(problemInputParameterDto);
+
+                TestCaseDto testCase = new TestCaseDto();
+                testCase.setInput(new HashMap());
+                testCase.setExpectedOutput("test output");
+                testCase.setIsSample(true);
+                List<TestCaseDto> testCaseList = List.of(testCase);
+                ProblemTestCaseDto problemTestCaseDto = new ProblemTestCaseDto();
+                problemTestCaseDto.setLanguage("Java");
+                problemTestCaseDto.setTestCases(testCaseList);
+                List<ProblemTestCaseDto> problemTestCaseDtoList = List.of(problemTestCaseDto);
+
+                MultipartFile excelFile = mock(MultipartFile.class);
+
+                when(problemRepository.findByLink(any())).thenReturn(Optional.empty());
+                when(languageService.findByName(any())).thenReturn(language);
+                when(languageService.getLanguagesByNameList(any())).thenReturn(Set.of(language));
+                when(problemRepository.isTitleExisted(anyString())).thenReturn(false);
+                when(excelService.readTestCaseExcel(any(), anyList(), anyString()))
+                                .thenReturn(new ArrayList());
+                when(problemRequestMapper.mapTo(any())).thenReturn(new Problem());
+                when(userService.getCurrentUser()).thenReturn(new Users());
+                when(problemRepository.save(any())).thenReturn(new Problem());
+                String lambdaResult = "{\"isAccepted\":true,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
+                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+
+                BadRequestException badRequestException = assertThrows(
+                                BadRequestException.class,
+                                () -> problemService.addProblem(problemBasicAddDto, problemEditorialDto,
+                                                problemInputParameterDtoList, excelFile));
+                assertEquals("Excel file doesn't contain any test case", badRequestException.getMessage());
+                assertEquals("Excel file doesn't contain any test case", badRequestException.getDetails());
+        }
+
+        @Test
+        void testAddProblemTestCaseNotPassed() {
+                Language language = new Language();
+                language.setId(1L);
+                language.setName("Java");
+
+                ProblemBasicAddDto problemBasicAddDto = new ProblemBasicAddDto();
+                problemBasicAddDto.setTitle("test title");
+                problemBasicAddDto.setDescription("test description");
+                problemBasicAddDto.setDifficulty(Difficulty.EASY);
+                problemBasicAddDto.setIsActive(true);
+                problemBasicAddDto.setLanguageSupport(List.of("Java"));
+                problemBasicAddDto.setSkills(new ArrayList());
+                problemBasicAddDto.setStatus(ProblemStatus.PUBLIC);
+                problemBasicAddDto.setTopics(new ArrayList());
+
+                ProblemEditorialDto problemEditorialDto = new ProblemEditorialDto();
+                EditorialDto editorialDto = new EditorialDto();
+                editorialDto.setEditorialTitle("test editorial title");
+                editorialDto.setEditorialTextSolution("test editorial text solution");
+                editorialDto.setEditorialSkills(new ArrayList<>());
+                SolutionCodeDto solutionCodeDto = new SolutionCodeDto();
+                solutionCodeDto.setSolutionCode("test code");
+                solutionCodeDto.setSolutionLanguage("Java");
+                editorialDto.setSolutionCodes(List.of(solutionCodeDto));
+                problemEditorialDto.setEditorialDtos(editorialDto);
+
+                ProblemInputParameterDto problemInputParameterDto = new ProblemInputParameterDto();
+                problemInputParameterDto.setFunctionSignature("test function signature");
+                problemInputParameterDto.setLanguage("Java");
+                problemInputParameterDto.setReturnType(InputType.INT);
+                InputParameterDto inputParameterDto = new InputParameterDto();
+                inputParameterDto.setInputName("test");
+                inputParameterDto.setInputType(InputType.INT);
+                problemInputParameterDto.setParameters(List.of(inputParameterDto));
+                TemplateCode templateCode = new TemplateCode();
+                templateCode.setCode("test code");
+                templateCode.setLanguage("Java");
+                problemInputParameterDto.setTemplateCode(templateCode);
+                List<ProblemInputParameterDto> problemInputParameterDtoList = List.of(problemInputParameterDto);
+
+                TestCaseDto testCase = new TestCaseDto();
+                testCase.setInput(new HashMap());
+                testCase.setExpectedOutput("test output");
+                testCase.setIsSample(true);
+                List<TestCaseDto> testCaseList = List.of(testCase);
+                ProblemTestCaseDto problemTestCaseDto = new ProblemTestCaseDto();
+                problemTestCaseDto.setLanguage("Java");
+                problemTestCaseDto.setTestCases(testCaseList);
+                List<ProblemTestCaseDto> problemTestCaseDtoList = List.of(problemTestCaseDto);
+
+                MultipartFile excelFile = mock(MultipartFile.class);
+
+                when(problemRepository.findByLink(any())).thenReturn(Optional.empty());
+                when(languageService.findByName(any())).thenReturn(language);
+                when(languageService.getLanguagesByNameList(any())).thenReturn(Set.of(language));
+                when(problemRepository.isTitleExisted(anyString())).thenReturn(false);
+                when(excelService.readTestCaseExcel(any(), anyList(), anyString()))
+                                .thenReturn(problemTestCaseDtoList);
+                when(problemRequestMapper.mapTo(any())).thenReturn(new Problem());
+                when(userService.getCurrentUser()).thenReturn(new Users());
+                when(problemRepository.save(any())).thenReturn(new Problem());
+                String lambdaResult = "{\"isAccepted\":false,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
+                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+
+                assertThrows(
+                                TestCaseNotPassedException.class,
+                                () -> problemService.addProblem(problemBasicAddDto, problemEditorialDto,
+                                                problemInputParameterDtoList, excelFile));
+        }
+
+        @Test
+        void testEditProblemSuccess() {
+                String link = "test";
+
+                Problem problem = new Problem();
+                problem.setId(1L);
+                problem.setTitle("test title");
+                problem.setLink(link);
+
+                Language language = new Language();
+                language.setId(1L);
+                language.setName("Java");
+
+                ProblemBasicAddDto problemBasicAddDto = new ProblemBasicAddDto();
+                problemBasicAddDto.setTitle("test title");
+                problemBasicAddDto.setDescription("test description");
+                problemBasicAddDto.setDifficulty(Difficulty.EASY);
+                problemBasicAddDto.setIsActive(true);
+                problemBasicAddDto.setLanguageSupport(List.of("Java"));
+                problemBasicAddDto.setSkills(new ArrayList());
+                problemBasicAddDto.setStatus(ProblemStatus.PUBLIC);
+                problemBasicAddDto.setTopics(new ArrayList());
+
+                ProblemEditorialDto problemEditorialDto = new ProblemEditorialDto();
+                EditorialDto editorialDto = new EditorialDto();
+                editorialDto.setEditorialTitle("test editorial title");
+                editorialDto.setEditorialTextSolution("test editorial text solution");
+                editorialDto.setEditorialSkills(new ArrayList<>());
+                SolutionCodeDto solutionCodeDto = new SolutionCodeDto();
+                solutionCodeDto.setSolutionCode("test code");
+                solutionCodeDto.setSolutionLanguage("Java");
+                editorialDto.setSolutionCodes(List.of(solutionCodeDto));
+                problemEditorialDto.setEditorialDtos(editorialDto);
+
+                ProblemInputParameterDto problemInputParameterDto = new ProblemInputParameterDto();
+                problemInputParameterDto.setFunctionSignature("test function signature");
+                problemInputParameterDto.setLanguage("Java");
+                problemInputParameterDto.setReturnType(InputType.INT);
+                InputParameterDto inputParameterDto = new InputParameterDto();
+                inputParameterDto.setInputName("test");
+                inputParameterDto.setInputType(InputType.INT);
+                problemInputParameterDto.setParameters(List.of(inputParameterDto));
+                TemplateCode templateCode = new TemplateCode();
+                templateCode.setCode("test code");
+                templateCode.setLanguage("Java");
+                problemInputParameterDto.setTemplateCode(templateCode);
+                List<ProblemInputParameterDto> problemInputParameterDtoList = List.of(problemInputParameterDto);
+
+                TestCaseDto testCase = new TestCaseDto();
+                testCase.setInput(new HashMap());
+                testCase.setExpectedOutput("test output");
+                testCase.setIsSample(true);
+                List<TestCaseDto> testCaseList = List.of(testCase);
+                ProblemTestCaseDto problemTestCaseDto = new ProblemTestCaseDto();
+                problemTestCaseDto.setLanguage("Java");
+                problemTestCaseDto.setTestCases(testCaseList);
+                List<ProblemTestCaseDto> problemTestCaseDtoList = List.of(problemTestCaseDto);
+
+                MultipartFile excelFile = mock(MultipartFile.class);
+
+                when(problemRepository.findByLink(any())).thenReturn(Optional.of(problem)).thenReturn(Optional.empty());
+                when(languageService.findByName(any())).thenReturn(language);
+                when(languageService.getLanguagesByNameList(any())).thenReturn(Set.of(language));
+                when(problemRepository.isTitleExisted(anyString())).thenReturn(false);
+                when(excelService.readTestCaseExcel(any(), anyList(), anyString()))
+                                .thenReturn(problemTestCaseDtoList);
+                when(problemRequestMapper.mapTo(any())).thenReturn(new Problem());
+                when(userService.getCurrentUser()).thenReturn(new Users());
+                when(problemRepository.save(any())).thenReturn(new Problem());
+                String lambdaResult = "{\"isAccepted\":true,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
+                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+
+                problemService.editProblem(link, problemBasicAddDto, problemEditorialDto,
+                                problemInputParameterDtoList, excelFile);
+
+                verify(problemRepository, times(1)).save(any());
+        }
+
+        @Test
+        void testGetProblemSolutionDetail() {
+                Long solutionId = 1L;
+
+                Users currentUser = new Users();
+                currentUser.setId(1L);
+
+                ProblemSolution problemSolution = new ProblemSolution();
+                problemSolution.setId(solutionId);
+                problemSolution.setCreatedBy(currentUser);
+
+                ProblemResponseDto problem = new ProblemResponseDto();
+                problem.setId(1L);
+
+                when(userService.getCurrentUser()).thenReturn(currentUser);
+                when(problemSolutionService.findSolutionById(anyLong())).thenReturn(problemSolution);
+                when(solutionCodeService.findBySolution(any(ProblemSolution.class))).thenReturn(new ArrayList());
+                when(problemResponseMapper.mapFrom(any(Problem.class))).thenReturn(problem);
+
+                ProblemSolutionDto result = problemService.getProblemSolutionDetail(solutionId);
+                assertNotNull(result);
+        }
+
+        @Test
+        public void testTagFavouriteProblemSuccess() {
+                String link = "test";
+
+                Problem problem = new Problem();
+                problem.setId(1L);
+                problem.setTitle("test title");
+                problem.setLink(link);
+                problem.setUsersFavourite(new HashSet());
+
+                Users currentUser = new Users();
+                currentUser.setEmail("test");
+
+                when(problemRepository.findByLinkAndStatusAndIsActive(link, ProblemStatus.PUBLIC, true))
+                                .thenReturn(Optional.of(problem));
+                problemService.tagFavouriteProblem(link);
+                verify(problemRepository, times(1)).save(any());
+        }
+
+        @Test
+        public void testTagFavouriteProblemAlreadyFavourite() {
+                String link = "test";
+
+                Users currentUser = new Users();
+                currentUser.setEmail("test");
+
+                Problem problem = new Problem();
+                problem.setId(1L);
+                problem.setTitle("test title");
+                problem.setLink(link);
+                problem.setUsersFavourite(Set.of(currentUser));
+
+                when(userService.getCurrentUser()).thenReturn(currentUser);
+                when(problemRepository.findByLinkAndStatusAndIsActive(link, ProblemStatus.PUBLIC, true))
+                                .thenReturn(Optional.of(problem));
+                BadRequestException badRequestException = assertThrows(
+                                BadRequestException.class,
+                                () -> problemService.tagFavouriteProblem(link));
+                assertEquals("This problem has already in your favourite", badRequestException.getMessage());
+                assertEquals("This problem has already in your favourite", badRequestException.getDetails());
+        }
+
+        @Test
+        public void testUntagFavouriteProblemSuccess() {
+                String link = "test";
+
+                Users currentUser = new Users();
+                currentUser.setEmail("test");
+
+                Problem problem = new Problem();
+                problem.setId(1L);
+                problem.setTitle("test title");
+                problem.setLink(link);
+                problem.setUsersFavourite(new HashSet<>(Set.of(currentUser))); // Sử dụng HashSet để có thể sửa đổi
+
+                when(userService.getCurrentUser()).thenReturn(currentUser);
+                when(problemRepository.findByLinkAndStatusAndIsActive(link, ProblemStatus.PUBLIC, true))
+                                .thenReturn(Optional.of(problem));
+
+                problemService.untagFavouriteProblem(link);
 
                 verify(problemRepository, times(1)).save(any());
         }

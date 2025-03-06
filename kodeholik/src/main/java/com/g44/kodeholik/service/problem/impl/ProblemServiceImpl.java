@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -88,7 +88,6 @@ import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
-import com.g44.kodeholik.service.CompileService;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
 import com.g44.kodeholik.service.excel.ExcelService;
 import com.g44.kodeholik.service.problem.ProblemInputParameterService;
@@ -516,6 +515,10 @@ public class ProblemServiceImpl implements ProblemService {
             problemTestCaseDtos.addAll(excelService.readTestCaseExcel(excelFile, inputNames,
                     language.getName()));
         }
+        if (problemTestCaseDtos.isEmpty()) {
+            throw new BadRequestException("Excel file doesn't contain any test case",
+                    "Excel file doesn't contain any test case");
+        }
         if (!checkTestCase(problemEditorialDto, problemTestCaseDtos,
                 problemInputParameterDto)) {
             throw new TestCaseNotPassedException("Your solution code doesn't pass all test case. Please check again",
@@ -530,6 +533,11 @@ public class ProblemServiceImpl implements ProblemService {
 
     private Problem addProblemBasic(ProblemBasicAddDto problemBasicAddDto, Set<Language> languages) {
         Users currentUsers = userService.getCurrentUser();
+        String link = getLinkForTitle(problemBasicAddDto.getTitle());
+        if (problemRepository.findByLink(link).isPresent()) {
+            throw new BadRequestException("Title is not valid because the link is duplicated",
+                    "Title is not valid because the link is duplicated");
+        }
 
         Problem problem = new Problem();
         problem.setTitle(problemBasicAddDto.getTitle());
@@ -540,7 +548,7 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setCreatedAt(Timestamp.from(Instant.now()));
         problem.setCreatedBy(currentUsers);
         problem.setStatus(problemBasicAddDto.getStatus());
-        problem.setLink(getLinkForTitle(problemBasicAddDto.getTitle()));
+        problem.setLink(link);
         problem.setActive(problemBasicAddDto.getIsActive().booleanValue());
         problem.setLanguageSupport(languages);
         Set<Topic> topics = tagService.getTopicsByNameList(problemBasicAddDto.getTopics());
@@ -554,6 +562,11 @@ public class ProblemServiceImpl implements ProblemService {
 
     private Problem editProblemBasic(ProblemBasicAddDto problemBasicAddDto, Problem problem, Set<Language> languages) {
         Users currentUsers = userService.getCurrentUser();
+        String link = getLinkForTitle(problemBasicAddDto.getTitle());
+        if (problemRepository.findByLink(link).isPresent()) {
+            throw new BadRequestException("Title is not valid because the link is duplicated",
+                    "Title is not valid because the link is duplicated");
+        }
 
         problem.setLanguageSupport(languages);
         problem.setTitle(problemBasicAddDto.getTitle());
@@ -562,7 +575,7 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setAcceptanceRate(0);
         problem.setNoSubmission(0);
         problem.setUpdatedAt(Timestamp.from(Instant.now()));
-        problem.setLink(getLinkForTitle(problemBasicAddDto.getTitle()));
+        problem.setLink(link);
         problem.setUpdatedBy(currentUsers);
         problem.setStatus(problemBasicAddDto.getStatus());
         problem.setActive(problemBasicAddDto.getIsActive().booleanValue());
@@ -1043,6 +1056,10 @@ public class ProblemServiceImpl implements ProblemService {
             problemTestCaseDtos.addAll(excelService.readTestCaseExcel(excelFile, inputNames,
                     language.getName()));
         }
+        if (problemTestCaseDtos.isEmpty()) {
+            throw new BadRequestException("Excel file doesn't contain any test case",
+                    "Excel file doesn't contain any test case");
+        }
         if (!checkTestCase(problemEditorialDto, problemTestCaseDtos, problemInputParameterDto)) {
             throw new TestCaseNotPassedException("Your solution code doesn't pass all test case. Please check again",
                     submissionResponseDto);
@@ -1268,20 +1285,23 @@ public class ProblemServiceImpl implements ProblemService {
         Problem problem = getActivePublicProblemByLink(link);
         Set<Users> userFavourite = problem.getUsersFavourite();
         Users currentUser = userService.getCurrentUser();
+
         boolean isInFavourite = false;
-        for (Users user : userFavourite) {
+        Iterator<Users> iterator = userFavourite.iterator();
+        while (iterator.hasNext()) {
+            Users user = iterator.next();
             if (user.getEmail().equals(currentUser.getEmail())) {
-                userFavourite.remove(currentUser);
+                iterator.remove(); // Xóa an toàn trong vòng lặp
                 problemRepository.save(problem);
                 isInFavourite = true;
                 break;
             }
         }
+
         if (!isInFavourite) {
             throw new BadRequestException("This problem is not in your favourite",
                     "This problem is not in your favourite");
         }
-
     }
 
     @Override

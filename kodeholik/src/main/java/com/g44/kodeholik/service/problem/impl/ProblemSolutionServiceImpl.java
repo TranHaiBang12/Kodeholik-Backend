@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -171,22 +172,27 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     public void unupvoteSolution(Long solutionId, Users user) {
         ProblemSolution problemSolution = findSolutionById(solutionId);
         Set<Users> usersVote = problemSolution.getUserVote();
+
         boolean isVote = false;
-        for (Users userVote : usersVote) {
+        Iterator<Users> iterator = usersVote.iterator();
+        while (iterator.hasNext()) {
+            Users userVote = iterator.next();
             if (userVote.getEmail().equals(user.getEmail())) {
                 isVote = true;
-                usersVote.remove(user);
+                iterator.remove(); // Xóa phần tử một cách an toàn
                 if (problemSolution.getNoUpvote() > 0) {
                     problemSolution.setNoUpvote(problemSolution.getNoUpvote() - 1);
                 }
-                problemSolutionRepository.save(problemSolution);
+                break; // Không cần tiếp tục vòng lặp
             }
         }
+
         if (!isVote) {
             throw new BadRequestException("You haven't voted this solution",
                     "You haven't voted this solution");
         }
 
+        problemSolutionRepository.save(problemSolution); // Chỉ lưu một lần sau khi xử lý
     }
 
     @Override

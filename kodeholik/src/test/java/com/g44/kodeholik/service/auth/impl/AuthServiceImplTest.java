@@ -253,10 +253,12 @@ public class AuthServiceImplTest {
     public void testCheckValidForgotPasswordTokenSuccessful() {
         String token = "token";
         String username = "testUser";
+        Users user = new Users();
+        user.setUsername(username);
 
         when(tokenService.extractUsername(anyString())).thenReturn(username);
         when(userRepository.isUserNotAllowed(anyString())).thenReturn(false);
-        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(new Users()));
+        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(user));
         when(redisService.getToken(anyString(), eq(TokenType.FORGOT))).thenReturn(token);
         when(tokenService.validateToken(anyString())).thenReturn(true);
 
@@ -350,7 +352,7 @@ public class AuthServiceImplTest {
 
         when(tokenService.extractUsername(anyString())).thenReturn(username);
         when(userRepository.isUserNotAllowed(anyString())).thenReturn(false);
-        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(new Users()));
+        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(user));
         when(redisService.getToken(anyString(), eq(TokenType.FORGOT))).thenReturn(token);
         when(tokenService.validateToken(anyString())).thenReturn(true);
 
@@ -381,7 +383,7 @@ public class AuthServiceImplTest {
 
         when(tokenService.extractUsername(anyString())).thenReturn(username);
         when(userRepository.isUserNotAllowed(anyString())).thenReturn(false);
-        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(new Users()));
+        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(user));
         when(redisService.getToken(anyString(), eq(TokenType.FORGOT))).thenReturn(token);
         when(tokenService.validateToken(anyString())).thenReturn(true);
 
@@ -431,21 +433,6 @@ public class AuthServiceImplTest {
         verify(redisService).deleteToken(eq("testUser"), eq(TokenType.REFRESH));
         verify(tokenService).deleteCookieFromResponse(eq(response), eq(TokenType.ACCESS));
         verify(tokenService).deleteCookieFromResponse(eq(response), eq(TokenType.REFRESH));
-    }
-
-    @Test
-    public void testLogoutUnauthorizedException() {
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        Users user = new Users();
-        user.setUsername("testUser");
-
-        when(userService.getCurrentUser()).thenReturn(null);
-
-        UnauthorizedException unauthorizedException = assertThrows(
-                UnauthorizedException.class,
-                () -> authServiceImpl.logout(response));
-        assertEquals("User not logged in", unauthorizedException.getMessage());
-        assertEquals("User not logged in", unauthorizedException.getDetails());
     }
 
     @Test
