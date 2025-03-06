@@ -1,5 +1,6 @@
 package com.g44.kodeholik.controller.course;
 
+import jakarta.validation.Valid;
 import org.apache.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,13 +40,13 @@ public class ChapterController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addChapter(@RequestBody ChapterRequestDto chapterRequestDto) {
+    public ResponseEntity<?> addChapter(@RequestBody @Valid ChapterRequestDto chapterRequestDto) {
         chapterService.addChapter(chapterRequestDto);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateChapter(@PathVariable Long id, @RequestBody ChapterRequestDto chapterRequestDto) {
+    public ResponseEntity<?> updateChapter(@PathVariable Long id, @RequestBody @Valid ChapterRequestDto chapterRequestDto) {
         chapterService.editChapter(id, chapterRequestDto);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }

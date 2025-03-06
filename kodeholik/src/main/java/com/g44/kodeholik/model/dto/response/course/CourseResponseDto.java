@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -16,7 +18,7 @@ public class CourseResponseDto {
 
     private String title;
 
-    private String description;
+//    private String description;
 
     private String image;
 
@@ -26,5 +28,6 @@ public class CourseResponseDto {
 
     private Integer numberOfParticipant;
 
-//    private List<TopicDto> topics;
+//    private List<ChapterResponseDto> chapters;
+    private List<String> topics;
 }

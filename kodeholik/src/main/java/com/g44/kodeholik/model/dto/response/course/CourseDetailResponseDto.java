@@ -1,8 +1,7 @@
 package com.g44.kodeholik.model.dto.response.course;
 
-import com.g44.kodeholik.model.entity.course.Lesson;
 import com.g44.kodeholik.model.enums.course.ChapterStatus;
-
+import com.g44.kodeholik.model.enums.course.CourseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,18 +13,20 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-public class ChapterResponseDto {
+public class CourseDetailResponseDto {
     private Long id;
-
-    private Long courseId;
 
     private String title;
 
     private String description;
 
-    private int displayOrder;
+    private String image;
 
-    private ChapterStatus status;
+    private CourseStatus status;
 
-    private List<LessonResponseDto> lessons;
+    private Double rate;
+
+    private Integer numberOfParticipant;
+
+    private List<ChapterResponseDto> chapters;
 }
