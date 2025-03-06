@@ -1,6 +1,7 @@
 package com.g44.kodeholik.interceptor;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -8,6 +9,7 @@ import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import com.g44.kodeholik.config.WebsocketSessionManager;
 import com.g44.kodeholik.service.token.TokenService;
 
 import lombok.extern.log4j.Log4j2;
@@ -17,8 +19,11 @@ public class JwtNotiHandShakeInterceptor implements HandshakeInterceptor {
 
     private TokenService tokenService;
 
-    public JwtNotiHandShakeInterceptor(TokenService tokenService) {
+    private WebsocketSessionManager websocketSessionManager;
+
+    public JwtNotiHandShakeInterceptor(TokenService tokenService, WebsocketSessionManager websocketSessionManager) {
         this.tokenService = tokenService;
+        this.websocketSessionManager = websocketSessionManager;
     }
 
     @Override
@@ -37,7 +42,9 @@ public class JwtNotiHandShakeInterceptor implements HandshakeInterceptor {
                 return false;
             }
             attributes.put("token", token);
-
+            String username = tokenService.extractUsername(token);
+            String sessionId = UUID.randomUUID().toString();
+            websocketSessionManager.registerSession(username, sessionId, "NOTI");
         }
         return true;
     }

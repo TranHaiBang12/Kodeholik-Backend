@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
+import com.g44.kodeholik.model.dto.request.problem.FilterProblemRequestAdminDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
@@ -21,6 +22,7 @@ import com.g44.kodeholik.model.dto.request.problem.add.ShareSolutionRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ListProblemAdminDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemBasicResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
@@ -165,4 +167,7 @@ public interface ProblemService {
         public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto);
 
         public RunProblemResponseDto runExam(String link, ProblemCompileRequestDto problemCompileRequestDto);
+
+        public Page<ListProblemAdminDto> getListProblemForAdmin(
+                        FilterProblemRequestAdminDto filterProblemRequestAdminDto);
 }

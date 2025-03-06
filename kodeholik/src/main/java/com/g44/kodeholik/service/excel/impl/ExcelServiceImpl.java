@@ -20,6 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
@@ -31,13 +32,17 @@ import com.g44.kodeholik.service.excel.ExcelService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Service
+@RequiredArgsConstructor
 public class ExcelServiceImpl implements ExcelService {
 
     private Gson gson = new Gson();
+
+    private final ObjectMapper objectMapper;
 
     @Override
     public Sheet readExcelSheet(MultipartFile file, String languageName) {
@@ -134,22 +139,24 @@ public class ExcelServiceImpl implements ExcelService {
     @Override
     public byte[] generateExcelFile(List<ProblemTestCase> problemTestCases, Problem problem) {
         try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             Set<Language> languages = problem.getLanguageSupport();
-            Workbook workbook = null;
+            Workbook workbook = new XSSFWorkbook();
             for (Language language : languages) {
-                workbook = new XSSFWorkbook();
                 Sheet sheet = workbook.createSheet(language.getName() + "TestCase");
                 List<String> columnHeaders = new ArrayList();
                 List<List<InputVariable>> inputVariablesList = new ArrayList();
+                boolean isGetInputName = false;
                 for (int i = 0; i < problemTestCases.size(); i++) {
                     if (problemTestCases.get(i).getLanguage().getName().equals(language.getName())) {
-                        List<InputVariable> inputVariables = gson.fromJson(problemTestCases.get(i).getInput(),
-                                new TypeToken<List<InputVariable>>() {
-                                }.getType());
-                        if (i == 0) {
+                        List<InputVariable> inputVariables = objectMapper.readValue(problemTestCases.get(i).getInput(),
+                                new com.fasterxml.jackson.core.type.TypeReference<List<InputVariable>>() {
+                                });
+                        if (!isGetInputName) {
                             for (int k = 0; k < inputVariables.size(); k++) {
                                 columnHeaders.add(inputVariables.get(k).getName());
                             }
+                            isGetInputName = true;
                         }
                         inputVariablesList.add(inputVariables);
                     }
@@ -167,28 +174,29 @@ public class ExcelServiceImpl implements ExcelService {
 
                 // Ghi dữ liệu từ danh sách vào file Excel
                 int rowNum = 1;
+                int m = 0;
                 for (int i = 0; i < problemTestCases.size(); i++) {
-                    ProblemTestCase data = problemTestCases.get(i);
-                    Row row = sheet.createRow(rowNum++);
-                    int k = 0;
-                    while (k < inputVariablesList.get(i).size()) {
-                        String value = inputVariablesList.get(i).get(k).getValue().toString().replaceAll("\"", "");
-                        row.createCell(k).setCellValue(value);
-                        k++;
+                    if (problemTestCases.get(i).getLanguage().getName().equals(language.getName())) {
+                        ProblemTestCase data = problemTestCases.get(i);
+                        Row row = sheet.createRow(rowNum++);
+                        int k = 0;
+                        while (k < inputVariablesList.get(m).size()) {
+                            Object value = inputVariablesList.get(m).get(k).getValue();
+                            log.info(value);
+                            row.createCell(k).setCellValue(value.toString());
+                            k++;
+                        }
+                        m++;
+                        row.createCell(k++).setCellValue(data.getExpectedOutput().toString().replaceAll("\"", ""));
+                        row.createCell(k++).setCellValue(data.isSample());
                     }
-                    row.createCell(k++).setCellValue(data.getExpectedOutput().toString().replaceAll("\"", ""));
-                    row.createCell(k++).setCellValue(data.isSample());
                 }
             }
-
-            // Chuyển workbook thành mảng byte để trả về
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
+
             workbook.close();
             return outputStream.toByteArray();
-        } catch (
-
-        IOException e) {
+        } catch (IOException e) {
             return null;
         }
     }

@@ -19,15 +19,14 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.g44.kodeholik.model.dto.request.problem.FilterProblemRequestAdminDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
-import com.g44.kodeholik.model.dto.request.problem.add.ProblemAddRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
+import com.g44.kodeholik.model.dto.response.problem.ListProblemAdminDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemBasicResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
@@ -218,4 +217,15 @@ public class ProblemController {
         }
         return ResponseEntity.ok(problemResponsePage);
     }
+
+    @PostMapping("/list-problem")
+    public ResponseEntity<Page<ListProblemAdminDto>> getListProblem(
+            @RequestBody FilterProblemRequestAdminDto filterProblemRequestAdminDto) {
+        Page<ListProblemAdminDto> pageProblem = problemService.getListProblemForAdmin(filterProblemRequestAdminDto);
+        if (pageProblem.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(pageProblem);
+    }
+
 }

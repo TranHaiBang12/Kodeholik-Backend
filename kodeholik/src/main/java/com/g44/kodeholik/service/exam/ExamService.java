@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 
 import com.g44.kodeholik.model.dto.request.exam.AddExamRequestDto;
+import com.g44.kodeholik.model.dto.request.exam.EditExamBasicRequestDto;
+import com.g44.kodeholik.model.dto.request.exam.EditExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
@@ -24,6 +26,10 @@ public interface ExamService {
 
         public ExamResponseDto editExam(AddExamRequestDto addExamRequestDto, String code);
 
+        public ExamResponseDto editExamBasic(EditExamBasicRequestDto editExamBasicRequestDto, String code);
+
+        public ExamResponseDto editExamProblem(EditExamProblemRequestDto editExamProblemRequestDto, String code);
+
         public void deleteExam(String code);
 
         public Page<ExamListResponseDto> getListOfExam(FilterExamRequestDto filterExamRequestDto);
@@ -32,11 +38,13 @@ public interface ExamService {
 
         public void enrollExam(String code);
 
+        public void unenrollExam(String code);
+
         public List<String> getCodeFromExamReadyToStarted();
 
         public List<ExamProblemDetailResponseDto> getProblemDetailInExam(String code);
 
-        public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto, String code,
+        public double submitExam(List<SubmitExamRequestDto> submitExamRequestDto, String code,
                         String username);
 
         public Object generateTokenForExam(String code);

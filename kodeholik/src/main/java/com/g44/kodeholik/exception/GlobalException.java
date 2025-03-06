@@ -123,7 +123,7 @@ public class GlobalException {
         @ResponseStatus(HttpStatus.BAD_REQUEST)
         @ResponseBody
         public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
-                return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getDetails()),
                                 HttpStatus.BAD_REQUEST);
         }
 

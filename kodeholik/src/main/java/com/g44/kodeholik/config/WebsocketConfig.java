@@ -47,7 +47,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();
         registry.addEndpoint("/ws/notification") // API WebSocket cho client kết nối
 
-                .addInterceptors(new JwtNotiHandShakeInterceptor(tokenService))
+                .addInterceptors(new JwtNotiHandShakeInterceptor(tokenService, websocketSessionManager))
                 .setAllowedOrigins("*")
 
                 .withSockJS();
@@ -55,7 +55,8 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic/exam", "/error", "/notification"); // Kênh gửi message đến client
+        registry.enableSimpleBroker("/topic/exam", "/error", "/notification", "/topic/disconnect"); // Kênh gửi message
+                                                                                                    // đến client
         registry.setApplicationDestinationPrefixes("/app"); // Prefix cho request từ client
     }
 

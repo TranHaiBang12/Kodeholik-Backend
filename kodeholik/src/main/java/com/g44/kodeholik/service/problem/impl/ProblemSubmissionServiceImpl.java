@@ -170,13 +170,14 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     }
 
     private String getReturn(ProblemTemplate problemTemplate, String language) {
-        if (language.equals("Java")) {
-            String[] words = problemTemplate.getTemplateCode().trim().split(" ");
-            return words[2];
-        } else {
-            String[] words = problemTemplate.getTemplateCode().trim().split(" ");
-            return words[0];
+        String[] words = problemTemplate.getTemplateCode().trim().split(" ");
+        for (int i = 0; i < words.length; i++) {
+            log.info(words[i]);
+            if (words[i].contains(problemTemplate.getFunctionSignature())) {
+                return words[i - 1];
+            }
         }
+        return "";
     }
 
     @Override

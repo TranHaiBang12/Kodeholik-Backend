@@ -71,4 +71,3 @@ public class Lesson {
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
     private Users updatedBy;
 }
-

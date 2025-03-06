@@ -30,4 +30,5 @@ public interface ExamParticipantRepository extends JpaRepository<ExamParticipant
     @Query("SELECT e FROM ExamParticipant e WHERE e.exam.status = :status AND e.participant = :user")
     public Page<ExamParticipant> findByStatus(ExamStatus status, Users user, Pageable pageable);
 
+    public List<ExamParticipant> findByParticipant(Users participant);
 }

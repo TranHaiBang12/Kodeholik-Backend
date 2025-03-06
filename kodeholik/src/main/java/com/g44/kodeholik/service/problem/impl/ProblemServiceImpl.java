@@ -31,6 +31,7 @@ import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
 import com.g44.kodeholik.model.dto.request.lambda.ResponseResult;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
+import com.g44.kodeholik.model.dto.request.problem.FilterProblemRequestAdminDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.EditorialDto;
@@ -48,6 +49,7 @@ import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDt
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ProblemResultOverviewResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.EditorialResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ListProblemAdminDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemBasicResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
@@ -101,6 +103,7 @@ import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.setting.TagService;
 import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.request.problem.ProblemRequestMapper;
+import com.g44.kodeholik.util.mapper.response.problem.ListProblemAdminResponseMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemBasicResponseMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemDescriptionMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemResponseMapper;
@@ -172,6 +175,10 @@ public class ProblemServiceImpl implements ProblemService {
     private Gson gson = new Gson();
 
     private SubmissionResponseDto submissionResponseDto;
+
+    private final ListProblemAdminResponseMapper listProblemAdminResponseMapper;
+
+    private Map<String, String> templateLanguage = new HashMap<>();
 
     @Async("s3TaskExecutor")
     @Override
@@ -563,9 +570,11 @@ public class ProblemServiceImpl implements ProblemService {
     private Problem editProblemBasic(ProblemBasicAddDto problemBasicAddDto, Problem problem, Set<Language> languages) {
         Users currentUsers = userService.getCurrentUser();
         String link = getLinkForTitle(problemBasicAddDto.getTitle());
-        if (problemRepository.findByLink(link).isPresent()) {
-            throw new BadRequestException("Title is not valid because the link is duplicated",
-                    "Title is not valid because the link is duplicated");
+        if (!problem.getLink().equals(link)) {
+            if (problemRepository.findByLink(link).isPresent()) {
+                throw new BadRequestException("Title is not valid because the link is duplicated",
+                        "Title is not valid because the link is duplicated");
+            }
         }
 
         problem.setLanguageSupport(languages);
@@ -637,6 +646,8 @@ public class ProblemServiceImpl implements ProblemService {
                 throw new BadRequestException("Your problem doesn't support this language",
                         "Your problem doesn't support this language");
             }
+            templateLanguage.put(problemInputParameterDto.get(j).getLanguage(),
+                    problemInputParameterDto.get(j).getTemplateCode().getCode());
             List<InputParameterDto> inputParameters = problemInputParameterDto.get(j).getParameters();
             addProblemTemplate(problemInputParameterDto.get(j), problemInputParameterDto.get(j).getTemplateCode(),
                     problem, languageSupports);
@@ -691,7 +702,12 @@ public class ProblemServiceImpl implements ProblemService {
                 throw new BadRequestException("Your problem doesn't support this language",
                         "Your problem doesn't support this language");
             }
-            solutionCode.setCode(solutionCodeDtos.get(i).getSolutionCode());
+            if (templateLanguage.get(solutionCodeDtos.get(i).getSolutionLanguage()) != null) {
+                solutionCode.setCode(templateLanguage.get(solutionCodeDtos.get(i).getSolutionLanguage()) + "\n"
+                        + solutionCodeDtos.get(i).getSolutionCode());
+            } else {
+                solutionCode.setCode(solutionCodeDtos.get(i).getSolutionCode());
+            }
             Language language = languageService.findByName(solutionCodeDtos.get(i).getSolutionLanguage());
             solutionCode.setLanguage(language);
             solutionCode.setProblem(problemSolution.getProblem());
@@ -1189,14 +1205,16 @@ public class ProblemServiceImpl implements ProblemService {
 
         for (int i = 0; i < problemInputParameters.size(); i++) {
             InputParameterDto inputParameterDto = new InputParameterDto();
-            List<InputVariable> inputVariables = gson.fromJson(problemInputParameters.get(i).getParameters(),
-                    new TypeToken<List<InputVariable>>() {
-                    }.getType());
-            for (int j = 0; j < inputVariables.size(); j++) {
-                inputParameterDto.setInputName(inputVariables.get(j).getName());
-                inputParameterDto.setInputType(InputType.valueOf(inputVariables.get(j).getType()));
-                inputParameterDtoList.add(inputParameterDto);
+            InputVariable inputVariables = gson.fromJson(problemInputParameters.get(i).getParameters(),
+                    InputVariable.class);
+            inputParameterDto.setInputName(inputVariables.getName());
+            try {
+                inputParameterDto.setInputType(InputType.valueOf(inputVariables.getType()));
+            } catch (IllegalArgumentException e) {
+                inputParameterDto.setOtherInputType(inputVariables.getType());
             }
+
+            inputParameterDtoList.add(inputParameterDto);
 
         }
 
@@ -1474,6 +1492,28 @@ public class ProblemServiceImpl implements ProblemService {
         return problemSubmissionService.run(problem, problemCompileRequestDto,
                 problemTestCaseService.getSampleTestCaseByProblemAndLanguage(problem, language),
                 findByAllProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()));
+    }
+
+    @Override
+    public Page<ListProblemAdminDto> getListProblemForAdmin(FilterProblemRequestAdminDto filterProblemRequestAdminDto) {
+        int page = filterProblemRequestAdminDto.getPage();
+        Integer size = filterProblemRequestAdminDto.getSize();
+        String sortBy = filterProblemRequestAdminDto.getSortBy();
+        Boolean ascending = filterProblemRequestAdminDto.getAscending();
+        Sort sort;
+        if (sortBy != null && (sortBy.equals("acceptanceRate") || sortBy.equals("noSubmission"))) {
+            sort = ascending != null && ascending.booleanValue() ? Sort.by(sortBy).ascending()
+                    : Sort.by(sortBy).descending();
+        } else {
+            sort = Sort.by("createdAt").descending();
+        }
+        Pageable pageable = PageRequest.of(page, size == null ? 5 : size.intValue(), sort);
+        log.info(filterProblemRequestAdminDto);
+        Page<Problem> problems = problemRepository.findByTitleContainsAndDifficultyAndStatusAndIsActive(
+                filterProblemRequestAdminDto.getTitle(), filterProblemRequestAdminDto.getDifficulty(),
+                filterProblemRequestAdminDto.getStatus(), filterProblemRequestAdminDto.getIsActive(), pageable);
+        log.info(problems);
+        return problems.map(listProblemAdminResponseMapper::mapFrom);
     }
 
 }

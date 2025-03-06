@@ -2,6 +2,8 @@ package com.g44.kodeholik.service.exam.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -11,63 +13,48 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
+
 import com.g44.kodeholik.exception.BadRequestException;
-import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.exam.AddExamRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
-import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
-import com.g44.kodeholik.model.dto.request.lambda.TestCase;
-import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
-import com.g44.kodeholik.model.dto.response.exam.examiner.ExamProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
-import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationResponseDto;
-import com.g44.kodeholik.model.dto.response.exam.student.ExamListStudentResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
-import com.g44.kodeholik.model.dto.response.exam.student.NotStartedExamListDto;
-import com.g44.kodeholik.model.dto.response.exam.student.ProblemResultOverviewResponseDto;
-import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.entity.exam.Exam;
 import com.g44.kodeholik.model.entity.exam.ExamParticipant;
-import com.g44.kodeholik.model.entity.exam.ExamParticipantId;
-import com.g44.kodeholik.model.entity.exam.ExamProblem;
-import com.g44.kodeholik.model.entity.exam.ExamProblemId;
 import com.g44.kodeholik.model.entity.exam.ExamSubmission;
-import com.g44.kodeholik.model.entity.exam.ExamSubmissionId;
 import com.g44.kodeholik.model.entity.problem.Problem;
-import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
-import com.g44.kodeholik.model.enums.user.NotificationType;
 import com.g44.kodeholik.model.enums.user.UserRole;
+import com.g44.kodeholik.repository.*;
 import com.g44.kodeholik.repository.exam.ExamParticipantRepository;
 import com.g44.kodeholik.repository.exam.ExamProblemRepository;
 import com.g44.kodeholik.repository.exam.ExamRepository;
 import com.g44.kodeholik.repository.exam.ExamSubmissionRepository;
+import com.g44.kodeholik.service.*;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.email.EmailService;
-import com.g44.kodeholik.service.exam.ExamService;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 import com.g44.kodeholik.service.problem.ProblemTestCaseService;
 import com.g44.kodeholik.service.publisher.Publisher;
 import com.g44.kodeholik.service.redis.RedisService;
-import com.g44.kodeholik.service.scheduler.ExamSchedulerService;
 import com.g44.kodeholik.service.scheduler.ExamStartEvent;
 import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.token.TokenService;
 import com.g44.kodeholik.service.user.NotificationService;
 import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
+import com.g44.kodeholik.util.mapper.request.exam.EditExamBasicRequestMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamListResponseMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamListStudentResponseMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamResponseMapper;
 import com.g44.kodeholik.util.mapper.response.exam.NotStartedExamListMapper;
-import com.g44.kodeholik.util.uuid.UUIDGenerator;
 
 class ExamServiceImplTest {
 
@@ -137,61 +124,260 @@ class ExamServiceImplTest {
     @Mock
     private NotStartedExamListMapper notStartedExamListMapper;
 
+    @Mock
+    private EditExamBasicRequestMapper editExamBasicRequestMapper;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testCreateExam() {
+    void testCreateExamSuccess() {
+
+        Language language = new Language();
+        language.setName("Java");
+
+        Problem problem = new Problem();
+        problem.setLanguageSupport(Set.of(language));
+
+        ExamProblemRequestDto examProblemRequestDto = new ExamProblemRequestDto();
+
+        List<ExamProblemRequestDto> examProblemRequestDtos = List.of(examProblemRequestDto);
+
         AddExamRequestDto addExamRequestDto = new AddExamRequestDto();
-        addExamRequestDto.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600)));
-        addExamRequestDto.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200)));
-        addExamRequestDto.setLanguageSupports(Arrays.asList("Java", "Python"));
-        addExamRequestDto.setProblemRequests(new ArrayList<>());
+        addExamRequestDto.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        addExamRequestDto.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        addExamRequestDto.setLanguageSupports(Collections.singletonList("Java"));
+        addExamRequestDto.setProblemRequests(examProblemRequestDtos);
 
         Exam exam = new Exam();
-        when(addExamRequestMapper.mapTo(addExamRequestDto)).thenReturn(exam);
-        when(languageService.getLanguagesByNameList(any())).thenReturn(new HashSet<>());
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        exam.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        exam.setTitle("test");
+        exam.setDescription("test");
+
+        when(addExamRequestMapper.mapTo(any(AddExamRequestDto.class))).thenReturn(exam);
+        when(languageService.getLanguagesByNameList(anyList())).thenReturn(new HashSet<>());
         when(userService.getCurrentUser()).thenReturn(new Users());
-        when(examRepository.save(any())).thenReturn(exam);
-        when(examRepository.findAll()).thenReturn(new ArrayList<>());
-        when(examResponseMapper.mapFrom(any())).thenReturn(new ExamResponseDto());
+        when(problemService.getProblemByExamProblemRequest(any())).thenReturn(problem);
+        when(examRepository.save(any(Exam.class))).thenReturn(exam);
+        when(examRepository.findAll()).thenReturn(Collections.emptyList());
+        when(examResponseMapper.mapFrom(any(Exam.class))).thenReturn(new ExamResponseDto());
+        when(examRepository.findByCode(any())).thenReturn(Optional.of(exam));
 
         ExamResponseDto response = examService.createExam(addExamRequestDto);
 
         assertNotNull(response);
-        verify(examRepository, times(1)).save(any());
-        verify(eventPublisher, times(1)).publishEvent(any());
+        verify(examRepository, times(1)).save(any(Exam.class));
+        verify(eventPublisher, times(1)).publishEvent(any(ExamStartEvent.class));
     }
 
     @Test
-    void testEditExam() {
+    void testCreateExamStartTimeInPast() {
+
+        Language language = new Language();
+        language.setName("Java");
+
+        Problem problem = new Problem();
+        problem.setLanguageSupport(Set.of(language));
+
+        ExamProblemRequestDto examProblemRequestDto = new ExamProblemRequestDto();
+
+        List<ExamProblemRequestDto> examProblemRequestDtos = List.of(examProblemRequestDto);
+
         AddExamRequestDto addExamRequestDto = new AddExamRequestDto();
         addExamRequestDto.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600)));
         addExamRequestDto.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200)));
-        addExamRequestDto.setLanguageSupports(Arrays.asList("Java", "Python"));
-        addExamRequestDto.setProblemRequests(new ArrayList<>());
+        addExamRequestDto.setLanguageSupports(Collections.singletonList("Java"));
+        addExamRequestDto.setProblemRequests(examProblemRequestDtos);
+
+        Exam exam = new Exam();
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        exam.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        exam.setTitle("test");
+        exam.setDescription("test");
+
+        when(addExamRequestMapper.mapTo(any(AddExamRequestDto.class))).thenReturn(exam);
+        when(languageService.getLanguagesByNameList(anyList())).thenReturn(new HashSet<>());
+        when(userService.getCurrentUser()).thenReturn(new Users());
+        when(problemService.getProblemByExamProblemRequest(any())).thenReturn(problem);
+        when(examRepository.save(any(Exam.class))).thenReturn(exam);
+        when(examRepository.findAll()).thenReturn(Collections.emptyList());
+        when(examResponseMapper.mapFrom(any(Exam.class))).thenReturn(new ExamResponseDto());
+        when(examRepository.findByCode(any())).thenReturn(Optional.of(exam));
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> examService.createExam(addExamRequestDto));
+        assertEquals("Start date cannot be in the past", badRequestException.getMessage());
+        assertEquals("Start date cannot be in the past", badRequestException.getDetails());
+    }
+
+    @Test
+    void testCreateExamEndTimeAfterStartTime() {
+
+        Language language = new Language();
+        language.setName("Java");
+
+        Problem problem = new Problem();
+        problem.setLanguageSupport(Set.of(language));
+
+        ExamProblemRequestDto examProblemRequestDto = new ExamProblemRequestDto();
+
+        List<ExamProblemRequestDto> examProblemRequestDtos = List.of(examProblemRequestDto);
+
+        AddExamRequestDto addExamRequestDto = new AddExamRequestDto();
+        addExamRequestDto.setStartTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        addExamRequestDto.setEndTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        addExamRequestDto.setLanguageSupports(Collections.singletonList("Java"));
+        addExamRequestDto.setProblemRequests(examProblemRequestDtos);
+
+        Exam exam = new Exam();
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        exam.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        exam.setTitle("test");
+        exam.setDescription("test");
+
+        when(addExamRequestMapper.mapTo(any(AddExamRequestDto.class))).thenReturn(exam);
+        when(languageService.getLanguagesByNameList(anyList())).thenReturn(new HashSet<>());
+        when(userService.getCurrentUser()).thenReturn(new Users());
+        when(problemService.getProblemByExamProblemRequest(any())).thenReturn(problem);
+        when(examRepository.save(any(Exam.class))).thenReturn(exam);
+        when(examRepository.findAll()).thenReturn(Collections.emptyList());
+        when(examResponseMapper.mapFrom(any(Exam.class))).thenReturn(new ExamResponseDto());
+        when(examRepository.findByCode(any())).thenReturn(Optional.of(exam));
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> examService.createExam(addExamRequestDto));
+        assertEquals("Start date cannot be after end date", badRequestException.getMessage());
+        assertEquals("Start date cannot be after end date", badRequestException.getDetails());
+    }
+
+    @Test
+    void testCreateExamLanguageNotMatch() {
+
+        Language language = new Language();
+        language.setName("C");
+
+        Problem problem = new Problem();
+        problem.setLanguageSupport(new HashSet());
+
+        ExamProblemRequestDto examProblemRequestDto = new ExamProblemRequestDto();
+
+        List<ExamProblemRequestDto> examProblemRequestDtos = List.of(examProblemRequestDto);
+
+        AddExamRequestDto addExamRequestDto = new AddExamRequestDto();
+        addExamRequestDto.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        addExamRequestDto.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        addExamRequestDto.setLanguageSupports(Collections.singletonList("Java"));
+        addExamRequestDto.setProblemRequests(examProblemRequestDtos);
+
+        Exam exam = new Exam();
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        exam.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        exam.setTitle("test");
+        exam.setDescription("test");
+
+        when(addExamRequestMapper.mapTo(any(AddExamRequestDto.class))).thenReturn(exam);
+        when(languageService.getLanguagesByNameList(anyList())).thenReturn(Set.of(language));
+        when(userService.getCurrentUser()).thenReturn(new Users());
+        when(problemService.getProblemByExamProblemRequest(any())).thenReturn(problem);
+        when(examRepository.save(any(Exam.class))).thenReturn(exam);
+        when(examRepository.findAll()).thenReturn(Collections.emptyList());
+        when(examResponseMapper.mapFrom(any(Exam.class))).thenReturn(new ExamResponseDto());
+        when(examRepository.findByCode(any())).thenReturn(Optional.of(exam));
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> examService.createExam(addExamRequestDto));
+        assertEquals("Language support of your exam does not match with your problem",
+                badRequestException.getMessage());
+        assertEquals("Language support of your exam does not match with your problem",
+                badRequestException.getDetails());
+    }
+
+    @Test
+    void testEditExamSuccess() {
+        Language language = new Language();
+        language.setName("Java");
+
+        Problem problem = new Problem();
+        problem.setLanguageSupport(Set.of(language));
+
+        ExamProblemRequestDto examProblemRequestDto = new ExamProblemRequestDto();
+
+        List<ExamProblemRequestDto> examProblemRequestDtos = List.of(examProblemRequestDto);
+
+        AddExamRequestDto addExamRequestDto = new AddExamRequestDto();
+        addExamRequestDto.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        addExamRequestDto.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        addExamRequestDto.setLanguageSupports(Collections.singletonList("Java"));
+        addExamRequestDto.setProblemRequests(examProblemRequestDtos);
 
         Exam savedExam = new Exam();
+        savedExam.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        savedExam.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        savedExam.setTitle("test");
+        savedExam.setDescription("test");
         savedExam.setStatus(ExamStatus.NOT_STARTED);
 
         when(examRepository.findByCode(anyString())).thenReturn(Optional.of(savedExam));
-        when(addExamRequestMapper.mapTo(addExamRequestDto)).thenReturn(savedExam);
-        when(languageService.getLanguagesByNameList(any())).thenReturn(new HashSet<>());
+        when(addExamRequestMapper.mapTo(any(AddExamRequestDto.class))).thenReturn(savedExam);
+        when(languageService.getLanguagesByNameList(anyList())).thenReturn(new HashSet<>());
         when(userService.getCurrentUser()).thenReturn(new Users());
-        when(examRepository.save(any())).thenReturn(savedExam);
-        when(examResponseMapper.mapFrom(any())).thenReturn(new ExamResponseDto());
+        when(examRepository.save(any(Exam.class))).thenReturn(savedExam);
+        when(examResponseMapper.mapFrom(any(Exam.class))).thenReturn(new ExamResponseDto());
+        when(problemService.getProblemByExamProblemRequest(any())).thenReturn(problem);
 
         ExamResponseDto response = examService.editExam(addExamRequestDto, "code");
 
         assertNotNull(response);
-        verify(examRepository, times(1)).save(any());
-        verify(eventPublisher, times(1)).publishEvent(any());
+        verify(examRepository, times(1)).save(any(Exam.class));
+        verify(eventPublisher, times(1)).publishEvent(any(ExamStartEvent.class));
     }
 
     @Test
-    void testDeleteExam() {
+    void testEditExamNotInRightStatus() {
+        Language language = new Language();
+        language.setName("Java");
+
+        Problem problem = new Problem();
+        problem.setLanguageSupport(Set.of(language));
+
+        ExamProblemRequestDto examProblemRequestDto = new ExamProblemRequestDto();
+
+        List<ExamProblemRequestDto> examProblemRequestDtos = List.of(examProblemRequestDto);
+
+        AddExamRequestDto addExamRequestDto = new AddExamRequestDto();
+        addExamRequestDto.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        addExamRequestDto.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        addExamRequestDto.setLanguageSupports(Collections.singletonList("Java"));
+        addExamRequestDto.setProblemRequests(examProblemRequestDtos);
+
+        Exam savedExam = new Exam();
+        savedExam.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600 + 1000 * 60 * 60 * 7)));
+        savedExam.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200 + 1000 * 60 * 60 * 7)));
+        savedExam.setTitle("test");
+        savedExam.setDescription("test");
+        savedExam.setStatus(ExamStatus.IN_PROGRESS);
+
+        when(examRepository.findByCode(anyString())).thenReturn(Optional.of(savedExam));
+        when(addExamRequestMapper.mapTo(any(AddExamRequestDto.class))).thenReturn(savedExam);
+        when(languageService.getLanguagesByNameList(anyList())).thenReturn(new HashSet<>());
+        when(userService.getCurrentUser()).thenReturn(new Users());
+        when(examRepository.save(any(Exam.class))).thenReturn(savedExam);
+        when(examResponseMapper.mapFrom(any(Exam.class))).thenReturn(new ExamResponseDto());
+        when(problemService.getProblemByExamProblemRequest(any())).thenReturn(problem);
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> examService.editExam(addExamRequestDto, "code"));
+        assertEquals("This exam is already started or ended",
+                badRequestException.getMessage());
+        assertEquals("This exam is already started or ended",
+                badRequestException.getDetails());
+    }
+
+    @Test
+    void testDeleteExamSuccess() {
         Exam savedExam = new Exam();
         savedExam.setStatus(ExamStatus.NOT_STARTED);
 
@@ -199,7 +385,22 @@ class ExamServiceImplTest {
 
         examService.deleteExam("code");
 
-        verify(examRepository, times(1)).delete(any());
+        verify(examRepository, times(1)).delete(any(Exam.class));
+    }
+
+    @Test
+    void testDeleteExamNotFound() {
+        Exam savedExam = new Exam();
+        savedExam.setStatus(ExamStatus.NOT_STARTED);
+
+        when(examRepository.findByCode(anyString())).thenReturn(Optional.empty());
+
+        NotFoundException notFoundException = assertThrows(NotFoundException.class,
+                () -> examService.deleteExam("code"));
+        assertEquals("Exam not found",
+                notFoundException.getMessage());
+        assertEquals("Exam not found",
+                notFoundException.getDetails());
     }
 
     @Test
@@ -207,26 +408,26 @@ class ExamServiceImplTest {
         FilterExamRequestDto filterExamRequestDto = new FilterExamRequestDto();
         filterExamRequestDto.setPage(0);
         filterExamRequestDto.setSize(5);
-        filterExamRequestDto.setSortBy("createdAt");
-        filterExamRequestDto.setAscending(true);
+        filterExamRequestDto.setTitle("test");
+        filterExamRequestDto.setStatus(ExamStatus.NOT_STARTED);
 
-        Page<Exam> examPage = new PageImpl<>(new ArrayList<>());
+        List<Exam> exams = new ArrayList();
+        exams.add(new Exam());
 
-        when(examRepository.searchExam(anyString(), any(), any(), any(), any())).thenReturn(examPage);
-        when(examListResponseMapper.mapFrom(any())).thenReturn(new ExamListResponseDto());
+        Page<Exam> examPage = new PageImpl<>(exams);
+        when(examRepository.searchExam(anyString(), any(), any(), any(), any(Pageable.class))).thenReturn(examPage);
 
         Page<ExamListResponseDto> response = examService.getListOfExam(filterExamRequestDto);
 
         assertNotNull(response);
-        verify(examRepository, times(1)).searchExam(anyString(), any(), any(), any(), any());
+        verify(examRepository, times(1)).searchExam(anyString(), any(), any(), any(), any(Pageable.class));
     }
 
     @Test
-    void testGetExamDetailByCode() {
+    void testGetExamDetailByCodeSuccess() {
         Exam exam = new Exam();
         when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
-        when(examResponseMapper.mapFrom(any())).thenReturn(new ExamResponseDto());
-        when(examProblemRepository.findByExam(any())).thenReturn(new ArrayList<>());
+        when(examResponseMapper.mapFrom(any(Exam.class))).thenReturn(new ExamResponseDto());
 
         ExamResponseDto response = examService.getExamDetailByCode("code");
 
@@ -235,45 +436,124 @@ class ExamServiceImplTest {
     }
 
     @Test
-    void testEnrollExam() {
+    void testGetExamDetailByCodeNotFound() {
+        when(examRepository.findByCode(anyString())).thenReturn(Optional.empty());
+        when(examResponseMapper.mapFrom(any(Exam.class))).thenReturn(new ExamResponseDto());
+
+        NotFoundException notFoundException = assertThrows(NotFoundException.class,
+                () -> examService.getExamDetailByCode("code"));
+        assertEquals("Exam not found",
+                notFoundException.getMessage());
+        assertEquals("Exam not found",
+                notFoundException.getDetails());
+    }
+
+    @Test
+    void testEnrollExamSuccess() {
         Exam exam = new Exam();
         exam.setStatus(ExamStatus.NOT_STARTED);
         exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600)));
 
         Users user = new Users();
+        when(examParticipantRepository
+                .checkDuplicateTimeExam(any(), any(), any(), any())).thenReturn(new ArrayList());
         when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
         when(userService.getCurrentUser()).thenReturn(user);
-        when(examParticipantRepository.findByExamAndParticipant(any(), any())).thenReturn(Optional.empty());
+        when(examParticipantRepository.findByExamAndParticipant(any(Exam.class), any(Users.class)))
+                .thenReturn(Optional.empty());
 
         examService.enrollExam("code");
 
-        verify(examParticipantRepository, times(1)).save(any());
-        verify(examRepository, times(1)).save(any());
+        verify(examParticipantRepository, times(1)).save(any(ExamParticipant.class));
+        verify(examRepository, times(1)).save(any(Exam.class));
     }
 
     @Test
-    void testGetCodeFromExamReadyToStarted() {
-        when(examRepository.getCodeFromExamReadyToStarted(any(), any())).thenReturn(new ArrayList<>());
-
-        List<String> response = examService.getCodeFromExamReadyToStarted();
-
-        assertNotNull(response);
-        verify(examRepository, times(1)).getCodeFromExamReadyToStarted(any(), any());
-    }
-
-    @Test
-    void testGetProblemDetailInExam() {
+    void testEnrollExamOverlapTime() {
         Exam exam = new Exam();
-        exam.setStatus(ExamStatus.IN_PROGRESS);
+        exam.setStatus(ExamStatus.NOT_STARTED);
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600)));
+
+        Users user = new Users();
+        when(examParticipantRepository
+                .checkDuplicateTimeExam(any(), any(), any(), any())).thenReturn(List.of(new ExamParticipant()));
+        when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
+        when(userService.getCurrentUser()).thenReturn(user);
+        when(examParticipantRepository.findByExamAndParticipant(any(Exam.class), any(Users.class)))
+                .thenReturn(Optional.empty());
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> examService.enrollExam("code"));
+        assertEquals("You have enrolled for another exam that overlaps with this one",
+                badRequestException.getMessage());
+        assertEquals("You have enrolled for another exam that overlaps with this one",
+                badRequestException.getDetails());
+    }
+
+    @Test
+    void testEnrollExamStartBefore() {
+        Exam exam = new Exam();
+        exam.setStatus(ExamStatus.NOT_STARTED);
         exam.setStartTime(Timestamp.from(Instant.now().minusSeconds(3600)));
 
+        Users user = new Users();
+        when(examParticipantRepository
+                .checkDuplicateTimeExam(any(), any(), any(), any())).thenReturn(new ArrayList());
         when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
-        when(examProblemRepository.findByExam(any())).thenReturn(new ArrayList<>());
+        when(userService.getCurrentUser()).thenReturn(user);
+        when(examParticipantRepository.findByExamAndParticipant(any(Exam.class), any(Users.class)))
+                .thenReturn(Optional.empty());
 
-        List<ExamProblemDetailResponseDto> response = examService.getProblemDetailInExam("code");
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> examService.enrollExam("code"));
+        assertEquals("This exam has already started",
+                badRequestException.getMessage());
+        assertEquals("This exam has already started",
+                badRequestException.getDetails());
+    }
 
-        assertNotNull(response);
-        verify(examRepository, times(1)).findByCode(anyString());
+    @Test
+    void testEnrollExamAlreadyStarted() {
+        Exam exam = new Exam();
+        exam.setStatus(ExamStatus.END);
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600)));
+
+        Users user = new Users();
+        when(examParticipantRepository
+                .checkDuplicateTimeExam(any(), any(), any(), any())).thenReturn(new ArrayList());
+        when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
+        when(userService.getCurrentUser()).thenReturn(user);
+        when(examParticipantRepository.findByExamAndParticipant(any(Exam.class), any(Users.class)))
+                .thenReturn(Optional.empty());
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> examService.enrollExam("code"));
+        assertEquals("This exam is already started or ended",
+                badRequestException.getMessage());
+        assertEquals("This exam is already started or ended",
+                badRequestException.getDetails());
+    }
+
+    @Test
+    void testEnrollExamAlreadyEnrolled() {
+        Exam exam = new Exam();
+        exam.setStatus(ExamStatus.NOT_STARTED);
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600)));
+
+        Users user = new Users();
+        when(examParticipantRepository
+                .checkDuplicateTimeExam(any(), any(), any(), any())).thenReturn(new ArrayList());
+        when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
+        when(userService.getCurrentUser()).thenReturn(user);
+        when(examParticipantRepository.findByExamAndParticipant(any(Exam.class), any(Users.class)))
+                .thenReturn(Optional.of(new ExamParticipant()));
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> examService.enrollExam("code"));
+        assertEquals("You have already enrolled this exam",
+                badRequestException.getMessage());
+        assertEquals("You have already enrolled this exam",
+                badRequestException.getDetails());
     }
 
     @Test
@@ -288,24 +568,30 @@ class ExamServiceImplTest {
 
         when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
         when(userService.getUserByUsernameOrEmail(anyString())).thenReturn(user);
-        when(examParticipantRepository.findByExamAndParticipant(any(), any()))
+        when(examParticipantRepository.findByExamAndParticipant(any(Exam.class), any(Users.class)))
                 .thenReturn(Optional.of(new ExamParticipant()));
-        when(problemService.submitExam(any())).thenReturn(new ExamResultOverviewResponseDto());
+        when(problemService.submitExam(anyList())).thenReturn(new ExamResultOverviewResponseDto());
 
-        ExamResultOverviewResponseDto response = examService.submitExam(new ArrayList<>(), "code", "username");
+        double grade = examService.submitExam(Collections.emptyList(), "code", "username");
 
-        assertNotNull(response);
-        verify(problemService, times(1)).submitExam(any());
+        assertEquals(0, grade);
+        verify(examSubmissionRepository, times(0)).save(any(ExamSubmission.class));
     }
 
     @Test
-    void testGenerateTokenForExam() {
+    void testGenerateTokenForExamSuccess() {
         Exam exam = new Exam();
+        exam.setCode("test");
         exam.setStatus(ExamStatus.NOT_STARTED);
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(36)));
 
         Users user = new Users();
-        user.setRole(UserRole.STUDENT);
+        user.setId(1L);
+        user.setUsername("test");
+        ExamParticipant examParticipant = new ExamParticipant();
+        examParticipant.setParticipant(user);
 
+        when(examParticipantRepository.findByExam(any())).thenReturn(List.of(examParticipant));
         when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
         when(userService.getCurrentUser()).thenReturn(user);
         when(tokenService.generateAccessToken(anyString())).thenReturn("token");
@@ -317,39 +603,102 @@ class ExamServiceImplTest {
     }
 
     @Test
+    void testGenerateTokenForExamAlreadyStarted() {
+        Exam exam = new Exam();
+        exam.setCode("test");
+        exam.setStatus(ExamStatus.END);
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(36)));
+
+        Users user = new Users();
+        user.setId(1L);
+        user.setUsername("test");
+        ExamParticipant examParticipant = new ExamParticipant();
+        examParticipant.setParticipant(user);
+
+        when(examParticipantRepository.findByExam(any())).thenReturn(List.of(examParticipant));
+        when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
+        when(userService.getCurrentUser()).thenReturn(user);
+        when(tokenService.generateAccessToken(anyString())).thenReturn("token");
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> examService.generateTokenForExam("code"));
+        assertEquals("The exam has already started or ended.",
+                badRequestException.getMessage());
+        assertEquals("The exam has already started or ended.",
+                badRequestException.getDetails());
+    }
+
+    @Test
+    void testGenerateTokenForExamNotEnrolled() {
+        Exam exam = new Exam();
+        exam.setCode("test");
+        exam.setStatus(ExamStatus.END);
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(36)));
+
+        Users user = new Users();
+        user.setId(1L);
+        user.setUsername("test");
+        ExamParticipant examParticipant = new ExamParticipant();
+        examParticipant.setParticipant(user);
+
+        when(examParticipantRepository.findByExam(any())).thenReturn(new ArrayList());
+        when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
+        when(userService.getCurrentUser()).thenReturn(user);
+        when(tokenService.generateAccessToken(anyString())).thenReturn("token");
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> examService.generateTokenForExam("code"));
+        assertEquals("The exam has already started or ended.",
+                badRequestException.getMessage());
+        assertEquals("The exam has already started or ended.",
+                badRequestException.getDetails());
+    }
+
+    @Test
+    void testGenerateTokenForExamNotReadyToStart() {
+        Exam exam = new Exam();
+        exam.setCode("test");
+        exam.setStatus(ExamStatus.END);
+        exam.setStartTime(Timestamp.from(Instant.now().minusSeconds(36000)));
+
+        Users user = new Users();
+        user.setId(1L);
+        user.setUsername("test");
+        ExamParticipant examParticipant = new ExamParticipant();
+        examParticipant.setParticipant(user);
+
+        when(examParticipantRepository.findByExam(any())).thenReturn(new ArrayList());
+        when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
+        when(userService.getCurrentUser()).thenReturn(user);
+        when(tokenService.generateAccessToken(anyString())).thenReturn("token");
+
+        assertThrows(BadRequestException.class,
+                () -> examService.generateTokenForExam("code"));
+    }
+
+    @Test
     void testStartExam() {
         Exam exam = new Exam();
         exam.setStatus(ExamStatus.NOT_STARTED);
+        exam.setStartTime(Timestamp.from(Instant.now().plusSeconds(36)));
 
         when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
-        when(examProblemRepository.findByExam(any())).thenReturn(new ArrayList<>());
+        when(examRepository.save(any(Exam.class))).thenReturn(exam);
 
         List<ExamProblemDetailResponseDto> response = examService.startExam("code");
 
         assertNotNull(response);
-        verify(examRepository, times(1)).save(any());
-    }
-
-    @Test
-    void testRunExam() {
-        Exam exam = new Exam();
-        when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
-        when(examProblemRepository.findByExam(any())).thenReturn(new ArrayList<>());
-        when(problemService.runExam(anyString(), any())).thenReturn(new RunProblemResponseDto());
-
-        RunProblemResponseDto response = examService.runExam("examCode", "link", new ProblemCompileRequestDto());
-
-        assertNotNull(response);
-        verify(problemService, times(1)).runExam(anyString(), any());
+        verify(examRepository, times(1)).save(any(Exam.class));
     }
 
     @Test
     void testEndExam() {
-        when(examRepository.getExamAlreadyEnded(any())).thenReturn(new ArrayList<>());
+        List<Exam> exams = Collections.singletonList(new Exam());
+        when(examRepository.getExamAlreadyEnded(any(Timestamp.class))).thenReturn(exams);
 
         examService.endExam();
 
-        verify(examRepository, times(1)).getExamAlreadyEnded(any());
+        verify(examRepository, times(1)).save(any(Exam.class));
     }
 
     @Test
@@ -358,92 +707,14 @@ class ExamServiceImplTest {
         exam.setStatus(ExamStatus.END);
 
         Users user = new Users();
-
         when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
         when(userService.getCurrentUser()).thenReturn(user);
-        when(examParticipantRepository.findByExamAndParticipant(any(), any()))
+        when(examParticipantRepository.findByExamAndParticipant(any(Exam.class), any(Users.class)))
                 .thenReturn(Optional.of(new ExamParticipant()));
-        when(examSubmissionRepository.findByExamParticipant(any())).thenReturn(new ArrayList<>());
 
         ExamResultOverviewResponseDto response = examService.viewResult("code");
 
         assertNotNull(response);
-        verify(examRepository, times(1)).findByCode(anyString());
-    }
-
-    @Test
-    void testGetListExam() {
-        Users user = new Users();
-        when(userService.getCurrentUser()).thenReturn(user);
-        when(examParticipantRepository.findByStatus(any(), any(), any())).thenReturn(Page.empty());
-        when(examListStudentResponseMapper.mapFrom(any())).thenReturn(new ExamListStudentResponseDto());
-
-        Page<ExamListStudentResponseDto> response = examService.getListExam(ExamStatus.NOT_STARTED, 0, 5);
-
-        assertNotNull(response);
-        verify(examParticipantRepository, times(1)).findByStatus(any(), any(), any());
-    }
-
-    @Test
-    void testGetAllParticipantsInExam() {
-        Exam exam = new Exam();
-        when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
-        when(examParticipantRepository.findByExam(any())).thenReturn(new ArrayList<>());
-
-        List<Map<String, String>> response = examService.getAllParticipantsInExam("code");
-
-        assertNotNull(response);
-        verify(examRepository, times(1)).findByCode(anyString());
-    }
-
-    @Test
-    void testViewResultOfASpecificParticipant() {
-        Exam exam = new Exam();
-        exam.setStatus(ExamStatus.END);
-
-        Users user = new Users();
-
-        when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
-        when(userService.getUserById(anyLong())).thenReturn(user);
-        when(examParticipantRepository.findByExamAndParticipant(any(), any()))
-                .thenReturn(Optional.of(new ExamParticipant()));
-        when(examSubmissionRepository.findByExamParticipant(any())).thenReturn(new ArrayList<>());
-
-        ExamResultOverviewResponseDto response = examService.viewResultOfASpecificParticpant("code", 1L);
-
-        assertNotNull(response);
-        verify(examRepository, times(1)).findByCode(anyString());
-    }
-
-    @Test
-    void testSendNotiToUserExamAboutToStart() {
-        when(examRepository.getExamAboutToStart(any(), any())).thenReturn(new ArrayList<>());
-
-        examService.sendNotiToUserExamAboutToStart();
-
-        verify(examRepository, times(1)).getExamAboutToStart(any(), any());
-    }
-
-    @Test
-    void testGetAllPendingExam() {
-        when(examRepository.findByStatus(any())).thenReturn(new ArrayList<>());
-
-        List<Exam> response = examService.getAllPendingExam();
-
-        assertNotNull(response);
-        verify(examRepository, times(1)).findByStatus(any());
-    }
-
-    @Test
-    void testGetAllPendingExamNotOverlapTime() {
-        Users user = new Users();
-        when(userService.getCurrentUser()).thenReturn(user);
-        when(examRepository.findByStatus(any())).thenReturn(new ArrayList<>());
-        when(notStartedExamListMapper.mapFrom(any())).thenReturn(new NotStartedExamListDto());
-
-        List<NotStartedExamListDto> response = examService.getAllPendingExamNotOverlapTime();
-
-        assertNotNull(response);
-        verify(examRepository, times(1)).findByStatus(any());
+        verify(examParticipantRepository, times(1)).findByExamAndParticipant(any(Exam.class), any(Users.class));
     }
 }

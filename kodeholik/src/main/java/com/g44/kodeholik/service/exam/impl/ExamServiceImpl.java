@@ -22,6 +22,8 @@ import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.exam.AddExamRequestDto;
+import com.g44.kodeholik.model.dto.request.exam.EditExamBasicRequestDto;
+import com.g44.kodeholik.model.dto.request.exam.EditExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
@@ -63,13 +65,13 @@ import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 import com.g44.kodeholik.service.problem.ProblemTestCaseService;
 import com.g44.kodeholik.service.publisher.Publisher;
 import com.g44.kodeholik.service.redis.RedisService;
-import com.g44.kodeholik.service.scheduler.ExamSchedulerService;
 import com.g44.kodeholik.service.scheduler.ExamStartEvent;
 import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.token.TokenService;
 import com.g44.kodeholik.service.user.NotificationService;
 import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
+import com.g44.kodeholik.util.mapper.request.exam.EditExamBasicRequestMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamListResponseMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamListStudentResponseMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamResponseMapper;
@@ -127,8 +129,13 @@ public class ExamServiceImpl implements ExamService {
 
     private final NotStartedExamListMapper notStartedExamListMapper;
 
+    private final EditExamBasicRequestMapper editExamBasicRequestMapper;
+
     @Override
     public ExamResponseDto createExam(AddExamRequestDto addExamRequestDto) {
+        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime() - 1000 * 60 * 60 * 7));
+        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime() - 1000 * 60 * 60 * 7));
+
         Exam exam = addExamRequestMapper.mapTo(addExamRequestDto);
 
         if (addExamRequestDto.getStartTime().before(Timestamp.from(Instant.now()))) {
@@ -194,6 +201,8 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public ExamResponseDto editExam(AddExamRequestDto addExamRequestDto, String code) {
+        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime() - 1000 * 60 * 60 * 7));
+        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime() - 1000 * 60 * 60 * 7));
         Exam savedExam = getExamByCode(code);
         if (savedExam.getStatus() != ExamStatus.NOT_STARTED) {
             throw new BadRequestException("This exam is already started or ended",
@@ -214,7 +223,7 @@ public class ExamServiceImpl implements ExamService {
         exam.setUpdatedAt(Timestamp.from(Instant.now()));
         exam.setUpdatedBy(userService.getCurrentUser());
         exam.setStatus(ExamStatus.NOT_STARTED);
-        exam.setNoParticipant(exam.getNoParticipant());
+        exam.setNoParticipant(savedExam.getNoParticipant());
 
         Set<Language> languages = languageService.getLanguagesByNameList(addExamRequestDto.getLanguageSupports());
         List<ExamProblemRequestDto> problemExams = addExamRequestDto.getProblemRequests();
@@ -406,10 +415,9 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto, String code,
+    public double submitExam(List<SubmitExamRequestDto> submitExamRequestDto, String code,
             String username) {
         Exam exam = getExamByCode(code);
-
         Timestamp now = new Timestamp(System.currentTimeMillis());
         Timestamp after5Minutes = new Timestamp(now.getTime() + 60 * 1000 * 5);
         Map<String, Object> mapError = new HashMap<String, Object>();
@@ -418,24 +426,34 @@ public class ExamServiceImpl implements ExamService {
             mapError.put("username", username);
             mapError.put("error", "Exam has not started yet");
             publisher.sendError(mapError);
+            return 0;
         }
 
         else if (exam.getEndTime().getTime() <= after5Minutes.getTime()) {
             mapError.put("username", username);
             mapError.put("error", "Exam has already ended");
             publisher.sendError(mapError);
+            return 0;
         }
 
         else if (exam.getStatus() != ExamStatus.IN_PROGRESS) {
             mapError.put("username", username);
             mapError.put("error", "The exam has not started or already ended.");
             publisher.sendError(mapError);
+            return 0;
         }
 
         Users currentUser = userService.getUserByUsernameOrEmail(username);
         List<ExamParticipant> examParticipants = examParticipantRepository.findByExam(exam);
-        ExamParticipant examParticipant = examParticipantRepository.findByExamAndParticipant(exam, currentUser)
-                .orElseThrow(() -> new NotFoundException("Exam not found", "Exam not found"));
+        ExamParticipant examParticipant = new ExamParticipant();
+        if (!examParticipantRepository.findByExamAndParticipant(exam, currentUser).isPresent()) {
+            mapError.put("username", username);
+            mapError.put("error", "Exam not found");
+            publisher.sendError(mapError);
+            return 0;
+        } else {
+            examParticipant = examParticipantRepository.findByExamAndParticipant(exam, currentUser).get();
+        }
         boolean isCurrentUserParticipated = false;
 
         if (currentUser.getRole() == UserRole.STUDENT) {
@@ -453,19 +471,29 @@ public class ExamServiceImpl implements ExamService {
             mapError.put("username", username);
             mapError.put("error", "You are not enrolled in this exam");
             publisher.sendError(mapError);
+            return 0;
         }
 
         for (int i = 0; i < submitExamRequestDto.size(); i++) {
             Problem problem = problemService.getProblemByLink(submitExamRequestDto.get(i).getProblemLink());
-            ExamProblem examProblem = examProblemRepository.findByExamAndProblem(exam, problem)
-                    .orElseThrow(() -> new NotFoundException("Exam not found", "Exam not found"));
+            ExamProblem examProblem = new ExamProblem();
+            if (!examProblemRepository.findByExamAndProblem(exam, problem).isPresent()) {
+                mapError.put("username", username);
+                mapError.put("error", "Exam not found");
+                publisher.sendError(mapError);
+                return 0;
+            } else {
+                examProblem = examProblemRepository.findByExamAndProblem(exam, problem).get();
+            }
             if (examSubmissionRepository.findByExamParticipantAndProblem(examParticipant, problem).isPresent()) {
                 mapError.put("username", username);
                 mapError.put("error", "You can only submit exam once");
                 publisher.sendError(mapError);
-                break;
+                return 0;
             }
-            submitExamRequestDto.get(i).setPoint(examProblem.getPoint());
+            if (examProblem != null) {
+                submitExamRequestDto.get(i).setPoint(examProblem.getPoint());
+            }
         }
         if (mapError.isEmpty()) {
             ExamResultOverviewResponseDto examResultResponseDto = problemService.submitExam(submitExamRequestDto);
@@ -485,14 +513,14 @@ public class ExamServiceImpl implements ExamService {
                 examSubmission.setPoint(problemResultDetailResponseDto.getPoint());
                 examSubmissionRepository.save(examSubmission);
 
-                examParticipant.setGrade(examResultResponseDto.getGrade());
-                examParticipantRepository.save(examParticipant);
-
             }
-            return examResultResponseDto;
+            examParticipant.setGrade(examResultResponseDto.getGrade());
+            examParticipantRepository.save(examParticipant);
+
+            return examResultResponseDto.getGrade();
 
         }
-        return null;
+        return 0;
     }
 
     @Override
@@ -503,21 +531,27 @@ public class ExamServiceImpl implements ExamService {
         boolean isCurrentUserParticipated = false;
         Users currentUser = userService.getCurrentUser();
 
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        Timestamp after5Minutes = new Timestamp(now.getTime() + 60 * 1000 * 5);
+
         if (exam.getStatus() != ExamStatus.NOT_STARTED) {
             throw new BadRequestException("The exam has already started or ended.",
                     "The exam has already started or ended.");
         }
 
-        if (currentUser.getRole() == UserRole.STUDENT) {
-            for (ExamParticipant ep : examParticipants) {
-                if (ep.getParticipant().getId().longValue() == currentUser.getId().longValue()) {
-                    isCurrentUserParticipated = true;
-                    break;
-                }
-            }
-        } else {
-            isCurrentUserParticipated = true;
+        if (!(after5Minutes.getTime() >= exam.getStartTime().getTime())) {
+            String formattedDate = sdf.format(exam.getStartTime());
+            throw new BadRequestException("The exam is not ready to start. Time start is " + formattedDate,
+                    "The exam is not ready to start. Time start is " + formattedDate);
         }
+
+        for (ExamParticipant ep : examParticipants) {
+            if (ep.getParticipant().getId().longValue() == currentUser.getId().longValue()) {
+                isCurrentUserParticipated = true;
+                break;
+            }
+        }
+
         if (!isCurrentUserParticipated) {
             throw new ForbiddenException("You are not enrolled in this exam", "You are not enrolled in this exam");
         }
@@ -605,7 +639,7 @@ public class ExamServiceImpl implements ExamService {
 
                 double percentPassed = (double) problemResultOverviewResponseDto.getNoTestCasePassed()
                         / testCases.size();
-                problemResultOverviewResponseDto.setPercentPassed(formatDouble(percentPassed));
+                problemResultOverviewResponseDto.setPercentPassed(formatDouble(percentPassed * 100) + "%");
                 problemResultDetailResponseDtoList.add(problemResultOverviewResponseDto);
             }
             examResultOverviewResponseDto.setProblemResults(problemResultDetailResponseDtoList);
@@ -686,7 +720,7 @@ public class ExamServiceImpl implements ExamService {
 
                     double percentPassed = (double) problemResultOverviewResponseDto.getNoTestCasePassed()
                             / testCases.size();
-                    problemResultOverviewResponseDto.setPercentPassed(formatDouble(percentPassed));
+                    problemResultOverviewResponseDto.setPercentPassed(formatDouble(percentPassed * 100) + "%");
                     problemResultDetailResponseDtoList.add(problemResultOverviewResponseDto);
                 }
                 examResultOverviewResponseDto.setProblemResults(problemResultDetailResponseDtoList);
@@ -734,14 +768,98 @@ public class ExamServiceImpl implements ExamService {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         List<Exam> exams = examRepository.findByStatus(ExamStatus.NOT_STARTED);
         for (int i = 0; i < exams.size(); i++) {
-            if (checkDuplicateTimeExam(exams.get(i), currentUsers) || now.after(exams.get(i).getStartTime())) {
+            if (checkDuplicateTimeExam(exams.get(i), currentUsers) || now.after(exams.get(i).getStartTime())
+                    || examParticipantRepository.findByExamAndParticipant(exams.get(i), currentUsers).isPresent()) {
                 exams.remove(i);
                 i--;
             }
+
         }
         return exams.stream()
                 .map(notStartedExamListMapper::mapFrom)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void unenrollExam(String code) {
+        Exam exam = getExamByCode(code);
+        Users user = userService.getCurrentUser();
+
+        if (exam.getStatus() != ExamStatus.NOT_STARTED) {
+            throw new BadRequestException("Cannot unenroll an exam that has started",
+                    "Cannot unenroll an exam that has started");
+        }
+
+        ExamParticipant examParticipant = examParticipantRepository.findByExamAndParticipant(exam, user)
+                .orElseThrow(() -> new BadRequestException("You haven't enrolled in this exam",
+                        "You haven't enrolled in this exam"));
+        examParticipantRepository.delete(examParticipant);
+        exam.setNoParticipant(exam.getNoParticipant() - 1 > 0 ? exam.getNoParticipant() - 1 : 0);
+    }
+
+    @Override
+    public ExamResponseDto editExamBasic(EditExamBasicRequestDto editExamBasicRequestDto, String code) {
+        editExamBasicRequestDto
+                .setStartTime(new Timestamp(editExamBasicRequestDto.getStartTime().getTime() - 1000 * 60 * 60 * 7));
+        editExamBasicRequestDto
+                .setEndTime(new Timestamp(editExamBasicRequestDto.getEndTime().getTime() - 1000 * 60 * 60 * 7));
+        Exam savedExam = getExamByCode(code);
+        if (savedExam.getStatus() != ExamStatus.NOT_STARTED) {
+            throw new BadRequestException("This exam is already started or ended",
+                    "This exam is already started or ended");
+        }
+        if (editExamBasicRequestDto.getStartTime().before(Timestamp.from(Instant.now()))) {
+            throw new BadRequestException("Start date cannot be in the past", "Start date cannot be in the past");
+        }
+        if (editExamBasicRequestDto.getStartTime().after(editExamBasicRequestDto.getEndTime())) {
+            throw new BadRequestException("Start date cannot be after end date", "Start date cannot be after end date");
+        }
+
+        Exam exam = editExamBasicRequestMapper.mapTo(editExamBasicRequestDto);
+        exam.setId(savedExam.getId());
+        exam.setCode(savedExam.getCode());
+        exam.setCreatedAt(savedExam.getCreatedAt());
+        exam.setCreatedBy(savedExam.getCreatedBy());
+        exam.setUpdatedAt(Timestamp.from(Instant.now()));
+        exam.setUpdatedBy(userService.getCurrentUser());
+        exam.setStatus(ExamStatus.NOT_STARTED);
+        exam.setNoParticipant(savedExam.getNoParticipant());
+        exam.setLanguageSupport(savedExam.getLanguageSupport());
+
+        exam = examRepository.save(exam);
+
+        eventPublisher.publishEvent(new ExamStartEvent(this, code, exam.getStartTime().toInstant()));
+        ExamResponseDto examResponseDto = getExamDetailByCode(code);
+        return examResponseDto;
+    }
+
+    @Override
+    public ExamResponseDto editExamProblem(EditExamProblemRequestDto editExamProblemRequestDto, String code) {
+
+        Exam exam = getExamByCode(code);
+
+        Set<Language> languages = languageService
+                .getLanguagesByNameList(editExamProblemRequestDto.getLanguageSupports());
+        List<ExamProblemRequestDto> problemExams = editExamProblemRequestDto.getProblemRequests();
+
+        exam.setLanguageSupport(languages);
+        exam = examRepository.save(exam);
+
+        examProblemRepository.deleteByExam(exam);
+        for (ExamProblemRequestDto problemExam : problemExams) {
+            Problem problem = problemService.getProblemByExamProblemRequest(problemExam);
+            ExamProblemId examProblemId = new ExamProblemId(exam.getId(), problem.getId());
+            ExamProblem examProblem = new ExamProblem(examProblemId, exam, problem, problemExam.getProblemPoint());
+            if (!checkLanguageSupportEquals(languages, problem.getLanguageSupport())) {
+                throw new BadRequestException("Language support of your exam does not match with your problem",
+                        "Language support of your exam does not match with your problem");
+            }
+            examProblemRepository.save(examProblem);
+        }
+
+        eventPublisher.publishEvent(new ExamStartEvent(this, code, exam.getStartTime().toInstant()));
+        ExamResponseDto examResponseDto = getExamDetailByCode(code);
+        return examResponseDto;
     }
 
 }

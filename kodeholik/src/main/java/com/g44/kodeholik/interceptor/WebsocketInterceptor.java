@@ -44,7 +44,7 @@ public class WebsocketInterceptor implements ChannelInterceptor {
 
                 // Nếu username trong token KHÔNG khớp với username trong topic -> Chặn
                 if (!requestedUsername.equals(usernameFromToken)) {
-                    throw new IllegalArgumentException("Bạn không được phép subscribe vào topic của người khác!");
+                    throw new IllegalArgumentException("You can not subscribe into other user's topic!");
                 }
             }
         }

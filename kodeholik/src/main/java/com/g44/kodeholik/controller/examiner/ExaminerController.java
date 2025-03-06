@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g44.kodeholik.model.dto.request.exam.AddExamRequestDto;
+import com.g44.kodeholik.model.dto.request.exam.EditExamBasicRequestDto;
+import com.g44.kodeholik.model.dto.request.exam.EditExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
@@ -43,6 +45,20 @@ public class ExaminerController {
     public ResponseEntity<ExamResponseDto> editExam(@RequestBody @Valid AddExamRequestDto addExamRequestDto,
             @PathVariable String code) {
         return new ResponseEntity<>(examService.editExam(addExamRequestDto, code), HttpStatus.OK);
+    }
+
+    @PutMapping("/edit-basic/{code}")
+    public ResponseEntity<ExamResponseDto> editExamBasic(
+            @RequestBody @Valid EditExamBasicRequestDto editExamBasicRequestDto,
+            @PathVariable String code) {
+        return new ResponseEntity<>(examService.editExamBasic(editExamBasicRequestDto, code), HttpStatus.OK);
+    }
+
+    @PutMapping("/edit-problem/{code}")
+    public ResponseEntity<ExamResponseDto> editExamProblem(
+            @RequestBody @Valid EditExamProblemRequestDto editExamProblemRequestDto,
+            @PathVariable String code) {
+        return new ResponseEntity<>(examService.editExamProblem(editExamProblemRequestDto, code), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{code}")

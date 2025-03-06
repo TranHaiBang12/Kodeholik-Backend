@@ -1,5 +1,6 @@
 package com.g44.kodeholik.interceptor;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -46,7 +47,8 @@ public class JwtExamHandShakeInterceptor implements HandshakeInterceptor {
                 String sessionId = UUID.randomUUID().toString();
                 attributes.put("username", username);
                 attributes.put("token", token);
-                if (!websocketSessionManager.registerSession(username, sessionId)) {
+
+                if (!websocketSessionManager.registerSession(username, sessionId, "EXAM")) {
                     return false; // Từ chối kết nối nếu user đã đăng nhập
                 }
             } else {

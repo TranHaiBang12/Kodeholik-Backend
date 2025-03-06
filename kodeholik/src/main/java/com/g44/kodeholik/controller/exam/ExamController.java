@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.g44.kodeholik.config.WebsocketSessionManager;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
@@ -30,11 +31,13 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Log4j2
@@ -51,8 +54,14 @@ public class ExamController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/unenroll/{code}")
+    public ResponseEntity<Void> unenrollExam(@PathVariable String code) {
+        examService.unenrollExam(code);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/detail/{code}")
-    public ResponseEntity<List<ExamProblemDetailResponseDto>> getMethodName(@PathVariable String code) {
+    public ResponseEntity<List<ExamProblemDetailResponseDto>> getExamDetail(@PathVariable String code) {
         List<ExamProblemDetailResponseDto> result = examService.getProblemDetailInExam(code);
         if (result.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -62,19 +71,16 @@ public class ExamController {
 
     @MessageMapping("/exam/submit/{code}")
     @SendTo("/topic/exam/{code}")
-    public ResponseEntity<ExamResultOverviewResponseDto> getExamResult(
+    public ResponseEntity<Double> getExamResult(
             @DestinationVariable String code,
             @Payload List<SubmitExamRequestDto> examProblemDetailResponseDtos,
             StompHeaderAccessor accessor) {
         String username = (String) accessor.getSessionAttributes().get("username");
 
-        ExamResultOverviewResponseDto examResultResponseDto = examService.submitExam(examProblemDetailResponseDtos,
+        double grade = examService.submitExam(examProblemDetailResponseDtos,
                 code,
                 username);
-        if (examResultResponseDto == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(examResultResponseDto);
+        return ResponseEntity.ok(grade);
     }
 
     @GetMapping("/get-token/{code}")
