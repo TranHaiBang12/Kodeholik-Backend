@@ -10,7 +10,9 @@ import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemShortResponseDto;
 import com.g44.kodeholik.service.exam.ExamService;
+import com.g44.kodeholik.service.problem.ProblemService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ExaminerController {
 
     private final ExamService examService;
+
+    private final ProblemService problemService;
 
     @PostMapping("/create")
     public ResponseEntity<ExamResponseDto> createExam(@RequestBody @Valid AddExamRequestDto addExamRequestDto) {
@@ -97,4 +101,12 @@ public class ExaminerController {
         return ResponseEntity.ok(examService.viewResultOfASpecificParticpant(code, userId));
     }
 
+    @GetMapping("/private-problem")
+    public ResponseEntity<List<ProblemShortResponseDto>> getPrivateProblem() {
+        List<ProblemShortResponseDto> result = problemService.getPrivateProblemShortResponseDto();
+        if (result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(result);
+    }
 }

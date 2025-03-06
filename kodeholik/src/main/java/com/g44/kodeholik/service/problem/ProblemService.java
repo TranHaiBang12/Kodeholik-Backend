@@ -160,7 +160,7 @@ public interface ProblemService {
 
         public List<String> getLanguageSupportByProblem(String link);
 
-        public List<ProblemShortResponseDto> getPrivateProblemShortResponseDto(String link);
+        public List<ProblemShortResponseDto> getPrivateProblemShortResponseDto();
 
         public Problem getProblemByExamProblemRequest(ExamProblemRequestDto request);
 
