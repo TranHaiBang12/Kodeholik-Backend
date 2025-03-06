@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,7 @@ import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationR
 import com.g44.kodeholik.model.dto.response.exam.student.ExamListStudentResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.student.NotStartedExamListDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ProblemResultOverviewResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.entity.exam.Exam;
@@ -60,6 +63,8 @@ import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 import com.g44.kodeholik.service.problem.ProblemTestCaseService;
 import com.g44.kodeholik.service.publisher.Publisher;
 import com.g44.kodeholik.service.redis.RedisService;
+import com.g44.kodeholik.service.scheduler.ExamSchedulerService;
+import com.g44.kodeholik.service.scheduler.ExamStartEvent;
 import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.token.TokenService;
 import com.g44.kodeholik.service.user.NotificationService;
@@ -68,8 +73,10 @@ import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamListResponseMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamListStudentResponseMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamResponseMapper;
+import com.g44.kodeholik.util.mapper.response.exam.NotStartedExamListMapper;
 import com.g44.kodeholik.util.uuid.UUIDGenerator;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -115,6 +122,10 @@ public class ExamServiceImpl implements ExamService {
     private final RedisService redisService;
 
     private final NotificationService notificationService;
+
+    private final ApplicationEventPublisher eventPublisher;
+
+    private final NotStartedExamListMapper notStartedExamListMapper;
 
     @Override
     public ExamResponseDto createExam(AddExamRequestDto addExamRequestDto) {
@@ -168,6 +179,7 @@ public class ExamServiceImpl implements ExamService {
         }
 
         ExamResponseDto examResponseDto = getExamDetailByCode(code);
+        eventPublisher.publishEvent(new ExamStartEvent(this, code, exam.getStartTime().toInstant()));
         return examResponseDto;
     }
 
@@ -222,6 +234,7 @@ public class ExamServiceImpl implements ExamService {
             examProblemRepository.save(examProblem);
         }
 
+        eventPublisher.publishEvent(new ExamStartEvent(this, code, exam.getStartTime().toInstant()));
         ExamResponseDto examResponseDto = getExamDetailByCode(code);
         return examResponseDto;
     }
@@ -348,6 +361,7 @@ public class ExamServiceImpl implements ExamService {
         return examRepository.getCodeFromExamReadyToStarted(now, maxTime);
     }
 
+    @Transactional
     @Override
     public List<ExamProblemDetailResponseDto> getProblemDetailInExam(String code) {
         List<ExamProblemDetailResponseDto> result = new ArrayList();
@@ -362,7 +376,7 @@ public class ExamServiceImpl implements ExamService {
             publisher.sendError(mapError);
         }
 
-        else if (!(exam.getStartTime().getTime() >= now.getTime()
+        else if (!(exam.getStartTime().getTime() >= now.getTime() - 1000 * 10
                 && exam.getStartTime().getTime() <= after5Minutes.getTime())) {
             mapError.put("error", "The test has not started yet or is already in progress.");
             publisher.sendError(mapError);
@@ -708,5 +722,26 @@ public class ExamServiceImpl implements ExamService {
     }
 
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy, HH:mm");
+
+    @Override
+    public List<Exam> getAllPendingExam() {
+        return examRepository.findByStatus(ExamStatus.NOT_STARTED);
+    }
+
+    @Override
+    public List<NotStartedExamListDto> getAllPendingExamNotOverlapTime() {
+        Users currentUsers = userService.getCurrentUser();
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        List<Exam> exams = examRepository.findByStatus(ExamStatus.NOT_STARTED);
+        for (int i = 0; i < exams.size(); i++) {
+            if (checkDuplicateTimeExam(exams.get(i), currentUsers) || now.after(exams.get(i).getStartTime())) {
+                exams.remove(i);
+                i--;
+            }
+        }
+        return exams.stream()
+                .map(notStartedExamListMapper::mapFrom)
+                .collect(Collectors.toList());
+    }
 
 }

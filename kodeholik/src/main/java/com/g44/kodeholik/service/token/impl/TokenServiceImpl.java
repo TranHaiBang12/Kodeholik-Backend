@@ -9,8 +9,6 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.MalformedJwtException;
@@ -51,6 +49,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateAccessToken(String username) {
+
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
                 .claims()

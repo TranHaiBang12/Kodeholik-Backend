@@ -11,6 +11,7 @@ import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationR
 import com.g44.kodeholik.model.dto.response.exam.student.ExamListStudentResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.student.NotStartedExamListDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
 import com.g44.kodeholik.service.exam.ExamService;
@@ -110,6 +111,15 @@ public class ExamController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(ePage);
+    }
+
+    @GetMapping("/pending-list")
+    public ResponseEntity<List<NotStartedExamListDto>> getListPendingExam() {
+        List<NotStartedExamListDto> list = examService.getAllPendingExamNotOverlapTime();
+        if (list.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(list);
     }
 
 }

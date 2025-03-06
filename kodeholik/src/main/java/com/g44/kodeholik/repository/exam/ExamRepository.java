@@ -33,4 +33,6 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
         @Query("SELECT e FROM Exam e WHERE e.status = 'NOT_STARTED' AND (e.startTime >= :now AND e.startTime <= :maxTime)")
         List<Exam> getExamAboutToStart(@Param("now") Timestamp now, @Param("maxTime") Timestamp maxTime);
 
+        List<Exam> findByStatus(ExamStatus status);
+
 }

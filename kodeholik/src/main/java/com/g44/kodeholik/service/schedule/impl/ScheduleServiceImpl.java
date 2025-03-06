@@ -35,23 +35,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     @Scheduled(fixedRate = 5000)
     @Override
-    public void startExam() {
-        List<String> codes = examService.getCodeFromExamReadyToStarted();
-        if (!codes.isEmpty()) {
-            for (int i = 0; i < codes.size(); i++) {
-                List<ExamProblemDetailResponseDto> examProblemDetailResponseDtos = examService.startExam(codes.get(i));
-                // examPublisher.startExam(codes.get(i));
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put("code", codes.get(i));
-                map.put("problems", examProblemDetailResponseDtos);
-                publisher.startExam(map);
-            }
-        }
-    }
-
-    @Transactional
-    @Scheduled(fixedRate = 5000)
-    @Override
     public void endExam() {
         examService.endExam();
     }
