@@ -1,5 +1,6 @@
 package com.g44.kodeholik.model.dto.response.course;
 
+import com.g44.kodeholik.model.dto.response.setting.TopicResponseDto;
 import com.g44.kodeholik.model.enums.course.ChapterStatus;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,8 @@ public class CourseDetailResponseDto {
     private Double rate;
 
     private Integer numberOfParticipant;
+
+    private List<TopicResponseDto> topics;
 
     private List<ChapterResponseDto> chapters;
 }
