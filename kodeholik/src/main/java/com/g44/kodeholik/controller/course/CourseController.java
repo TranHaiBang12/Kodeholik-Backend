@@ -36,12 +36,7 @@ public class CourseController {
     private final CourseService courseService;
     private final CourseCommentService courseCommentService;
     private final CourseRatingService courseRatingService;
-
-
-    @GetMapping("/list")
-    public ResponseEntity<Page<CourseResponseDto>> getListCourse(Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.SC_OK).body(courseService.getAllCourse(pageable));
-    }
+    
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<CourseDetailResponseDto> getCourseDetail(@PathVariable Long id) {
