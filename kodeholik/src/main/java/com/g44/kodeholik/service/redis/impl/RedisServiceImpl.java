@@ -48,25 +48,25 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public void saveKeyCheckExamReminder(String username, String code) {
+    public void saveKeyCheckExamReminder(String username, String code, int minutes) {
         redisTemplate.opsForValue().set(
-                getPrefixForExamReminder(username, code), code,
+                getPrefixForExamReminder(username, code, minutes), code,
                 Duration.ofMinutes(30));
     }
 
     @Override
-    public String getKeyCheckExamReminder(String username, String code) {
+    public String getKeyCheckExamReminder(String username, String code, int minutes) {
         return (String) redisTemplate.opsForValue()
-                .get(getPrefixForExamReminder(username, code));
+                .get(getPrefixForExamReminder(username, code, minutes));
     }
 
     @Override
-    public boolean isUserRemindedForExam(String username, String code) {
-        return redisTemplate.hasKey(getPrefixForExamReminder(username, code));
+    public boolean isUserRemindedForExam(String username, String code, int minutes) {
+        return redisTemplate.hasKey(getPrefixForExamReminder(username, code, minutes));
     }
 
-    private String getPrefixForExamReminder(String username, String code) {
-        return "EXAM_REMINDER_" + username + "_" + code;
+    private String getPrefixForExamReminder(String username, String code, int minutes) {
+        return "EXAM_REMINDER_" + username + "_" + code + "_" + minutes;
     }
 
 }

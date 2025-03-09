@@ -74,8 +74,9 @@ public class RedisServiceImplTest {
     public void testSaveKeyCheckExamReminder() {
         String username = "user1";
         String code = "exam123";
+        int minutes = 30;
 
-        redisServiceImpl.saveKeyCheckExamReminder(username, code);
+        redisServiceImpl.saveKeyCheckExamReminder(username, code, minutes);
 
         verify(valueOperations).set("EXAM_REMINDER_user1_exam123", code, Duration.ofMinutes(30));
     }
@@ -85,10 +86,11 @@ public class RedisServiceImplTest {
         String username = "user1";
         String code = "exam123";
         String expectedCode = "exam123";
+        int minutes = 30;
 
         when(valueOperations.get("EXAM_REMINDER_user1_exam123")).thenReturn(expectedCode);
 
-        String actualCode = redisServiceImpl.getKeyCheckExamReminder(username, code);
+        String actualCode = redisServiceImpl.getKeyCheckExamReminder(username, code, minutes);
 
         verify(valueOperations).get("EXAM_REMINDER_user1_exam123");
         assertEquals(expectedCode, actualCode);
@@ -98,10 +100,11 @@ public class RedisServiceImplTest {
     public void testIsUserRemindedForExam() {
         String username = "user1";
         String code = "exam123";
+        int minutes = 30;
 
         when(redisTemplate.hasKey("EXAM_REMINDER_user1_exam123")).thenReturn(true);
 
-        boolean isReminded = redisServiceImpl.isUserRemindedForExam(username, code);
+        boolean isReminded = redisServiceImpl.isUserRemindedForExam(username, code, minutes);
 
         verify(redisTemplate).hasKey("EXAM_REMINDER_user1_exam123");
         assertTrue(isReminded);

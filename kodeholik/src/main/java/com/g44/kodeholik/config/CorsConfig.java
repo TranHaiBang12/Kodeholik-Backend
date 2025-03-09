@@ -23,7 +23,7 @@ public class CorsConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174")); //
         // Domain của client
-        configuration.setAllowedOrigins(Arrays.asList(frontendUrl));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174", "http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*")); // Cho phép tất cả headers
         configuration.setAllowCredentials(true); // Cho phép credentials

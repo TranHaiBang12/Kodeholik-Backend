@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemInputParameter;
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.repository.problem.ProblemInputParameterRepository;
 import com.g44.kodeholik.service.problem.ProblemInputParameterService;
 import com.g44.kodeholik.service.problem.ProblemService;
@@ -21,6 +22,11 @@ public class ProblemInputParameterServiceImpl implements ProblemInputParameterSe
     @Override
     public List<ProblemInputParameter> getProblemInputParameters(Problem problem) {
         return problemInputParameterRepository.findByProblem(problem);
+    }
+
+    @Override
+    public List<ProblemInputParameter> getProblemInputParameters(Problem problem, Language language) {
+        return problemInputParameterRepository.findByProblemAndLanguage(problem, language);
     }
 
     @Override

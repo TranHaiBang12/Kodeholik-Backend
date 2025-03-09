@@ -9,9 +9,9 @@ public interface RedisService {
 
     public void deleteToken(String username, TokenType tokenType);
 
-    public void saveKeyCheckExamReminder(String username, String code);
+    public void saveKeyCheckExamReminder(String username, String code, int minutes);
 
-    public String getKeyCheckExamReminder(String username, String code);
+    public String getKeyCheckExamReminder(String username, String code, int minutes);
 
-    public boolean isUserRemindedForExam(String username, String code);
+    public boolean isUserRemindedForExam(String username, String code, int minutes);
 }

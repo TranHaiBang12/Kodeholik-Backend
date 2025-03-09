@@ -7,5 +7,8 @@ public interface EmailService {
 
     public void sendEmailAddUser(String to, String subject, String username, String password);
 
-    public void sendEmailNotifyExam(String to, String subject, String username, String date, String code);
+    public void sendEmailNotifyExam30Minutes(String to, String subject, String username, String date, String code);
+
+    public void sendEmailNotifyExam5Minutes(String to, String subject, String username, String date, String code);
+
 }

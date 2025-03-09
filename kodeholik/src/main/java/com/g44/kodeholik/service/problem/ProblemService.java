@@ -107,7 +107,11 @@ public interface ProblemService {
 
         public ProblemEditorialResponseDto getProblemEditorialDtoList(String link);
 
-        public ProblemInputParameterResponseDto getProblemInputParameterDtoList(String link);
+        public ProblemEditorialResponseDto getProblemEditorialDtoListTeacher(String link);
+
+        public List<ProblemInputParameterResponseDto> getProblemInputParameterDtoList(String link);
+
+        public List<ProblemInputParameterResponseDto> getProblemInputParameterDtoListTeacher(String link);
 
         public byte[] getExcelFile(String link);
 

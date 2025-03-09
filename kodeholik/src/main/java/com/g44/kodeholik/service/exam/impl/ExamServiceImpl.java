@@ -286,6 +286,7 @@ public class ExamServiceImpl implements ExamService {
                 : Timestamp.valueOf("1970-01-01 00:00:00");
         Timestamp endTimestamp = filterExamRequestDto.getEnd() != null ? filterExamRequestDto.getEnd()
                 : Timestamp.valueOf("2100-01-01 00:00:00");
+        log.info(filterExamRequestDto);
         Page<Exam> examList = examRepository
                 .searchExam(
                         filterExamRequestDto.getTitle(),
@@ -737,6 +738,7 @@ public class ExamServiceImpl implements ExamService {
     public void sendNotiToUserExamAboutToStart() {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         Timestamp after30Minutes = new Timestamp(now.getTime() + 1000 * 30 * 60);
+        Timestamp after5Minutes = new Timestamp(now.getTime() + 1000 * 5 * 60);
 
         List<Exam> examList = examRepository.getExamAboutToStart(now, after30Minutes);
         for (int i = 0; i < examList.size(); i++) {
@@ -744,12 +746,30 @@ public class ExamServiceImpl implements ExamService {
             for (int j = 0; j < participants.size(); j++) {
                 Users user = participants.get(j).getParticipant();
                 String formattedDate = sdf.format(examList.get(i).getStartTime());
-                if (!redisService.isUserRemindedForExam(user.getUsername(), examList.get(i).getCode())) {
-                    redisService.saveKeyCheckExamReminder(user.getUsername(), examList.get(i).getCode());
+                if (!redisService.isUserRemindedForExam(user.getUsername(), examList.get(i).getCode(), 30)) {
+                    redisService.saveKeyCheckExamReminder(user.getUsername(), examList.get(i).getCode(), 30);
                     notificationService.saveNotification(user, "There is a exam that will start on " + formattedDate,
                             "", NotificationType.SYSTEM);
-                    emailService.sendEmailNotifyExam(user.getEmail(), "[KODEHOLIK] Exam Reminder", user.getUsername(),
+                    emailService.sendEmailNotifyExam30Minutes(user.getEmail(), "[KODEHOLIK] Exam Reminder",
+                            user.getUsername(),
                             formattedDate, examList.get(i).getCode());
+                }
+            }
+        }
+
+        List<Exam> examList5Minutes = examRepository.getExamAboutToStart(now, after5Minutes);
+        for (int i = 0; i < examList5Minutes.size(); i++) {
+            List<ExamParticipant> participants = examParticipantRepository.findByExam(examList5Minutes.get(i));
+            for (int j = 0; j < participants.size(); j++) {
+                Users user = participants.get(j).getParticipant();
+                String formattedDate = sdf.format(examList.get(i).getStartTime());
+                if (!redisService.isUserRemindedForExam(user.getUsername(), examList5Minutes.get(i).getCode(), 5)) {
+                    redisService.saveKeyCheckExamReminder(user.getUsername(), examList5Minutes.get(i).getCode(), 5);
+                    notificationService.saveNotification(user, "There is a exam that will start on " + formattedDate,
+                            "", NotificationType.SYSTEM);
+                    emailService.sendEmailNotifyExam30Minutes(user.getEmail(), "[KODEHOLIK] Exam Reminder",
+                            user.getUsername(),
+                            formattedDate, examList5Minutes.get(i).getCode());
                 }
             }
         }

@@ -85,6 +85,7 @@ public class ProblemController {
             @RequestPart("problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
             @RequestPart(name = "testCaseFile") MultipartFile testCaseFile) {
         // TODO: process POST request
+        log.info(problemInputParameterDto.get(1).getParameters());
         problemService.editProblem(link, problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
@@ -99,7 +100,7 @@ public class ProblemController {
 
     @GetMapping("/editorial-for-emp/{link}")
     public ResponseEntity<ProblemEditorialResponseDto> getProblemEditorialForEmployee(@PathVariable String link) {
-        return ResponseEntity.ok(problemService.getProblemEditorialDtoList(link));
+        return ResponseEntity.ok(problemService.getProblemEditorialDtoListTeacher(link));
     }
 
     @GetMapping("/editorial/{link}")
@@ -108,8 +109,9 @@ public class ProblemController {
     }
 
     @GetMapping("/template-for-emp/{link}")
-    public ResponseEntity<ProblemInputParameterResponseDto> getProblemTemplateForEmployee(@PathVariable String link) {
-        return ResponseEntity.ok(problemService.getProblemInputParameterDtoList(link));
+    public ResponseEntity<List<ProblemInputParameterResponseDto>> getProblemTemplateForEmployee(
+            @PathVariable String link) {
+        return ResponseEntity.ok(problemService.getProblemInputParameterDtoListTeacher(link));
     }
 
     @GetMapping("/download-testcase/{link}")

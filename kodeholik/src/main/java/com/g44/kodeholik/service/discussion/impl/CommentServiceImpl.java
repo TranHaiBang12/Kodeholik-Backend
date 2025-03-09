@@ -175,7 +175,6 @@ public class CommentServiceImpl implements CommentService {
                     ? new HashSet<>(comment.getProblems())
                     : new HashSet<>();
             commentProblems.add(problem);
-
             comment.setProblems(commentProblems);
             commentRepository.save(comment);
         }
