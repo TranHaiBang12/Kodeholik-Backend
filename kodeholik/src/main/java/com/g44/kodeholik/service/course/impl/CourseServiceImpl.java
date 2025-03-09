@@ -12,6 +12,7 @@ import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
 import com.g44.kodeholik.model.enums.s3.FileNameType;
+import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.repository.course.CourseUserRepository;
 import com.g44.kodeholik.repository.setting.TopicRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
@@ -72,13 +73,6 @@ public class CourseServiceImpl implements CourseService {
     private final TopicService topicService;
 
     private final S3Service s3Service;
-
-    @Override
-    public Page<CourseResponseDto> getAllCourse(Pageable pageable) {
-        Page<Course> coursePage = courseRepository
-                .findByStatus(CourseStatus.ACTIVATED, pageable);
-        return coursePage.map(courseResponseMapper::mapFrom);
-    }
 
     @Override
     public CourseDetailResponseDto getCourseById(Long courseId) {
@@ -185,21 +179,32 @@ public class CourseServiceImpl implements CourseService {
         Sort sort = Sort.by(direction, sortField);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        CourseStatus activeStatus = CourseStatus.ACTIVATED;
+        // Lấy user hiện tại
+        Users currentUser = userService.getCurrentUser();
+        UserRole userRole = currentUser.getRole();
+
+        // Xác định trạng thái course theo role
+        List<CourseStatus> allowedStatuses;
+        if (userRole == UserRole.STUDENT) {
+            allowedStatuses = Collections.singletonList(CourseStatus.ACTIVATED);
+        } else {
+            allowedStatuses = Arrays.asList(CourseStatus.values());
+        }
 
         Page<Course> courses;
         if (title.isEmpty() && topics.isEmpty()) {
-            courses = courseRepository.findByStatus(activeStatus, pageable);
+            courses = courseRepository.findByStatusIn(allowedStatuses, pageable);
         } else if (!title.isEmpty() && topics.isEmpty()) {
-            courses = courseRepository.findByTitleContainingIgnoreCaseAndStatus(title, activeStatus, pageable);
+            courses = courseRepository.findByTitleContainingIgnoreCaseAndStatusIn(title, allowedStatuses, pageable);
         } else if (title.isEmpty()) {
-            courses = courseRepository.findByTopicsInAndStatus(topics, activeStatus, pageable);
+            courses = courseRepository.findByTopicsInAndStatusIn(topics, allowedStatuses, pageable);
         } else {
-            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsInAndStatus(title, topics, activeStatus, pageable);
+            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(title, topics, allowedStatuses, pageable);
         }
 
         return courses.map(courseResponseMapper::mapFrom);
     }
+
 
     @Transactional
     @Override

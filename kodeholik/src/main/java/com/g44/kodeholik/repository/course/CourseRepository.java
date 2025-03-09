@@ -15,15 +15,16 @@ import java.util.List;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
+
     Page<Course> findByTitle(String title, Pageable pageable);
 
-    Page<Course> findByStatus(CourseStatus status, Pageable pageable);
+    Page<Course> findByStatusIn(List<CourseStatus> statuses, Pageable pageable);
 
-    Page<Course> findByTitleContainingIgnoreCaseAndStatus(String title, CourseStatus status, Pageable pageable);
+    Page<Course> findByTitleContainingIgnoreCaseAndStatusIn(String title, List<CourseStatus> statuses, Pageable pageable);
 
-    Page<Course> findByTopicsInAndStatus(List<Topic> topics, CourseStatus status, Pageable pageable);
+    Page<Course> findByTopicsInAndStatusIn(List<Topic> topics, List<CourseStatus> statuses, Pageable pageable);
 
-    Page<Course> findByTitleContainingIgnoreCaseAndTopicsInAndStatus(String title, List<Topic> topics, CourseStatus status, Pageable pageable);
-
+    Page<Course> findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(String title, List<Topic> topics, List<CourseStatus> statuses, Pageable pageable);
 }
+
 

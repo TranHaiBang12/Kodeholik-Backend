@@ -15,6 +15,9 @@ public class VideoController {
     @Autowired
     private GoogleCloudStorageService storageService;
 
+//    @GetMapping("/upload-video-url")
+//    public
+
     @GetMapping("/{fileName}/signed-url")
     public ResponseEntity<String> getSignedUrl(@PathVariable String fileName) {
         String signedUrl = storageService.generateSignedUrl("videos/" + fileName);

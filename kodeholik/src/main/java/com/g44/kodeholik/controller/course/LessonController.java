@@ -61,8 +61,6 @@ public class LessonController {
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
 
-
-
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateLesson(@PathVariable Long id, @RequestBody @Valid LessonRequestDto lessonRequestDto) {
         lessonService.editLesson(id, lessonRequestDto);
