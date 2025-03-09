@@ -5,7 +5,7 @@
 -- Dumped from database version 17.2
 -- Dumped by pg_dump version 17.2
 
--- Started on 2025-03-03 23:02:23
+-- Started on 2025-03-09 19:41:30
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -131,19 +131,20 @@ CREATE TYPE schema_course.course_status AS ENUM (
 ALTER TYPE schema_course.course_status OWNER TO postgres;
 
 --
--- TOC entry 946 (class 1247 OID 18444)
+-- TOC entry 1050 (class 1247 OID 18747)
 -- Name: lesson_status; Type: TYPE; Schema: schema_course; Owner: postgres
 --
 
 CREATE TYPE schema_course.lesson_status AS ENUM (
-    'ACTIVATED, INACTIVATED'
+    'ACTIVATED',
+    'INACTIVATED'
 );
 
 
 ALTER TYPE schema_course.lesson_status OWNER TO postgres;
 
 --
--- TOC entry 949 (class 1247 OID 18448)
+-- TOC entry 946 (class 1247 OID 18448)
 -- Name: lesson_type; Type: TYPE; Schema: schema_course; Owner: postgres
 --
 
@@ -172,7 +173,7 @@ CREATE TYPE schema_exam.exam_status AS ENUM (
 ALTER TYPE schema_exam.exam_status OWNER TO postgres;
 
 --
--- TOC entry 1020 (class 1247 OID 17382)
+-- TOC entry 1017 (class 1247 OID 17382)
 -- Name: difficulty; Type: TYPE; Schema: schema_problem; Owner: postgres
 --
 
@@ -186,7 +187,7 @@ CREATE TYPE schema_problem.difficulty AS ENUM (
 ALTER TYPE schema_problem.difficulty OWNER TO postgres;
 
 --
--- TOC entry 1029 (class 1247 OID 17534)
+-- TOC entry 1026 (class 1247 OID 17534)
 -- Name: input_type; Type: TYPE; Schema: schema_problem; Owner: postgres
 --
 
@@ -211,7 +212,7 @@ CREATE TYPE schema_problem.input_type AS ENUM (
 ALTER TYPE schema_problem.input_type OWNER TO postgres;
 
 --
--- TOC entry 1011 (class 1247 OID 17350)
+-- TOC entry 1008 (class 1247 OID 17350)
 -- Name: problem_status; Type: TYPE; Schema: schema_problem; Owner: postgres
 --
 
@@ -224,7 +225,7 @@ CREATE TYPE schema_problem.problem_status AS ENUM (
 ALTER TYPE schema_problem.problem_status OWNER TO postgres;
 
 --
--- TOC entry 1041 (class 1247 OID 18584)
+-- TOC entry 1038 (class 1247 OID 18584)
 -- Name: submission_status; Type: TYPE; Schema: schema_problem; Owner: postgres
 --
 
@@ -237,7 +238,7 @@ CREATE TYPE schema_problem.submission_status AS ENUM (
 ALTER TYPE schema_problem.submission_status OWNER TO postgres;
 
 --
--- TOC entry 1050 (class 1247 OID 17677)
+-- TOC entry 1047 (class 1247 OID 17677)
 -- Name: level; Type: TYPE; Schema: schema_setting; Owner: postgres
 --
 
@@ -251,7 +252,7 @@ CREATE TYPE schema_setting.level AS ENUM (
 ALTER TYPE schema_setting.level OWNER TO postgres;
 
 --
--- TOC entry 1044 (class 1247 OID 18591)
+-- TOC entry 1041 (class 1247 OID 18591)
 -- Name: notification_type; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
@@ -264,7 +265,7 @@ CREATE TYPE schema_user.notification_type AS ENUM (
 ALTER TYPE schema_user.notification_type OWNER TO postgres;
 
 --
--- TOC entry 984 (class 1247 OID 17230)
+-- TOC entry 981 (class 1247 OID 17230)
 -- Name: transaction_status; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
@@ -277,7 +278,7 @@ CREATE TYPE schema_user.transaction_status AS ENUM (
 ALTER TYPE schema_user.transaction_status OWNER TO postgres;
 
 --
--- TOC entry 981 (class 1247 OID 17224)
+-- TOC entry 978 (class 1247 OID 17224)
 -- Name: transaction_type; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
@@ -290,7 +291,7 @@ CREATE TYPE schema_user.transaction_type AS ENUM (
 ALTER TYPE schema_user.transaction_type OWNER TO postgres;
 
 --
--- TOC entry 1026 (class 1247 OID 17494)
+-- TOC entry 1023 (class 1247 OID 17494)
 -- Name: user_role; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
@@ -305,7 +306,7 @@ CREATE TYPE schema_user.user_role AS ENUM (
 ALTER TYPE schema_user.user_role OWNER TO postgres;
 
 --
--- TOC entry 1023 (class 1247 OID 17504)
+-- TOC entry 1020 (class 1247 OID 17504)
 -- Name: user_status; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
@@ -452,7 +453,7 @@ CREATE TABLE schema_course.lesson (
     display_order integer,
     type schema_course.lesson_type NOT NULL,
     video_url character varying(200),
-    attatched_file character varying(250),
+    attached_file character varying(250),
     created_at timestamp without time zone NOT NULL,
     created_by integer NOT NULL,
     updated_at timestamp without time zone,
@@ -1181,6 +1182,7 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 -- Data for Name: chapter; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
 
+INSERT INTO schema_course.chapter (id, course_id, title, description, display_order, status, created_at, created_by, updated_at, updated_by) OVERRIDING SYSTEM VALUE VALUES (1, 1, 'test', 'test', 1, 'ACTIVATED', '2025-01-18 16:25:07.673921', 1, NULL, NULL);
 
 
 --
@@ -1226,6 +1228,7 @@ INSERT INTO schema_course.course_user (course_id, user_id, enrolled_at) VALUES (
 -- Data for Name: lesson; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
 
+INSERT INTO schema_course.lesson (id, chapter_id, title, description, display_order, type, video_url, attached_file, created_at, created_by, updated_at, updated_by, status) OVERRIDING SYSTEM VALUE VALUES (1, 1, 'test', 'test', 1, 'VIDEO', NULL, 'lessons/3f69eb45-2b69-433c-8cd8-95926501bdeb-EmailWriting.txt', '2025-03-06 13:19:13.509344', 5, NULL, NULL, 'ACTIVATED');
 
 
 --
@@ -1271,6 +1274,8 @@ INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_
 INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (28, 'Ahaha', 0, '2025-03-03 22:57:28.809864', 1, NULL, NULL, NULL);
 INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (29, 'Please gúy, dont post any solution in this section. It is only used for any questions about the title', 0, '2025-03-03 22:58:49.800098', 1, NULL, NULL, NULL);
 INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (30, 'Please gúy, dont post any solution in this section. It is only used for any questions about the title', 0, '2025-03-03 22:59:25.193033', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (31, 'saada', 0, '2025-03-07 07:09:35.573509', 1, NULL, NULL, NULL);
+INSERT INTO schema_discussion.comment (id, comment, upvote, created_at, created_by, updated_at, updated_by, comment_reply) OVERRIDING SYSTEM VALUE VALUES (32, 'hehe', 0, '2025-03-07 19:06:57.043751', 1, NULL, NULL, NULL);
 
 
 --
@@ -1289,15 +1294,20 @@ INSERT INTO schema_discussion.comment_vote (user_id, comment_id) VALUES (1, 4);
 -- Data for Name: exam; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
 
-INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (12, 'a4768a1f-67e1-448a-84a8-a441013c4396', 'Exam for Java. Trial #1', 'Trial test for Java in FPT University', '2025-04-04 23:25:00', '2025-04-07 01:25:00', 'NOT_STARTED', '2025-03-03 18:48:46.883106', 76, '2025-03-03 18:58:39.160939', 76, 0);
-INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (14, 'df64708b-4872-4fd7-913d-030ee5dfef78', 'Exam for Java. Trial #2', 'Trial test for java', '2025-04-03 23:25:00', '2025-04-06 01:25:00', 'NOT_STARTED', '2025-03-03 18:56:14.865331', 76, NULL, NULL, 0);
-INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (15, 'code1', 'Test 1', 'Test 1', '2024-04-04 23:25:00', '2024-04-05 01:25:00', 'IN_PROGRESS', '2024-02-05 01:25:00', 76, NULL, NULL, 212);
-INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (16, 'code2', 'Test 2', 'Test 2', '2024-02-02 23:25:00', '2024-02-05 01:25:00', 'IN_PROGRESS', '2023-02-05 01:25:00', 76, NULL, NULL, 160);
-INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (17, 'code3', 'Test for C 1', 'Test 3', '2024-01-04 23:25:00', '2024-01-05 01:25:00', 'IN_PROGRESS', '2020-02-05 01:25:00', 76, NULL, NULL, 125);
-INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (18, 'code4', 'Test for C 2', 'Test 4', '2024-02-04 23:25:00', '2024-02-05 01:25:00', 'IN_PROGRESS', '2020-02-05 01:25:00', 76, NULL, NULL, 467);
 INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (19, 'code5', 'Test 3', 'Test 5', '2023-04-04 23:25:00', '2023-04-05 01:25:00', 'END', '2020-02-05 01:25:00', 76, NULL, NULL, 300);
 INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (20, 'code6', 'Test 4', 'Test 6', '2023-04-04 23:25:00', '2023-04-05 01:25:00', 'END', '2020-02-05 01:25:00', 76, NULL, NULL, 1000);
 INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (21, 'code7', 'Test 5', 'Test 7', '2023-04-04 23:25:00', '2023-04-05 01:25:00', 'END', '2020-02-05 01:25:00', 76, NULL, NULL, 250);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (18, 'code4', 'Test for C 2', 'Test 4', '2026-02-04 23:25:00', '2026-02-05 01:25:00', 'NOT_STARTED', '2020-02-05 01:25:00', 76, NULL, NULL, 468);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (26, '790ec861-8a7f-409a-a63d-7e5d6e2da7ef', 'Exam for Java #1', 'Trial test for java', '2026-03-06 20:05:00', '2026-03-07 18:25:00', 'NOT_STARTED', '2025-03-06 22:24:36.357302', 76, NULL, NULL, 0);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (12, 'a4768a1f-67e1-448a-84a8-a441013c4396', 'Exam for Java. Trial #1', 'Trial test for Java in FPT University', '2025-03-06 19:46:00', '2025-03-06 19:10:00', 'END', '2025-03-03 18:48:46.883106', 76, '2025-03-03 18:58:39.160939', 76, 12);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (22, '99157936-f00c-4d5e-a235-29551209e4f4', 'Exam for Java #1', 'Trial test for java', '2025-03-07 02:54:00', '2025-03-08 01:25:00', 'NOT_STARTED', '2025-03-06 19:48:24.017884', 76, NULL, NULL, 0);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (23, '10744e81-ae04-46e9-9836-00a83dc3598c', 'Exam for Java #1', 'Trial test for java', '2025-03-07 02:54:00', '2025-03-08 01:25:00', 'NOT_STARTED', '2025-03-06 19:50:28.830602', 76, NULL, NULL, 0);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (15, 'code1', 'Test 1', 'Test 1', '2024-04-04 23:25:00', '2024-04-05 01:25:00', 'END', '2024-02-05 01:25:00', 76, NULL, NULL, 212);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (16, 'code2', 'Test 2', 'Test 2', '2024-02-02 23:25:00', '2024-02-05 01:25:00', 'END', '2023-02-05 01:25:00', 76, NULL, NULL, 160);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (17, 'code3', 'Test for C 1', 'Test 3', '2024-01-04 23:25:00', '2024-01-05 01:25:00', 'END', '2020-02-05 01:25:00', 76, NULL, NULL, 125);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (24, 'aa14149e-15f1-47aa-a2cd-d253009d7b74', 'Exam for Java #1', 'Trial test for java', '2025-03-06 20:00:00', '2025-03-07 18:25:00', 'IN_PROGRESS', '2025-03-06 19:52:45.510527', 76, NULL, NULL, 1);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (14, 'df64708b-4872-4fd7-913d-030ee5dfef78', 'Exam for Java. Trial #2', 'Trial test for java', '2025-03-06 19:45:07', '2025-03-07 11:25:00', 'END', '2025-03-03 18:56:14.865331', 76, NULL, NULL, 6);
+INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time, status, created_at, created_by, updated_at, updated_by, no_participant) OVERRIDING SYSTEM VALUE VALUES (25, 'f10b5f86-ae42-40f1-b554-abc55a1e0078', 'Exam for Java. Trial #6', 'Sixth Trial test for Java in FPT University', '2025-03-07 08:00:00', '2025-03-09 18:25:00', 'IN_PROGRESS', '2025-03-06 20:04:02.80897', 76, '2025-03-06 20:53:42.530983', 76, 2);
 
 
 --
@@ -1308,6 +1318,11 @@ INSERT INTO schema_exam.exam (id, code, title, description, start_time, end_time
 
 INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (12, 1);
 INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (14, 1);
+INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (22, 1);
+INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (23, 1);
+INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (24, 1);
+INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (25, 1);
+INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (26, 1);
 
 
 --
@@ -1316,6 +1331,7 @@ INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (14,
 -- Data for Name: exam_participant; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
 
+INSERT INTO schema_exam.exam_participant (exam_id, participant_id, grade) VALUES (25, 1, 4.5);
 
 
 --
@@ -1324,12 +1340,27 @@ INSERT INTO schema_exam.exam_language_support (exam_id, language_id) VALUES (14,
 -- Data for Name: exam_problem; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
 
-INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (14, 51, 3);
-INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (14, 48, 3);
-INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (14, 29, 4);
-INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (12, 51, 4);
-INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (12, 48, 4);
-INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (12, 29, 2);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (14, 98, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (14, 100, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (14, 112, 4);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (12, 98, 4);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (12, 100, 4);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (12, 112, 2);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (22, 51, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (22, 48, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (22, 29, 4);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (23, 51, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (23, 48, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (23, 29, 4);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (24, 51, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (24, 48, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (24, 29, 4);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (25, 98, 4);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (25, 100, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (25, 112, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (26, 51, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (26, 48, 3);
+INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (26, 29, 4);
 
 
 --
@@ -1338,6 +1369,9 @@ INSERT INTO schema_exam.exam_problem (exam_id, problem_id, point) VALUES (12, 29
 -- Data for Name: exam_submission; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
 
+INSERT INTO schema_exam.exam_submission (exam_id, participant_id, problem_id, submission_id, point) VALUES (25, 1, 98, 213, 0);
+INSERT INTO schema_exam.exam_submission (exam_id, participant_id, problem_id, submission_id, point) VALUES (25, 1, 100, 214, 1.5);
+INSERT INTO schema_exam.exam_submission (exam_id, participant_id, problem_id, submission_id, point) VALUES (25, 1, 112, 215, 3);
 
 
 --
@@ -1355,7 +1389,6 @@ INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (13
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (27, 1);
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (30, 1);
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (98, 1);
-INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (96, 1);
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (88, 1);
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (29, 1);
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (51, 1);
@@ -1383,6 +1416,7 @@ INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (46
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (47, 1);
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (100, 1);
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (100, 2);
+INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (96, 1);
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (112, 1);
 INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (112, 2);
 
@@ -1393,17 +1427,21 @@ INSERT INTO schema_problem.language_support (problem_id, language_id) VALUES (11
 -- Data for Name: problem; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (62, 'Valid Parentheses', 'Given an array nums of n integers, return an array of all the unique quadruplets [nums[a], nums[b], nums[c], nums[d]] such that: 0 <= a, b, c, d < n 
+ a, b, c, and d are distinct.
+nums[a] + nums[b] + nums[c] + nums[d] == target.
+You may return the answer in any order.', 'EASY', 50.00, 20, 'PUBLIC', '2025-02-13 20:36:04.908291', 1, '2025-02-17 22:23:57.104682', 1, true, 'valid-parentheses');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (24, 'Divide Two Integers', 'Given two integers dividend and divisor, divide two integers without using multiplication, division, and mod operator.
 
 The integer division should truncate toward zero, which means losing its fractional part. For example, 8.345 would be truncated to 8, and -2.7335 would be truncated to -2.
 
 Return the quotient after dividing dividend by divisor.
 
-Note: Assume we are dealing with an environment that could only store integers within the 32-bit signed integer range: [−231, 231 − 1]. For this problem, if the quotient is strictly greater than 231 - 1, then return 231 - 1, and if the quotient is strictly less than -231, then return -231.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-18 16:25:07.673921', 1, '2025-01-18 16:25:12.583489', 1, true, 'divide-two-integers');
-INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (62, 'Valid Parentheses', 'Given an array nums of n integers, return an array of all the unique quadruplets [nums[a], nums[b], nums[c], nums[d]] such that: 0 <= a, b, c, d < n 
- a, b, c, and d are distinct.
-nums[a] + nums[b] + nums[c] + nums[d] == target.
-You may return the answer in any order.', 'EASY', 50.00, 20, 'PUBLIC', '2025-02-13 20:36:04.908291', 1, '2025-02-17 22:23:57.104682', 1, true, 'valid-parentheses');
+Note: Assume we are dealing with an environment that could only store integers within the 32-bit signed integer range: [−231, 231 − 1]. For this problem, if the quotient is strictly greater than 231 - 1, then return 231 - 1, and if the quotient is strictly less than -231, then return -231.', 'MEDIUM', 0.00, 0, 'PRIVATE', '2025-01-18 16:25:07.673921', 1, '2025-01-18 16:25:12.583489', 1, true, 'divide-two-integers');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (98, 'Edit Distance 1', 'Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.You have the following three operations permitted on a word: Insert a character 
+ Delete a character 
+ Replace a character', 'MEDIUM', 52.27, 44, 'PRIVATE', '2025-02-18 16:47:34.284482', 1, NULL, NULL, true, 'edit-distance-1');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (96, 'Multiply Strings', 'Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string. Note: You must not use any built-in BigInteger library or convert the inputs to integer directly.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-02-17 19:33:03.092842', 1, '2025-03-09 12:41:26.553811', 22, true, 'multiply-strings');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (97, 'Edit Distance', 'Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.You have the following three operations permitted on a word: Insert a character 
  Delete a character 
  Replace a character', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-02-18 16:46:29.310675', 1, NULL, NULL, true, 'edit-distance');
@@ -1432,10 +1470,6 @@ If there is still a tie, append nums[i] to arr1.
 The array result is formed by concatenating the arrays arr1 and arr2. For example, if arr1 == [1,2,3] and arr2 == [4,5,6], then result = [1,2,3,4,5,6].
 
 Return the integer array result.', 'HARD', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'distribute-elements-into-two-arrays-ii');
-INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (98, 'Edit Distance 1', 'Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.You have the following three operations permitted on a word: Insert a character 
- Delete a character 
- Replace a character', 'MEDIUM', 30.00, 10, 'PUBLIC', '2025-02-18 16:47:34.284482', 1, NULL, NULL, true, 'edit-distance-1');
-INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (96, 'Multiply Strings', 'Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string. Note: You must not use any built-in BigInteger library or convert the inputs to integer directly.', 'MEDIUM', 41.67, 12, 'PUBLIC', '2025-02-17 19:33:03.092842', 1, '2025-02-18 13:48:42.126348', 1, true, 'multiply-strings');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (29, 'Largest Merge Of Two Strings', 'ou are given two strings word1 and word2. You want to construct a string merge in the following way: while either word1 or word2 are non-empty, choose one of the following options:
 
 If word1 is non-empty, append the first character in word1 to merge and delete it from word1.
@@ -1458,6 +1492,7 @@ INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptan
 You must buy exactly two chocolates in such a way that you still have some non-negative leftover money. You would like to minimize the sum of the prices of the two chocolates you buy.
 
 Return the amount of money you will have leftover after buying the two chocolates. If there is no way for you to buy two chocolates without ending up in debt, return money. Note that the leftover must be non-negative.', 'EASY', 0.00, 0, 'PRIVATE', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'buy-two-chocolates');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (100, 'Palindrome Number', 'Given an integer x, return true if x is a palindrome, and false otherwise.', 'EASY', 66.67, 30, 'PRIVATE', '2025-03-02 00:58:22.13278', 1, '2025-03-02 01:28:22.235596', 1, true, 'palindrome-number');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (49, 'Valid Number', 'Given a string s, return whether s is a valid number.
 
 For example, all the following are valid numbers: "2", "0089", "-0.1", "+3.14", "4.", "-.9", "2e10", "-90E3", "3e+7", "+6e-1", "53.5e93", "-123.456e789", while the following are not valid numbers: "abc", "1a", "1e", "e3", "99e2.5", "--6", "-+3", "95a54e53".
@@ -1483,7 +1518,6 @@ You should pack your words in a greedy approach; that is, pack as many words as 
 Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line does not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.
 
 For the last line of text, it should be left-justified, and no extra space is inserted between words.', 'HARD', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'text-justification');
-INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (100, 'Palindrome Number', 'Given an integer x, return true if x is a palindrome, and false otherwise.', 'EASY', 0.00, 0, 'PUBLIC', '2025-03-02 00:58:22.13278', 1, '2025-03-02 01:28:22.235596', 1, true, 'palindrome-number');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (40, 'Power of Two', 'Given an integer n, return true if it is a power of two. Otherwise, return false.
 
 An integer n is a power of two, if there exists an integer x such that n == 2x.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'power-of-two');
@@ -1539,7 +1573,7 @@ INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptan
 
 Return the minimum cost to fly every person to a city such that exactly n people arrive in each city.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'two-city-scheduling');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (32, 'Maximum XOR of Two Numbers in an Array', 'Given an integer array nums, return the maximum result of nums[i] XOR nums[j], where 0 <= i <= j < n.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'maximum-xor-of-two-numbers-in-an-array');
-INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (112, 'Gas Station', 'There are n gas stations along a circular route, where the amount of gas at the ith station is gas[i]. You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from the ith station to its next (i + 1)th station. You begin the journey with an empty tank at one of the gas stations. Given two integer arrays gas and cost, return the starting gas station''s index if you can travel around the circuit once in the clockwise direction, otherwise return -1. If there exists a solution, it is guaranteed to be unique.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-03-02 22:42:33.891205', 1, '2025-03-02 22:43:32.515186', 1, true, 'gas-station');
+INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (112, 'Gas Station', 'There are n gas stations along a circular route, where the amount of gas at the ith station is gas[i]. You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from the ith station to its next (i + 1)th station. You begin the journey with an empty tank at one of the gas stations. Given two integer arrays gas and cost, return the starting gas station''s index if you can travel around the circuit once in the clockwise direction, otherwise return -1. If there exists a solution, it is guaranteed to be unique.', 'MEDIUM', 0.00, 0, 'PUBLIC', '2025-03-02 22:42:33.891205', 1, '2025-03-09 19:36:25.619685', 22, true, 'gas-station');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (42, 'Intersection of Two Arrays II', 'Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must appear as many times as it shows in both arrays and you may return the result in any order.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:55:02.708558', 1, NULL, NULL, true, 'intersection-of-two-arrays-ii');
 INSERT INTO schema_problem.problem (id, title, description, difficulty, acceptance_rate, no_submission, status, created_at, created_by, updated_at, updated_by, is_active, link) OVERRIDING SYSTEM VALUE VALUES (44, 'Number of Days Between Two Dates', 'Write a program to count the number of days between two dates.
 
@@ -1598,6 +1632,8 @@ INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 
 INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 27);
 INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 28);
 INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 29);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 31);
+INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (96, 32);
 
 
 --
@@ -1608,20 +1644,18 @@ INSERT INTO schema_problem.problem_comment (problem_id, comment_id) VALUES (25, 
 
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (1, 25, NULL, NULL);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (2, 25, NULL, NULL);
-INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (131, 96, '{"name":"num1","type":"STRING"}', 1);
-INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (132, 96, '{"name":"num2","type":"STRING"}', 1);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (133, 98, '{"name":"word1","type":"STRING"}', 1);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (134, 98, '{"name":"word2","type":"STRING"}', 1);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (137, 100, '{"name":"x","type":"INT"}', 1);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (138, 100, '{"name":"x","type":"INT"}', 2);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (29, 62, NULL, NULL);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (30, 62, NULL, NULL);
-INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (209, 112, '{"name":"gas","type":"ARR_INT"}', 1);
-INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (210, 112, '{"name":"cost","type":"ARR_INT"}', 1);
-INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (211, 112, '{"name":"gas","type":"ARR_INT"}', 2);
-INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (212, 112, '{"name":"gasSize","type":"INT"}', 2);
-INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (213, 112, '{"name":"cost","type":"ARR_INT"}', 2);
-INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (214, 112, '{"name":"costSize","type":"INT"}', 2);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (289, 112, '{"name":"gas","type":"ARR_INT","noDimension":"1"}', 1);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (290, 112, '{"name":"cost","type":"ARR_INT","noDimension":"1"}', 1);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (291, 112, '{"name":"gas","type":"ARR_INT","noDimension":"1"}', 2);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (292, 112, '{"name":"gasSize","type":"INT"}', 2);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (293, 112, '{"name":"cost","type":"ARR_INT","noDimension":"1"}', 2);
+INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (294, 112, '{"name":"costSize","type":"INT"}', 2);
 INSERT INTO schema_problem.problem_input_parameter (id, problem_id, parameters, language_id) OVERRIDING SYSTEM VALUE VALUES (56, 88, NULL, NULL);
 
 
@@ -1640,8 +1674,6 @@ INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (88, 3);
 INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (62, 11);
 INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (62, 1);
 INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (62, 3);
-INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (96, 2);
-INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (96, 3);
 INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (97, 2);
 INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (97, 3);
 INSERT INTO schema_problem.problem_skill (problem_id, skill_id) VALUES (98, 2);
@@ -1658,17 +1690,16 @@ INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solutio
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (14, 62, 'Kodeholik - Editorial', 'test', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (82, 98, 'Kodeholik - Editorial', 'The problem requires transforming one string into another using three operations: insert, delete, or replace. This is a classic Dynamic Programming problem, where we aim to minimize the cost of edits. The solution involves comparing prefixes of both strings to compute the minimum operations required.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (128, 96, 'Just a little hhihi code', 'We dont need to do this problem. This problem is so easy.', false, 0, '2025-02-27 17:09:44.072222', 1, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (81, 96, 'Kodeholik - Editorial', 'We can solve the problem by iterating through the numbers 1 to n, and use linear search to determine whether each number is in the array. The first number we cannot find is the smallest missing integer. This approach would result in a quadratic time complexity.We need to determine whether an element is in the array in constant time. Array indexing provides constant lookup time. We need to check the existence of a relatively small range of values, positive numbers between 1 and n, so we can use an array like a hash table by using the index as a key and the value as a presence indicator. The default value is false, which represents a missing number, and we set the value to true for keys that exist in nums. Numbers not in the range 1 to n are not relevant in the search for the first missing positive, so we do not mark them in the seen array. To solve the problem, we can create an array of size n + 1. For each positive number less than n in nums, we set seen[num] to true. Then, we iterate through the integers 1 to n and return the first number that is not marked as seen in the array. If the array contains all of the elements 1 to n, we return n + 1.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (39, 88, 'Kodeholik - Editorial', 'We can solve the problem by iterating through the numbers 1 to n, and use linear search to determine whether each number is in the array. The first number we cannot find is the smallest missing integer. This approach would result in a quadratic time complexity.We need to determine whether an element is in the array in constant time. Array indexing provides constant lookup time. We need to check the existence of a relatively small range of values, positive numbers between 1 and n, so we can use an array like a hash table by using the index as a key and the value as a presence indicator. The default value is false, which represents a missing number, and we set the value to true for keys that exist in nums. Numbers not in the range 1 to n are not relevant in the search for the first missing positive, so we do not mark them in the seen array. To solve the problem, we can create an array of size n + 1. For each positive number less than n in nums, we set seen[num] to true. Then, we iterate through the integers 1 to n and return the first number that is not marked as seen in the array. If the array contains all of the elements 1 to n, we return n + 1.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (98, 96, 'Easiest solution', 'Remember how we do multiplication?
 
 Start from right to left, perform multiplication on every pair of digits, and add them together', false, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
-INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (149, 112, 'Kodeholik - Editorial', 'The solution follows a greedy approach to determine the correct starting station efficiently. Step 1: Compute Net Gain at Each Station Calculate the net gas available at each station as: diff[𝑖]=gas[𝑖]−cost[𝑖]. Maintain a to variable to track the total sum of all diff[i] values. Key Insight: If sum(gas) < sum(cost), meaning to < 0, it is impossible to complete the circuit, so return -1. Step 2: Find the Valid Starting Index. Initialize index = 0 to track the potential starting station.. Traverse the array while maintaining a to variable to track the gas balance..If to (current gas balance) becomes negative at any station: --> Reset the index to i+1 (next station). --> Reset to = 0 (restart counting from this new index).', true, 0, '2025-03-02 22:43:34.143777', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (99, 96, 'Easy understand', 'If we break it into steps, it will have the following steps. 1. compute products from each pair of digits from num1 and num2. 2. carry each element over. 3. output the solution.
 
 Things to note:
 
 The product of two numbers cannot exceed the sum of the two lengths. (e.g. 99 * 99 cannot be five digit)', false, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (163, 112, 'Kodeholik - Editorial', 'The solution follows a greedy approach to determine the correct starting station efficiently. Step 1: Compute Net Gain at Each Station Calculate the net gas available at each station as: diff[𝑖]=gas[𝑖]−cost[𝑖]. Maintain a to variable to track the total sum of all diff[i] values. Key Insight: If sum(gas) < sum(cost), meaning to < 0, it is impossible to complete the circuit, so return -1. Step 2: Find the Valid Starting Index. Initialize index = 0 to track the potential starting station.. Traverse the array while maintaining a to variable to track the gas balance..If to (current gas balance) becomes negative at any station: --> Reset the index to i+1 (next station). --> Reset to = 0 (restart counting from this new index).', true, 0, '2025-03-09 19:36:26.554979', 22, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (118, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, NULL, 1, NULL, 1, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (119, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, NULL, 1, NULL, 1, 0);
 INSERT INTO schema_problem.problem_solution (id, problem_id, title, text_solution, is_problem_implementation, no_upvote, created_at, created_by, updated_at, updated_by, no_comment) OVERRIDING SYSTEM VALUE VALUES (100, 96, 'Easy Java solution', 'Complexity
@@ -1770,9 +1801,9 @@ INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (100, 11);
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (39, 1);
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (39, 11);
-INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (149, 11);
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (14, 1);
 INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (14, 11);
+INSERT INTO schema_problem.problem_solution_skill (problem_solution_id, skill_id) VALUES (163, 11);
 
 
 --
@@ -1791,6 +1822,50 @@ INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, la
 int n = nums.length;for (int i = 0; i < n - 1; i++) {for (int j = i + 1; j < n; j++) {if (nums[i] + nums[j] == target) {return new int[]{i, j};}}}return new int[]{}; }', 1, NULL, 0.52, 5, '2025-02-16 23:10:41.927647', true, NULL, NULL, 5, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (61, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0.52, 5, '2025-02-17 19:33:35.860922', true, NULL, NULL, 2, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (62, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0.52, 4, '2025-02-17 19:55:38.722401', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (158, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.26, 7, '2025-03-05 07:27:42.486789', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (215, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 1.97, 5, '2025-03-07 08:00:41.849753', true, NULL, NULL, 2, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (63, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 3.08, 4, '2025-02-17 22:20:02.666287', true, NULL, NULL, 2, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (64, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 2.88, 4, '2025-02-18 16:10:35.992705', true, NULL, NULL, 2, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (65, 1, 96, 'char* multiply(char* num1, char* num2) {\nif (strcmp(num1, \"0\") == 0 || strcmp(num2, \"0\") == 0) {\nchar* zero_result = (char*)malloc(2 * sizeof(char));\nstrcpy(zero_result, \"0\");\nreturn zero_result;\n}\nint len1 = strlen(num1);\nint len2 = strlen(num2);\nint* result = (int*)calloc(len1 + len2, sizeof(int));\nfor (int i = len1 - 1; i >= 0; i--) {\nfor (int j = len2 - 1; j >= 0; j--) {\nint mul = (num1[i] - ''0'') * (num2[j] - ''0'');\nint total = mul + result[i + j + 1];\nresult[i + j] += total / 10;\nresult[i + j + 1] = total % 10;\n}\n}\nchar* result_str = (char*)malloc((len1 + len2 + 1) * sizeof(char));\nint idx = 0;\nint start = 0;\nfor (int i = 0; i < len1 + len2; i++) {\nif (!(result[i] == 0 && start == 0)) {\nresult_str[idx++] = result[i] + ''0'';\nstart = 1;\n}\n}\nresult_str[idx] = ''\0'';\nfree(result);\nif (idx == 0) {\nstrcpy(result_str, \"0\");\n}\nreturn result_str;\n}', 2, NULL, 0, 0, '2025-02-18 16:13:32.323691', false, 'Compilation Error:
@@ -1892,6 +1967,59 @@ strcpy(result_str, "0");
 return result_str;
 }', 2, NULL, 3.15, 4, '2025-02-18 16:22:57.949125', false, NULL, '{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2"},{"name":"num2","type":"STRING","value":"3"}],"expectedOutput":"6","status":"Failed","actualOutput":"60"}', 0, 'FAILED');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (79, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0.26, 5, '2025-02-25 13:30:57.860046', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (132, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 6, '2025-03-05 04:48:21.712767', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (133, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.05, 6, '2025-03-05 04:48:23.254258', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (134, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 6, '2025-03-05 04:48:24.672722', true, NULL, NULL, 2, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (68, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
@@ -2062,6 +2190,28 @@ main.c:19:8: error: ‘result’ undeclared (first use in this function)
      x) result;
         ^~~~~~
 ', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (185, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 6, '2025-03-05 08:11:00.47929', true, NULL, NULL, 2, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (93, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:01:12.957243', false, 'Compilation Error:
 Main.java:9: error: illegal start of expression
          static result = multiply("2", "3");
@@ -2350,6 +2500,28 @@ INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, la
  } 
  return (x==check || x==check/10); 
  }', 2, NULL, 1.57, 7, '2025-03-02 01:07:30.08449', true, NULL, NULL, 18, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (128, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 04:47:15.563849', true, NULL, NULL, 2, 'SUCCESS');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (99, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:08:34.94852', false, '{"isAccepted":false,"results":[{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"},{"id":2,"inputs":[{"name":"num1","type":"STRING","value":"123","isSample":false},{"name":"num2","type":"STRING","value":"456","isSample":false}],"expectedOutput":""56088"","status":"Failed","actualOutput":"56088"}],"time":"0.52","memoryUsage":7.0,"noSuccessTestcase":0,"inputWrong":{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"}}', NULL, 0, 'FAILED');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (100, 1, 62, 'public static List<List<Integer>> fourSum(int[] nums, int target) {List<List<Integer>> result = new ArrayList<>();if (nums == null || nums.length < 4) return result; Arrays.sort(nums); int n = nums.length;for (int i = 0; i < n - 3; i++) {if (i > 0 && nums[i] == nums[i - 1]) continue; for (int j = i + 1; j < n - 2; j++) {if (j > i + 1 && nums[j] == nums[j - 1]) continue; int left = j + 1, right = n - 1; while (left < right) {long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];if (sum == target) {result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));while (left < right && nums[left] == nums[left + 1]) left++; while (left < right && nums[right] == nums[right - 1]) right--; left++;right--;} else if (sum < target) {left++;} else {right--;}}}}return result;}', 1, NULL, 0.52, 7, '2025-03-01 22:09:29.732473', false, NULL, '{"id":1,"inputs":[{"name":"nums","type":"ARR_INT","value":[1.0,0.0,-1.0,0.0,-2.0,2.0]},{"name":"target","type":"INT","value":0.0}],"expectedOutput":"[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]","status":"Failed","actualOutput":"[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]"}', 0, 'FAILED');
 INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (101, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0, 0, '2025-03-01 22:14:28.148606', false, '{"isAccepted":false,"results":[{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"},{"id":2,"inputs":[{"name":"num1","type":"STRING","value":"123","isSample":false},{"name":"num2","type":"STRING","value":"456","isSample":false}],"expectedOutput":""56088"","status":"Failed","actualOutput":"56088"}],"time":"0.52","memoryUsage":8.0,"noSuccessTestcase":0,"inputWrong":{"id":1,"inputs":[{"name":"num1","type":"STRING","value":"2","isSample":false},{"name":"num2","type":"STRING","value":"3","isSample":false}],"expectedOutput":""6"","status":"Failed","actualOutput":"6"}}', NULL, 0, 'FAILED');
@@ -2417,6 +2589,1531 @@ INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, la
  } 
  return reverse == xcopy; 
  }', 1, NULL, 1.05, 7, '2025-03-02 01:07:40.122353', true, NULL, NULL, 18, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (129, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.26, 6, '2025-03-05 04:47:43.747255', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (130, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.05, 6, '2025-03-05 04:47:45.590354', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (131, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 6, '2025-03-05 04:47:47.150832', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (135, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 9.18, 4, '2025-03-05 06:55:01.077153', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (136, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 8.39, 4, '2025-03-05 06:55:02.86536', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (137, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 06:55:04.203219', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (138, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 5, '2025-03-05 06:56:20.931373', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (139, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.05, 5, '2025-03-05 06:56:22.495073', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (140, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 06:56:24.003719', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (141, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 9.04, 4, '2025-03-05 07:07:26.190859', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (142, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.31, 4, '2025-03-05 07:07:28.2094', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (143, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 07:07:30.012918', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (119, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1) return i + 1;if (i == -1) return j + 1;if (dp[i][j] != -1) return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 0, 0, '2025-03-05 04:31:59.643034', false, 'Compilation Error:
+Main.java:57: error: <identifier> expected
+public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1) return i + 1;if (i == -1) return j + 1;if (dp[i][j] != -1) return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (120, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) { 
+ if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1) return i + 1;if (i == -1) return j + 1;if (dp[i][j] != -1) return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 0, 0, '2025-03-05 04:33:30.733798', false, 'Compilation Error:
+Main.java:58: error: <identifier> expected
+ if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1) return i + 1;if (i == -1) return j + 1;if (dp[i][j] != -1) return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (121, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) { 
+ if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1) return i + 1;if (i == -1) return j + 1;if (dp[i][j] != -1) return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publi cstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', 1, NULL, 0, 0, '2025-03-05 04:34:49.308815', false, 'Compilation Error:
+Main.java:58: error: '';'' expected
+ if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else return 1;}if (j == -1) return i + 1;if (i == -1) return j + 1;if (dp[i][j] != -1) return dp[i][j]; int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publi cstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (122, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 11.01, 5, '2025-03-05 04:36:39.536478', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (123, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 9.7, 4, '2025-03-05 04:44:30.093121', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (124, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.31, 4, '2025-03-05 04:44:31.702502', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (125, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 04:44:33.075846', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (126, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.79, 5, '2025-03-05 04:47:12.426648', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (127, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.05, 5, '2025-03-05 04:47:14.05298', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (144, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 13.63, 4, '2025-03-05 07:14:28.269085', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (145, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.57, 4, '2025-03-05 07:14:29.891619', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (146, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 07:14:31.346244', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (147, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 5, '2025-03-05 07:16:28.266377', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (148, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.05, 5, '2025-03-05 07:16:29.87806', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (149, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 07:16:31.237722', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (150, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.26, 6, '2025-03-05 07:19:04.408619', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (151, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 0.79, 6, '2025-03-05 07:19:06.022418', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (152, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 6, '2025-03-05 07:19:07.519983', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (153, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 6, '2025-03-05 07:24:01.039391', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (154, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 0.79, 7, '2025-03-05 07:24:02.638687', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (155, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.26, 7, '2025-03-05 07:24:04.009995', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (156, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 7, '2025-03-05 07:27:39.51507', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (157, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 0.79, 7, '2025-03-05 07:27:41.184218', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (159, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 8, '2025-03-05 07:31:22.642337', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (160, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 0.52, 8, '2025-03-05 07:31:24.2038', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (161, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 8, '2025-03-05 07:31:25.529821', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (162, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 8, '2025-03-05 07:35:01.6358', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (163, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 1.05, 9, '2025-03-05 07:35:03.376932', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (164, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0, 9, '2025-03-05 07:35:04.731621', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (165, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 9, '2025-03-05 07:37:11.971373', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (166, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 1.05, 9, '2025-03-05 07:37:13.462092', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (167, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0, 9, '2025-03-05 07:37:14.837476', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (168, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return 0; 
+ }', 1, NULL, 0, 10, '2025-03-05 07:38:01.23891', false, NULL, '{"id":1,"inputs":[{"name":"word1","type":"STRING","value":"horse"},{"name":"word2","type":"STRING","value":"ros"}],"expectedOutput":"3","status":"Failed","actualOutput":"0"}', 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (169, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 0.52, 10, '2025-03-05 07:38:02.821232', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (170, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return 0; 
+ }', 1, NULL, 0.52, 10, '2025-03-05 07:38:04.190791', false, NULL, '{"id":1,"inputs":[{"name":"gas","type":"ARR_INT","value":[1.0,2.0,3.0,4.0,5.0]},{"name":"cost","type":"ARR_INT","value":[3.0,4.0,5.0,1.0,2.0]}],"expectedOutput":"3","status":"Failed","actualOutput":"0"}', 1, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (200, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 2.62, 5, '2025-03-06 13:31:17.711129', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (171, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return 0; 
+ }', 1, NULL, 10.09, 4, '2025-03-05 08:01:33.244926', false, NULL, '{"id":1,"inputs":[{"name":"word1","type":"STRING","value":"horse"},{"name":"word2","type":"STRING","value":"ros"}],"expectedOutput":"3","status":"Failed","actualOutput":"0"}', 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (172, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 1.7, 4, '2025-03-05 08:01:34.933102', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (173, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return 0; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 08:01:36.389686', false, NULL, '{"id":1,"inputs":[{"name":"gas","type":"ARR_INT","value":[1.0,2.0,3.0,4.0,5.0]},{"name":"cost","type":"ARR_INT","value":[3.0,4.0,5.0,1.0,2.0]}],"expectedOutput":"3","status":"Failed","actualOutput":"0"}', 1, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (174, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 5, '2025-03-05 08:02:51.272733', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (175, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.31, 5, '2025-03-05 08:02:52.824536', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (176, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.79, 5, '2025-03-05 08:02:54.245113', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (177, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 10.75, 4, '2025-03-05 08:10:23.738963', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (178, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.57, 4, '2025-03-05 08:10:25.527572', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (179, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 08:10:27.003194', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (180, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 5, '2025-03-05 08:10:45.169945', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (181, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.05, 5, '2025-03-05 08:10:46.920344', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (182, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 08:10:48.455735', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (183, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.52, 5, '2025-03-05 08:10:57.536439', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (184, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.05, 6, '2025-03-05 08:10:59.077708', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (186, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 11.01, 4, '2025-03-05 08:35:32.60393', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (187, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.57, 4, '2025-03-05 08:35:34.286614', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (188, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 08:35:35.785607', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (189, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 0.79, 5, '2025-03-05 08:37:10.485483', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (190, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.05, 5, '2025-03-05 08:37:12.122288', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (191, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 08:37:13.59854', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (192, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ return solve(m - 1, n - 1, word1, word2, dp); 
+ }', 1, NULL, 10.62, 4, '2025-03-05 16:19:11.401207', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (193, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return reverse == xcopy; 
+ }', 1, NULL, 1.57, 4, '2025-03-05 16:19:13.189383', true, NULL, NULL, 9, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (194, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 0.52, 5, '2025-03-05 16:19:14.617281', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (195, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ 0; 
+ }', 1, NULL, 0, 0, '2025-03-05 16:44:08.034272', false, 'Compilation Error:
+Main.java:74: error: not a statement
+ 0; 
+ ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (196, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 10.75, 4, '2025-03-05 16:44:10.407925', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (197, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 1.84, 5, '2025-03-05 16:44:12.282137', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (198, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ 0; 
+ }', 1, NULL, 0, 0, '2025-03-06 13:31:14.283338', false, 'Compilation Error:
+Main.java:74: error: not a statement
+ 0; 
+ ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (199, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 10.75, 4, '2025-03-06 13:31:16.082407', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (201, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 11.8, 4, '2025-03-06 16:52:30.005001', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (202, 1, 96, 'b', 2, NULL, 0, 0, '2025-03-06 16:52:37.702086', false, 'Compilation Error:
+main.c:10:1: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘int’
+ int main() {
+ ^~~
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (203, 1, 96, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', 1, NULL, 0.66, 4, '2025-03-06 16:52:49.102035', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (204, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ 0; 
+ }', 1, NULL, 0, 0, '2025-03-06 18:03:58.957323', false, 'Compilation Error:
+Main.java:74: error: not a statement
+ 0; 
+ ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (205, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 9.18, 4, '2025-03-06 18:04:01.08706', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (206, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 1.84, 5, '2025-03-06 18:04:02.450007', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (207, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ 0; 
+ }', 1, NULL, 0, 0, '2025-03-06 19:46:35.834493', false, 'Compilation Error:
+Main.java:74: error: not a statement
+ 0; 
+ ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (208, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 11.01, 4, '2025-03-06 19:46:37.534171', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (209, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 2.36, 5, '2025-03-06 19:46:39.021587', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (210, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ 0; 
+ }', 1, NULL, 0, 0, '2025-03-06 20:28:13.007054', false, 'Compilation Error:
+Main.java:74: error: not a statement
+ 0; 
+ ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (211, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 12.58, 4, '2025-03-06 20:28:14.659864', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (212, 1, 112, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+ int len = gas.length; 
+ int[] diff = new int[len]; 
+ int to = 0; 
+ for(int i = 0;i < len;i++){ 
+ diff[i] += (gas[i]-cost[i]); 
+ to += diff[i]; 
+ } 
+ if(to < 0){ 
+ return -1; 
+ } 
+ int index = 0; 
+ to = 0; 
+ for(int i = 0;i < len;i++){ 
+ to += diff[i]; 
+ if(to < 0){ 
+ index = i+1; 
+ to = 0; 
+ } 
+ } 
+ return index; 
+ }', 1, NULL, 2.1, 5, '2025-03-06 20:28:16.031217', true, NULL, NULL, 2, 'SUCCESS');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (213, 1, 98, 'public static int solve(int i, int j, String s1, String s2, int[][] dp) { 
+ if (i == -1) return j + 1; 
+ if (j == -1) return i + 1; 
+ if (dp[i][j] != -1) return dp[i][j]; 
+ if (s1.charAt(i) == s2.charAt(j)) { 
+ return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp); 
+ } else { 
+ int insert = 1 + solve(i, j - 1, s1, s2, dp); 
+ int replace = 1 + solve(i - 1, j - 1, s1, s2, dp); 
+ int delete = 1 + solve(i - 1, j, s1, s2, dp); 
+ return dp[i][j] = Math.min(insert, Math.min(replace, delete)); 
+ } 
+ } 
+ public static int minDistance(String word1, String word2) { 
+ int m = word1.length(), n = word2.length(); 
+ int[][] dp = new int[m + 1][n + 1]; 
+ for (int[] row : dp) Arrays.fill(row, -1); 
+ 0; 
+ }', 1, NULL, 0, 0, '2025-03-07 08:00:38.738131', false, 'Compilation Error:
+Main.java:74: error: not a statement
+ 0; 
+ ^
+1 error
+', NULL, 0, 'FAILED');
+INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, language_id, notes, execution_time, memory_usage, created_at, is_accepted, message, input_wrong, no_testcase_passed, status) OVERRIDING SYSTEM VALUE VALUES (214, 1, 100, 'public static boolean isPalindrome(int x) { 
+ if (x < 0) { 
+ return false; 
+ } 
+ int reverse = 0; 
+ int xcopy = x; 
+ while (x > 0) { 
+ reverse = (reverse * 10) + (x % 10); 
+ x /= 10; 
+ } 
+ return true; 
+ }', 1, NULL, 10.35, 4, '2025-03-07 08:00:40.426865', false, NULL, '{"id":3,"inputs":[{"name":"x","type":"INT","value":10.0}],"expectedOutput":"false","status":"Failed","actualOutput":"true"}', 6, 'FAILED');
 
 
 --
@@ -2425,28 +4122,39 @@ INSERT INTO schema_problem.problem_submission (id, user_id, problem_id, code, la
 -- Data for Name: problem_template; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (2, 25, 1, 'public int[] twoSum(int[] nums, int target) {}', 'twoSum', 'ARR_INT');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (3, 25, 2, 'int* twoSum(int* nums, int numsSize, int target, int* returnSize) {}', 'twoSum', 'ARR_INT');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (18, 62, 1, 'public static List<List<Integer>> fourSum(int[] nums, int target) {
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (160, 112, 1, '//Test 
+//Function 
+ public static int canCompleteCircuit(int[] gas, int[] cost) {
+}', 'canCompleteCircuit', 'INT');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (161, 112, 2, '//Test 
+//Function 
+ int canCompleteCircuit(int* gas, int gasSize, int* cost, int costSize) {
+}', 'canCompleteCircuit', 'INT');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (134, 96, 1, '//Function
+public static String multiply(String num1, String num2) {
+}', 'multiply', 'STRING');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (18, 62, 1, '//Function 
+public static List<List<Integer>> fourSum(int[] nums, int target) {
 }', 'fourSum', 'ARR_INT');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (44, 88, 1, 'public int firstMissingPositive(int[] nums) {
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (44, 88, 1, '//Function
+public int firstMissingPositive(int[] nums) {
 }', 'firstMissingPositive', 'INT');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (88, 96, 1, 'public static String multiply(String num1, String num2) {
-}', 'multiply', 'STRING');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (89, 96, 2, 'public char* multiply(char* num1, char* num2) {
-}', 'multiply', 'STRING');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (90, 98, 1, 'public static int minDistance(String word1, String word2) {
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (90, 98, 1, '//Function
+public static int minDistance(String word1, String word2) {
 }', 'minDistance', 'INT');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (91, 98, 2, 'public int minDistance(char* word1, char* word2) {
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (2, 25, 1, '//Function
+public int[] twoSum(int[] nums, int target) {}', 'twoSum', 'ARR_INT');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (3, 25, 2, '//Function
+int* twoSum(int* nums, int numsSize, int target, int* returnSize) {}', 'twoSum', 'ARR_INT');
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (91, 98, 2, '//Function
+public int minDistance(char* word1, char* word2) {
 }', 'minDistance', 'INT');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (93, 100, 2, 'bool isPalindrome(int x) {
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (93, 100, 2, '//Function
+bool isPalindrome(int x) {
 }', 'isPalindrome', 'BOOLEAN');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (92, 100, 1, 'public static boolean isPalindrome(int x) {
+INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (92, 100, 1, '//Function
+public static boolean isPalindrome(int x) {
 }', 'isPalindrome', 'BOOLEAN');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (131, 112, 1, 'public static int canCompleteCircuit(int[] gas, int[] cost) {
-}', 'canCompleteCircuit', 'INT');
-INSERT INTO schema_problem.problem_template (id, problem_id, language_id, template_code, function_signature, return_type) OVERRIDING SYSTEM VALUE VALUES (132, 112, 2, 'int canCompleteCircuit(int* gas, int gasSize, int* cost, int costSize) {
-}', 'canCompleteCircuit', 'INT');
 
 
 --
@@ -2458,15 +4166,16 @@ INSERT INTO schema_problem.problem_template (id, problem_id, language_id, templa
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (25, 2);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (25, 3);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (25, 9);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (112, 19);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (112, 9);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (112, 2);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (88, 9);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (88, 2);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (62, 2);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (62, 1);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (62, 9);
-INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (112, 2);
-INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (112, 19);
-INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (112, 9);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (96, 9);
+INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (96, 2);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (96, 6);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (97, 6);
 INSERT INTO schema_problem.problem_topic (problem_id, topic_id) VALUES (97, 9);
@@ -2532,7 +4241,6 @@ res.add(Arrays.asList(nums[lo++], nums[hi--]));
 }
 return res;
 }');
-INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (81, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (82, 98, 1, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
@@ -2605,7 +4313,9 @@ INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, 
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (128, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (129, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
 INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (133, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
-INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (149, 112, 1, 'public static int canCompleteCircuit(int[] gas, int[] cost) { 
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (163, 112, 1, '//Test 
+
+public static int canCompleteCircuit(int[] gas, int[] cost) { 
  int len = gas.length; 
  int[] diff = new int[len]; 
  int to = 0; 
@@ -2627,7 +4337,9 @@ INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, 
  } 
  return index; 
  }');
-INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (149, 112, 2, 'int canCompleteCircuit(int* gas, int gasSize, int* cost, int costSize){ 
+INSERT INTO schema_problem.solution_code (solution_id, problem_id, language_id, code) VALUES (163, 112, 2, '//Test 
+
+int canCompleteCircuit(int* gas, int gasSize, int* cost, int costSize){ 
  int gas_tank = 0, start_index = 0, sum = 0; 
  for (int i=0; i<costSize; i++) { 
  sum += gas[i] - cost[i]; 
@@ -2657,71 +4369,10 @@ INSERT INTO schema_problem.solution_vote (user_id, solution_id) VALUES (1, 100);
 -- Data for Name: test_case; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
 
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (2, 25, '[
-        {
-            "name": "nums",
-            "type": "ARR_INT",
-            "value": [3,2,4]
-        },
-        {
-            "name": "target",
-            "type": "INT",
-            "value": 6
-        }
-    ]', '[1,2]', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (3, 25, '[
-        {
-            "name": "nums",
-            "type": "ARR_INT",
-            "value": [3,3]
-        },
-        {
-            "name": "target",
-            "type": "INT",
-            "value": 6
-        }
-    ]', '[0,1]', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (4, 25, '[
-        {
-            "name": "nums",
-            "type": "ARR_INT",
-            "value": [6,4,5,6]
-        },
-        {
-            "name":"target",
-            "type": "INT",
-            "value": 12
-        }
-    ]', '[0,3]', false, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (5, 25, '[
-        {
-            "name":"nums",
-            "type": "ARR_INT",
-            "value": [2,9,5,6]
-        },
-        {
-            "name":"target",
-            "type": "INT",
-            "value": 7
-        }
-    ]', '[0,2]', false, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (1, 25, '[
-        {
-            "name": "nums",
-            "type": "ARR_INT",
-            "value": [2,7,11,15]
-        },
-        {
-            "name": "target",
-            "type": "INT",
-            "value": 9
-        }
-    ]', '[0,1]', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (22, 62, '[{"name": "nums","type": "ARR_INT","value": [1,0,-1,0,-2,2]},{"name": "target","type": "INT","value": 0}]', '[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (23, 62, '[{"name": "nums","type": "ARR_INT","value": [2,2,2,2,2]},{"name": "target","type": "INT","value": 8}]', '[[2,2,2,2]]', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (81, 88, '[{"name":"nums","type":"ARR_INT","value":[1,2,0]}]', '3', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (82, 88, '[{"name":"nums","type":"ARR_INT","value":[3,4,-1,1]}]', '2', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (83, 88, '[{"name":"nums","type":"ARR_INT","value":[7,8,9,11,12]}]', '1', true, NULL);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (318, 112, '[{"name":"gas","type":"ARR_INT","value":[1,2,3,4,5],"noDimension":1},{"name":"cost","type":"ARR_INT","value":[3,4,5,1,2],"noDimension":1}]', '3', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (319, 112, '[{"name":"gas","type":"ARR_INT","value":[2,3,4],"noDimension":1},{"name":"cost","type":"ARR_INT","value":[3,4,3],"noDimension":1}]', '-1', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (320, 112, '[{"name":"gas","type":"ARR_INT","value":[1,2,3,4,5],"noDimension":1},{"name":"gasSize","type":"INT","value":5},{"name":"cost","type":"ARR_INT","value":[3,4,5,1,2],"noDimension":1},{"name":"costSize","type":"INT","value":5}]', '3', true, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (321, 112, '[{"name":"gas","type":"ARR_INT","value":[2,3,4],"noDimension":1},{"name":"gasSize","type":"INT","value":3},{"name":"cost","type":"ARR_INT","value":[3,4,3],"noDimension":1},{"name":"costSize","type":"INT","value":3}]', '-1', true, 2);
 INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (186, 100, '[{"name":"x","type":"INT","value":121}]', 'true', true, 1);
 INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (187, 100, '[{"name":"x","type":"INT","value":-121}]', 'false', true, 1);
 INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (188, 100, '[{"name":"x","type":"INT","value":10}]', 'false', true, 1);
@@ -2740,14 +4391,73 @@ INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is
 INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (201, 100, '[{"name":"x","type":"INT","value":0}]', 'true', false, 2);
 INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (202, 100, '[{"name":"x","type":"INT","value":9}]', 'true', false, 2);
 INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (203, 100, '[{"name":"x","type":"INT","value":30213}]', 'false', false, 2);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (264, 112, '[{"name":"gas","type":"ARR_INT","value":[1,2,3,4,5]},{"name":"cost","type":"ARR_INT","value":[3,4,5,1,2]}]', '3', true, 1);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (265, 112, '[{"name":"gas","type":"ARR_INT","value":[2,3,4]},{"name":"cost","type":"ARR_INT","value":[3,4,3]}]', '-1', true, 1);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (266, 112, '[{"name":"gas","type":"ARR_INT","value":[1,2,3,4,5]},{"name":"gasSize","type":"INT","value":5},{"name":"cost","type":"ARR_INT","value":[3,4,5,1,2]},{"name":"costSize","type":"INT","value":5}]', '3', true, 2);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (164, 96, '[{"name":"num1","type":"STRING","value":"2"},{"name":"num2","type":"STRING","value":"3"}]', '"6"', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (165, 96, '[{"name":"num1","type":"STRING","value":"123"},{"name":"num2","type":"STRING","value":"456"}]', '"56088"', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (166, 98, '[{"name":"word1","type":"STRING","value":"horse"},{"name":"word2","type":"STRING","value":"ros"}]', '3', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (167, 98, '[{"name":"word1","type":"STRING","value":"intention"},{"name":"word2","type":"STRING","value":"execution"}]', '5', true, NULL);
-INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (267, 112, '[{"name":"gas","type":"ARR_INT","value":[2,3,4]},{"name":"gasSize","type":"INT","value":3},{"name":"cost","type":"ARR_INT","value":[3,4,3]},{"name":"costSize","type":"INT","value":3}]', '-1', true, 2);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (2, 25, '[
+        {
+            "name": "nums",
+            "type": "ARR_INT",
+            "value": [3,2,4]
+        },
+        {
+            "name": "target",
+            "type": "INT",
+            "value": 6
+        }
+    ]', '[1,2]', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (3, 25, '[
+        {
+            "name": "nums",
+            "type": "ARR_INT",
+            "value": [3,3]
+        },
+        {
+            "name": "target",
+            "type": "INT",
+            "value": 6
+        }
+    ]', '[0,1]', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (4, 25, '[
+        {
+            "name": "nums",
+            "type": "ARR_INT",
+            "value": [6,4,5,6]
+        },
+        {
+            "name":"target",
+            "type": "INT",
+            "value": 12
+        }
+    ]', '[0,3]', false, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (5, 25, '[
+        {
+            "name":"nums",
+            "type": "ARR_INT",
+            "value": [2,9,5,6]
+        },
+        {
+            "name":"target",
+            "type": "INT",
+            "value": 7
+        }
+    ]', '[0,2]', false, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (1, 25, '[
+        {
+            "name": "nums",
+            "type": "ARR_INT",
+            "value": [2,7,11,15]
+        },
+        {
+            "name": "target",
+            "type": "INT",
+            "value": 9
+        }
+    ]', '[0,1]', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (22, 62, '[{"name": "nums","type": "ARR_INT","value": [1,0,-1,0,-2,2]},{"name": "target","type": "INT","value": 0}]', '[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (23, 62, '[{"name": "nums","type": "ARR_INT","value": [2,2,2,2,2]},{"name": "target","type": "INT","value": 8}]', '[[2,2,2,2]]', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (81, 88, '[{"name":"nums","type":"ARR_INT","value":[1,2,0]}]', '3', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (82, 88, '[{"name":"nums","type":"ARR_INT","value":[3,4,-1,1]}]', '2', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (83, 88, '[{"name":"nums","type":"ARR_INT","value":[7,8,9,11,12]}]', '1', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (166, 98, '[{"name":"word1","type":"STRING","value":"horse"},{"name":"word2","type":"STRING","value":"ros"}]', '3', true, 1);
+INSERT INTO schema_problem.test_case (id, problem_id, input, expected_output, is_sample, language_id) OVERRIDING SYSTEM VALUE VALUES (167, 98, '[{"name":"word1","type":"STRING","value":"intention"},{"name":"word2","type":"STRING","value":"execution"}]', '5', true, 1);
 
 
 --
@@ -2825,6 +4535,62 @@ INSERT INTO schema_setting.topic (id, name, created_at, created_by, updated_at, 
 --
 
 INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (1, 76, 'Welcome to Kodeholik', NULL, '2025-02-28 08:43:02.924344', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (4, 22, 'There is a exam that will start on 05/03/2025, 18:20', '', '2025-03-05 18:00:35.089178', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (2, 5, 'There is a exam that will start on 05/03/2025, 18:20', '', '2025-03-05 18:00:35.084413', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (3, 1, 'There is a exam that will start on 05/03/2025, 18:20', '', '2025-03-05 18:00:35.081777', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (5, 5, 'There is a exam that will start on 05/03/2025, 18:23', '', '2025-03-05 18:22:19.470739', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (6, 1, 'There is a exam that will start on 05/03/2025, 18:23', '', '2025-03-05 18:22:19.470739', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (7, 22, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:08:04.388452', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (8, 1, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:08:04.378431', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (9, 5, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:08:04.382096', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (10, 1, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:08:54.22793', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (11, 5, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:08:54.231252', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (12, 22, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:08:54.234446', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (13, 1, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:09:24.229312', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (14, 5, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:09:24.231418', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (15, 22, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:09:24.233522', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (16, 5, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:12:18.335594', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (17, 1, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:12:18.333488', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (18, 22, 'There is a exam that will start on 05/03/2025, 19:23', '', '2025-03-05 19:12:18.339619', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (20, 5, 'There is a exam that will start on 05/03/2025, 19:43', '', '2025-03-05 19:18:38.445651', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (19, 1, 'There is a exam that will start on 05/03/2025, 19:43', '', '2025-03-05 19:18:38.444598', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (21, 22, 'There is a exam that will start on 05/03/2025, 19:43', '', '2025-03-05 19:18:38.452445', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (23, 1, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:13:59.360411', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (22, 5, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:13:59.360411', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (24, 22, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:13:59.378235', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (25, 1, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:18:26.066228', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (26, 5, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:18:26.068329', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (27, 22, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:18:26.072563', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (28, 1, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:19:00.875096', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (29, 5, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:19:00.878856', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (30, 22, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:19:00.883163', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (31, 1, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:19:25.860073', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (32, 5, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:19:25.86222', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (33, 22, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:19:25.864361', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (34, 1, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:20:05.866426', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (35, 5, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:20:05.868553', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (36, 22, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:20:05.872248', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (39, 5, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:21:30.003573', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (38, 22, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:21:30.007791', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (37, 1, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:21:30.000491', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (40, 1, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:21:44.984954', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (41, 5, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:21:44.987067', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (42, 22, 'There is a exam that will start on 06/03/2025, 03:43', '', '2025-03-06 03:21:44.990288', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (45, 1, 'There is a exam that will start on 06/03/2025, 11:03', '', '2025-03-06 11:02:09.460433', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (44, 5, 'There is a exam that will start on 06/03/2025, 11:03', '', '2025-03-06 11:02:09.464765', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (43, 22, 'There is a exam that will start on 06/03/2025, 11:03', '', '2025-03-06 11:02:09.467936', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (46, 5, 'There is a exam that will start on 06/03/2025, 13:30', '', '2025-03-06 13:28:22.554609', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (48, 1, 'There is a exam that will start on 06/03/2025, 13:30', '', '2025-03-06 13:28:22.550098', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (47, 22, 'There is a exam that will start on 06/03/2025, 13:30', '', '2025-03-06 13:28:22.560221', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (51, 1, 'There is a exam that will start on 06/03/2025, 19:30', '', '2025-03-06 19:25:24.284365', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (49, 22, 'There is a exam that will start on 06/03/2025, 19:30', '', '2025-03-06 19:25:24.293124', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (50, 5, 'There is a exam that will start on 06/03/2025, 19:30', '', '2025-03-06 19:25:24.288074', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (52, 1, 'There is a exam that will start on 06/03/2025, 19:46', '', '2025-03-06 19:39:32.957063', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (53, 1, 'There is a exam that will start on 06/03/2025, 20:00', '', '2025-03-06 19:53:23.584354', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (54, 1, 'There is a exam that will start on 06/03/2025, 20:05', '', '2025-03-06 20:04:43.564764', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (55, 1, 'There is a exam that will start on 06/03/2025, 22:53', '', '2025-03-06 22:51:21.809764', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (56, 1, 'There is a exam that will start on 07/03/2025, 08:00', '', '2025-03-07 07:57:20.356944', 'SYSTEM');
+INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OVERRIDING SYSTEM VALUE VALUES (57, 1, 'There is a exam that will start on 07/03/2025, 08:00', '', '2025-03-07 07:58:49.615063', 'SYSTEM');
 
 
 --
@@ -2841,14 +4607,14 @@ INSERT INTO schema_user.notification (id, user_id, content, link, date, type) OV
 -- Data for Name: users; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
 
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (22, '27 - Trần Hải Bằng', '27 - Trần Hải Bằng', '$2a$10$VS.SuPBGxhmF6LMckxvnauCcZeRYQ/Jzf4WOuhJM9KS.myVT2oY.C', 'bangthhe170871@fpt.edu.vn', 'STUDENT', 'ACTIVATED', '2025-02-10', 'https://lh3.googleusercontent.com/a/ACg8ocLUGVSI7vY8J1U-dedYf6BNl_pub8sHys0YFcbHGUSToW5ihw=s96-c');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (5, 'HngThng', 'Dang Hong Thang', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thangdh1557@gmail.com', 'STUDENT', 'ACTIVATED', '2024-09-06', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (6, 'Jasmine Milk', 'Vu Tuan Hung', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'hungvt321@gmail.com', 'STUDENT', 'BANNED', '2024-10-12', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (67, 'binhtq', 'Tran Quoc Binh', '$2a$10$P2Y3FTKGIoMtXqNfLYQ95OjXfplOACRVoJc/tcXdzdVqCcfmjCSf2', 'binhtq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (68, 'baotq', 'Tran Quoc Bao', '$2a$10$4T5KVE1i8E3ExtT9uRX1s.IL5d6P.VnGym8oXlt/J7kT.YY8PEOUi', 'baotq@gmail.com', 'STUDENT', 'ACTIVATED', '2025-02-13', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (2, 'Phong', 'Pham Duy Phong', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'phongk72tp@gmail.com', 'ADMIN', 'ACTIVATED', '2024-05-01', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (70, 'haitq', 'Tran Quoc Hai', '$2a$10$DqXH5YDKXQD35XrztK1SeudCH5g1boI1z22pUuSPMYgxqaQ6vSlHa', '12', 'STUDENT', 'ACTIVATED', '2025-02-13', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
-INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$38pqPB3j/vnGRxidhOcBP.jxeCWgGSKMdL3/SjBFF265iPQTa6JDu', 'tranhaibang665@gmail.com', 'TEACHER', 'ACTIVATED', '2024-03-20', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (1, 'mast', 'Tran Hai Bang', '$2a$10$38pqPB3j/vnGRxidhOcBP.jxeCWgGSKMdL3/SjBFF265iPQTa6JDu', 'tranhaibang665@gmail.com', 'STUDENT', 'ACTIVATED', '2024-03-20', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
+INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (22, '27 - Trần Hải Bằng', '27 - Trần Hải Bằng', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'bangthhe170871@fpt.edu.vn', 'TEACHER', 'ACTIVATED', '2025-02-10', 'https://lh3.googleusercontent.com/a/ACg8ocLUGVSI7vY8J1U-dedYf6BNl_pub8sHys0YFcbHGUSToW5ihw=s96-c');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (76, 'Near Me', 'Near Me', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'basihamedical@gmail.com', 'EXAMINER', 'ACTIVATED', '2025-02-28', 'https://lh3.googleusercontent.com/a/ACg8ocIArfWVqGfDK0hMAdne8ZWCuGRZvwnHDsDhQFIDdU3f2JVwfA=s96-c');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (3, 'Thai', 'Pham Hong Thai', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'thaiph@gmail.com', 'STUDENT', 'ACTIVATED', '2024-06-02', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
 INSERT INTO schema_user.users (id, username, fullname, password, email, role, status, created_date, avatar) OVERRIDING SYSTEM VALUE VALUES (4, 'Duy', 'Dang Nguyen Quang Duy', '$2y$10$Tq5qcPgXnPftWwm0ko54DOelkO2yLc6K6o7b63gQu0wdSM4zRUiwa', 'duydnq123@gmail.com', 'STUDENT', 'ACTIVATED', '2024-07-03', 'kodeholik-problem-image-2f3ce180-2409-43fc-85eb-d427f560cc47');
@@ -2860,7 +4626,7 @@ INSERT INTO schema_user.users (id, username, fullname, password, email, role, st
 -- Name: chapter_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_course.chapter_id_seq', 1, false);
+SELECT pg_catalog.setval('schema_course.chapter_id_seq', 1, true);
 
 
 --
@@ -2878,7 +4644,7 @@ SELECT pg_catalog.setval('schema_course.course_id_seq', 1, true);
 -- Name: lesson_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_course.lesson_id_seq', 1, false);
+SELECT pg_catalog.setval('schema_course.lesson_id_seq', 1, true);
 
 
 --
@@ -2887,7 +4653,7 @@ SELECT pg_catalog.setval('schema_course.lesson_id_seq', 1, false);
 -- Name: discussion_id_seq; Type: SEQUENCE SET; Schema: schema_discussion; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_discussion.discussion_id_seq', 30, true);
+SELECT pg_catalog.setval('schema_discussion.discussion_id_seq', 32, true);
 
 
 --
@@ -2896,7 +4662,7 @@ SELECT pg_catalog.setval('schema_discussion.discussion_id_seq', 30, true);
 -- Name: exam_id_seq; Type: SEQUENCE SET; Schema: schema_exam; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_exam.exam_id_seq', 21, true);
+SELECT pg_catalog.setval('schema_exam.exam_id_seq', 26, true);
 
 
 --
@@ -2914,7 +4680,7 @@ SELECT pg_catalog.setval('schema_problem.problem_id_seq', 112, true);
 -- Name: problem_input_parameter_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_problem.problem_input_parameter_id_seq', 214, true);
+SELECT pg_catalog.setval('schema_problem.problem_input_parameter_id_seq', 294, true);
 
 
 --
@@ -2923,7 +4689,7 @@ SELECT pg_catalog.setval('schema_problem.problem_input_parameter_id_seq', 214, t
 -- Name: problem_submission_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_problem.problem_submission_id_seq', 118, true);
+SELECT pg_catalog.setval('schema_problem.problem_submission_id_seq', 215, true);
 
 
 --
@@ -2932,7 +4698,7 @@ SELECT pg_catalog.setval('schema_problem.problem_submission_id_seq', 118, true);
 -- Name: problemsolution_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_problem.problemsolution_id_seq', 149, true);
+SELECT pg_catalog.setval('schema_problem.problemsolution_id_seq', 163, true);
 
 
 --
@@ -2941,7 +4707,7 @@ SELECT pg_catalog.setval('schema_problem.problemsolution_id_seq', 149, true);
 -- Name: problemtemplate_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_problem.problemtemplate_id_seq', 132, true);
+SELECT pg_catalog.setval('schema_problem.problemtemplate_id_seq', 161, true);
 
 
 --
@@ -2950,7 +4716,7 @@ SELECT pg_catalog.setval('schema_problem.problemtemplate_id_seq', 132, true);
 -- Name: testcase_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_problem.testcase_id_seq', 267, true);
+SELECT pg_catalog.setval('schema_problem.testcase_id_seq', 321, true);
 
 
 --
@@ -2986,7 +4752,7 @@ SELECT pg_catalog.setval('schema_setting.topic_id_seq', 19, true);
 -- Name: notification_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_user.notification_id_seq', 1, true);
+SELECT pg_catalog.setval('schema_user.notification_id_seq', 57, true);
 
 
 --
@@ -4039,7 +5805,7 @@ ALTER TABLE ONLY schema_user.transaction
     ADD CONSTRAINT transaction_user_id_fkey FOREIGN KEY (user_id) REFERENCES schema_user.users(id);
 
 
--- Completed on 2025-03-03 23:02:23
+-- Completed on 2025-03-09 19:41:31
 
 --
 -- PostgreSQL database dump complete
