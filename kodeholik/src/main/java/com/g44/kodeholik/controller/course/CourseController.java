@@ -36,7 +36,7 @@ public class CourseController {
     private final CourseService courseService;
     private final CourseCommentService courseCommentService;
     private final CourseRatingService courseRatingService;
-    
+
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<CourseDetailResponseDto> getCourseDetail(@PathVariable Long id) {
@@ -70,7 +70,7 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ResponseEntity<Page<CourseResponseDto>> searchCourses(
             @RequestBody SearchCourseRequestDto request,
             @RequestParam(defaultValue = "0") Integer page,
