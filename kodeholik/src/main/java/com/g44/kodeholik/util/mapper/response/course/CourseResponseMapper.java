@@ -1,6 +1,7 @@
 package com.g44.kodeholik.util.mapper.response.course;
 
 import com.g44.kodeholik.model.dto.response.course.ChapterResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.entity.course.Chapter;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import jakarta.annotation.PostConstruct;
@@ -37,15 +38,17 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
 
     @Override
     public CourseResponseDto mapFrom(Course course) {
-        return CourseResponseDto.builder()
-                .id(course.getId())
-                .title(course.getTitle())
-                .image(course.getImage())
-                .status(course.getStatus())
-                .rate(course.getRate())
-                .numberOfParticipant(course.getNumberOfParticipant())
-                .topics(course.getTopics().stream().map(Topic::getName).collect(Collectors.toList()))
-                .build();
+//        return CourseResponseDto.builder()
+//                .id(course.getId())
+//                .title(course.getTitle())
+//                .image(course.getImage())
+//                .status(course.getStatus())
+//                .rate(course.getRate())
+//                .createdAt(course.getCreatedAt())
+//                .numberOfParticipant(course.getNumberOfParticipant())
+//                .topics(course.getTopics().stream().map(Topic::getName).collect(Collectors.toList()))
+//                .build();
+        return modelMapper.map(course, CourseResponseDto.class);
     }
 
 }
