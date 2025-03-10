@@ -337,21 +337,30 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         SubmissionStatus.SUCCESS);
                 break;
             case "FAILED":
-                submissionResponseDto = new FailedSubmissionResponseDto(
-                        problemSubmission.getNoTestCasePassed(),
-                        noTestCase,
-                        gson.fromJson(problemSubmission.getInputWrong(), TestResult.class),
-                        problemSubmission.getCode(),
-                        problemSubmission.getLanguage().getName(),
-                        Timestamp.from(Instant.now()),
-                        SubmissionStatus.FAILED);
+                if (problemSubmission.getMessage() == null) {
+                    submissionResponseDto = new FailedSubmissionResponseDto(
+                            problemSubmission.getNoTestCasePassed(),
+                            noTestCase,
+                            gson.fromJson(problemSubmission.getInputWrong(), TestResult.class),
+                            problemSubmission.getCode(),
+                            problemSubmission.getLanguage().getName(),
+                            problemSubmission.getCreatedAt(),
+                            SubmissionStatus.FAILED);
+                } else {
+                    submissionResponseDto = new CompileErrorResposneDto(
+                            problemSubmission.getMessage(),
+                            problemSubmission.getCode(),
+                            problemSubmission.getLanguage().getName(),
+                            problemSubmission.getCreatedAt(),
+                            SubmissionStatus.FAILED);
+                }
                 break;
             default:
                 submissionResponseDto = new CompileErrorResposneDto(
                         problemSubmission.getMessage(),
                         problemSubmission.getCode(),
                         problemSubmission.getLanguage().getName(),
-                        Timestamp.from(Instant.now()),
+                        problemSubmission.getCreatedAt(),
                         SubmissionStatus.FAILED);
                 break;
         }
@@ -502,7 +511,6 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         } catch (Exception e) {
             status = result;
         }
-        log.info(responseResult.getResults());
 
         List<TestResult> results = responseResult.getResults();
 

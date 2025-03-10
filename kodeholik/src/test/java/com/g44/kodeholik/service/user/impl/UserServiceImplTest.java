@@ -263,7 +263,6 @@ class UserServiceImplTest {
 
         MultipartFile mockFile = mock(MultipartFile.class);
         requestDto.setAvatar(mockFile);
-        // 🔹 Mock user hiện tại
         Users mockUser = new Users();
         mockUser.setUsername("oldUser");
         mockUser.setFullname("Old Fullname");
@@ -271,12 +270,10 @@ class UserServiceImplTest {
 
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(mockUser));
         when(profileResponseMapper.mapFrom(any(Users.class))).thenReturn(new ProfileResponseDto());
-        // 🔹 Mock kiểm tra username đã tồn tại
 
-        // 🔹 Mock upload file lên S3
         List<String> uploadedFileKeys = List.of("new-avatar.jpg");
         when(s3Service.uploadFileNameTypeFile(anyList(), eq(FileNameType.AVATAR))).thenReturn(uploadedFileKeys);
-        // 🔹 Mock trả về profile mới
+
         ProfileResponseDto expectedProfile = new ProfileResponseDto();
         expectedProfile.setUsername("newUser");
         expectedProfile.setFullname("New Fullname");
@@ -285,17 +282,86 @@ class UserServiceImplTest {
         when(profileResponseMapper.mapFrom(any(Users.class))).thenReturn(expectedProfile);
         when(userService.getProfileCurrentUser()).thenReturn(expectedProfile);
 
-        // 🏆 Thực thi hàm cần test
         ProfileResponseDto result = userService.editProfile(requestDto);
 
-        // ✅ Kiểm tra kết quả
         assertNotNull(result);
         assertEquals("newUser", result.getUsername());
         assertEquals("New Fullname", result.getFullname());
         assertEquals("new-avatar.jpg", result.getAvatar());
 
-        // 🛠 Kiểm tra các phương thức được gọi đúng số lần
         verify(s3Service, times(1)).uploadFileNameTypeFile(anyList(), eq(FileNameType.AVATAR));
+    }
+
+    @Test
+    void testEditProfileNewUsername() {
+        EditProfileRequestDto requestDto = new EditProfileRequestDto();
+        requestDto.setUsername("oldUser");
+        requestDto.setFullname("New Fullname");
+
+        MultipartFile mockFile = mock(MultipartFile.class);
+        requestDto.setAvatar(mockFile);
+        Users mockUser = new Users();
+        mockUser.setUsername("newUser");
+        mockUser.setFullname("Old Fullname");
+        mockUser.setAvatar("old-avatar.jpg");
+
+        when(userRepository.findByUsername(anyString()))
+                .thenReturn(Optional.of(mockUser))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(mockUser));
+        when(profileResponseMapper.mapFrom(any(Users.class))).thenReturn(new ProfileResponseDto());
+
+        List<String> uploadedFileKeys = List.of("new-avatar.jpg");
+        when(s3Service.uploadFileNameTypeFile(anyList(), eq(FileNameType.AVATAR))).thenReturn(uploadedFileKeys);
+
+        ProfileResponseDto expectedProfile = new ProfileResponseDto();
+        expectedProfile.setUsername("newUser");
+        expectedProfile.setFullname("New Fullname");
+        expectedProfile.setAvatar("new-avatar.jpg");
+
+        when(profileResponseMapper.mapFrom(any(Users.class))).thenReturn(expectedProfile);
+
+        ProfileResponseDto result = userService.editProfile(requestDto);
+
+        assertNotNull(result);
+        assertEquals("newUser", result.getUsername());
+        assertEquals("New Fullname", result.getFullname());
+        assertEquals("new-avatar.jpg", result.getAvatar());
+
+        verify(s3Service, times(1)).uploadFileNameTypeFile(anyList(), eq(FileNameType.AVATAR));
+    }
+
+    @Test
+    void testEditProfileNewUsernameExisted() {
+        EditProfileRequestDto requestDto = new EditProfileRequestDto();
+        requestDto.setUsername("oldUser");
+        requestDto.setFullname("New Fullname");
+
+        MultipartFile mockFile = mock(MultipartFile.class);
+        requestDto.setAvatar(mockFile);
+        Users mockUser = new Users();
+        mockUser.setUsername("newUser");
+        mockUser.setFullname("Old Fullname");
+        mockUser.setAvatar("old-avatar.jpg");
+
+        when(userRepository.findByUsername(anyString()))
+                .thenReturn(Optional.of(mockUser));
+        when(profileResponseMapper.mapFrom(any(Users.class))).thenReturn(new ProfileResponseDto());
+
+        List<String> uploadedFileKeys = List.of("new-avatar.jpg");
+        when(s3Service.uploadFileNameTypeFile(anyList(), eq(FileNameType.AVATAR))).thenReturn(uploadedFileKeys);
+
+        ProfileResponseDto expectedProfile = new ProfileResponseDto();
+        expectedProfile.setUsername("newUser");
+        expectedProfile.setFullname("New Fullname");
+        expectedProfile.setAvatar("new-avatar.jpg");
+
+        when(profileResponseMapper.mapFrom(any(Users.class))).thenReturn(expectedProfile);
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> userService.editProfile(requestDto));
+        assertEquals("Username already exists", badRequestException.getMessage());
+        assertEquals("Username already exists", badRequestException.getDetails());
     }
 
     @Test

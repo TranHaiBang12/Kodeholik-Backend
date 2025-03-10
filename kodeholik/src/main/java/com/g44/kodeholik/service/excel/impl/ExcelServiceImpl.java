@@ -30,7 +30,6 @@ import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
 import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.service.excel.ExcelService;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -197,7 +196,7 @@ public class ExcelServiceImpl implements ExcelService {
             workbook.close();
             return outputStream.toByteArray();
         } catch (IOException e) {
-            return null;
+            throw new BadRequestException("Error generating excel file", "Error generating excel file");
         }
     }
 

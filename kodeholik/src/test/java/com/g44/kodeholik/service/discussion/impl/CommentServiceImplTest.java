@@ -7,6 +7,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import org.h2.command.dml.MergeUsing.When;
 import org.junit.jupiter.api.BeforeEach;
 
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,7 @@ import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
 import com.g44.kodeholik.model.entity.user.Users;
+import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
@@ -75,6 +78,7 @@ class CommentServiceImplTest {
         Boolean ascending = true;
 
         Problem problem = new Problem();
+        problem.setStatus(ProblemStatus.PUBLIC);
         Comment comment = new Comment();
         List<Comment> commentList = Collections.singletonList(comment);
         Page<Comment> commentPage = new PageImpl<>(commentList);
@@ -83,6 +87,7 @@ class CommentServiceImplTest {
         userResponseDto.setAvatar("avatar-url");
         commentResponseDto.setCreatedBy(userResponseDto);
 
+        when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
         when(problemService.getActivePublicProblemByLink(link)).thenReturn(problem);
         when(commentRepository.findByCommentReplyAndProblemsContains(null, problem,
                 PageRequest.of(page, 5, Sort.by(sortBy).ascending()))).thenReturn(commentPage);
@@ -381,6 +386,23 @@ class CommentServiceImplTest {
     }
 
     @Test
+    void testUpvoteCommentAlreadyUpvote() {
+        Long commentId = 1L;
+        Comment comment = new Comment();
+        Users currentUser = new Users();
+        currentUser.setEmail("test@example.com");
+        comment.setUserVote(Set.of(currentUser));
+
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(userService.getCurrentUser()).thenReturn(currentUser);
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> commentService.upvoteComment(commentId));
+        assertEquals("You have already voted this comment", badRequestException.getMessage());
+        assertEquals("You have already voted this comment", badRequestException.getDetails());
+    }
+
+    @Test
     void testUnupvoteComment() {
         Long commentId = 1L;
         Comment comment = new Comment();
@@ -399,6 +421,25 @@ class CommentServiceImplTest {
         assertEquals(0, comment.getNoUpvote());
         assertFalse(comment.getUserVote().contains(currentUser));
         verify(commentRepository, times(1)).save(comment);
+    }
+
+    @Test
+    void testUnupvoteCommentNotVoted() {
+        Long commentId = 1L;
+        Comment comment = new Comment();
+        Users currentUser = new Users();
+        currentUser.setEmail("test@example.com");
+
+        comment.setUserVote(new HashSet<>());
+        comment.setNoUpvote(1);
+
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(userService.getCurrentUser()).thenReturn(currentUser);
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> commentService.unupvoteComment(commentId));
+        assertEquals("You have not voted for this comment", badRequestException.getMessage());
+        assertEquals("You have not voted for this comment", badRequestException.getDetails());
     }
 
     @Test

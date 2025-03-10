@@ -188,10 +188,12 @@ public class AuthServiceImpl implements AuthService {
             redisService.deleteToken(user.getUsername(), TokenType.REFRESH);
             tokenService.deleteCookieFromResponse(response, TokenType.ACCESS);
             tokenService.deleteCookieFromResponse(response, TokenType.REFRESH);
-            websocketSessionManager.removeSession("EXAM", user.getUsername());
-            websocketSessionManager.removeSession("NOTI", user.getUsername());
-            messagingTemplate.convertAndSend("/topic/exam/disconnect/" + user.getUsername(), "FORCE_DISCONNECT");
-            messagingTemplate.convertAndSend("/topic/noti/disconnect/" + user.getUsername(), "FORCE_DISCONNECT");
+            // websocketSessionManager.removeSession("EXAM", user.getUsername());
+            // websocketSessionManager.removeSession("NOTI", user.getUsername());
+            // messagingTemplate.convertAndSend("/topic/exam/disconnect/" +
+            // user.getUsername(), "FORCE_DISCONNECT");
+            // messagingTemplate.convertAndSend("/topic/noti/disconnect/" +
+            // user.getUsername(), "FORCE_DISCONNECT");
         }
     }
 

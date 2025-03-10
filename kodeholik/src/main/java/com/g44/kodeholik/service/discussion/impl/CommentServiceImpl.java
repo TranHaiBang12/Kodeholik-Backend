@@ -79,6 +79,8 @@ public class CommentServiceImpl implements CommentService {
             if (userResponseDto != null) {
                 userResponseDto.setAvatar(s3Service.getPresignedUrl(userResponseDto.getAvatar()));
             }
+            commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
+
             commentResponseDto.setCreatedBy(userResponseDto);
         }
         return commentResponseDtos;
@@ -146,6 +148,7 @@ public class CommentServiceImpl implements CommentService {
             if (userResponseDto != null) {
                 userResponseDto.setAvatar(s3Service.getPresignedUrl(userResponseDto.getAvatar()));
             }
+            commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
             commentResponseDto.setCreatedBy(userResponseDto);
         }
         return commentResponseDtos;

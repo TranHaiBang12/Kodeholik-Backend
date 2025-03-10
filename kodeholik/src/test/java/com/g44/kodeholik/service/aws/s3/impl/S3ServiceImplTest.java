@@ -66,7 +66,8 @@ public class S3ServiceImplTest {
     @Test
     public void testUploadFileToS3() throws Exception {
         // Tạo file tạm
-        File tempFile = Files.createTempFile("test", ".txt").toFile();
+        File tempFile = Files.createTempFile("test", ".txt")
+                .toFile();
         assertNotNull(tempFile); // Kiểm tra file đã được tạo
 
         // Mock static method của FileConvert
@@ -74,28 +75,23 @@ public class S3ServiceImplTest {
             mockedFileConvert.when(() -> FileConvert.convertMultiPartToFile(multipartFile))
                     .thenReturn(tempFile);
 
-            // Mock các hành vi của multipartFile
-            // when(multipartFile.getContentType()).thenReturn("text/plain");
-
             // Mock hành vi của S3 Client
-            when(s3Client.putObject(ArgumentMatchers.<PutObjectRequest>any(), ArgumentMatchers.<Path>any()))
+            when(s3Client.putObject(ArgumentMatchers.<PutObjectRequest>any(),
+                    ArgumentMatchers.<Path>any()))
                     .thenReturn(mock(PutObjectResponse.class));
 
-            // Gọi hàm cần test
             s3ServiceImpl.uploadFileToS3(multipartFile, "test-key");
 
-            // Kiểm tra S3 đã gọi putObject đúng số lần
             verify(s3Client, times(1))
                     .putObject(ArgumentMatchers.<PutObjectRequest>any(),
                             ArgumentMatchers.<Path>any());
-
-            // Đảm bảo file bị xóa sau khi test
         }
     }
 
     @Test
     public void testDoesObjectExist() {
-        when(s3Client.headObject(any(HeadObjectRequest.class))).thenReturn(null);
+        when(s3Client.headObject(any(HeadObjectRequest.class)))
+                .thenReturn(null);
 
         boolean exists = s3ServiceImpl.doesObjectExist("test-key");
 
@@ -103,18 +99,24 @@ public class S3ServiceImplTest {
     }
 
     @Test
-    public void testDoesObjectExist_NotFound() {
-        when(s3Client.headObject(any(HeadObjectRequest.class))).thenThrow(NoSuchKeyException.class);
+    public void testDoesObjectExistNotFound() {
+        when(s3Client.headObject(any(HeadObjectRequest.class)))
+                .thenThrow(NoSuchKeyException.class);
 
         assertThrows(NotFoundException.class, () -> s3ServiceImpl.doesObjectExist("test-key"));
     }
 
     @Test
     public void testGetPresignedUrl() throws MalformedURLException {
-        when(s3Client.headObject(any(HeadObjectRequest.class))).thenReturn(null);
+        when(s3Client
+                .headObject(any(HeadObjectRequest.class)))
+                .thenReturn(null);
         PresignedGetObjectRequest presignedRequest = mock(PresignedGetObjectRequest.class);
-        when(presignedRequest.url()).thenReturn(new java.net.URL("http://example.com"));
-        when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenReturn(presignedRequest);
+        when(presignedRequest.url()).thenReturn(
+                new java.net.URL("http://example.com"));
+        when(s3Presigner.presignGetObject(
+                any(GetObjectPresignRequest.class)))
+                .thenReturn(presignedRequest);
 
         String url = s3ServiceImpl.getPresignedUrl("test-key");
 
@@ -123,28 +125,36 @@ public class S3ServiceImplTest {
 
     @Test
     public void testUploadFileNameTypeFile() throws Exception {
-        File file = Files.createTempFile("test", ".txt").toFile();
+        File file = Files.createTempFile("test", ".txt")
+                .toFile();
         try (MockedStatic<FileConvert> mockedFileConvert = mockStatic(FileConvert.class)) {
             mockedFileConvert.when(() -> FileConvert.convertMultiPartToFile(multipartFile))
                     .thenReturn(file);
-            when(s3Client.putObject(any(PutObjectRequest.class), any(Path.class)))
+            when(s3Client
+                    .putObject(any(PutObjectRequest.class),
+                            any(Path.class)))
                     .thenReturn(mock(PutObjectResponse.class));
 
-            List<String> keys = s3ServiceImpl.uploadFileNameTypeFile(Arrays.asList(multipartFile),
+            List<String> keys = s3ServiceImpl.uploadFileNameTypeFile(
+                    Arrays.asList(multipartFile),
                     FileNameType.PROBLEM);
 
             assertEquals(1, keys.size());
-            verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(Path.class));
+            verify(s3Client, times(1))
+                    .putObject(any(PutObjectRequest.class),
+                            any(Path.class));
         }
     }
 
     @Test
     public void testDeleteFileFromS3() {
-        when(s3Client.headObject(any(HeadObjectRequest.class))).thenReturn(null);
+        when(s3Client.headObject(any(HeadObjectRequest.class)))
+                .thenReturn(null);
 
         s3ServiceImpl.deleteFileFromS3("test-key");
 
-        verify(s3Client, times(1)).deleteObject(any(DeleteObjectRequest.class));
+        verify(s3Client, times(1))
+                .deleteObject(any(DeleteObjectRequest.class));
     }
 
     @Test

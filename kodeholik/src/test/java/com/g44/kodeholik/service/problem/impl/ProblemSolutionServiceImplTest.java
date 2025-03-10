@@ -96,7 +96,8 @@ class ProblemSolutionServiceImplTest {
         List<ProblemSolution> result = problemSolutionService.findEditorialByProblem(problem);
 
         assertEquals(problemSolutions, result);
-        verify(problemSolutionRepository, times(1)).findByProblemAndIsProblemImplementation(problem, true);
+        verify(problemSolutionRepository, times(1))
+                .findByProblemAndIsProblemImplementation(problem, true);
     }
 
     @Test
@@ -105,7 +106,8 @@ class ProblemSolutionServiceImplTest {
 
         problemSolutionService.deleteEditorialByProblem(problem);
 
-        verify(problemSolutionRepository, times(1)).deleteAllByProblemAndIsProblemImplementation(problem, true);
+        verify(problemSolutionRepository, times(1))
+                .deleteAllByProblemAndIsProblemImplementation(problem, true);
     }
 
     @Test
@@ -214,7 +216,8 @@ class ProblemSolutionServiceImplTest {
         Users user = new Users();
         user.setEmail("test@example.com");
 
-        assertThrows(BadRequestException.class, () -> problemSolutionService.unupvoteSolution(1L, user));
+        assertThrows(BadRequestException.class, () -> problemSolutionService
+                .unupvoteSolution(1L, user));
     }
 
     @Test
@@ -400,7 +403,6 @@ class ProblemSolutionServiceImplTest {
 
     @Test
     void testFindOtherSolutionByProblemFilterSkillSuccess() {
-
         String title = "test";
         int page = 0;
 
@@ -428,16 +430,25 @@ class ProblemSolutionServiceImplTest {
                 .thenReturn(Page.empty());
 
         Page<SolutionListResponseDto> result = problemSolutionService
-                .findOtherSolutionByProblem(problem, page, null, title, skillList, language, "DATE", true,
+                .findOtherSolutionByProblem(
+                        problem,
+                        page,
+                        null,
+                        title,
+                        skillList,
+                        language,
+                        "DATE",
+                        true,
                         PageRequest.of(page, 10), user);
         assertNotNull(result);
-        verify(problemSolutionRepository, times(1)).findByProblemAndIsProblemImplementationAndTitleContainAndSkillsIn(
-                any(Problem.class),
-                anyString(),
-                any(Language.class),
-                anyBoolean(),
-                any(Set.class),
-                any(Pageable.class));
+        verify(problemSolutionRepository, times(1))
+                .findByProblemAndIsProblemImplementationAndTitleContainAndSkillsIn(
+                        any(Problem.class),
+                        anyString(),
+                        any(Language.class),
+                        anyBoolean(),
+                        any(Set.class),
+                        any(Pageable.class));
     }
 
     @Test
@@ -472,7 +483,15 @@ class ProblemSolutionServiceImplTest {
         BadRequestException badRequestException = assertThrows(
                 BadRequestException.class,
                 () -> problemSolutionService
-                        .findOtherSolutionByProblem(problem, page, null, title, skillList, language, "", true,
+                        .findOtherSolutionByProblem(
+                                problem,
+                                page,
+                                null,
+                                title,
+                                skillList,
+                                language,
+                                "",
+                                true,
                                 PageRequest.of(page, 10), user));
         assertEquals("Sort field is wrong",
                 badRequestException.getMessage());
@@ -483,7 +502,6 @@ class ProblemSolutionServiceImplTest {
 
     @Test
     void testFindOtherSolutionByProblemNotFilterSkillSuccess() {
-
         String title = "test";
         int page = 0;
 
@@ -506,14 +524,23 @@ class ProblemSolutionServiceImplTest {
                 .thenReturn(Page.empty());
 
         Page<SolutionListResponseDto> result = problemSolutionService
-                .findOtherSolutionByProblem(problem, page, null, title, null, language, "DATE", true,
+                .findOtherSolutionByProblem(
+                        problem,
+                        page,
+                        null,
+                        title,
+                        null,
+                        language,
+                        "DATE",
+                        true,
                         PageRequest.of(page, 10), user);
         assertNotNull(result);
-        verify(problemSolutionRepository, times(1)).findByProblemAndIsProblemImplementationAndTitleContain(
-                any(Problem.class),
-                anyString(),
-                any(Language.class),
-                anyBoolean(),
-                any(Pageable.class));
+        verify(problemSolutionRepository, times(1))
+                .findByProblemAndIsProblemImplementationAndTitleContain(
+                        any(Problem.class),
+                        anyString(),
+                        any(Language.class),
+                        anyBoolean(),
+                        any(Pageable.class));
     }
 }

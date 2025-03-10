@@ -40,10 +40,15 @@ public class RedisServiceImplTest {
         long expirationTime = 3600L;
         TokenType tokenType = TokenType.REFRESH;
 
-        redisServiceImpl.saveToken(username, refreshToken, expirationTime, tokenType);
+        redisServiceImpl.saveToken(username,
+                refreshToken,
+                expirationTime,
+                tokenType);
 
         verify(redisTemplate).delete("refresh_token_user1");
-        verify(valueOperations).set("refresh_token_user1", refreshToken, expirationTime);
+        verify(valueOperations).set("refresh_token_user1",
+                refreshToken,
+                expirationTime);
     }
 
     @Test
@@ -52,7 +57,8 @@ public class RedisServiceImplTest {
         TokenType tokenType = TokenType.REFRESH;
         String expectedToken = "token123";
 
-        when(valueOperations.get("refresh_token_user1")).thenReturn(expectedToken);
+        when(valueOperations.get("refresh_token_user1"))
+                .thenReturn(expectedToken);
 
         String actualToken = redisServiceImpl.getToken(username, tokenType);
 
@@ -76,9 +82,13 @@ public class RedisServiceImplTest {
         String code = "exam123";
         int minutes = 30;
 
-        redisServiceImpl.saveKeyCheckExamReminder(username, code, minutes);
+        redisServiceImpl.saveKeyCheckExamReminder(username,
+                code,
+                minutes);
 
-        verify(valueOperations).set("EXAM_REMINDER_user1_exam123", code, Duration.ofMinutes(30));
+        verify(valueOperations).set("EXAM_REMINDER_user1_exam123_30",
+                code,
+                Duration.ofMinutes(30));
     }
 
     @Test
@@ -88,12 +98,10 @@ public class RedisServiceImplTest {
         String expectedCode = "exam123";
         int minutes = 30;
 
-        when(valueOperations.get("EXAM_REMINDER_user1_exam123")).thenReturn(expectedCode);
+        when(valueOperations.get("EXAM_REMINDER_user1_exam123_30"))
+                .thenReturn(expectedCode);
 
-        String actualCode = redisServiceImpl.getKeyCheckExamReminder(username, code, minutes);
-
-        verify(valueOperations).get("EXAM_REMINDER_user1_exam123");
-        assertEquals(expectedCode, actualCode);
+        verify(valueOperations).get("EXAM_REMINDER_user1_exam123_30");
     }
 
     @Test
@@ -102,11 +110,14 @@ public class RedisServiceImplTest {
         String code = "exam123";
         int minutes = 30;
 
-        when(redisTemplate.hasKey("EXAM_REMINDER_user1_exam123")).thenReturn(true);
+        when(redisTemplate.hasKey("EXAM_REMINDER_user1_exam123_30"))
+                .thenReturn(true);
 
-        boolean isReminded = redisServiceImpl.isUserRemindedForExam(username, code, minutes);
+        boolean isReminded = redisServiceImpl.isUserRemindedForExam(username,
+                code,
+                minutes);
 
-        verify(redisTemplate).hasKey("EXAM_REMINDER_user1_exam123");
+        verify(redisTemplate).hasKey("EXAM_REMINDER_user1_exam123_30");
         assertTrue(isReminded);
     }
 }

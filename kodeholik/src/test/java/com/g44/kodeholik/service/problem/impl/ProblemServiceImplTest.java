@@ -295,7 +295,10 @@ class ProblemServiceImplTest {
                 ProblemDescriptionResponseDto result = problemService.getProblemDescriptionById("test-link");
 
                 assertNotNull(result);
-                verify(problemRepository, times(1)).findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean());
+                verify(problemRepository, times(1)).findByLinkAndStatusAndIsActive(
+                                anyString(),
+                                any(),
+                                anyBoolean());
         }
 
         @Test
@@ -303,7 +306,6 @@ class ProblemServiceImplTest {
                 Problem problem = new Problem();
                 problem.setTopics(new HashSet<>());
                 problem.setSkills(new HashSet<>());
-                // problem.setComments(new HashSet());
 
                 when(problemRepository.findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean()))
                                 .thenReturn(Optional.empty());
@@ -316,7 +318,11 @@ class ProblemServiceImplTest {
                 assertEquals("Problem not found", notFoundException.getMessage());
                 assertEquals("Problem not found", notFoundException.getDetails());
 
-                verify(problemRepository, times(1)).findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean());
+                verify(problemRepository, times(1))
+                                .findByLinkAndStatusAndIsActive(
+                                                anyString(),
+                                                any(),
+                                                anyBoolean());
         }
 
         @Test
@@ -366,8 +372,10 @@ class ProblemServiceImplTest {
                 ProblemEditorialResponseDto result = problemService.getProblemEditorialDtoList(link);
 
                 assertNotNull(result);
-                verify(problemSolutionService, times(1)).findEditorialByProblem(any(Problem.class));
-                verify(solutionCodeService, times(1)).findBySolution(any(ProblemSolution.class));
+                verify(problemSolutionService, times(1))
+                                .findEditorialByProblem(any(Problem.class));
+                verify(solutionCodeService, times(1))
+                                .findBySolution(any(ProblemSolution.class));
         }
 
         @Test
@@ -405,7 +413,11 @@ class ProblemServiceImplTest {
 
                 Problem result = problemService.getActivePublicProblemByLink("test-link");
                 assertNotNull(result);
-                verify(problemRepository, times(1)).findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean());
+                verify(problemRepository, times(1))
+                                .findByLinkAndStatusAndIsActive(
+                                                anyString(),
+                                                any(),
+                                                anyBoolean());
         }
 
         @Test
@@ -420,12 +432,14 @@ class ProblemServiceImplTest {
                                 () -> problemService.getActivePublicProblemByLink("test-link"));
                 assertEquals("Problem not found", notFoundException.getMessage());
                 assertEquals("Problem not found", notFoundException.getDetails());
-                verify(problemRepository, times(1)).findByLinkAndStatusAndIsActive(anyString(), any(), anyBoolean());
+                verify(problemRepository, times(1)).findByLinkAndStatusAndIsActive(
+                                anyString(),
+                                any(),
+                                anyBoolean());
         }
 
         @Test
         void testSearchProblemsSuccess() throws IOException {
-                // Mock dữ liệu từ Elasticsearch
                 SearchProblemRequestDto searchDto = new SearchProblemRequestDto();
                 searchDto.setTitle("");
                 searchDto.setDifficulty(List.of("EASY"));
@@ -450,7 +464,6 @@ class ProblemServiceImplTest {
                                 .relation(TotalHitsRelation.Eq)
                                 .build();
 
-                // Mock SearchResponse
                 SearchResponse<ProblemElasticsearch> mockResponse = mock(SearchResponse.class);
                 when(mockResponse.hits()).thenReturn(new HitsMetadata.Builder<ProblemElasticsearch>()
                                 .hits(hits)
@@ -460,21 +473,25 @@ class ProblemServiceImplTest {
                 when(elasticsearchClient.search(any(SearchRequest.class), eq(ProblemElasticsearch.class)))
                                 .thenReturn(mockResponse);
 
-                // Mock dữ liệu từ Database
                 Problem mockDbProblem = new Problem();
                 mockDbProblem.setId(1L);
                 mockDbProblem.setTitle("Algorithm Problem");
 
-                // Gọi hàm service
-                Page<ProblemElasticsearch> result = problemService.searchProblems(searchDto, 0, 5, null, true);
+                Page<ProblemElasticsearch> result = problemService.searchProblems(
+                                searchDto,
+                                0,
+                                5,
+                                null,
+                                true);
 
-                // Kiểm tra kết quả
                 assertNotNull(result);
                 assertEquals(1, result.getTotalElements());
                 assertEquals("Algorithm Problem", result.getContent().get(0).getTitle());
 
-                // Kiểm tra mock được gọi đúng số lần
-                verify(elasticsearchClient, times(1)).search(any(SearchRequest.class), eq(ProblemElasticsearch.class));
+                verify(elasticsearchClient, times(1))
+                                .search(
+                                                any(SearchRequest.class),
+                                                eq(ProblemElasticsearch.class));
         }
 
         @Test
@@ -501,7 +518,6 @@ class ProblemServiceImplTest {
                                 .relation(TotalHitsRelation.Eq)
                                 .build();
 
-                // Mock SearchResponse
                 SearchResponse<ProblemElasticsearch> mockResponse = mock(SearchResponse.class);
                 when(mockResponse.hits()).thenReturn(new HitsMetadata.Builder<ProblemElasticsearch>()
                                 .hits(hits)
@@ -511,28 +527,30 @@ class ProblemServiceImplTest {
                 when(elasticsearchClient.search(any(SearchRequest.class), eq(ProblemElasticsearch.class)))
                                 .thenReturn(mock(SearchResponse.class));
 
-                // Mock dữ liệu từ Database
                 Problem mockDbProblem = new Problem();
                 mockDbProblem.setId(1L);
                 mockDbProblem.setTitle("Algorithm Problem");
 
-                // Gọi hàm service
-                Page<ProblemElasticsearch> result = problemService.searchProblems(searchDto, 0, 5, null, true);
+                Page<ProblemElasticsearch> result = problemService.searchProblems(
+                                searchDto,
+                                0, 5,
+                                null,
+                                true);
 
                 // Kiểm tra kết quả
                 assertNotNull(result);
                 assertEquals(0, result.getTotalElements());
 
                 // Kiểm tra mock được gọi đúng số lần
-                verify(elasticsearchClient, times(1)).search(any(SearchRequest.class), eq(ProblemElasticsearch.class));
+                verify(elasticsearchClient, times(1)).search(
+                                any(SearchRequest.class),
+                                eq(ProblemElasticsearch.class));
         }
 
         @Test
         void testGetAutocompleteSuggestionsForProblemTitle() throws Exception {
-                // Mock ElasticsearchClient
                 ElasticsearchClient mockClient = mock(ElasticsearchClient.class);
 
-                // Mock dữ liệu giả lập
                 ProblemElasticsearch problem1 = new ProblemElasticsearch();
                 problem1.setId(1L);
                 problem1.setTitle("Java Programming");
@@ -541,12 +559,10 @@ class ProblemServiceImplTest {
                 problem2.setId(2L);
                 problem2.setTitle("JavaScript Basics");
 
-                // Tạo danh sách `Hit` chứa kết quả tìm kiếm giả lập
                 List<Hit<ProblemElasticsearch>> hits = List.of(
                                 Hit.of(h -> h.index("problems").id("1").score(1.0).source(problem1)),
                                 Hit.of(h -> h.index("problems").id("2").score(0.9).source(problem2)));
 
-                // Mock SearchResponse
                 TotalHits totalHits = new TotalHits.Builder().value(2L).relation(TotalHitsRelation.Eq).build();
                 SearchResponse<ProblemElasticsearch> mockResponse = mock(SearchResponse.class);
                 when(mockResponse.hits()).thenReturn(new HitsMetadata.Builder<ProblemElasticsearch>()
@@ -556,7 +572,6 @@ class ProblemServiceImplTest {
                 when(elasticsearchClient.search(any(SearchRequest.class), eq(ProblemElasticsearch.class)))
                                 .thenReturn(mockResponse);
 
-                // Gọi hàm thực tế
                 List<String> suggestions = problemService.getAutocompleteSuggestionsForProblemTitle("Java");
 
                 // Kiểm tra kết quả
@@ -568,10 +583,8 @@ class ProblemServiceImplTest {
 
         @Test
         void testNotGetAutocompleteSuggestionsForProblemTitle() throws Exception {
-                // Mock ElasticsearchClient
                 ElasticsearchClient mockClient = mock(ElasticsearchClient.class);
 
-                // Mock dữ liệu giả lập
                 ProblemElasticsearch problem1 = new ProblemElasticsearch();
                 problem1.setId(1L);
                 problem1.setTitle("Java Programming");
@@ -580,12 +593,10 @@ class ProblemServiceImplTest {
                 problem2.setId(2L);
                 problem2.setTitle("JavaScript Basics");
 
-                // Tạo danh sách `Hit` chứa kết quả tìm kiếm giả lập
                 List<Hit<ProblemElasticsearch>> hits = List.of(
                                 Hit.of(h -> h.index("problems").id("1").score(1.0).source(problem1)),
                                 Hit.of(h -> h.index("problems").id("2").score(0.9).source(problem2)));
 
-                // Mock SearchResponse
                 TotalHits totalHits = new TotalHits.Builder().value(2L).relation(TotalHitsRelation.Eq).build();
                 SearchResponse<ProblemElasticsearch> mockResponse = mock(SearchResponse.class);
                 when(mockResponse.hits()).thenReturn(new HitsMetadata.Builder<ProblemElasticsearch>()
@@ -595,10 +606,8 @@ class ProblemServiceImplTest {
                 when(elasticsearchClient.search(any(SearchRequest.class), eq(ProblemElasticsearch.class)))
                                 .thenReturn(mock(SearchResponse.class));
 
-                // Gọi hàm thực tế
                 List<String> suggestions = problemService.getAutocompleteSuggestionsForProblemTitle("Java");
 
-                // Kiểm tra kết quả
                 assertNotNull(suggestions);
                 assertEquals(0, suggestions.size());
         }
@@ -676,7 +685,9 @@ class ProblemServiceImplTest {
                                 any()))
                                 .thenReturn(new ProblemCompileResponseDto());
 
-                ProblemCompileResponseDto result = problemService.getProblemCompileInformationById("test-link", "Java");
+                ProblemCompileResponseDto result = problemService.getProblemCompileInformationById(
+                                "test-link",
+                                "Java");
 
                 assertNotNull(result);
         }

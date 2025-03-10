@@ -10,6 +10,7 @@ import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.model.InvokeRequest;
 import com.amazonaws.services.lambda.model.InvokeResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
 
@@ -56,8 +57,7 @@ public class LambdaServiceImpl implements LambdaService {
             // log.info(result);
             return result;
         } catch (Exception e) {
-            log.info(e.getMessage());
-            return "";
+            throw new BadRequestException("Request on lambda failed", "Request on lambda failed");
         }
 
     }

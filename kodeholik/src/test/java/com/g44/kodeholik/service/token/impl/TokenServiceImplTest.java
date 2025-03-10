@@ -1,17 +1,18 @@
 package com.g44.kodeholik.service.token.impl;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
-import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
-import javax.crypto.SecretKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,12 +24,7 @@ import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.token.TokenType;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.redis.RedisService;
-import com.g44.kodeholik.service.token.TokenService;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -109,7 +105,7 @@ class TokenServiceImplTest {
     void testAddTokenToCookie() {
         String token = "testToken";
         tokenService.addTokenToCookie(token, response, TokenType.ACCESS);
-        verify(response, times(1)).addCookie(any(Cookie.class));
+        verify(response, times(1)).addHeader(anyString(), anyString());
     }
 
     @Test
@@ -129,7 +125,11 @@ class TokenServiceImplTest {
         String username = "testUser";
         String refreshToken = "testRefreshToken";
         tokenService.saveRefreshToken(refreshToken, username);
-        verify(redisService, times(1)).saveToken(username, refreshToken, refreshTokenExpiryTime, TokenType.REFRESH);
+        verify(redisService, times(1)).saveToken(
+                username,
+                refreshToken,
+                refreshTokenExpiryTime,
+                TokenType.REFRESH);
     }
 
     @Test
