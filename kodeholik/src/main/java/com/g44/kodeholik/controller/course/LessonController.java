@@ -28,6 +28,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/lesson")
@@ -95,6 +97,18 @@ public class LessonController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/complete/{lessonId}")
+    public ResponseEntity<?> markLessonAsCompleted(@PathVariable Long lessonId) {
+        lessonService.markLessonAsCompleted(lessonId);
+        return ResponseEntity.ok().body("Lesson marked as completed");
+    }
+
+    @GetMapping("/completed-lessons")
+    public ResponseEntity<List<Long>> getCompletedLessons() {
+        List<Long> completedLessons = lessonService.getCompletedLessons();
+        return ResponseEntity.ok(completedLessons);
     }
 
 }

@@ -3,10 +3,17 @@ package com.g44.kodeholik.service.course.impl;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.entity.course.Chapter;
+import com.g44.kodeholik.model.entity.course.UserLessonProgress;
+import com.g44.kodeholik.model.entity.course.UserLessonProgressId;
+import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.course.LessonStatus;
+import com.g44.kodeholik.repository.course.UserLessonProgressRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
 import lombok.extern.log4j.Log4j2;
@@ -44,6 +51,8 @@ public class LessonServiceImpl implements LessonService {
     private final S3Service s3Service;
 
     private final GoogleCloudStorageService gcsService;
+
+    private final UserLessonProgressRepository userLessonProgressRepository;
 
     @Override
     public Page<LessonResponseDto> getAllLesson(Pageable pageable) {
@@ -113,6 +122,32 @@ public class LessonServiceImpl implements LessonService {
         lessonRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
         lessonRepository.deleteById(id);
+    }
+
+    @Override
+    public void markLessonAsCompleted(Long lessonId) {
+        Users currentUser = userService.getCurrentUser();
+
+
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson with ID " + lessonId + " does not exist"));
+
+
+        UserLessonProgress progress = new UserLessonProgress();
+        progress.setId(new UserLessonProgressId(currentUser.getId(), lessonId));
+        progress.setUser(currentUser);
+        progress.setLesson(lesson);
+
+        userLessonProgressRepository.save(progress);
+    }
+
+    @Override
+    public List<Long> getCompletedLessons() {
+        Users currentUser = userService.getCurrentUser();
+        return userLessonProgressRepository.findByUserId(currentUser.getId())
+                .stream()
+                .map(progress -> progress.getLesson().getId())
+                .collect(Collectors.toList());
     }
 
 }

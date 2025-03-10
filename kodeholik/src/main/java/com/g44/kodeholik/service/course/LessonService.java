@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import com.g44.kodeholik.model.dto.request.course.LessonRequestDto;
 import com.g44.kodeholik.model.dto.response.course.LessonResponseDto;
 
+import java.util.List;
+
 public interface LessonService {
     public Page<LessonResponseDto> getAllLesson(Pageable pageable);
 
@@ -16,4 +18,8 @@ public interface LessonService {
     public void editLesson(Long lessonId, LessonRequestDto lessonRequestDto);
 
     public void deleteLessonById(Long id);
+
+    public void markLessonAsCompleted(Long lessonId);
+
+    public List<Long> getCompletedLessons();
 }
