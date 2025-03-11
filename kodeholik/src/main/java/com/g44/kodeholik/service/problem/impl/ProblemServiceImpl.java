@@ -1475,6 +1475,7 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public List<ProblemShortResponseDto> getPrivateProblemShortResponseDto() {
+        log.info("test");
         List<ProblemShortResponseDto> result = new ArrayList();
         List<Problem> problems = problemRepository.findByStatusAndIsActive(ProblemStatus.PRIVATE, true);
         for (int i = 0; i < problems.size(); i++) {

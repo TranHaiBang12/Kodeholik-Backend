@@ -133,8 +133,8 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public ExamResponseDto createExam(AddExamRequestDto addExamRequestDto) {
-        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime() - 1000 * 60 * 60 * 7));
-        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime() - 1000 * 60 * 60 * 7));
+        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime()));
+        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime()));
 
         Exam exam = addExamRequestMapper.mapTo(addExamRequestDto);
 
@@ -201,8 +201,8 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public ExamResponseDto editExam(AddExamRequestDto addExamRequestDto, String code) {
-        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime() - 1000 * 60 * 60 * 7));
-        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime() - 1000 * 60 * 60 * 7));
+        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime()));
+        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime()));
         Exam savedExam = getExamByCode(code);
         if (savedExam.getStatus() != ExamStatus.NOT_STARTED) {
             throw new BadRequestException("This exam is already started or ended",
@@ -229,17 +229,19 @@ public class ExamServiceImpl implements ExamService {
         List<ExamProblemRequestDto> problemExams = addExamRequestDto.getProblemRequests();
 
         exam.setLanguageSupport(languages);
+        for (ExamProblemRequestDto problemExam : problemExams) {
+            Problem problem = problemService.getProblemByExamProblemRequest(problemExam);
+            if (!checkLanguageSupportEquals(languages, problem.getLanguageSupport())) {
+                throw new BadRequestException("Language support of your exam does not match with your problem",
+                        "Language support of your exam does not match with your problem");
+            }
+        }
         exam = examRepository.save(exam);
-
         examProblemRepository.deleteByExam(exam);
         for (ExamProblemRequestDto problemExam : problemExams) {
             Problem problem = problemService.getProblemByExamProblemRequest(problemExam);
             ExamProblemId examProblemId = new ExamProblemId(exam.getId(), problem.getId());
             ExamProblem examProblem = new ExamProblem(examProblemId, exam, problem, problemExam.getProblemPoint());
-            if (!checkLanguageSupportEquals(languages, problem.getLanguageSupport())) {
-                throw new BadRequestException("Language support of your exam does not match with your problem",
-                        "Language support of your exam does not match with your problem");
-            }
             examProblemRepository.save(examProblem);
         }
 
@@ -255,6 +257,12 @@ public class ExamServiceImpl implements ExamService {
             throw new BadRequestException("This exam is already started or ended",
                     "This exam is already started or ended");
         }
+        List<ExamParticipant> participants = examParticipantRepository.findByExam(savedExam);
+        if (!participants.isEmpty()) {
+            throw new BadRequestException("Can't delete this exam because it already has participant",
+                    "Can't delete this exam because it already has participant");
+        }
+        examProblemRepository.deleteByExam(savedExam);
         examRepository.delete(savedExam);
     }
 

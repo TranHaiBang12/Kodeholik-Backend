@@ -125,13 +125,13 @@ public class ProblemController {
         return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
     }
 
-    @PatchMapping("/activate-problem/{link}")
+    @PutMapping("/activate-problem/{link}")
     public ResponseEntity<?> activateProblem(@PathVariable String link) {
         problemService.activateProblem(link);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/deactivate-problem/{link}")
+    @PutMapping("/deactivate-problem/{link}")
     public ResponseEntity<?> deactivateProblem(@PathVariable String link) {
         problemService.deactivateProblem(link);
         return ResponseEntity.noContent().build();
