@@ -2,6 +2,8 @@ package com.g44.kodeholik.service.course.impl;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -79,6 +81,14 @@ public class ChapterServiceImpl implements ChapterService {
         chapterRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
         chapterRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ChapterResponseDto> getChapterByCourseId(Long id) {
+        List<Chapter> chapters = chapterRepository.findByCourseId(id);
+        return chapters.stream()
+                .map(chapterResponseMapper::mapDetailFrom)
+                .collect(Collectors.toList());
     }
 
 }

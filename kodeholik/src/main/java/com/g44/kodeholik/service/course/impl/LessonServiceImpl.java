@@ -150,4 +150,12 @@ public class LessonServiceImpl implements LessonService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<LessonResponseDto> getLessonByChapterId(Long id) {
+        List<Lesson> lessons = lessonRepository.findByChapterId(id);
+        return lessons.stream()
+                .map(lessonResponseMapper::mapFrom)
+                .collect(Collectors.toList());
+    }
+
 }

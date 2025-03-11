@@ -1,5 +1,6 @@
 package com.g44.kodeholik.controller.course;
 
+import com.g44.kodeholik.model.dto.response.course.LessonResponseDto;
 import jakarta.validation.Valid;
 import org.apache.http.HttpStatus;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,8 @@ import com.g44.kodeholik.service.course.ChapterService;
 import com.g44.kodeholik.service.course.CourseService;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,5 +58,11 @@ public class ChapterController {
     public ResponseEntity<?> deleteChapter(@PathVariable Long id) {
         chapterService.deleteChapter(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/by-course/{courseId}")
+    public ResponseEntity<List<ChapterResponseDto>> getChapterByCourse(@PathVariable Long courseId) {
+        List<ChapterResponseDto> chapters = chapterService.getChapterByCourseId(courseId);
+        return ResponseEntity.ok(chapters);
     }
 }

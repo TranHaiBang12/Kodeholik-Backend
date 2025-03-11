@@ -25,4 +25,14 @@ public class ChapterResponseMapper implements Mapper<Chapter, ChapterResponseDto
         return mapper.map(a, ChapterResponseDto.class);
     }
 
+    public ChapterResponseDto mapDetailFrom(Chapter chapter) {
+        return ChapterResponseDto.builder()
+                .id(chapter.getId())
+                .title(chapter.getTitle())
+                .courseId(chapter.getCourse().getId())
+                .description(chapter.getDescription())
+                .status(chapter.getStatus())
+                .build();
+    }
+
 }

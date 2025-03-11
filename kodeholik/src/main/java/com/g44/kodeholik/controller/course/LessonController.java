@@ -111,4 +111,10 @@ public class LessonController {
         return ResponseEntity.ok(completedLessons);
     }
 
+    @GetMapping("/by-chapter/{chapterId}")
+    public ResponseEntity<List<LessonResponseDto>> getLessonsByChapter(@PathVariable Long chapterId) {
+        List<LessonResponseDto> lessons = lessonService.getLessonByChapterId(chapterId);
+        return ResponseEntity.ok(lessons);
+    }
+
 }

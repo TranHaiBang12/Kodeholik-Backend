@@ -22,4 +22,6 @@ public interface LessonService {
     public void markLessonAsCompleted(Long lessonId);
 
     public List<Long> getCompletedLessons();
+
+    public List<LessonResponseDto> getLessonByChapterId(Long id);
 }
