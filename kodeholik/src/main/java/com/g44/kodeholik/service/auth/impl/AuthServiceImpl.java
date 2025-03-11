@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.config.MessageProperties;
+import com.g44.kodeholik.config.WebsocketSessionManager;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
@@ -64,6 +66,10 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
 
     private final MessageProperties messageProperties;
+
+    private final SimpMessagingTemplate messagingTemplate;
+
+    private final WebsocketSessionManager websocketSessionManager;
 
     @Value("${spring.jwt.forgot-token.expiry-time}")
     private int forgotTokenExpiryTime;
@@ -141,8 +147,9 @@ public class AuthServiceImpl implements AuthService {
             throw new ForbiddenException("This account is not allowed to do this action",
                     "This account is not allowed to do this action");
         }
-        if (userRepository.existsByUsernameOrEmail(username).isPresent()) {
-            String savedToken = redisService.getToken(username, TokenType.FORGOT);
+        Optional<Users> user = userRepository.existsByUsernameOrEmail(username);
+        if (user.isPresent()) {
+            String savedToken = redisService.getToken(user.get().getUsername(), TokenType.FORGOT);
             if (savedToken != null) {
                 if (tokenService.validateToken(token) &&
                         token.equals(savedToken.trim())) {
@@ -181,6 +188,12 @@ public class AuthServiceImpl implements AuthService {
             redisService.deleteToken(user.getUsername(), TokenType.REFRESH);
             tokenService.deleteCookieFromResponse(response, TokenType.ACCESS);
             tokenService.deleteCookieFromResponse(response, TokenType.REFRESH);
+            // websocketSessionManager.removeSession("EXAM", user.getUsername());
+            // websocketSessionManager.removeSession("NOTI", user.getUsername());
+            // messagingTemplate.convertAndSend("/topic/exam/disconnect/" +
+            // user.getUsername(), "FORCE_DISCONNECT");
+            // messagingTemplate.convertAndSend("/topic/noti/disconnect/" +
+            // user.getUsername(), "FORCE_DISCONNECT");
         }
     }
 
@@ -250,6 +263,12 @@ public class AuthServiceImpl implements AuthService {
         } else {
             throw new BadRequestException("Wrong password", "Wrong password");
         }
+    }
+
+    @Override
+    public String generateTokenForNotification() {
+        Users user = userService.getCurrentUser();
+        return tokenService.generateAccessToken(user.getUsername());
     }
 
 }

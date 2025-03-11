@@ -19,15 +19,14 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.g44.kodeholik.model.dto.request.problem.FilterProblemRequestAdminDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
-import com.g44.kodeholik.model.dto.request.problem.add.ProblemAddRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
+import com.g44.kodeholik.model.dto.response.problem.ListProblemAdminDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemBasicResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
@@ -35,6 +34,7 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDt
 import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemShortResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.service.problem.ProblemService;
 
@@ -64,11 +64,11 @@ public class ProblemController {
             @RequestPart(name = "problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
             @RequestPart(name = "problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
             @RequestPart(name = "problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
-            @RequestPart(name = "excelFile") MultipartFile excelFile) {
+            @RequestPart(name = "testCaseFile") MultipartFile testCaseFile) {
         problemService.addProblem(problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
-                excelFile);
+                testCaseFile);
 
         // problemService.addProblem(problemRequestDto.getProblemBasicAddDto(),
         // problemRequestDto.getProblemEditorialDto(),
@@ -83,12 +83,13 @@ public class ProblemController {
             @RequestPart("problemBasicAddDto") @Valid ProblemBasicAddDto problemBasicAddDto,
             @RequestPart("problemEditorialDto") @Valid ProblemEditorialDto problemEditorialDto,
             @RequestPart("problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
-            @RequestPart("testcaseFile") MultipartFile testcaseFile) {
+            @RequestPart(name = "testCaseFile") MultipartFile testCaseFile) {
         // TODO: process POST request
+        log.info(problemInputParameterDto.get(1).getParameters());
         problemService.editProblem(link, problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
-                testcaseFile);
+                testCaseFile);
         return ResponseEntity.noContent().build();
     }
 
@@ -99,7 +100,7 @@ public class ProblemController {
 
     @GetMapping("/editorial-for-emp/{link}")
     public ResponseEntity<ProblemEditorialResponseDto> getProblemEditorialForEmployee(@PathVariable String link) {
-        return ResponseEntity.ok(problemService.getProblemEditorialDtoList(link));
+        return ResponseEntity.ok(problemService.getProblemEditorialDtoListTeacher(link));
     }
 
     @GetMapping("/editorial/{link}")
@@ -108,8 +109,9 @@ public class ProblemController {
     }
 
     @GetMapping("/template-for-emp/{link}")
-    public ResponseEntity<ProblemInputParameterResponseDto> getProblemTemplateForEmployee(@PathVariable String link) {
-        return ResponseEntity.ok(problemService.getProblemInputParameterDtoList(link));
+    public ResponseEntity<List<ProblemInputParameterResponseDto>> getProblemTemplateForEmployee(
+            @PathVariable String link) {
+        return ResponseEntity.ok(problemService.getProblemInputParameterDtoListTeacher(link));
     }
 
     @GetMapping("/download-testcase/{link}")
@@ -123,13 +125,13 @@ public class ProblemController {
         return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
     }
 
-    @PatchMapping("/activate-problem/{link}")
+    @PutMapping("/activate-problem/{link}")
     public ResponseEntity<?> activateProblem(@PathVariable String link) {
         problemService.activateProblem(link);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/deactivate-problem/{link}")
+    @PutMapping("/deactivate-problem/{link}")
     public ResponseEntity<?> deactivateProblem(@PathVariable String link) {
         problemService.deactivateProblem(link);
         return ResponseEntity.noContent().build();
@@ -160,6 +162,12 @@ public class ProblemController {
             @PathVariable String link,
             @RequestParam String languageName) {
         return ResponseEntity.ok(problemService.getProblemCompileInformationById(link, languageName));
+    }
+
+    @GetMapping("/language-support/{link}")
+    public ResponseEntity<List<String>> getLanguageSupportForProblemByLink(
+            @PathVariable String link) {
+        return ResponseEntity.ok(problemService.getLanguageSupportByProblem(link));
     }
 
     @GetMapping("/description/{link}")
@@ -212,4 +220,15 @@ public class ProblemController {
         }
         return ResponseEntity.ok(problemResponsePage);
     }
+
+    @PostMapping("/list-problem")
+    public ResponseEntity<Page<ListProblemAdminDto>> getListProblem(
+            @RequestBody FilterProblemRequestAdminDto filterProblemRequestAdminDto) {
+        Page<ListProblemAdminDto> pageProblem = problemService.getListProblemForAdmin(filterProblemRequestAdminDto);
+        if (pageProblem.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(pageProblem);
+    }
+
 }

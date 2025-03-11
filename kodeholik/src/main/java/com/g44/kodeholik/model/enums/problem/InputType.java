@@ -9,6 +9,7 @@ public enum InputType {
     BOOLEAN,
     LIST,
     MAP,
+    SET,
     ARR_INT,
     ARR_DOUBLE,
     ARR_OBJECT,

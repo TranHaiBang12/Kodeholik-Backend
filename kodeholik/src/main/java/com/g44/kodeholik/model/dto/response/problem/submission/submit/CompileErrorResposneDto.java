@@ -2,18 +2,22 @@ package com.g44.kodeholik.model.dto.response.problem.submission.submit;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
 public class CompileErrorResposneDto extends SubmissionResponseDto {
     private String message;
-    private Timestamp createdAt;
+
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long createdAt;
 
     public CompileErrorResposneDto(String message, String code, String languageName, Timestamp createdAt,
             SubmissionStatus status) {
         super(code, languageName, status);
         this.message = message;
-        this.createdAt = createdAt;
+        this.createdAt = createdAt.getTime();
     }
 
     public String getMessage() {
@@ -44,11 +48,11 @@ public class CompileErrorResposneDto extends SubmissionResponseDto {
         this.languageName = languageName;
     }
 
-    public Timestamp getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
     }
 

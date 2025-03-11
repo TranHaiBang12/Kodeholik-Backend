@@ -122,11 +122,16 @@ public class AuthServiceImplTest {
         when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(user));
         when(userRepository.isUserNotAllowed(anyString())).thenReturn(false);
         when(tokenService.generateAccessToken(anyString())).thenReturn("accessToken");
-        when(tokenService.generateRefreshToken(anyString(), any(Date.class))).thenReturn("refreshToken");
+        when(tokenService.generateRefreshToken(anyString(), any(Date.class)))
+                .thenReturn("refreshToken");
         authServiceImpl.loginNormal(loginRequest, response);
 
-        verify(tokenService).addTokenToCookie(eq("accessToken"), eq(response), eq(TokenType.ACCESS));
-        verify(tokenService).addTokenToCookie(eq("refreshToken"), eq(response), eq(TokenType.REFRESH));
+        verify(tokenService).addTokenToCookie(eq("accessToken"),
+                eq(response),
+                eq(TokenType.ACCESS));
+        verify(tokenService).addTokenToCookie(eq("refreshToken"),
+                eq(response),
+                eq(TokenType.REFRESH));
     }
 
     @Test
@@ -150,8 +155,10 @@ public class AuthServiceImplTest {
         ForbiddenException forbiddenException = assertThrows(
                 ForbiddenException.class,
                 () -> authServiceImpl.loginNormal(loginRequest, response));
-        assertEquals("This account is not allowed to do this action", forbiddenException.getMessage());
-        assertEquals("This account is not allowed to do this action", forbiddenException.getDetails());
+        assertEquals("This account is not allowed to do this action",
+                forbiddenException.getMessage());
+        assertEquals("This account is not allowed to do this action",
+                forbiddenException.getDetails());
     }
 
     @Test
@@ -213,8 +220,12 @@ public class AuthServiceImplTest {
 
         authServiceImpl.resetPasswordInit("test@example.com");
 
-        verify(redisService).saveToken(eq("testUser"), eq("token"), eq(0L), eq(TokenType.FORGOT));
-        verify(emailService).sendEmailResetPassword(eq("test@example.com"), anyString(), eq("testUser"), anyString());
+        verify(redisService).saveToken(eq("testUser"), eq("token"),
+                eq(0L),
+                eq(TokenType.FORGOT));
+        verify(emailService).sendEmailResetPassword(eq("test@example.com"),
+                anyString(), eq("testUser"),
+                anyString());
     }
 
     @Test
@@ -230,8 +241,10 @@ public class AuthServiceImplTest {
         ForbiddenException forbiddenException = assertThrows(
                 ForbiddenException.class,
                 () -> authServiceImpl.resetPasswordInit("test@example.com"));
-        assertEquals("This account is not allowed to do this action", forbiddenException.getMessage());
-        assertEquals("This account is not allowed to do this action", forbiddenException.getDetails());
+        assertEquals("This account is not allowed to do this action",
+                forbiddenException.getMessage());
+        assertEquals("This account is not allowed to do this action",
+                forbiddenException.getDetails());
     }
 
     @Test
@@ -253,10 +266,12 @@ public class AuthServiceImplTest {
     public void testCheckValidForgotPasswordTokenSuccessful() {
         String token = "token";
         String username = "testUser";
+        Users user = new Users();
+        user.setUsername(username);
 
         when(tokenService.extractUsername(anyString())).thenReturn(username);
         when(userRepository.isUserNotAllowed(anyString())).thenReturn(false);
-        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(new Users()));
+        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(user));
         when(redisService.getToken(anyString(), eq(TokenType.FORGOT))).thenReturn(token);
         when(tokenService.validateToken(anyString())).thenReturn(true);
 
@@ -275,8 +290,10 @@ public class AuthServiceImplTest {
         ForbiddenException forbiddenException = assertThrows(
                 ForbiddenException.class,
                 () -> authServiceImpl.checkValidForgotPasswordToken(token));
-        assertEquals("This account is not allowed to do this action", forbiddenException.getMessage());
-        assertEquals("This account is not allowed to do this action", forbiddenException.getDetails());
+        assertEquals("This account is not allowed to do this action",
+                forbiddenException.getMessage());
+        assertEquals("This account is not allowed to do this action",
+                forbiddenException.getDetails());
     }
 
     @Test
@@ -350,14 +367,15 @@ public class AuthServiceImplTest {
 
         when(tokenService.extractUsername(anyString())).thenReturn(username);
         when(userRepository.isUserNotAllowed(anyString())).thenReturn(false);
-        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(new Users()));
+        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(user));
         when(redisService.getToken(anyString(), eq(TokenType.FORGOT))).thenReturn(token);
         when(tokenService.validateToken(anyString())).thenReturn(true);
 
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
         when(tokenService.validateToken(anyString())).thenReturn(true);
         try (MockedStatic<Validation> mockedStaticValidation = mockStatic(Validation.class)) {
-            mockedStaticValidation.when(() -> Validation.isValidPassword(anyString())).thenReturn(true);
+            mockedStaticValidation.when(() -> Validation.isValidPassword(anyString()))
+                    .thenReturn(true);
 
         }
         authServiceImpl.resetPasswordFinish(token, password);
@@ -381,14 +399,15 @@ public class AuthServiceImplTest {
 
         when(tokenService.extractUsername(anyString())).thenReturn(username);
         when(userRepository.isUserNotAllowed(anyString())).thenReturn(false);
-        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(new Users()));
+        when(userRepository.existsByUsernameOrEmail(anyString())).thenReturn(Optional.of(user));
         when(redisService.getToken(anyString(), eq(TokenType.FORGOT))).thenReturn(token);
         when(tokenService.validateToken(anyString())).thenReturn(true);
 
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
         when(tokenService.validateToken(anyString())).thenReturn(true);
         try (MockedStatic<Validation> mockedStaticValidation = mockStatic(Validation.class)) {
-            mockedStaticValidation.when(() -> Validation.isValidPassword(anyString())).thenReturn(false);
+            mockedStaticValidation.when(() -> Validation.isValidPassword(anyString()))
+                    .thenReturn(false);
             BadRequestException badRequestException = assertThrows(
                     BadRequestException.class,
                     () -> authServiceImpl.resetPasswordFinish(token, password));
@@ -434,21 +453,6 @@ public class AuthServiceImplTest {
     }
 
     @Test
-    public void testLogoutUnauthorizedException() {
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        Users user = new Users();
-        user.setUsername("testUser");
-
-        when(userService.getCurrentUser()).thenReturn(null);
-
-        UnauthorizedException unauthorizedException = assertThrows(
-                UnauthorizedException.class,
-                () -> authServiceImpl.logout(response));
-        assertEquals("User not logged in", unauthorizedException.getMessage());
-        assertEquals("User not logged in", unauthorizedException.getDetails());
-    }
-
-    @Test
     public void testChangePasswordSuccessfull() {
         ChangePasswordRequestDto changePasswordRequestDto = new ChangePasswordRequestDto();
         changePasswordRequestDto.setOldPassword("oldPassword");
@@ -462,8 +466,10 @@ public class AuthServiceImplTest {
         try (MockedStatic<PasswordUtils> mockedStatic = mockStatic(PasswordUtils.class);
                 MockedStatic<Validation> mockedStaticValidation = mockStatic(Validation.class)) {
 
-            mockedStatic.when(() -> PasswordUtils.verifyPassword(anyString(), anyString())).thenReturn(true);
-            mockedStaticValidation.when(() -> Validation.isValidPassword(anyString())).thenReturn(true);
+            mockedStatic.when(() -> PasswordUtils.verifyPassword(anyString(), anyString()))
+                    .thenReturn(true);
+            mockedStaticValidation.when(() -> Validation.isValidPassword(anyString()))
+                    .thenReturn(true);
             authServiceImpl.changePassword(changePasswordRequestDto);
 
             verify(userRepository).save(any(Users.class));
@@ -486,7 +492,8 @@ public class AuthServiceImplTest {
         try (MockedStatic<PasswordUtils> mockedStatic = mockStatic(PasswordUtils.class);
                 MockedStatic<Validation> mockedStaticValidation = mockStatic(Validation.class)) {
 
-            mockedStatic.when(() -> PasswordUtils.verifyPassword(anyString(), anyString())).thenReturn(false);
+            mockedStatic.when(() -> PasswordUtils.verifyPassword(anyString(), anyString()))
+                    .thenReturn(false);
             BadRequestException badRequestException = assertThrows(BadRequestException.class,
                     () -> authServiceImpl.changePassword(changePasswordRequestDto));
             assertEquals("Wrong password", badRequestException.getMessage());
@@ -509,8 +516,10 @@ public class AuthServiceImplTest {
         try (MockedStatic<PasswordUtils> mockedStatic = mockStatic(PasswordUtils.class);
                 MockedStatic<Validation> mockedStaticValidation = mockStatic(Validation.class)) {
 
-            mockedStatic.when(() -> PasswordUtils.verifyPassword(anyString(), anyString())).thenReturn(true);
-            mockedStatic.when(() -> Validation.isValidPassword(anyString())).thenReturn(false);
+            mockedStatic.when(() -> PasswordUtils.verifyPassword(anyString(), anyString()))
+                    .thenReturn(true);
+            mockedStatic.when(() -> Validation.isValidPassword(anyString()))
+                    .thenReturn(false);
             BadRequestException badRequestException = assertThrows(BadRequestException.class,
                     () -> authServiceImpl.changePassword(changePasswordRequestDto));
             assertEquals(error, badRequestException.getMessage());

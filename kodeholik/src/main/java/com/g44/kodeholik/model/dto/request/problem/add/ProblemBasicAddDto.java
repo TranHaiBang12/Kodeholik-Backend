@@ -40,4 +40,6 @@ public class ProblemBasicAddDto {
 
     @NotNull(message = "{MSG02}")
     private Boolean isActive;
+
+    private List<String> languageSupport;
 }

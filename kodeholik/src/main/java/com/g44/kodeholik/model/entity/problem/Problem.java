@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.g44.kodeholik.model.entity.discussion.Comment;
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
@@ -85,9 +87,12 @@ public class Problem {
     @JoinTable(name = "problem_topic", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "topic_id"))
     private Set<Topic> topics = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(name = "problem_comment", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "comment_id"))
-    private Set<Comment> comments = new HashSet<>();
+    // @ManyToMany
+    // @JoinTable(name = "problem_comment", schema = "schema_problem", joinColumns =
+    // @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name =
+    // "comment_id"))
+    // @JsonManagedReference
+    // private Set<Comment> comments = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "problem_skill", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
@@ -96,6 +101,10 @@ public class Problem {
     @ManyToMany
     @JoinTable(name = "user_favourite", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<Users> usersFavourite = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "language_support", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "language_id"))
+    private Set<Language> languageSupport = new HashSet<>();
 
     public Problem(String title, String description, Difficulty difficulty, float acceptanceRate, int noSubmission,
             ProblemStatus problemStatus, Timestamp createdAt, Users createdBy) {

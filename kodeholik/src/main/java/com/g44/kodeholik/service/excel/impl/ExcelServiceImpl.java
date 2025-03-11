@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -19,29 +20,35 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
 import com.g44.kodeholik.model.dto.request.problem.add.TestCaseDto;
+import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.service.excel.ExcelService;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Service
+@RequiredArgsConstructor
 public class ExcelServiceImpl implements ExcelService {
 
     private Gson gson = new Gson();
 
+    private final ObjectMapper objectMapper;
+
     @Override
-    public Sheet readExcelSheet(MultipartFile file) {
+    public Sheet readExcelSheet(MultipartFile file, String languageName) {
         try (InputStream inputStream = file.getInputStream();
                 Workbook workbook = new XSSFWorkbook(inputStream)) {
-
-            Sheet sheet = workbook.getSheet("TestCase");
+            log.info(languageName + "TestCase");
+            Sheet sheet = workbook.getSheet(languageName + "TestCase");
             return sheet;
         } catch (Exception ex) {
             log.info(ex.getMessage());
@@ -50,9 +57,16 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
-    public ProblemTestCaseDto readTestCaseExcel(MultipartFile file, List<String> inputNames) {
-        Sheet sheet = readExcelSheet(file);
+    public List<ProblemTestCaseDto> readTestCaseExcel(MultipartFile file, List<String> inputNames,
+            String languageName) {
+        List<ProblemTestCaseDto> problemTestCaseDtoList = new ArrayList<>();
+        Sheet sheet = readExcelSheet(file, languageName);
+        if (sheet == null) {
+            throw new BadRequestException("Please define a excel file test case for each language",
+                    "Please define a excel file test case for each language");
+        }
         ProblemTestCaseDto problemTestCaseDto = new ProblemTestCaseDto();
+        problemTestCaseDto.setLanguage(languageName);
         List<TestCaseDto> testCases = new ArrayList();
         Row headerRow = sheet.getRow(0);
         Map<String, Integer> columnIndexMap = new HashMap<>();
@@ -79,17 +93,21 @@ public class ExcelServiceImpl implements ExcelService {
         }
         int expectedOutputIndex = columnIndexMap.get("Expected Output");
         int isSampleIndex = columnIndexMap.get("Is Sample");
+        log.info(expectedOutputIndex + " " + isSampleIndex);
 
         // Duyệt các dòng dữ liệu (bỏ qua header - row 0)
         Iterator<Row> rowIterator = sheet.iterator();
         rowIterator.next(); // Bỏ qua header
 
-        while (rowIterator.hasNext()) {
+        outerLoop: while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
             Map<String, String> inputMap = new HashMap();
             for (int i = 0; i < inputIndexList.size(); i++) {
                 Cell inputCell = row.getCell(inputIndexList.get(i));
                 String input;
+                if (inputCell == null) {
+                    break outerLoop;
+                }
                 if (inputCell.getCellType() == CellType.NUMERIC) {
                     DecimalFormat df = new DecimalFormat("#");
                     input = df.format(inputCell.getNumericCellValue());
@@ -113,62 +131,72 @@ public class ExcelServiceImpl implements ExcelService {
         }
 
         problemTestCaseDto.setTestCases(testCases);
-        return problemTestCaseDto;
+        problemTestCaseDtoList.add(problemTestCaseDto);
+        return problemTestCaseDtoList;
     }
 
     @Override
-    public byte[] generateExcelFile(List<ProblemTestCase> problemTestCases) {
+    public byte[] generateExcelFile(List<ProblemTestCase> problemTestCases, Problem problem) {
         try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            Set<Language> languages = problem.getLanguageSupport();
             Workbook workbook = new XSSFWorkbook();
-            Sheet sheet = workbook.createSheet("TestCase");
-            List<String> columnHeaders = new ArrayList();
-            List<List<InputVariable>> inputVariablesList = new ArrayList();
-            for (int i = 0; i < problemTestCases.size(); i++) {
-                List<InputVariable> inputVariables = gson.fromJson(problemTestCases.get(i).getInput(),
-                        new TypeToken<List<InputVariable>>() {
-                        }.getType());
-                if (i == 0) {
-                    for (int k = 0; k < inputVariables.size(); k++) {
-                        columnHeaders.add(inputVariables.get(k).getName());
+            for (Language language : languages) {
+                Sheet sheet = workbook.createSheet(language.getName() + "TestCase");
+                List<String> columnHeaders = new ArrayList();
+                List<List<InputVariable>> inputVariablesList = new ArrayList();
+                boolean isGetInputName = false;
+                for (int i = 0; i < problemTestCases.size(); i++) {
+                    if (problemTestCases.get(i).getLanguage().getName().equals(language.getName())) {
+                        List<InputVariable> inputVariables = objectMapper.readValue(problemTestCases.get(i).getInput(),
+                                new com.fasterxml.jackson.core.type.TypeReference<List<InputVariable>>() {
+                                });
+                        if (!isGetInputName) {
+                            for (int k = 0; k < inputVariables.size(); k++) {
+                                columnHeaders.add(inputVariables.get(k).getName());
+                            }
+                            isGetInputName = true;
+                        }
+                        inputVariablesList.add(inputVariables);
                     }
                 }
-                inputVariablesList.add(inputVariables);
-            }
 
-            columnHeaders.add("Expected Output");
-            columnHeaders.add("Is Sample");
+                columnHeaders.add("Expected Output");
+                columnHeaders.add("Is Sample");
 
-            // Tạo hàng tiêu đề
-            Row headerRow = sheet.createRow(0);
-            for (int i = 0; i < columnHeaders.size(); i++) {
-                Cell cell = headerRow.createCell(i);
-                cell.setCellValue(columnHeaders.get(i));
-            }
-
-            // Ghi dữ liệu từ danh sách vào file Excel
-            int rowNum = 1;
-            for (int i = 0; i < problemTestCases.size(); i++) {
-                ProblemTestCase data = problemTestCases.get(i);
-                Row row = sheet.createRow(rowNum++);
-                int k = 0;
-                while (k < inputVariablesList.get(i).size()) {
-                    String value = inputVariablesList.get(i).get(k).getValue().toString().replaceAll("\"", "");
-                    row.createCell(k).setCellValue(value);
-                    k++;
+                // Tạo hàng tiêu đề
+                Row headerRow = sheet.createRow(0);
+                for (int i = 0; i < columnHeaders.size(); i++) {
+                    Cell cell = headerRow.createCell(i);
+                    cell.setCellValue(columnHeaders.get(i));
                 }
-                row.createCell(k++).setCellValue(data.getExpectedOutput().toString().replaceAll("\"", ""));
-                row.createCell(k++).setCellValue(data.isSample());
-            }
 
-            // Chuyển workbook thành mảng byte để trả về
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                // Ghi dữ liệu từ danh sách vào file Excel
+                int rowNum = 1;
+                int m = 0;
+                for (int i = 0; i < problemTestCases.size(); i++) {
+                    if (problemTestCases.get(i).getLanguage().getName().equals(language.getName())) {
+                        ProblemTestCase data = problemTestCases.get(i);
+                        Row row = sheet.createRow(rowNum++);
+                        int k = 0;
+                        while (k < inputVariablesList.get(m).size()) {
+                            Object value = inputVariablesList.get(m).get(k).getValue();
+                            log.info(value);
+                            row.createCell(k).setCellValue(value.toString());
+                            k++;
+                        }
+                        m++;
+                        row.createCell(k++).setCellValue(data.getExpectedOutput().toString().replaceAll("\"", ""));
+                        row.createCell(k++).setCellValue(data.isSample());
+                    }
+                }
+            }
             workbook.write(outputStream);
+
             workbook.close();
             return outputStream.toByteArray();
-        } catch (
-
-        IOException e) {
-            return null;
+        } catch (IOException e) {
+            throw new BadRequestException("Error generating excel file", "Error generating excel file");
         }
     }
 

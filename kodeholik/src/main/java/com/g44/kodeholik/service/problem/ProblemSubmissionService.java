@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.student.ProblemResultOverviewResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.ProblemSubmissionDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
@@ -33,6 +35,11 @@ public interface ProblemSubmissionService {
                         ProblemCompileRequestDto problemCompileRequestDto,
                         List<TestCase> testCases,
                         ProblemTemplate problemTemplate);
+
+        public ProblemResultOverviewResponseDto submitExam(Problem problem,
+                        ProblemCompileRequestDto problemCompileRequestDto,
+                        List<TestCase> testCases,
+                        ProblemTemplate problemTemplate, double point);
 
         public long getNumberAcceptedSubmission(Problem problem);
 

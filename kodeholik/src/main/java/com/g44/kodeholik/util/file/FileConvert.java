@@ -8,11 +8,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class FileConvert {
     public static File convertMultiPartToFile(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
-        FileOutputStream fos = new FileOutputStream(convFile);
-        fos.write(file.getBytes());
-        fos.close();
-        return convFile;
+        if (file != null) {
+            File convFile = new File(file.getOriginalFilename());
+            FileOutputStream fos = new FileOutputStream(convFile);
+            fos.write(file.getBytes());
+            fos.close();
+            return convFile;
+        } else {
+            return null;
+        }
     }
 
 }

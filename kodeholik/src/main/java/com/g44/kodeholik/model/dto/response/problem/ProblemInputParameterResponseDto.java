@@ -17,11 +17,17 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ProblemInputParameterResponseDto {
-    private List<TemplateCode> templateCodes;
+    private TemplateCodeResponseDto templateCodes;
 
     private String functionSignature;
 
     private InputType returnType;
+
+    private String otherReturnType;
+
+    private Integer noDimension;
+
+    private String language;
 
     private List<InputParameterDto> parameters;
 }

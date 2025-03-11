@@ -43,6 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private static List<String> skipFilterUrls = Arrays.asList(
             "/login/**",
+            "/api/v1/lambda/**",
             "/api/v1/auth/logout",
             "/api/v1/auth/login",
             "/api/v1/auth/login/**",
@@ -57,9 +58,12 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/problem/compile-information/**",
             "/api/v1/course/list/**",
             "/api/v1/course/detail/**",
-            "/api/v1/comment/problem/**",
             "/api/v1/course/search/**",
             "/api/v1/tag/all-skill/**",
+            "/api/v1/tag/all-topic/**",
+            "/api/v1/s3/presigned-url",
+            "/ws",
+            "/ws/**",
             "/api/v1/lesson/download-file",
             "/api/v1/tag/all-topic/**");
 
@@ -121,33 +125,38 @@ public class JwtFilter extends OncePerRequestFilter {
 
         Cookie[] cookies = request.getCookies();
         if (!request.getRequestURI().equals("/api/v1/auth/login/oauth2/google")) {
-            String accessToken = "";
-            String username = "";
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if (cookie.getName().equals("access_token")) {
-                        accessToken = cookie.getValue();
-                        username = tokenService.extractUsername(accessToken);
-                    }
-                }
-            }
-            log.info("access: " + accessToken);
-            if (accessToken != null && !accessToken.equals("")) {
-                if ((username != null && !username.equals("")) &&
-                        SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    if (userRepository.existsByUsernameOrEmail(username).isPresent()
-                            && tokenService.validateToken(accessToken)) {
-                        if (userRepository.isUserNotAllowed(username)) {
-                            throw new ForbiddenException("This account is not allowed to do this action",
-                                    "This account is not allowed to do this action");
+            try {
+                String accessToken = "";
+                String username = "";
+                if (cookies != null) {
+                    for (Cookie cookie : cookies) {
+                        if (cookie.getName().equals("access_token")) {
+                            accessToken = cookie.getValue();
+                            username = tokenService.extractUsername(accessToken);
                         }
-                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
-                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     }
                 }
+                log.info("access: " + accessToken);
+                if (accessToken != null && !accessToken.equals("")) {
+                    if ((username != null && !username.equals("")) &&
+                            SecurityContextHolder.getContext().getAuthentication() == null) {
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                        if (userRepository.existsByUsernameOrEmail(username).isPresent()
+                                && tokenService.validateToken(accessToken)) {
+                            if (userRepository.isUserNotAllowed(username)) {
+                                throw new ForbiddenException("This account is not allowed to do this action",
+                                        "This account is not allowed to do this action");
+                            }
+                            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities());
+                            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                return skipFilterUrls.stream().anyMatch(url -> new AntPathRequestMatcher(url).matches(request));
+
             }
         }
         return skipFilterUrls.stream().anyMatch(url -> new AntPathRequestMatcher(url).matches(request));

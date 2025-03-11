@@ -1,15 +1,14 @@
 package com.g44.kodeholik.service.problem.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.math.*;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -95,7 +94,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             String title,
             Set<Skill> skillList,
             Language language,
-            String sortBy, Boolean ascending, Pageable pageable) {
+            String sortBy, Boolean ascending, Pageable pageable, Users currentUser) {
         int sizeN = 5;
         if (size != null) {
             sizeN = size;
@@ -146,8 +145,10 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         Page<SolutionListResponseDto> solutionPage = solution.map(solutionListResponseMapper::mapFrom);
         int index = 0;
         for (SolutionListResponseDto solutionListResponseDto : solutionPage) {
-            solutionListResponseDto.setNoComment(solutionList.get(index).getComments().size());
             solutionListResponseDto.setNoUpvote(solutionList.get(index).getNoUpvote());
+            solutionListResponseDto.setCurrentUserCreated(
+                    currentUser.getId().longValue() == solutionListResponseDto.getCreatedBy().getId());
+
         }
         return solutionPage;
     }
@@ -171,22 +172,27 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     public void unupvoteSolution(Long solutionId, Users user) {
         ProblemSolution problemSolution = findSolutionById(solutionId);
         Set<Users> usersVote = problemSolution.getUserVote();
+
         boolean isVote = false;
-        for (Users userVote : usersVote) {
+        Iterator<Users> iterator = usersVote.iterator();
+        while (iterator.hasNext()) {
+            Users userVote = iterator.next();
             if (userVote.getEmail().equals(user.getEmail())) {
                 isVote = true;
-                usersVote.remove(user);
+                iterator.remove(); // Xóa phần tử một cách an toàn
                 if (problemSolution.getNoUpvote() > 0) {
                     problemSolution.setNoUpvote(problemSolution.getNoUpvote() - 1);
                 }
-                problemSolutionRepository.save(problemSolution);
+                break; // Không cần tiếp tục vòng lặp
             }
         }
+
         if (!isVote) {
             throw new BadRequestException("You haven't voted this solution",
                     "You haven't voted this solution");
         }
 
+        problemSolutionRepository.save(problemSolution); // Chỉ lưu một lần sau khi xử lý
     }
 
     @Override

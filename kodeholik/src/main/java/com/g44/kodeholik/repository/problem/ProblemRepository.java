@@ -31,4 +31,8 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
 
     public Page<Problem> findByUsersFavouriteContains(Users user, Pageable pageable);
 
+    @Query("SELECT p FROM Problem p WHERE (cast(:title as text) IS NULL OR (p.title LIKE '%' || cast(:title as text) || '%')) AND (COALESCE(:difficulty, p.difficulty) = p.difficulty) AND (COALESCE(:status, p.status) = p.status) AND (:isActive IS NULL OR p.isActive = :isActive)")
+    public Page<Problem> findByTitleContainsAndDifficultyAndStatusAndIsActive(String title, Difficulty difficulty,
+            ProblemStatus status, Boolean isActive, Pageable pageable);
+
 }

@@ -1,6 +1,7 @@
 package com.g44.kodeholik.controller.auth;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,6 +101,11 @@ public class AuthenticationController {
     public ResponseEntity<?> logout(HttpServletResponse response) {
         authService.logout(response);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/get-token-noti")
+    public ResponseEntity<String> getTokenNotification() {
+        return ResponseEntity.ok(authService.generateTokenForNotification());
     }
 
 }

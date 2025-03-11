@@ -7,6 +7,7 @@ import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.EditProfileRequestDto;
 import com.g44.kodeholik.model.dto.response.user.NotificationResponseDto;
 import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.service.user.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,11 @@ public class UserController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(notifications);
+    }
+
+    @GetMapping("/other-profile/{id}")
+    public ResponseEntity<UserResponseDto> getMethodName(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getOtherProfile(id));
     }
 
 }

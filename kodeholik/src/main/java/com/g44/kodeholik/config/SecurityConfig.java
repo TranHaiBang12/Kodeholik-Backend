@@ -33,6 +33,7 @@ public class SecurityConfig {
 
         private final String[] publicUrls = {
                         "/login/**",
+                        "/api/v1/lambda/**",
                         "/api/v1/auth/logout",
                         "/api/v1/auth/login",
                         "/api/v1/auth/login/**",
@@ -48,16 +49,20 @@ public class SecurityConfig {
                         "/api/v1/course/list/**",
                         "/api/v1/course/detail/**",
                         "/api/v1/course/search/**",
-                        "/api/v1/comment/problem/**",
                         "/api/v1/tag/all-skill/**",
-                        "/api/v1/tag/all-topic/**"
+                        "/api/v1/tag/all-topic/**",
+                        "/api/v1/s3/presigned-url",
+                        "/ws",
+                        "/ws/**"
         };
 
         private final String[] teacherUrls = {
                         "/api/v1/problem/add-problem",
                         "/api/v1/problem/edit-problem/**",
                         "/api/v1/problem/activate-problem/**",
-                        "/api/v1/problem/deactivate-problem/**"
+                        "/api/v1/problem/deactivate-problem/**",
+                        "/api/v1/problem/list-problem",
+                        "/api/v1/problem/private-problem"
         };
 
         private final JwtFilter jwtFilter;
@@ -76,6 +81,8 @@ public class SecurityConfig {
                                                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                                 .requestMatchers("/api/v1/admin/**")
                                                                 .hasAuthority(UserRole.ADMIN.toString())
+                                                                .requestMatchers("/api/v1/examiner/**")
+                                                                .hasAuthority(UserRole.EXAMINER.toString())
                                                                 .requestMatchers(teacherUrls)
                                                                 .hasAuthority(UserRole.TEACHER.toString())
                                                                 .requestMatchers(publicUrls).permitAll()
