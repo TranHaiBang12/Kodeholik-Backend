@@ -33,36 +33,30 @@ import com.g44.kodeholik.util.mapper.request.course.LessonRequestMapper;
 import com.g44.kodeholik.util.mapper.response.course.LessonResponseMapper;
 
 import lombok.RequiredArgsConstructor;
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
 public class LessonServiceImpl implements LessonService {
 
     private final LessonRepository lessonRepository;
-
     private final ChapterRepository chapterRepository;
-
     private final LessonRequestMapper lessonRequestMapper;
-
     private final LessonResponseMapper lessonResponseMapper;
-
     private final UserService userService;
-
     private final S3Service s3Service;
-
     private final GoogleCloudStorageService gcsService;
-
     private final UserLessonProgressRepository userLessonProgressRepository;
 
     @Override
     public Page<LessonResponseDto> getAllLesson(Pageable pageable) {
-        Page<Lesson> lessonPage = lessonRepository.findByStatus(LessonStatus.ACTIVATED,pageable);
+        Page<Lesson> lessonPage = lessonRepository.findByStatus(LessonStatus.ACTIVATED, pageable);
         return lessonPage.map(lessonResponseMapper::mapFrom);
     }
 
     @Override
     public LessonResponseDto getLessonById(Long id) {
-        log.info(id);
+        log.info("Fetching lesson with ID: {}", id);
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
         return lessonResponseMapper.mapFrom(lesson);
@@ -78,60 +72,98 @@ public class LessonServiceImpl implements LessonService {
         lesson.setCreatedAt(Timestamp.from(Instant.now()));
         lesson.setCreatedBy(userService.getCurrentUser());
 
-        // Upload attached file to S3
-        if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
-            String s3Key = "lessons/" + UUID.randomUUID() + "-" + lessonRequestDto.getAttachedFile().getOriginalFilename();
-            s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
-            lesson.setAttachedFile(s3Key);
-        }
-
-        // Upload video to Google Cloud Storage
-        if (lessonRequestDto.getVideoFile() != null && !lessonRequestDto.getVideoFile().isEmpty()) {
-            try {
-                String gcsPath = gcsService.uploadVideo(lessonRequestDto.getVideoFile()); // Upload video
-                lesson.setVideoUrl(gcsPath); // Store the GCS object path in DB
-            } catch (IOException e) {
-                log.error("Error uploading video to Google Cloud Storage", e);
-                throw new RuntimeException("Failed to upload video");
+        try {
+            // Upload file đính kèm lên S3 nếu có
+            if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
+                String s3Key = "lessons/" + UUID.randomUUID() + "-"
+                        + lessonRequestDto.getAttachedFile().getOriginalFilename();
+                s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
+                lesson.setAttachedFile(s3Key);
             }
+
+            // Upload video lên Google Cloud Storage nếu có
+            if (lessonRequestDto.getVideoFile() != null && !lessonRequestDto.getVideoFile().isEmpty()) {
+                String gcsPath = gcsService.uploadVideo(lessonRequestDto.getVideoFile());
+                lesson.setVideoUrl(gcsPath);
+            }
+
+            lessonRepository.save(lesson);
+        } catch (Exception e) {
+            log.error("Error occurred while adding lesson", e);
+            throw new RuntimeException("Failed to add lesson: " + e.getMessage());
         }
-
-        lessonRepository.save(lesson);
     }
-
-
 
     @Override
     public void editLesson(Long lessonId, LessonRequestDto lessonRequestDto) {
         Lesson savedLesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
-        Lesson lesson = lessonRequestMapper.mapTo(lessonRequestDto);
-        lesson.setId(lessonId);
-        lesson.setChapter(chapterRepository
-                .findById(lessonRequestDto.getChapterId())
-                .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found")));
-        lesson.setUpdatedAt(Timestamp.from(Instant.now()));
-        lesson.setUpdatedBy(userService.getCurrentUser());
-        lesson.setCreatedAt(savedLesson.getCreatedAt());
-        lesson.setCreatedBy(savedLesson.getCreatedBy());
-        lessonRepository.save(lesson);
+
+        try {
+            savedLesson.setTitle(lessonRequestDto.getTitle());
+            savedLesson.setDescription(lessonRequestDto.getDescription());
+            savedLesson.setUpdatedAt(Timestamp.from(Instant.now()));
+            savedLesson.setUpdatedBy(userService.getCurrentUser());
+            savedLesson.setChapter(chapterRepository.findById(lessonRequestDto.getChapterId())
+                    .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found")));
+
+            // Kiểm tra nếu có file mới thì xóa file cũ và upload file mới lên S3
+            if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
+                if (savedLesson.getAttachedFile() != null) {
+                    s3Service.deleteFileFromS3(savedLesson.getAttachedFile());
+                }
+                String s3Key = "lessons/" + UUID.randomUUID() + "-"
+                        + lessonRequestDto.getAttachedFile().getOriginalFilename();
+                s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
+                savedLesson.setAttachedFile(s3Key);
+            }
+
+            // Kiểm tra nếu có video mới thì xóa video cũ và upload video mới lên GCS
+            if (lessonRequestDto.getVideoFile() != null && !lessonRequestDto.getVideoFile().isEmpty()) {
+                if (savedLesson.getVideoUrl() != null) {
+                    gcsService.deleteFile(savedLesson.getVideoUrl());
+                }
+                String gcsPath = gcsService.uploadVideo(lessonRequestDto.getVideoFile());
+                savedLesson.setVideoUrl(gcsPath);
+            }
+
+            lessonRepository.save(savedLesson);
+        } catch (Exception e) {
+            log.error("Error occurred while editing lesson", e);
+            throw new RuntimeException("Failed to edit lesson: " + e.getMessage());
+        }
     }
 
     @Override
     public void deleteLessonById(Long id) {
-        lessonRepository.findById(id)
+        Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
-        lessonRepository.deleteById(id);
+
+        try {
+            // Xóa file trên S3 nếu có
+            if (lesson.getAttachedFile() != null) {
+                s3Service.deleteFileFromS3(lesson.getAttachedFile());
+            }
+
+            // Xóa video trên GCS nếu có
+            if (lesson.getVideoUrl() != null) {
+                gcsService.deleteFile(lesson.getVideoUrl());
+            }
+
+            lessonRepository.deleteById(id);
+        } catch (Exception e) {
+            log.error("Error occurred while deleting lesson", e);
+            throw new RuntimeException("Failed to delete lesson: " + e.getMessage());
+        }
     }
 
     @Override
     public void markLessonAsCompleted(Long lessonId) {
         Users currentUser = userService.getCurrentUser();
 
-
         Lesson lesson = lessonRepository.findById(lessonId)
-                .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson with ID " + lessonId + " does not exist"));
-
+                .orElseThrow(() -> new NotFoundException("Lesson not found",
+                        "Lesson with ID " + lessonId + " does not exist"));
 
         UserLessonProgress progress = new UserLessonProgress();
         progress.setId(new UserLessonProgressId(currentUser.getId(), lessonId));
@@ -157,5 +189,4 @@ public class LessonServiceImpl implements LessonService {
                 .map(lessonResponseMapper::mapFrom)
                 .collect(Collectors.toList());
     }
-
 }

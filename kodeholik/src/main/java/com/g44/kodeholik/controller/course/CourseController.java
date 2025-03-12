@@ -94,23 +94,35 @@ public class CourseController {
         return ResponseEntity.ok("User unenrolled successfully!");
     }
 
-    @GetMapping("/discussion/{courseId}")
-    public ResponseEntity<List<Comment>> getCourseComments(@PathVariable Long courseId) {
-        List<Comment> comments = courseCommentService.getAllCommentsByCourse(courseId);
-        return ResponseEntity.ok(comments);
-    }
+//    @GetMapping("/discussion/{courseId}")
+//    public ResponseEntity<List<Comment>> getCourseComments(@PathVariable Long courseId) {
+//        List<Comment> comments = courseCommentService.getAllCommentsByCourse(courseId);
+//        return ResponseEntity.ok(comments);
+//    }
 
     @PostMapping("/rate")
     public ResponseEntity<CourseRatingResponseDto> rateCourse(@RequestBody @Valid CourseRatingRequestDto requestDto) {
         CourseRatingResponseDto responseDto = courseRatingService.rateCourse(requestDto);
         return ResponseEntity.ok(responseDto);
     }
+//
+//    @PostMapping("/comment/{courseId}")
+//    public ResponseEntity<CommentResponseDto> addComment(@PathVariable Long courseId ,
+//                                                         @RequestBody @Valid AddCommentRequestDto request ) {
+//        Comment comment = courseCommentService.addCommentToCourse(courseId, request);
+//        return ResponseEntity.ok(new CommentResponseDto(comment));
+//    }
 
-    @PostMapping("/comment/{courseId}")
-    public ResponseEntity<CommentResponseDto> addComment(@PathVariable Long courseId ,
-                                                         @RequestBody @Valid AddCommentRequestDto request ) {
-        Comment comment = courseCommentService.addCommentToCourse(courseId, request);
-        return ResponseEntity.ok(new CommentResponseDto(comment));
+    @PostMapping("/comment")
+    public ResponseEntity<Void> createComment(@RequestBody AddCommentRequestDto requestDto) {
+        courseCommentService.createComment(requestDto);
+        return ResponseEntity.status(HttpStatus.SC_CREATED).build();
+    }
+
+    @GetMapping("/discussion/{courseId}")
+    public ResponseEntity<List<CommentResponseDto>> getDiscussionByCourseId(@PathVariable Long courseId) {
+        List<CommentResponseDto> discussions = courseCommentService.getDiscussionByCourseId(courseId);
+        return ResponseEntity.ok(discussions);
     }
 
 }

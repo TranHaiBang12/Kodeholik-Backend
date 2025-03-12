@@ -1,7 +1,6 @@
 package com.g44.kodeholik.service.gcs.impl;
+
 import com.google.cloud.storage.*;
-
-
 
 import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -21,22 +21,35 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
     @Value("${gcs.bucket.name}")
     private String bucketName;
 
+    private static final String VIDEO_PREFIX = "videos/";
+
     @Override
     public String uploadVideo(MultipartFile file) throws IOException {
-        String fileName = "videos/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        if (storage.get(bucketName) == null) {
+            throw new IllegalStateException("Bucket " + bucketName + " does not exist.");
+        }
 
-        BlobId blobId = BlobId.of(bucketName, fileName);
+        String safeFileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        String filePath = VIDEO_PREFIX + safeFileName;
+
+        BlobId blobId = BlobId.of(bucketName, filePath);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType(file.getContentType())
                 .build();
 
-        storage.create(blobInfo, file.getBytes());
-        return fileName;
+        // Dùng InputStream để tránh tải toàn bộ file vào RAM
+        try (InputStream inputStream = file.getInputStream()) {
+            storage.create(blobInfo, inputStream);
+        }
+
+        return filePath;
     }
 
     @Override
     public String generateUploadSignedUrl(String fileName, String contentType) {
-        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, "videos/" + fileName)
+        String filePath = VIDEO_PREFIX + fileName;
+
+        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, filePath)
                 .setContentType(contentType)
                 .build();
 
@@ -49,10 +62,22 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
 
     @Override
     public String generateSignedUrl(String fileName) {
-        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, fileName).build();
+        String filePath = VIDEO_PREFIX + fileName;
+        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, filePath).build();
 
         URL signedUrl = storage.signUrl(blobInfo, 30, TimeUnit.MINUTES, Storage.SignUrlOption.withV4Signature());
 
         return signedUrl.toString();
     }
+
+    @Override
+    public void deleteFile(String fileName) {
+        System.out.println("Deleting file: " +fileName);  // Debug fileName
+        BlobId blobId = BlobId.of(bucketName, fileName);
+        boolean deleted = storage.delete(blobId);
+        if (!deleted) {
+            throw new RuntimeException("Failed to delete file: " + fileName);
+        }
+    }
+
 }

@@ -62,7 +62,8 @@ public class SecurityConfig {
                         "/api/v1/problem/activate-problem/**",
                         "/api/v1/problem/deactivate-problem/**",
                         "/api/v1/problem/list-problem",
-                        "/api/v1/problem/private-problem"
+                "/api/v1/chapter/list-problem",
+                "/api/v1/problem/private-problem"
         };
 
         private final JwtFilter jwtFilter;

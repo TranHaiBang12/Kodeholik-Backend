@@ -15,15 +15,20 @@ public class VideoController {
     private GoogleCloudStorageService storageService;
 
     @GetMapping("/upload-signed-url")
-    public ResponseEntity<Map<String, String>> getUploadSignedUrl(@RequestParam String fileName, @RequestParam String contentType) {
+    public ResponseEntity<Map<String, String>> getUploadSignedUrl(@RequestParam String fileName,
+            @RequestParam String contentType) {
+        if (!fileName.matches("^[a-zA-Z0-9._-]+$")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid file name"));
+        }
+
         String signedUrl = storageService.generateUploadSignedUrl(fileName, contentType);
-        Map<String, String> response = Map.of("signedUrl", signedUrl);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of("signedUrl", signedUrl));
     }
 
     @GetMapping("/{fileName}/signed-url")
     public ResponseEntity<String> getSignedUrl(@PathVariable String fileName) {
-        String signedUrl = storageService.generateSignedUrl("videos/" + fileName);
+        String signedUrl = storageService.generateSignedUrl(fileName);
         return ResponseEntity.ok(signedUrl);
     }
+
 }

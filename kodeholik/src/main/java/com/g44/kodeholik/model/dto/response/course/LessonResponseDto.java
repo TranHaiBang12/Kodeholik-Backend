@@ -22,7 +22,7 @@ public class LessonResponseDto {
     private LessonStatus status;
     private String attachedFile;
     private String videoUrl;
-
+    private LessonVideoType videoType; //TODO:
 
 
     //TODO: Thêm trường ifSolved

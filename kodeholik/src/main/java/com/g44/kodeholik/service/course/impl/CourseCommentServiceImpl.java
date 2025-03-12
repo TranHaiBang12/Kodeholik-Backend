@@ -1,6 +1,7 @@
 package com.g44.kodeholik.service.course.impl;
 
 import com.g44.kodeholik.model.dto.request.discussion.AddCommentRequestDto;
+import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.course.Course;
 import com.g44.kodeholik.model.entity.course.CourseComment;
 import com.g44.kodeholik.model.entity.course.CourseCommentId;
@@ -28,34 +29,57 @@ public class CourseCommentServiceImpl implements CourseCommentService {
     private final CommentRepository commentRepository;
     private final CourseRepository courseRepository;
     private final UserService userService;
-    @Override
-    public List<Comment> getAllCommentsByCourse(Long courseId) {
-        List<CourseComment> courseComments = courseCommentRepository.findByCourseId(courseId);
-        return courseComments.stream()
-                .map(CourseComment::getComment)
-                .collect(Collectors.toList());
-    }
+
 
     @Override
-    public Comment addCommentToCourse(Long courseId, AddCommentRequestDto request) {
+    public void createComment(AddCommentRequestDto requestDto) {
         Users currentUser = userService.getCurrentUser();
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
-        Comment comment = new Comment();
-        comment.setComment(request.getComment());
-        comment.setCreatedBy(currentUser);
-        comment.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        Comment comment = Comment.builder()
+                .comment(requestDto.getComment())
+                .createdBy(currentUser)
+                .createdAt(new Timestamp(System.currentTimeMillis()))
+                .build();
+
+        if (requestDto.getCommentReply() != null) {
+            Comment parentComment = commentRepository.findById(requestDto.getCommentReply())
+                    .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+            comment.setCommentReply(parentComment);
+        }
 
         comment = commentRepository.save(comment);
 
-        CourseComment courseComment = new CourseComment();
-        courseComment.setId(new CourseCommentId(courseId, comment.getId()));
-        courseComment.setCourse(course);
-        courseComment.setComment(comment);
-        courseCommentRepository.save(courseComment);
+        if (requestDto.getCourseId() != null) {
+            Course course = courseRepository.findById(requestDto.getCourseId())
+                    .orElseThrow(() -> new RuntimeException("Course not found"));
 
-        return comment;
+            CourseComment courseComment = new CourseComment(
+                    new CourseCommentId(course.getId(), comment.getId()),
+                    course,
+                    comment
+            );
+
+            courseCommentRepository.save(courseComment);
+        }
     }
+
+    @Override
+    public List<CommentResponseDto> getDiscussionByCourseId(Long courseId) {
+        if (!courseRepository.existsById(courseId)) {
+            throw new RuntimeException("Course not found");
+        }
+
+        List<Comment> comments = courseCommentRepository.findCommentsByCourseId(courseId);
+
+        return comments.stream()
+                .map(comment -> {
+                    CommentResponseDto dto = new CommentResponseDto(comment);
+                    dto.setReplyId(comment.getCommentReply() != null ? comment.getCommentReply().getId() : null);
+                    dto.setNoReply(commentRepository.countByCommentReply(comment)); // ✅ Gọi repository để đếm số reply
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
 }
 

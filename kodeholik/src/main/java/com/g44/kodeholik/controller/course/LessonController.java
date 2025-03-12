@@ -27,6 +27,7 @@ import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
 import java.util.List;
 
@@ -64,9 +65,10 @@ public class LessonController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateLesson(@PathVariable Long id, @RequestBody @Valid LessonRequestDto lessonRequestDto) {
+    public ResponseEntity<?> updateLesson(@PathVariable Long id,
+            @ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
         lessonService.editLesson(id, lessonRequestDto);
-        return ResponseEntity.status(HttpStatus.SC_CREATED).build();
+        return ResponseEntity.status(HttpStatus.SC_OK).build();
     }
 
     @DeleteMapping("/delete/{id}")
@@ -78,13 +80,15 @@ public class LessonController {
     @GetMapping("/download-file")
     public ResponseEntity<byte[]> downloadFile(@RequestParam String key) {
         try {
-            // Gửi yêu cầu tải file từ S3
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
                     .key(key)
                     .build();
 
             ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);
+            if (objectBytes == null) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
+            }
 
             byte[] fileBytes = objectBytes.asByteArray();
             String contentType = objectBytes.response().contentType();
@@ -95,7 +99,7 @@ public class LessonController {
                     .body(fileBytes);
 
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
         }
     }
 

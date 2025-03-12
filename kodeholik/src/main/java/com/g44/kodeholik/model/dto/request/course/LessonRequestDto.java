@@ -33,4 +33,6 @@ public class LessonRequestDto {
     private MultipartFile attachedFile;
 
     private MultipartFile videoFile;
+
+    private String youtubeUrl;
 }
