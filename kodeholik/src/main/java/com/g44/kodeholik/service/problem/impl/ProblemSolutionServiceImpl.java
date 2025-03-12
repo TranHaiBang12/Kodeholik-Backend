@@ -269,6 +269,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         problemSolution.setTitle(shareSolutionRequestDto.getTitle());
         problemSolution.setTextSolution(shareSolutionRequestDto.getTextSolution());
         problemSolution.setSkills(skills);
+        problemSolution.setUpdatedAt(Timestamp.from(Instant.now()));
+        problemSolution.setUpdatedBy(user);
 
         Set<SolutionCode> solutionCodes = new HashSet();
         List<String> codeList = new ArrayList();

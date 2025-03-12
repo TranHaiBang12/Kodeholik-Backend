@@ -34,7 +34,7 @@ public class ProblemBasicResponseDto {
 
     private List<String> skills;
 
-    private Boolean isActive;
+    private boolean isActive;
 
     @JsonSerialize(using = TimestampSerializer.class)
     private Long createdAt;

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.g44.kodeholik.model.dto.response.user.NotificationResponseDto;
 import com.g44.kodeholik.model.entity.user.Notification;
+import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.util.mapper.Mapper;
 
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ public class NotificationResponseMapper implements Mapper<Notification, Notifica
 
     private final ModelMapper mapper;
 
+    private final S3Service s3Service;
+
     @Override
     public Notification mapTo(NotificationResponseDto b) {
         return mapper.map(b, Notification.class);
@@ -22,8 +25,11 @@ public class NotificationResponseMapper implements Mapper<Notification, Notifica
 
     @Override
     public NotificationResponseDto mapFrom(Notification a) {
-        return mapper.map(a, NotificationResponseDto.class);
-
+        NotificationResponseDto notificationResponseDto = mapper.map(a, NotificationResponseDto.class);
+        if (a.getUser() != null && a.getUser().getAvatar() != null && a.getUser().getAvatar().startsWith("kodeholik")) {
+            notificationResponseDto.getUser().setAvatar(s3Service.getPresignedUrl(a.getUser().getAvatar()));
+        }
+        return notificationResponseDto;
     }
 
 }

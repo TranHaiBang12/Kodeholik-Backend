@@ -76,9 +76,6 @@ public class CommentServiceImpl implements CommentService {
         Page<CommentResponseDto> commentResponseDtos = comments.map(commentResponseMapper::mapFrom);
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
             UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
-            if (userResponseDto != null && userResponseDto.getAvatar().startsWith("kodeholik")) {
-                userResponseDto.setAvatar(s3Service.getPresignedUrl(userResponseDto.getAvatar()));
-            }
             commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
 
             commentResponseDto.setCreatedBy(userResponseDto);
@@ -145,9 +142,6 @@ public class CommentServiceImpl implements CommentService {
         Page<CommentResponseDto> commentResponseDtos = comments.map(commentResponseMapper::mapFrom);
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
             UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
-            if (userResponseDto != null) {
-                userResponseDto.setAvatar(s3Service.getPresignedUrl(userResponseDto.getAvatar()));
-            }
             commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
             commentResponseDto.setCreatedBy(userResponseDto);
         }
@@ -287,9 +281,6 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
             UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
-            if (userResponseDto != null) {
-                userResponseDto.setAvatar(s3Service.getPresignedUrl(userResponseDto.getAvatar()));
-            }
             commentResponseDto.setCreatedBy(userResponseDto);
         }
         return commentResponseDtos;

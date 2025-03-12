@@ -37,11 +37,17 @@ public class AuthenticationController {
 
     private final TokenService tokenService;
 
-    @Value("${spring.security.oauth2.google-url}")
-    private String googleUrl;
+    @Value("${spring.security.oauth2.user-google-url}")
+    private String userGoogleUrl;
 
-    @Value("${spring.security.oauth2.github-url}")
-    private String githubUrl;
+    @Value("${spring.security.oauth2.user-github-url}")
+    private String userGithubUrl;
+
+    @Value("${spring.security.oauth2.emp-google-url}")
+    private String empGoogleUrl;
+
+    @Value("${spring.security.oauth2.emp-github-url}")
+    private String empGithubUrl;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto loginRequestDto, HttpServletResponse response) {
@@ -59,9 +65,14 @@ public class AuthenticationController {
     public void loginOauth2(
             OAuth2AuthenticationToken oAuth2User,
             HttpServletResponse response,
-            HttpServletRequest request) throws IOException {
+            HttpServletRequest request,
+            @RequestParam int port) throws IOException {
         // authService.loginWithGoogle(oAuth2User, response, request);
-        response.sendRedirect(googleUrl);
+        if (port == 5174) {
+            response.sendRedirect(userGoogleUrl);
+        } else {
+            response.sendRedirect(empGoogleUrl);
+        }
     }
 
     @PostMapping("/rotate-token")

@@ -1,8 +1,6 @@
-package com.g44.kodeholik.model.dto.request.problem.search;
+package com.g44.kodeholik.model.dto.request.setting;
 
-import java.sql.Date;
-
-import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.model.enums.setting.TagType;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -15,12 +13,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class FilterProgress {
+public class FilterTagRequestDto {
     @NotNull(message = "MSG02")
+    private String name;
+
+    @NotNull(message = "MSG02")
+    private TagType type;
+
     @Min(0)
+    @NotNull(message = "MSG02")
     private int page;
-    private SubmissionStatus status;
+
     private Integer size;
-    private String sortBy;
+
     private Boolean ascending;
 }
