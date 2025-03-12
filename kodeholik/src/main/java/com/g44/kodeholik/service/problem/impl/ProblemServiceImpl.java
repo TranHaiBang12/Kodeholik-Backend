@@ -112,6 +112,7 @@ import com.g44.kodeholik.util.mapper.response.problem.ProblemBasicResponseMapper
 import com.g44.kodeholik.util.mapper.response.problem.ProblemDescriptionMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemResponseMapper;
 import com.g44.kodeholik.util.mapper.response.problem.SolutionCodeMapper;
+import com.g44.kodeholik.util.mapper.response.user.UserResponseMapper;
 import com.g44.kodeholik.util.string.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -185,6 +186,8 @@ public class ProblemServiceImpl implements ProblemService {
     private Map<String, String> templateLanguage = new HashMap<>();
 
     private final ObjectMapper objectMapper;
+
+    private final UserResponseMapper userResponseMapper;
 
     @Transactional
     @Override
@@ -1313,12 +1316,18 @@ public class ProblemServiceImpl implements ProblemService {
         problemSolutionDto.setTextSolution(problemSolution.getTextSolution());
         List<SolutionCodeDto> solutionCodeDtos = solutionCodeService.findBySolution(problemSolution);
         problemSolutionDto.setSolutionCodes(solutionCodeDtos);
-        problemSolutionDto.setCurrentUserCreated(currentUser.getId() == problemSolution.getCreatedBy().getId());
+        problemSolutionDto
+                .setCurrentUserCreated(currentUser.getId().longValue() == problemSolution.getCreatedBy().getId());
 
-        UserResponseDto userResponseDto = new UserResponseDto();
-        userResponseDto.setId(problemSolution.getCreatedBy().getId());
-        userResponseDto.setAvatar(problemSolution.getCreatedBy().getAvatar());
-        userResponseDto.setUsername(problemSolution.getCreatedBy().getUsername());
+        if (problemSolution.getCreatedBy() != null) {
+            UserResponseDto createdUser = userResponseMapper.mapFrom(problemSolution.getCreatedBy());
+            problemSolutionDto.setCreatedBy(createdUser);
+        }
+        if (problemSolution.getUpdatedBy() != null) {
+            UserResponseDto updatedUser = userResponseMapper.mapFrom(problemSolution.getUpdatedBy());
+            problemSolutionDto.setUpdatedBy(updatedUser);
+        }
+
         return problemSolutionDto;
     }
 

@@ -2,6 +2,9 @@ package com.g44.kodeholik.model.entity.setting;
 
 import java.sql.Timestamp;
 
+import com.g44.kodeholik.model.entity.course.Course;
+import com.g44.kodeholik.model.entity.problem.Problem;
+import com.g44.kodeholik.model.entity.problem.ProblemSolution;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.setting.Level;
 
@@ -14,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

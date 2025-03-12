@@ -3,6 +3,7 @@ package com.g44.kodeholik.model.dto.request.user;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.g44.kodeholik.model.enums.user.UserRole;
+import com.g44.kodeholik.model.enums.user.UserStatus;
 import com.g44.kodeholik.util.validation.image.ValidImage;
 
 import jakarta.validation.constraints.Email;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class AddUserAvatarFileDto {
+public class EditUserAvatarFileDto {
     @NotBlank(message = "MSG02")
     @Size(min = 1, max = 50, message = "MSG49")
     private String fullname;
@@ -34,9 +35,11 @@ public class AddUserAvatarFileDto {
     private String avatar;
 
     @ValidImage
-    @NotNull(message = "MSG02")
     private MultipartFile avatarFile;
 
-    @NotNull(message = "MSG02")
+    @NotNull
     private UserRole role;
+
+    @NotNull
+    private UserStatus status;
 }

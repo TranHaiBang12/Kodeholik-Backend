@@ -48,7 +48,7 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
         if (oauthUser == null) {
             throw new UnauthorizedException("Wrong credentials", "Wrong credentials");
         }
-        log.info(request.getRequestURI());
+        log.info(request.getServerPort());
         log.info(oauthUser);
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         String registrationId = oauthToken.getAuthorizedClientRegistrationId();
@@ -65,7 +65,7 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
             name = oauthUser.getAttribute("login");
             picture = oauthUser.getAttribute("avatar_url");
         }
-        apiCallbackUrl = "/api/v1/auth/login/oauth2/google";
+        apiCallbackUrl = "/api/v1/auth/login/oauth2/google?port=" + request.getServerPort();
 
         // OAuth2AuthenticationToken authenticationToken = new
         // OAuth2AuthenticationToken(

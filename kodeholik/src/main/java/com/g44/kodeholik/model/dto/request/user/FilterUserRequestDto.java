@@ -1,13 +1,14 @@
-package com.g44.kodeholik.model.dto.request.problem.search;
+package com.g44.kodeholik.model.dto.request.user;
 
 import java.sql.Date;
 
-import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.model.enums.user.UserRole;
+import com.g44.kodeholik.model.enums.user.UserStatus;
+import com.google.auto.value.AutoValue.Builder;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,16 +16,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class FilterSubmission {
-    private String link;
-    private SubmissionStatus status;
+public class FilterUserRequestDto {
+    private String text;
+
+    private UserRole role;
+
+    private UserStatus status;
+
     private Date start;
+
     private Date end;
 
-    @NotNull(message = "MSG02")
     @Min(0)
+    @NotNull(message = "MSG02")
     private int page;
+
     private Integer size;
-    private String sortBy;
+
     private Boolean ascending;
 }

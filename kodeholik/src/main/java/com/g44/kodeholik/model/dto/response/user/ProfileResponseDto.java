@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ProfileResponseDto {
+    private Long id;
+
     private String avatar;
 
     private String username;

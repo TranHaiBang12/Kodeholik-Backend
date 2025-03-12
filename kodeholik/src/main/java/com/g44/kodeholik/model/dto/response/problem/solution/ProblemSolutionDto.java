@@ -33,4 +33,6 @@ public class ProblemSolutionDto {
     private boolean isCurrentUserCreated;
 
     private UserResponseDto createdBy;
+
+    private UserResponseDto updatedBy;
 }

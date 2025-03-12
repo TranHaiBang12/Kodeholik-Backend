@@ -85,6 +85,7 @@ public class Problem {
 
     @ManyToMany
     @JoinTable(name = "problem_topic", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "topic_id"))
+    @JsonManagedReference
     private Set<Topic> topics = new HashSet<>();
 
     // @ManyToMany
@@ -96,6 +97,7 @@ public class Problem {
 
     @ManyToMany
     @JoinTable(name = "problem_skill", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
+    @JsonManagedReference
     private Set<Skill> skills = new HashSet<>();
 
     @ManyToMany
