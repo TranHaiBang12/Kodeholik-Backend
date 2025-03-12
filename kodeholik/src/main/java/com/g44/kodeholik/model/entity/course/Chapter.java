@@ -33,8 +33,13 @@ public class Chapter {
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     private Course course;
 
+    @Column(name = "title", length = 100, nullable = false)
     private String title;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "display_order")
     private int displayOrder;
 
     @Enumerated(EnumType.STRING)
