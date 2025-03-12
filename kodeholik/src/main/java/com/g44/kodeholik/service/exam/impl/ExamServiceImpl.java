@@ -795,17 +795,19 @@ public class ExamServiceImpl implements ExamService {
         Users currentUsers = userService.getCurrentUser();
         Timestamp now = new Timestamp(System.currentTimeMillis());
         List<Exam> exams = examRepository.findByStatus(ExamStatus.NOT_STARTED);
+        List<NotStartedExamListDto> result = exams.stream()
+                .map(notStartedExamListMapper::mapFrom)
+                .collect(Collectors.toList());
         for (int i = 0; i < exams.size(); i++) {
             if (checkDuplicateTimeExam(exams.get(i), currentUsers) || now.after(exams.get(i).getStartTime())
                     || examParticipantRepository.findByExamAndParticipant(exams.get(i), currentUsers).isPresent()) {
-                exams.remove(i);
-                i--;
+                result.get(i).setCanEnroll(false);
+            } else {
+                result.get(i).setCanEnroll(true);
             }
 
         }
-        return exams.stream()
-                .map(notStartedExamListMapper::mapFrom)
-                .collect(Collectors.toList());
+        return result;
     }
 
     @Override

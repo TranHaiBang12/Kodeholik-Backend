@@ -151,6 +151,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void addComment(AddCommentRequestDto addCommentRequestDto) {
         Comment comment = new Comment();
+        log.info(addCommentRequestDto.getLocationId());
         comment.setComment(addCommentRequestDto.getComment());
         if (addCommentRequestDto.getCommentReply() != null)
             comment.setCommentReply(getCommentById(addCommentRequestDto.getCommentReply()));
