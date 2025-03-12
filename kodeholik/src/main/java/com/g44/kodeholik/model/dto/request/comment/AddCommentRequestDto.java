@@ -15,9 +15,10 @@ public class AddCommentRequestDto {
     @NotBlank(message = "MSG17")
     private String comment;
 
-    @NotNull
+    @NotNull(message = "MSG02")
     private CommentLocation location;
 
+    @NotNull(message = "MSG02")
     private Long locationId;
 
     private Long commentReply;
