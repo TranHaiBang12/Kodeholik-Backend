@@ -48,7 +48,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Transactional
-    // @Scheduled(fixedRate = 1000 * 5 * 60)
+    @Scheduled(fixedRate = 1000 * 5)
     @Override
     public void syncProblemToElasticsearch() {
         problemService.syncProblemsToElasticsearch();

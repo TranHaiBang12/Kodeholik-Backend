@@ -90,6 +90,7 @@ import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.InputType;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.model.enums.setting.Level;
 import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
@@ -496,6 +497,7 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public List<NoAchivedInformationResponseDto> getListNoAchievedInformationByCurrentUser() {
         Users user = userService.getCurrentUser();
+        log.info(user);
         long problemSize = problemRepository.findAll().size();
         List<NoAchivedInformationResponseDto> result = new ArrayList<>();
         NoAchivedInformationResponseDto achievedEasy = getNoAchieved(user, Difficulty.EASY);
@@ -1624,6 +1626,24 @@ public class ProblemServiceImpl implements ProblemService {
             results.add(problemInputParameterResponseDto);
         }
         return results;
+    }
+
+    @Override
+    public List<Map<String, String>> getNumberSkillUserSolved(Level level) {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getNumberSkillUserSolved(currentUser, level);
+    }
+
+    @Override
+    public List<Map<String, String>> getNumberTopicUserSolved() {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getNumberTopicUserSolved(currentUser);
+    }
+
+    @Override
+    public List<Map<String, String>> getNumberLanguageUserSolved() {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getNumberLanguageUserSolved(currentUser);
     }
 
 }

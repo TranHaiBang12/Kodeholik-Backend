@@ -46,6 +46,7 @@ import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
 import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.model.enums.setting.Level;
 
 public interface ProblemService {
 
@@ -174,4 +175,10 @@ public interface ProblemService {
 
         public Page<ListProblemAdminDto> getListProblemForAdmin(
                         FilterProblemRequestAdminDto filterProblemRequestAdminDto);
+
+        public List<Map<String, String>> getNumberSkillUserSolved(Level level);
+
+        public List<Map<String, String>> getNumberTopicUserSolved();
+
+        public List<Map<String, String>> getNumberLanguageUserSolved();
 }

@@ -14,6 +14,7 @@ import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.model.enums.setting.Level;
 
 public interface ProblemSubmissionRepository extends JpaRepository<ProblemSubmission, Long> {
         public long countByIsAcceptedAndProblem(boolean isAccepted, Problem problem);
@@ -70,5 +71,30 @@ public interface ProblemSubmissionRepository extends JpaRepository<ProblemSubmis
         Page<Object[]> findLastSubmittedByUserAndProblemInAndFailedStatus(
                         @Param("user") Users user,
                         Pageable pageable);
+
+        @Query("SELECT sk, COUNT(DISTINCT p.title) FROM ProblemSubmission ps " +
+                        "JOIN ps.problem p " +
+                        "JOIN p.skills sk " +
+                        "WHERE ps.status = 'SUCCESS' AND ps.user = :user AND sk.level = :level " +
+                        "GROUP BY sk")
+        List<Object[]> findNumberSkillUserSolved(
+                        @Param("user") Users user,
+                        Level level);
+
+        @Query("SELECT t, COUNT(DISTINCT p.title) FROM ProblemSubmission ps " +
+                        "JOIN ps.problem p " +
+                        "JOIN p.topics t " +
+                        "WHERE ps.status = 'SUCCESS' AND ps.user = :user " +
+                        "GROUP BY t")
+        List<Object[]> findNumberTopicUserSolved(
+                        @Param("user") Users user);
+
+        @Query("SELECT l, COUNT(DISTINCT p.title) FROM ProblemSubmission ps " +
+                        "JOIN ps.problem p " +
+                        "JOIN ps.language l " +
+                        "WHERE ps.status = 'SUCCESS' AND ps.user = :user " +
+                        "GROUP BY l")
+        List<Object[]> findNumberLanguageUserSolved(
+                        @Param("user") Users user);
 
 }

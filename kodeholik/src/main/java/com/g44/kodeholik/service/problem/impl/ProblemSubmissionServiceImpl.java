@@ -16,7 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
+import software.amazon.awssdk.services.s3.S3Client;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
@@ -39,8 +39,12 @@ import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
+import com.g44.kodeholik.model.entity.setting.Language;
+import com.g44.kodeholik.model.entity.setting.Skill;
+import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.model.enums.setting.Level;
 import com.g44.kodeholik.model.enums.user.ProgressType;
 import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
@@ -60,6 +64,8 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor
 public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
+
+    private final S3Client getS3Client;
 
     private final ProblemSubmissionRepository problemSubmissionRepository;
 
@@ -622,6 +628,49 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         } else {
             return String.format("%.2f", value); // Nếu có nhiều hơn 1 số sau dấu phẩy, giữ 2 số
         }
+    }
+
+    @Override
+    public List<Map<String, String>> getNumberSkillUserSolved(Users user, Level level) {
+        List<Map<String, String>> results = new ArrayList<>();
+        List<Object[]> submissionSkills = problemSubmissionRepository.findNumberSkillUserSolved(user, level);
+        for (int i = 0; i < submissionSkills.size(); i++) {
+            Map<String, String> map = new HashMap<>();
+            Skill skill = (Skill) submissionSkills.get(i)[0];
+            map.put("name", skill.getName());
+            map.put("level", skill.getLevel().toString());
+            map.put("number", submissionSkills.get(i)[1].toString());
+            results.add(map);
+        }
+        return results;
+    }
+
+    @Override
+    public List<Map<String, String>> getNumberTopicUserSolved(Users user) {
+        List<Map<String, String>> results = new ArrayList<>();
+        List<Object[]> submissionTopics = problemSubmissionRepository.findNumberTopicUserSolved(user);
+        for (int i = 0; i < submissionTopics.size(); i++) {
+            Map<String, String> map = new HashMap<>();
+            Topic topic = (Topic) submissionTopics.get(i)[0];
+            map.put("name", topic.getName());
+            map.put("number", submissionTopics.get(i)[1].toString());
+            results.add(map);
+        }
+        return results;
+    }
+
+    @Override
+    public List<Map<String, String>> getNumberLanguageUserSolved(Users user) {
+        List<Map<String, String>> results = new ArrayList<>();
+        List<Object[]> submissionLanguages = problemSubmissionRepository.findNumberLanguageUserSolved(user);
+        for (int i = 0; i < submissionLanguages.size(); i++) {
+            Map<String, String> map = new HashMap<>();
+            Language language = (Language) submissionLanguages.get(i)[0];
+            map.put("name", language.getName());
+            map.put("number", submissionLanguages.get(i)[1].toString());
+            results.add(map);
+        }
+        return results;
     }
 
 }

@@ -11,9 +11,11 @@ import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemRes
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
 import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
+import com.g44.kodeholik.model.enums.setting.Level;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemSubmissionService;
-
+import com.g44.kodeholik.service.problem.impl.ProblemServiceImpl;
+import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -112,4 +114,31 @@ public class ProblemSubmissionController {
         return ResponseEntity.ok(myProgress);
     }
 
+    @GetMapping("/number-skill")
+    public ResponseEntity<List<Map<String, String>>> getNumberSkillUserSolved(
+            @RequestParam Level level) {
+        List<Map<String, String>> results = problemService.getNumberSkillUserSolved(level);
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/number-topic")
+    public ResponseEntity<List<Map<String, String>>> getNumberTopicUserSolved() {
+        List<Map<String, String>> results = problemService.getNumberTopicUserSolved();
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/number-language")
+    public ResponseEntity<List<Map<String, String>>> getNumberLanguageUserSolved() {
+        List<Map<String, String>> results = problemService.getNumberLanguageUserSolved();
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(results);
+    }
 }
