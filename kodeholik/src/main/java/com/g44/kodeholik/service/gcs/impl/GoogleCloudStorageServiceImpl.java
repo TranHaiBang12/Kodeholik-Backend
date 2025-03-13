@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 @Log4j2
@@ -28,22 +29,21 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
 
     @Async
     @Override
-    public CompletableFuture<String> uploadVideo(MultipartFile file) throws IOException {
+    public CompletableFuture<String> uploadVideo(byte[] fileBytes, String originalFileName, String contentType) {
         if (storage.get(bucketName) == null) {
             throw new IllegalStateException("Bucket " + bucketName + " does not exist.");
         }
 
-        String safeFileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        String safeFileName = System.currentTimeMillis() + "_" + originalFileName;
         String filePath = VIDEO_PREFIX + safeFileName;
 
         BlobId blobId = BlobId.of(bucketName, filePath);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                .setContentType(file.getContentType())
+                .setContentType(contentType)
                 .build();
 
-        try (InputStream inputStream = file.getInputStream()) {
-            storage.create(blobInfo, inputStream);
-        }
+        // Upload từ byte[] thay vì InputStream để tránh mất file tạm
+        storage.create(blobInfo, fileBytes);
 
         return CompletableFuture.completedFuture(filePath);
     }

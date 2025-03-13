@@ -129,4 +129,10 @@ public class CourseController {
         return ResponseEntity.ok(ratings);
     }
 
+    @GetMapping("/enroll/check/{courseId}")
+    public ResponseEntity<Boolean> checkUserEnrollment(@PathVariable Long courseId) {
+        boolean isEnrolled = courseService.isUserEnrolled(courseId);
+        return ResponseEntity.ok(isEnrolled);
+    }
+
 }

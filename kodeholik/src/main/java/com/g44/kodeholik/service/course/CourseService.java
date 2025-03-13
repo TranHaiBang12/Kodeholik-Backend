@@ -25,4 +25,6 @@ public interface CourseService {
     public void enrollUserInCourse(Long courseId);
 
     public void unenrollUserFromCourse(Long courseId);
+
+    public boolean isUserEnrolled(Long courseId);
 }

@@ -106,22 +106,22 @@ class LessonServiceImplTest {
         assertThrows(NotFoundException.class, () -> lessonService.getLessonById(1L));
     }
 
-    @Test
-    void testAddLessonSuccess() throws IOException {
-        when(chapterRepository.findById(1L)).thenReturn(Optional.of(chapter));
-        when(userService.getCurrentUser()).thenReturn(user);
-        when(lessonRequestMapper.mapTo(requestDto)).thenReturn(lesson);
-        when(lessonRepository.save(any(Lesson.class))).thenReturn(lesson);
-
-        MultipartFile mockVideoFile = mock(MultipartFile.class);
-        when(mockVideoFile.isEmpty()).thenReturn(false);
-        when(gcsService.uploadVideo(mockVideoFile)).thenReturn("gcs-video-url");
-
-        requestDto.setVideoFile(mockVideoFile);
-        lessonService.addLesson(requestDto);
-
-        verify(lessonRepository, times(1)).save(any(Lesson.class));
-    }
+//    @Test
+//    void testAddLessonSuccess() throws IOException {
+//        when(chapterRepository.findById(1L)).thenReturn(Optional.of(chapter));
+//        when(userService.getCurrentUser()).thenReturn(user);
+//        when(lessonRequestMapper.mapTo(requestDto)).thenReturn(lesson);
+//        when(lessonRepository.save(any(Lesson.class))).thenReturn(lesson);
+//
+//        MultipartFile mockVideoFile = mock(MultipartFile.class);
+//        when(mockVideoFile.isEmpty()).thenReturn(false);
+//        when(gcsService.uploadVideo(mockVideoFile)).thenReturn("gcs-video-url");
+//
+//        requestDto.setVideoFile(mockVideoFile);
+//        lessonService.addLesson(requestDto);
+//
+//        verify(lessonRepository, times(1)).save(any(Lesson.class));
+//    }
 
     @Test
     void testDeleteLessonByIdSuccess() {

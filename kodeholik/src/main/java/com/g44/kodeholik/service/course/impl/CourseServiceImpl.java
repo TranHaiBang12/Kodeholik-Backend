@@ -242,4 +242,14 @@ public class CourseServiceImpl implements CourseService {
         course.setNumberOfParticipant(Math.max(course.getNumberOfParticipant() - 1, 0));
         courseRepository.save(course);
     }
+
+    @Override
+    public boolean isUserEnrolled(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new EntityNotFoundException("Course not found"));
+
+        Users user = userService.getCurrentUser();
+
+        return courseUserRepository.existsByCourseAndUser(course, user);
+    }
 }
