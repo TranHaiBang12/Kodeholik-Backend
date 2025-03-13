@@ -54,7 +54,20 @@ public class CourseRatingServiceImpl implements CourseRatingService {
                 .build();
 
         courseRatingRepository.save(courseRating);
+        updateCourseRating(course);
         return courseRatingResponseMapper.mapFrom(courseRating);
+    }
+
+    private void updateCourseRating(Course course) {
+        List<CourseRating> ratings = courseRatingRepository.findByCourseId(course.getId());
+
+        double avgRating = ratings.stream()
+                .mapToInt(CourseRating::getRating)
+                .average()
+                .orElse(0.0);
+
+        course.setRate(avgRating);
+        courseRepository.save(course);
     }
 
 
