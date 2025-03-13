@@ -243,7 +243,7 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
-    public void changePassword(ChangePasswordRequestDto changePasswordRequestDto) {
+    public void changePassword(ChangePasswordRequestDto changePasswordRequestDto, HttpServletResponse response) {
         if (!changePasswordRequestDto.getNewPassword().equals(changePasswordRequestDto.getConfirmPassword())) {
             throw new BadRequestException("Confirm password must be the same to new password",
                     "Confirm password must be the same to new password");
@@ -255,6 +255,7 @@ public class AuthServiceImpl implements AuthService {
             if (Validation.isValidPassword(newPassword)) {
                 user.setPassword(PasswordUtils.encodePassword(newPassword));
                 userRepository.save(user);
+                logout(response);
             } else {
                 throw new BadRequestException(messageProperties.getMessage("MSG10"),
                         messageProperties.getMessage("MSG10"));

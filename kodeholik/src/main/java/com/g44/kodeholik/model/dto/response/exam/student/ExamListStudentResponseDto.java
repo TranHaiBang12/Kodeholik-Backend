@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ExamListStudentResponseDto {
+    private String title;
+
     private String code;
 
     @JsonSerialize(using = TimestampSerializer.class)

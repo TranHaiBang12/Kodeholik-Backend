@@ -42,6 +42,7 @@ import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
 import com.g44.kodeholik.model.enums.user.ProgressType;
+import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
@@ -314,7 +315,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     @Override
     public SubmissionResponseDto getSubmissionDetail(ProblemSubmission problemSubmission, int noTestCase,
             Users currentUser) {
-        if (currentUser.getId() != problemSubmission.getUser().getId()) {
+        if (currentUser.getRole() != UserRole.EXAMINER && currentUser.getId() != problemSubmission.getUser().getId()) {
             throw new ForbiddenException("You are not allowed to view this submission",
                     "You are not allowed to view this submission");
         }
@@ -528,8 +529,6 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
 
         problemResultDetailResponseDto.setId(problem.getId());
         problemResultDetailResponseDto.setLink(problem.getLink());
-        problemResultDetailResponseDto.setCode(problemCompileRequestDto.getCode());
-        problemResultDetailResponseDto.setLanguageName(problemCompileRequestDto.getLanguageName());
         problemResultDetailResponseDto.setNoTestCasePassed(testCasePassed);
         problemResultDetailResponseDto.setTitle(problem.getTitle());
 

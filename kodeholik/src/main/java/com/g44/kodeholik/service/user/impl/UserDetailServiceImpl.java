@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.g44.kodeholik.exception.UnauthorizedException;
 import com.g44.kodeholik.model.entity.user.UserPrincipal;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.repository.user.UserRepository;
@@ -21,8 +22,9 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info(username);
         Users user = userRepository.existsByUsernameOrEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found", "User not found"));
         UserDetails userDetails = new UserPrincipal(user);
         return userDetails;
 

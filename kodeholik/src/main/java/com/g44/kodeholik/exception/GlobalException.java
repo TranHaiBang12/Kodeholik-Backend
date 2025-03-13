@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -44,6 +45,14 @@ public class GlobalException {
         public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
                 return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getDetails()),
                                 HttpStatus.NOT_FOUND);
+        }
+
+        @ExceptionHandler(UsernameNotFoundException.class)
+        @ResponseStatus(HttpStatus.UNAUTHORIZED)
+        @ResponseBody
+        public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+                return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                                HttpStatus.UNAUTHORIZED);
         }
 
         // handle request param bi sai dinh dang

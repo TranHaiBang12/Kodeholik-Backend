@@ -20,6 +20,8 @@ import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.model.enums.user.UserStatus;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 public interface UserService {
 
     public Optional<Users> isUserExistedbyUsernameOrEmail(String username);
@@ -50,7 +52,7 @@ public interface UserService {
 
     public ProfileResponseDto getProfileCurrentUser();
 
-    public ProfileResponseDto editProfile(EditProfileRequestDto editProfileRequestDto);
+    public ProfileResponseDto editProfile(EditProfileRequestDto editProfileRequestDto, HttpServletRequest request);
 
     public boolean isUserNotAllowed(String username);
 
