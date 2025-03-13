@@ -77,8 +77,18 @@ public class LessonServiceImpl implements LessonService {
         lesson.setCreatedBy(userService.getCurrentUser());
 
         try {
+            // Upload file đính kèm lên S3 (nếu có)
+            if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
+                String s3Key = "lessons/" + UUID.randomUUID() + "-" + lessonRequestDto.getAttachedFile().getOriginalFilename();
+                s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
+                lesson.setAttachedFile(s3Key);
+                lesson.setStatus(LessonStatus.ACTIVATED);
+            }
+
             if (lessonRequestDto.getVideoType() == LessonVideoType.YOUTUBE) {
+                // Nếu là YouTube, lấy videoId từ URL và kích hoạt luôn
                 lesson.setVideoUrl(YoutubeUrlParser.extractVideoId(lessonRequestDto.getYoutubeUrl()));
+                lesson.setStatus(LessonStatus.ACTIVATED);
             } else if (lessonRequestDto.getVideoType() == LessonVideoType.VIDEO_FILE
                     && lessonRequestDto.getVideoFile() != null
                     && !lessonRequestDto.getVideoFile().isEmpty()) {
@@ -87,15 +97,17 @@ public class LessonServiceImpl implements LessonService {
                 String originalFileName = lessonRequestDto.getVideoFile().getOriginalFilename();
                 String contentType = lessonRequestDto.getVideoFile().getContentType();
 
-                // Đặt giá trị tạm thời
+                // Đặt trạng thái là IN_PROGRESS vì đang upload video
                 lesson.setVideoUrl("uploading...");
+                lesson.setStatus(LessonStatus.IN_PROGRESS);
                 lessonRepository.save(lesson);
 
                 // Upload video lên GCS **ASYNC**
                 gcsService.uploadVideo(fileBytes, originalFileName, contentType)
                         .thenAccept(gcsPath -> {
                             lesson.setVideoUrl(gcsPath);
-                            lessonRepository.save(lesson); // Cập nhật videoUrl sau khi upload xong
+                            lesson.setStatus(LessonStatus.ACTIVATED); // Chuyển sang ACTIVATED khi upload xong
+                            lessonRepository.save(lesson);
                         })
                         .exceptionally(ex -> {
                             log.error("Failed to upload video to GCS", ex);
@@ -113,43 +125,62 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public void editLesson(Long lessonId, LessonRequestDto lessonRequestDto) {
-        Lesson savedLesson = lessonRepository.findById(lessonId)
+        Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
 
+        Chapter chapter = chapterRepository.findById(lessonRequestDto.getChapterId())
+                .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
+        lesson.setChapter(chapter);
+        lesson.setTitle(lessonRequestDto.getTitle());
+        lesson.setDescription(lessonRequestDto.getDescription());
+        lesson.setUpdatedAt(Timestamp.from(Instant.now()));
+        lesson.setUpdatedBy(userService.getCurrentUser());
+
         try {
-            savedLesson.setTitle(lessonRequestDto.getTitle());
-            savedLesson.setDescription(lessonRequestDto.getDescription());
-            savedLesson.setUpdatedAt(Timestamp.from(Instant.now()));
-            savedLesson.setUpdatedBy(userService.getCurrentUser());
-            savedLesson.setChapter(chapterRepository.findById(lessonRequestDto.getChapterId())
-                    .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found")));
-
-            // Kiểm tra nếu có file mới thì xóa file cũ và upload file mới lên S3
+            // Xử lý file đính kèm (S3)
             if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
-                if (savedLesson.getAttachedFile() != null) {
-                    s3Service.deleteFileFromS3(savedLesson.getAttachedFile());
-                }
-                String s3Key = "lessons/" + UUID.randomUUID() + "-"
-                        + lessonRequestDto.getAttachedFile().getOriginalFilename();
+                String s3Key = "lessons/" + UUID.randomUUID() + "-" + lessonRequestDto.getAttachedFile().getOriginalFilename();
                 s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
-                savedLesson.setAttachedFile(s3Key);
+                lesson.setAttachedFile(s3Key);
             }
 
-            // Kiểm tra nếu có video mới thì xóa video cũ và upload video mới lên GCS
-            if (lessonRequestDto.getVideoFile() != null && !lessonRequestDto.getVideoFile().isEmpty()) {
-                if (savedLesson.getVideoUrl() != null) {
-                    gcsService.deleteFile(savedLesson.getVideoUrl());
-                }
-//                String gcsPath = gcsService.uploadVideo(lessonRequestDto.getVideoFile());
-//                savedLesson.setVideoUrl(gcsPath);
+            if (lessonRequestDto.getVideoType() == LessonVideoType.YOUTUBE) {
+                // Nếu là YouTube, cập nhật videoId từ URL
+                lesson.setVideoUrl(YoutubeUrlParser.extractVideoId(lessonRequestDto.getYoutubeUrl()));
+                lesson.setStatus(LessonStatus.ACTIVATED);
+            } else if (lessonRequestDto.getVideoType() == LessonVideoType.VIDEO_FILE
+                    && lessonRequestDto.getVideoFile() != null
+                    && !lessonRequestDto.getVideoFile().isEmpty()) {
+                // Đọc file thành byte[]
+                byte[] fileBytes = lessonRequestDto.getVideoFile().getBytes();
+                String originalFileName = lessonRequestDto.getVideoFile().getOriginalFilename();
+                String contentType = lessonRequestDto.getVideoFile().getContentType();
+
+                // Đặt trạng thái IN_PROGRESS trước khi upload video mới
+                lesson.setVideoUrl("uploading...");
+                lesson.setStatus(LessonStatus.IN_PROGRESS);
+                lessonRepository.save(lesson);
+
+                // Upload video lên GCS **ASYNC**
+                gcsService.uploadVideo(fileBytes, originalFileName, contentType)
+                        .thenAccept(gcsPath -> {
+                            lesson.setVideoUrl(gcsPath);
+                            lesson.setStatus(LessonStatus.ACTIVATED); // Chuyển sang ACTIVATED khi upload xong
+                            lessonRepository.save(lesson);
+                        })
+                        .exceptionally(ex -> {
+                            log.error("Failed to upload video to GCS", ex);
+                            return null;
+                        });
             }
 
-            lessonRepository.save(savedLesson);
+            lessonRepository.save(lesson);
         } catch (Exception e) {
             log.error("Error occurred while editing lesson", e);
             throw new RuntimeException("Failed to edit lesson: " + e.getMessage());
         }
     }
+
 
     @Override
     public void deleteLessonById(Long id) {
