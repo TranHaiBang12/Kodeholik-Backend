@@ -548,7 +548,10 @@ public class ExamServiceImpl implements ExamService {
             throw new BadRequestException("The exam has already started or ended.",
                     "The exam has already started or ended.");
         }
-
+        if (exam.getStartTime().getTime() <= now.getTime()) {
+            throw new BadRequestException("The exam has already started or ended.",
+                    "The exam has already started or ended.");
+        }
         if (!(after5Minutes.getTime() >= exam.getStartTime().getTime())) {
             String formattedDate = sdf.format(exam.getStartTime());
             throw new BadRequestException("The exam is not ready to start. Time start is " + formattedDate,
@@ -808,11 +811,16 @@ public class ExamServiceImpl implements ExamService {
                 .map(notStartedExamListMapper::mapFrom)
                 .collect(Collectors.toList());
         for (int i = 0; i < exams.size(); i++) {
-            if (checkDuplicateTimeExam(exams.get(i), currentUsers) || now.after(exams.get(i).getStartTime())
+            if (now.after(exams.get(i).getStartTime())
                     || examParticipantRepository.findByExamAndParticipant(exams.get(i), currentUsers).isPresent()) {
-                result.get(i).setCanEnroll(false);
+                exams.remove(i);
+                i--;
             } else {
-                result.get(i).setCanEnroll(true);
+                if (checkDuplicateTimeExam(exams.get(i), currentUsers)) {
+                    result.get(i).setCanEnroll(false);
+                } else {
+                    result.get(i).setCanEnroll(true);
+                }
             }
 
         }
