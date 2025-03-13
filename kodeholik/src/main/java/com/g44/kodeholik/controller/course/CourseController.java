@@ -52,7 +52,6 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
 
-
     @PutMapping("/update/{id}")
     public ResponseEntity<?> editCourse(
             @PathVariable Long id,
@@ -62,7 +61,6 @@ public class CourseController {
         courseService.editCourse(id, requestDto, imageFile);
         return ResponseEntity.ok().build();
     }
-
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
@@ -123,6 +121,12 @@ public class CourseController {
     public ResponseEntity<List<CommentResponseDto>> getDiscussionByCourseId(@PathVariable Long courseId) {
         List<CommentResponseDto> discussions = courseCommentService.getDiscussionByCourseId(courseId);
         return ResponseEntity.ok(discussions);
+    }
+
+    @GetMapping("/rating/{courseId}")
+    public ResponseEntity<List<CourseRatingResponseDto>> getCommentAndRatingByCourseId(@PathVariable Long courseId) {
+        List<CourseRatingResponseDto> ratings = courseRatingService.getCourseRating(courseId);
+        return ResponseEntity.ok(ratings);
     }
 
 }

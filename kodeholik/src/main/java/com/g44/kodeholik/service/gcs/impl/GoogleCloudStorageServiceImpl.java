@@ -5,6 +5,7 @@ import com.google.cloud.storage.*;
 import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,7 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
 
     private static final String VIDEO_PREFIX = "videos/";
 
+    @Async
     @Override
     public String uploadVideo(MultipartFile file) throws IOException {
         if (storage.get(bucketName) == null) {

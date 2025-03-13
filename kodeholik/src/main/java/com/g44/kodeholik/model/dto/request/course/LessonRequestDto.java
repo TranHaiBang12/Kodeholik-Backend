@@ -2,6 +2,7 @@ package com.g44.kodeholik.model.dto.request.course;
 
 import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.model.enums.course.LessonType;
+import com.g44.kodeholik.model.dto.response.course.LessonVideoType;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -35,4 +36,6 @@ public class LessonRequestDto {
     private MultipartFile videoFile;
 
     private String youtubeUrl;
+
+    private LessonVideoType videoType;
 }
