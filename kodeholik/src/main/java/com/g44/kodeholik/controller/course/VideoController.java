@@ -9,6 +9,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/videos")
+@CrossOrigin(origins = "http://localhost:5174")
 public class VideoController {
 
     @Autowired
