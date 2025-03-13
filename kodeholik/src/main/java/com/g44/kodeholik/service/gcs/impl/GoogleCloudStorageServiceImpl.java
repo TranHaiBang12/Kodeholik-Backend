@@ -4,6 +4,7 @@ import com.google.cloud.storage.*;
 
 import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -12,8 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService {
@@ -26,7 +28,7 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
 
     @Async
     @Override
-    public String uploadVideo(MultipartFile file) throws IOException {
+    public CompletableFuture<String> uploadVideo(MultipartFile file) throws IOException {
         if (storage.get(bucketName) == null) {
             throw new IllegalStateException("Bucket " + bucketName + " does not exist.");
         }
@@ -39,12 +41,11 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
                 .setContentType(file.getContentType())
                 .build();
 
-        // Dùng InputStream để tránh tải toàn bộ file vào RAM
         try (InputStream inputStream = file.getInputStream()) {
             storage.create(blobInfo, inputStream);
         }
 
-        return filePath;
+        return CompletableFuture.completedFuture(filePath);
     }
 
     @Override

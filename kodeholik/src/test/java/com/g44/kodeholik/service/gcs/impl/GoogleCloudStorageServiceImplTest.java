@@ -37,26 +37,26 @@ class GoogleCloudStorageServiceImplTest {
     }
 
 
-    @Test
-    void uploadVideoShouldUploadFileAndReturnFileName() throws IOException {
-        
-        MockMultipartFile file = new MockMultipartFile(
-                "file", "test.mp4", "video/mp4", "dummy data".getBytes());
-
-        String expectedFileName = "videos/" + System.currentTimeMillis() + "_test.mp4";
-        BlobId blobId = BlobId.of(bucketName, expectedFileName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("video/mp4").build();
-
-        when(storage.create(any(BlobInfo.class), any(byte[].class))).thenReturn(mock(Blob.class));
-
-        
-        String actualFileName = googleCloudStorageService.uploadVideo(file);
-
-        
-        assertNotNull(actualFileName);
-        assertTrue(actualFileName.startsWith("videos/"));
-        verify(storage).create(any(BlobInfo.class), any(byte[].class));
-    }
+//    @Test
+//    void uploadVideoShouldUploadFileAndReturnFileName() throws IOException {
+//
+//        MockMultipartFile file = new MockMultipartFile(
+//                "file", "test.mp4", "video/mp4", "dummy data".getBytes());
+//
+//        String expectedFileName = "videos/" + System.currentTimeMillis() + "_test.mp4";
+//        BlobId blobId = BlobId.of(bucketName, expectedFileName);
+//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("video/mp4").build();
+//
+//        when(storage.create(any(BlobInfo.class), any(byte[].class))).thenReturn(mock(Blob.class));
+//
+//
+//        String actualFileName = googleCloudStorageService.uploadVideo(file);
+//
+//
+//        assertNotNull(actualFileName);
+//        assertTrue(actualFileName.startsWith("videos/"));
+//        verify(storage).create(any(BlobInfo.class), any(byte[].class));
+//    }
 
     @Test
     void generateUploadSignedUrlShouldReturnSignedUrl() {

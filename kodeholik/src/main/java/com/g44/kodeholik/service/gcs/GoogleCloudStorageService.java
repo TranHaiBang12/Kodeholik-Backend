@@ -3,9 +3,10 @@ package com.g44.kodeholik.service.gcs;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 public interface GoogleCloudStorageService {
-    public String uploadVideo(MultipartFile file) throws IOException;
+    public CompletableFuture<String> uploadVideo(MultipartFile file) throws IOException;
 
     public String generateUploadSignedUrl(String fileName, String contentType);
 

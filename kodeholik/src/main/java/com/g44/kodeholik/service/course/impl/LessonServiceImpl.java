@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import com.g44.kodeholik.exception.BadRequestException;
@@ -13,9 +14,11 @@ import com.g44.kodeholik.model.entity.course.UserLessonProgress;
 import com.g44.kodeholik.model.entity.course.UserLessonProgressId;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.course.LessonStatus;
+import com.g44.kodeholik.model.enums.course.LessonVideoType;
 import com.g44.kodeholik.repository.course.UserLessonProgressRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
+import com.g44.kodeholik.util.string.YoutubeUrlParser;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +36,7 @@ import com.g44.kodeholik.util.mapper.request.course.LessonRequestMapper;
 import com.g44.kodeholik.util.mapper.response.course.LessonResponseMapper;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Log4j2
 @Service
@@ -81,18 +85,38 @@ public class LessonServiceImpl implements LessonService {
                 lesson.setAttachedFile(s3Key);
             }
 
-            // Upload video lên Google Cloud Storage nếu có
-            if (lessonRequestDto.getVideoFile() != null && !lessonRequestDto.getVideoFile().isEmpty()) {
-                String gcsPath = gcsService.uploadVideo(lessonRequestDto.getVideoFile());
-                lesson.setVideoUrl(gcsPath);
+            // Xử lý video theo videoType
+            if (lessonRequestDto.getVideoType() == LessonVideoType.YOUTUBE) {
+                lesson.setVideoUrl(YoutubeUrlParser.extractVideoId(lessonRequestDto.getYoutubeUrl()));
+            } else if (lessonRequestDto.getVideoType() == LessonVideoType.VIDEO_FILE
+                    && lessonRequestDto.getVideoFile() != null
+                    && !lessonRequestDto.getVideoFile().isEmpty()) {
+                // Đặt giá trị tạm thời cho video URL
+                lesson.setVideoUrl("uploading...");
+                lesson = lessonRepository.save(lesson);
+
+                MultipartFile videoFile = lessonRequestDto.getVideoFile();
+                Lesson finalLesson = lesson;
+                gcsService.uploadVideo(videoFile).thenAccept(gcsPath -> updateLessonVideoUrl(finalLesson, gcsPath))
+                        .exceptionally(ex -> {
+                            log.error("Failed to upload video to GCS", ex);
+                            return null;
+                        });
             }
 
+            // Lưu lesson vào DB ngay lập tức (video sẽ cập nhật sau)
             lessonRepository.save(lesson);
         } catch (Exception e) {
             log.error("Error occurred while adding lesson", e);
             throw new RuntimeException("Failed to add lesson: " + e.getMessage());
         }
     }
+
+    private void updateLessonVideoUrl(Lesson lesson, String videoUrl) {
+        lesson.setVideoUrl(videoUrl);
+        lessonRepository.save(lesson);
+    }
+
 
     @Override
     public void editLesson(Long lessonId, LessonRequestDto lessonRequestDto) {
@@ -123,8 +147,8 @@ public class LessonServiceImpl implements LessonService {
                 if (savedLesson.getVideoUrl() != null) {
                     gcsService.deleteFile(savedLesson.getVideoUrl());
                 }
-                String gcsPath = gcsService.uploadVideo(lessonRequestDto.getVideoFile());
-                savedLesson.setVideoUrl(gcsPath);
+//                String gcsPath = gcsService.uploadVideo(lessonRequestDto.getVideoFile());
+//                savedLesson.setVideoUrl(gcsPath);
             }
 
             lessonRepository.save(savedLesson);
