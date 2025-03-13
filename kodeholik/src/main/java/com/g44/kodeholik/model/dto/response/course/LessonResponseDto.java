@@ -3,6 +3,7 @@ package com.g44.kodeholik.model.dto.response.course;
 import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.model.enums.course.LessonType;
 
+import com.g44.kodeholik.model.enums.course.LessonVideoType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,8 +23,6 @@ public class LessonResponseDto {
     private LessonStatus status;
     private String attachedFile;
     private String videoUrl;
-    private LessonVideoType videoType; //TODO:
+    private LessonVideoType videoType;
 
-
-    //TODO: Thêm trường ifSolved
 }

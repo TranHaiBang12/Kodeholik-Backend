@@ -1,4 +1,4 @@
-package com.g44.kodeholik.model.dto.response.course;
+package com.g44.kodeholik.model.enums.course;
 
 public enum LessonVideoType {
     YOUTUBE,

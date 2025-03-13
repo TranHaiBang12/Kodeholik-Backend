@@ -74,7 +74,7 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
 
     @Override
     public void deleteFile(String fileName) {
-        System.out.println("Deleting file: " +fileName);  // Debug fileName
+        System.out.println("Deleting file: " + fileName); // Debug fileName
         BlobId blobId = BlobId.of(bucketName, fileName);
         boolean deleted = storage.delete(blobId);
         if (!deleted) {

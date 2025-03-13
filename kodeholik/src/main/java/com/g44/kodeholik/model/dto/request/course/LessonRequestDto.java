@@ -2,7 +2,7 @@ package com.g44.kodeholik.model.dto.request.course;
 
 import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.model.enums.course.LessonType;
-import com.g44.kodeholik.model.dto.response.course.LessonVideoType;
+import com.g44.kodeholik.model.enums.course.LessonVideoType;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
