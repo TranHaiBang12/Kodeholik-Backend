@@ -90,4 +90,6 @@ public interface ProblemSubmissionService {
         public List<Map<String, String>> getNumberTopicUserSolved(Users user);
 
         public List<Map<String, String>> getNumberLanguageUserSolved(Users user);
+
+        public Map<String, String> getAcceptanceRateAndNoSubmissionByUser(Users user);
 }

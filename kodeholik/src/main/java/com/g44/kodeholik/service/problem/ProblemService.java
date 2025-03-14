@@ -181,4 +181,6 @@ public interface ProblemService {
         public List<Map<String, String>> getNumberTopicUserSolved();
 
         public List<Map<String, String>> getNumberLanguageUserSolved();
+
+        public Map<String, String> getAcceptanceRateAndNoSubmissionByUser();
 }

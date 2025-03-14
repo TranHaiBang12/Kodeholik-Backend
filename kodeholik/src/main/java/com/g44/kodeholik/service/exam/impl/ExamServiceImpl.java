@@ -555,7 +555,7 @@ public class ExamServiceImpl implements ExamService {
         if (!(after5Minutes.getTime() >= exam.getStartTime().getTime())) {
             String formattedDate = sdf.format(exam.getStartTime());
             throw new BadRequestException("The exam is not ready to start. Time start is " + formattedDate,
-                    "The exam is not ready to start. Time start is " + formattedDate);
+                    formattedDate);
         }
 
         for (ExamParticipant ep : examParticipants) {

@@ -141,4 +141,10 @@ public class ProblemSubmissionController {
         }
         return ResponseEntity.ok(results);
     }
+
+    @GetMapping("/acceptance-rate")
+    public ResponseEntity<Map<String, String>> getAcceptanceRate() {
+        return ResponseEntity.ok(problemService.getAcceptanceRateAndNoSubmissionByUser());
+    }
+
 }

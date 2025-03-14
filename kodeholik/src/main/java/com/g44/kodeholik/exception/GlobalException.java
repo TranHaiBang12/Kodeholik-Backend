@@ -171,14 +171,14 @@ public class GlobalException {
                                 HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        // @ExceptionHandler(Exception.class)
-        // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-        // @ResponseBody
-        // public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
-        // return new ResponseEntity(new ErrorResponse(ex.getMessage(),
-        // ex.getMessage()),
-        // HttpStatus.INTERNAL_SERVER_ERROR);
-        // }
+        @ExceptionHandler(Exception.class)
+        @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+        @ResponseBody
+        public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
+                return new ResponseEntity(new ErrorResponse(ex.getMessage(),
+                                ex.getMessage()),
+                                HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         @ExceptionHandler(BadCredentialsException.class)
         @ResponseStatus(HttpStatus.UNAUTHORIZED)

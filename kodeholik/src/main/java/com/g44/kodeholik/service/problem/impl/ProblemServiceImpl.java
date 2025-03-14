@@ -270,13 +270,24 @@ public class ProblemServiceImpl implements ProblemService {
         for (Skill skill : problem.getSkills()) {
             skills.add(skill.getName());
         }
-
         problemDescriptionResponseDto = problemDescriptionMapper.mapFrom(problem);
         problemDescriptionResponseDto.setNoComment(commentRepository.countByProblemsContains(problem));
         problemDescriptionResponseDto.setTopicList(topics);
         problemDescriptionResponseDto
                 .setNoAccepted(problemSubmissionService.countByIsAcceptedAndProblem(true, problem));
         problemDescriptionResponseDto.setSkillList(skills);
+        if (problemSubmissionService.checkIsCurrentUserSolvedProblem(problem)) {
+            problemDescriptionResponseDto.setSolved(true);
+        } else {
+            problemDescriptionResponseDto.setSolved(false);
+        }
+
+        Users currentUser = userService.getCurrentUser();
+        if (problem.getUsersFavourite().contains(currentUser)) {
+            problemDescriptionResponseDto.setFavourite(true);
+        } else {
+            problemDescriptionResponseDto.setFavourite(false);
+        }
         return problemDescriptionResponseDto;
     }
 
@@ -1644,6 +1655,12 @@ public class ProblemServiceImpl implements ProblemService {
     public List<Map<String, String>> getNumberLanguageUserSolved() {
         Users currentUser = userService.getCurrentUser();
         return problemSubmissionService.getNumberLanguageUserSolved(currentUser);
+    }
+
+    @Override
+    public Map<String, String> getAcceptanceRateAndNoSubmissionByUser() {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getAcceptanceRateAndNoSubmissionByUser(currentUser);
     }
 
 }

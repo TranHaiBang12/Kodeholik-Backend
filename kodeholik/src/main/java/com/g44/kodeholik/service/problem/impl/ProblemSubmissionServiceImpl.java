@@ -444,6 +444,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                 && (sortBy.equals("createdAt") || sortBy.equals("noSubmission"))) {
             if (sortBy.equals("noSubmission"))
                 sortBy = "problem.noSubmission";
+
             Sort sort = ascending.booleanValue() ? Sort.by(sortBy.toString()).ascending()
                     : Sort.by(sortBy.toString()).descending();
             pageable = PageRequest.of(page, size == null ? 5 : size.intValue(), sort);
@@ -671,6 +672,18 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
             results.add(map);
         }
         return results;
+    }
+
+    @Override
+    public Map<String, String> getAcceptanceRateAndNoSubmissionByUser(Users user) {
+        Map<String, String> result = new HashMap<>();
+        int successSubmissions = problemSubmissionRepository.getNumberSuccessSubmission(user);
+        int totalSubmissions = problemSubmissionRepository.getTotalSubmission(user);
+        String formatted = String.format("%.0f",
+                totalSubmissions != 0 ? (double) successSubmissions / totalSubmissions * 100 : 0);
+        result.put("rate", formatted + "%");
+        result.put("total", String.valueOf(totalSubmissions));
+        return result;
     }
 
 }

@@ -97,4 +97,10 @@ public interface ProblemSubmissionRepository extends JpaRepository<ProblemSubmis
         List<Object[]> findNumberLanguageUserSolved(
                         @Param("user") Users user);
 
+        @Query("SELECT COUNT(*) FROM ProblemSubmission ps WHERE ps.user = :user AND ps.status = 'SUCCESS'")
+        public int getNumberSuccessSubmission(Users user);
+
+        @Query("SELECT COUNT(*) FROM ProblemSubmission ps WHERE ps.user = :user")
+        public int getTotalSubmission(Users user);
+
 }

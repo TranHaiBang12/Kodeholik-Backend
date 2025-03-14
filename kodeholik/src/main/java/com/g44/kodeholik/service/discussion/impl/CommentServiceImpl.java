@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.config.MessageProperties;
+import com.g44.kodeholik.controller.admin.AdminController;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.exception.UnauthorizedException;
@@ -36,6 +37,9 @@ import com.g44.kodeholik.service.discussion.CommentService;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemSolutionService;
 import com.g44.kodeholik.service.user.UserService;
+import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
+import com.g44.kodeholik.util.mapper.request.user.AddUserAvatarFileMapper;
+import com.g44.kodeholik.util.mapper.request.user.AddUserRequestMapper;
 import com.g44.kodeholik.util.mapper.response.discussion.CommentResponseMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -45,6 +49,14 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
+
+    private final AdminController adminController;
+
+    private final AddUserRequestMapper addUserRequestMapper;
+
+    private final AddUserAvatarFileMapper addUserAvatarFileMapper;
+
+    private final AddExamRequestMapper addExamRequestMapper;
 
     private final CommentRepository commentRepository;
 
@@ -72,10 +84,22 @@ public class CommentServiceImpl implements CommentService {
             sort = Sort.by("createdAt").descending();
         }
         Pageable pageable = PageRequest.of(page, 5, sort);
+        Users currentUser = userService.getCurrentUser();
+        commentResponseMapper.currentUser = currentUser;
         Page<Comment> comments = commentRepository.findByCommentReplyAndProblemsContains(null, problem, pageable);
         Page<CommentResponseDto> commentResponseDtos = comments.map(commentResponseMapper::mapFrom);
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
             UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
+            if (userResponseDto.getId() == currentUser.getId()) {
+                commentResponseDto.setUser(true);
+                if (isWithinSevenDays(Instant.ofEpochMilli(commentResponseDto.getCreatedAt()), Instant.now())) {
+                    commentResponseDto.setCanEdit(true);
+                } else {
+                    commentResponseDto.setCanEdit(false);
+                }
+            } else {
+                commentResponseDto.setUser(false);
+            }
             commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
 
             commentResponseDto.setCreatedBy(userResponseDto);
@@ -139,11 +163,24 @@ public class CommentServiceImpl implements CommentService {
         Pageable pageable = PageRequest.of(page, 5, sort);
         Page<Comment> comments = commentRepository.findByCommentReplyAndProblemSolutionsContains(null, problemSolution,
                 pageable);
+        Users currentUser = userService.getCurrentUser();
+        commentResponseMapper.currentUser = currentUser;
         Page<CommentResponseDto> commentResponseDtos = comments.map(commentResponseMapper::mapFrom);
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
             UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
+            if (userResponseDto.getId() == currentUser.getId()) {
+                commentResponseDto.setUser(true);
+                if (isWithinSevenDays(Instant.ofEpochMilli(commentResponseDto.getCreatedAt()), Instant.now())) {
+                    commentResponseDto.setCanEdit(true);
+                } else {
+                    commentResponseDto.setCanEdit(false);
+                }
+            } else {
+                commentResponseDto.setUser(false);
+            }
             commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
             commentResponseDto.setCreatedBy(userResponseDto);
+
         }
         return commentResponseDtos;
     }
@@ -151,7 +188,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void addComment(AddCommentRequestDto addCommentRequestDto) {
         Comment comment = new Comment();
-        log.info(addCommentRequestDto.getLocationId());
         comment.setComment(addCommentRequestDto.getComment());
         if (addCommentRequestDto.getCommentReply() != null)
             comment.setCommentReply(getCommentById(addCommentRequestDto.getCommentReply()));
@@ -277,12 +313,27 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentResponseDto> getAllCommentReplyByComment(Long commentId) {
         Comment comment = getCommentById(commentId);
         List<Comment> comments = commentRepository.findByCommentReply(comment);
+
+        Users currentUser = userService.getCurrentUser();
+        commentResponseMapper.currentUser = currentUser;
         List<CommentResponseDto> commentResponseDtos = comments.stream()
                 .map(commentResponseMapper::mapFrom)
                 .collect(Collectors.toList());
         for (CommentResponseDto commentResponseDto : commentResponseDtos) {
             UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
+            if (userResponseDto.getId() == currentUser.getId()) {
+                commentResponseDto.setUser(true);
+                if (isWithinSevenDays(Instant.ofEpochMilli(commentResponseDto.getCreatedAt()), Instant.now())) {
+                    commentResponseDto.setCanEdit(true);
+                } else {
+                    commentResponseDto.setCanEdit(false);
+                }
+            } else {
+                commentResponseDto.setUser(false);
+            }
+            commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
             commentResponseDto.setCreatedBy(userResponseDto);
+
         }
         return commentResponseDtos;
     }
