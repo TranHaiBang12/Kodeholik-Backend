@@ -1323,6 +1323,7 @@ public class ProblemServiceImpl implements ProblemService {
             skills.add(skill.getName());
         }
         problemSolutionDto.setId(solutionId);
+        problemSolutionDto.setNoUpvote(problemSolution.getNoUpvote());
         problemSolutionDto.setSkills(skills);
         problemSolutionDto.setProblem(problemResponseMapper.mapFrom(problemSolution.getProblem()));
         problemSolutionDto.setTitle(problemSolution.getTitle());

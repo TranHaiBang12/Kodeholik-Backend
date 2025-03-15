@@ -186,8 +186,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void addComment(AddCommentRequestDto addCommentRequestDto) {
+    public CommentResponseDto addComment(AddCommentRequestDto addCommentRequestDto) {
         Comment comment = new Comment();
+        Users currentUser = userService.getCurrentUser();
         comment.setComment(addCommentRequestDto.getComment());
         if (addCommentRequestDto.getCommentReply() != null)
             comment.setCommentReply(getCommentById(addCommentRequestDto.getCommentReply()));
@@ -200,6 +201,21 @@ public class CommentServiceImpl implements CommentService {
         } else if (addCommentRequestDto.getLocation() == CommentLocation.SOLUTION) {
             addCommentProblemSolution(addCommentRequestDto, comment);
         }
+        CommentResponseDto commentResponseDto = commentResponseMapper.mapFrom(comment);
+        UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
+        if (userResponseDto.getId() == currentUser.getId()) {
+            commentResponseDto.setUser(true);
+            if (isWithinSevenDays(Instant.ofEpochMilli(commentResponseDto.getCreatedAt()), Instant.now())) {
+                commentResponseDto.setCanEdit(true);
+            } else {
+                commentResponseDto.setCanEdit(false);
+            }
+        } else {
+            commentResponseDto.setUser(false);
+        }
+        commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
+        commentResponseDto.setCreatedBy(userResponseDto);
+        return commentResponseDto;
     }
 
     private void addCommentProblem(AddCommentRequestDto addCommentRequestDto, Comment comment) {
@@ -231,11 +247,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void editComment(Long commentId, String newComment) {
+    public CommentResponseDto editComment(Long commentId, String newComment) {
         Comment comment = getCommentById(commentId);
         Timestamp updatedAt;
         Users currentUser = userService.getCurrentUser();
-
         if (comment.getUpdatedAt() != null) {
             updatedAt = comment.getUpdatedAt();
         } else {
@@ -252,11 +267,26 @@ public class CommentServiceImpl implements CommentService {
             throw new BadRequestException("Comment can only be edited in 7 days",
                     "Comment can only be edited in 7 days");
         }
-        comment.setComment(newComment.substring(1, newComment.length() - 1));
+        comment.setComment(newComment);
         comment.setUpdatedAt(Timestamp.from(Instant.now()));
         comment.setUpdatedBy(currentUser);
 
         commentRepository.save(comment);
+        CommentResponseDto commentResponseDto = commentResponseMapper.mapFrom(comment);
+        UserResponseDto userResponseDto = commentResponseDto.getCreatedBy();
+        if (userResponseDto.getId() == currentUser.getId()) {
+            commentResponseDto.setUser(true);
+            if (isWithinSevenDays(Instant.ofEpochMilli(commentResponseDto.getCreatedAt()), Instant.now())) {
+                commentResponseDto.setCanEdit(true);
+            } else {
+                commentResponseDto.setCanEdit(false);
+            }
+        } else {
+            commentResponseDto.setUser(false);
+        }
+        commentResponseDto.setNoReply(countCommentReply(commentResponseDto.getId()));
+        commentResponseDto.setCreatedBy(userResponseDto);
+        return commentResponseDto;
     }
 
     public boolean isWithinSevenDays(Instant t1, Instant t2) {
