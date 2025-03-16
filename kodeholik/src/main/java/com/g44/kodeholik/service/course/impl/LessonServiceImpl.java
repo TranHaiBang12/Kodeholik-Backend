@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import com.g44.kodeholik.exception.BadRequestException;
+import com.g44.kodeholik.model.dto.response.course.LessonProblemResponseDto;
 import com.g44.kodeholik.model.entity.course.*;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.user.Users;
@@ -86,7 +87,6 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public LessonResponseDto getLessonById(Long id) {
-        log.info("Fetching lesson with ID: {}", id);
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
 
@@ -96,8 +96,21 @@ public class LessonServiceImpl implements LessonService {
             lesson.setVideoUrl(videoUrl);
         }
 
-        return lessonResponseMapper.mapFrom(lesson);
+        List<LessonProblem> lessonProblems = lessonProblemRepository.findByLesson_Id(id);
+
+        List<LessonProblemResponseDto> lessonProblemDtos = lessonProblems.stream()
+                .map(lp -> new LessonProblemResponseDto(
+                        lp.getProblem().getLink()
+                ))
+                .collect(Collectors.toList());
+
+
+        LessonResponseDto lessonResponse = lessonResponseMapper.mapFrom(lesson);
+        lessonResponse.setProblems(lessonProblemDtos);
+
+        return lessonResponse;
     }
+
 
 
     @Override

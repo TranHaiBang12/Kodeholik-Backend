@@ -1,7 +1,9 @@
 package com.g44.kodeholik.util.mapper.response.course;
 
 import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
+import com.g44.kodeholik.model.dto.response.course.LessonProblemResponseDto;
 import com.g44.kodeholik.model.entity.course.Course;
+import com.g44.kodeholik.model.entity.course.LessonProblem;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;

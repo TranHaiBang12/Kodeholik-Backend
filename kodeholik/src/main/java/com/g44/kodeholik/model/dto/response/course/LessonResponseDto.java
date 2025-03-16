@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -25,4 +27,5 @@ public class LessonResponseDto {
     private String videoUrl;
     private LessonVideoType videoType;
     private boolean isCompleted;
+    private List<LessonProblemResponseDto> problems;
 }
