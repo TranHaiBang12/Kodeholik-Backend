@@ -63,26 +63,7 @@ public class LessonController {
 
     @PostMapping("/add")
     public ResponseEntity<Map<String, String>> addLesson(@ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
-        log.info("Received request to add lesson:");
-        log.info("Title: {}", lessonRequestDto.getTitle());
-        log.info("Description: {}", lessonRequestDto.getDescription());
-        log.info("Chapter ID: {}", lessonRequestDto.getChapterId());
-        log.info("Display Order: {}", lessonRequestDto.getDisplayOrder());
-        log.info("Type: {}", lessonRequestDto.getType());
-        log.info("Status: {}", lessonRequestDto.getStatus());
-
-        if (lessonRequestDto.getVideoFile() != null) {
-            log.info("Video file received: {}", lessonRequestDto.getVideoFile().getOriginalFilename());
-            log.info("File size: {} bytes", lessonRequestDto.getVideoFile().getSize());
-            log.info("File type: {}", lessonRequestDto.getVideoFile().getContentType());
-        } else {
-            log.warn("Video file is null!");
-        }
-
-        // Gọi service để xử lý
         lessonService.addLesson(lessonRequestDto);
-
-        // Trả về response JSON
         Map<String, String> response = new HashMap<>();
         response.put("message", "Lesson created successfully");
 

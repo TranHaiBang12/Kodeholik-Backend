@@ -33,4 +33,6 @@ public class CourseResponseDto {
     private Long createdAt;
 
     private List<String> topics;
+
+    private Double progress;
 }

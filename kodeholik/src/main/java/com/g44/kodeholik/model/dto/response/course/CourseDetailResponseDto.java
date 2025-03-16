@@ -32,4 +32,6 @@ public class CourseDetailResponseDto {
     private List<TopicResponseDto> topics;
 
     private List<ChapterResponseDto> chapters;
+
+    private Double progress;
 }

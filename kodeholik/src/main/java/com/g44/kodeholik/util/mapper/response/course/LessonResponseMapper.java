@@ -1,5 +1,8 @@
 package com.g44.kodeholik.util.mapper.response.course;
 
+import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
+import com.g44.kodeholik.model.entity.course.Course;
+import com.g44.kodeholik.model.entity.setting.Topic;
 import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -9,6 +12,9 @@ import com.g44.kodeholik.model.entity.course.Lesson;
 import com.g44.kodeholik.util.mapper.Mapper;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -31,5 +37,6 @@ public class LessonResponseMapper implements Mapper<Lesson, LessonResponseDto> {
     public LessonResponseDto mapFrom(Lesson a) {
         return modelMapper.map(a, LessonResponseDto.class);
     }
+
 }
 

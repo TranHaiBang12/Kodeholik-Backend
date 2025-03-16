@@ -11,6 +11,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @AllArgsConstructor
@@ -41,5 +43,12 @@ public class LessonRequestDto {
 
     private LessonVideoType videoType;
 
-    private List<Long> problemIds;
+    private List<String> problemIds = new ArrayList<>();
+
+    public void setProblemIds(String problemIdsStr) {
+        if (problemIdsStr != null && !problemIdsStr.isEmpty()) {
+            this.problemIds = Arrays.asList(problemIdsStr.split(","));
+        }
+    }
+
 }

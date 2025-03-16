@@ -3,10 +3,7 @@ package com.g44.kodeholik.service.course.impl;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -134,7 +131,6 @@ public class LessonServiceImpl implements LessonService {
                 String originalFileName = lessonRequestDto.getVideoFile().getOriginalFilename();
                 String contentType = lessonRequestDto.getVideoFile().getContentType();
 
-                // Đặt trạng thái là IN_PROGRESS vì đang upload video
                 lesson.setVideoUrl("uploading...");
                 lesson.setStatus(LessonStatus.IN_PROGRESS);
                 lessonRepository.save(lesson);
@@ -143,7 +139,7 @@ public class LessonServiceImpl implements LessonService {
                 gcsService.uploadVideo(fileBytes, originalFileName, contentType)
                         .thenAccept(gcsPath -> {
                             lesson.setVideoUrl(gcsPath);
-                            lesson.setStatus(LessonStatus.ACTIVATED); // Chuyển sang ACTIVATED khi upload xong
+                            lesson.setStatus(LessonStatus.ACTIVATED);
                             lessonRepository.save(lesson);
                         })
                         .exceptionally(ex -> {
@@ -155,16 +151,18 @@ public class LessonServiceImpl implements LessonService {
             lessonRepository.save(lesson);
 
             if (lessonRequestDto.getProblemIds() != null && !lessonRequestDto.getProblemIds().isEmpty()) {
-                List<Problem> problems = problemRepository.findAllById(lessonRequestDto.getProblemIds());
+                List<LessonProblem> lessonProblems = lessonRequestDto.getProblemIds().stream()
+                        .map(problemLink -> problemRepository.findByLink(problemLink)
+                                .map(problem -> new LessonProblem(lesson, problem))
+                                .orElse(null)) // Nếu không tìm thấy thì bỏ qua
+                        .filter(Objects::nonNull) // Lọc bỏ null
+                        .collect(Collectors.toList());
 
-                if (!problems.isEmpty()) {
-                    List<LessonProblem> lessonProblems = problems.stream()
-                            .map(problem -> new LessonProblem(lesson, problem))
-                            .collect(Collectors.toList());
-
+                if (!lessonProblems.isEmpty()) {
                     lessonProblemRepository.saveAll(lessonProblems);
                 }
             }
+
         } catch (Exception e) {
             log.error("Error occurred while adding lesson", e);
             throw new RuntimeException("Failed to add lesson: " + e.getMessage());
@@ -281,9 +279,15 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public List<LessonResponseDto> getLessonByChapterId(Long id) {
-        List<Lesson> lessons = lessonRepository.findByChapterIdAndStatusIn(id,getAllowedStatus());
+        List<Long> completedLessons = getCompletedLessons();
+        List<Lesson> lessons = lessonRepository.findByChapterIdAndStatusIn(id, getAllowedStatus());
+
         return lessons.stream()
-                .map(lessonResponseMapper::mapFrom)
+                .map(lesson -> {
+                    LessonResponseDto dto = lessonResponseMapper.mapFrom(lesson);
+                    dto.setCompleted(completedLessons.contains(lesson.getId()));
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 

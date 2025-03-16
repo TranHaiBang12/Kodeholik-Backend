@@ -24,5 +24,5 @@ public class LessonResponseDto {
     private String attachedFile;
     private String videoUrl;
     private LessonVideoType videoType;
-
+    private boolean isCompleted;
 }
