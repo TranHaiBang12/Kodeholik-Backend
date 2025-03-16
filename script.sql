@@ -5,7 +5,7 @@
 -- Dumped from database version 17.2
 -- Dumped by pg_dump version 17.2
 
--- Started on 2025-03-15 21:57:00
+-- Started on 2025-03-17 00:16:40
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -21,7 +21,7 @@ SET row_security = off;
 
 DROP DATABASE IF EXISTS kodeholik;
 --
--- TOC entry 5279 (class 1262 OID 16517)
+-- TOC entry 5280 (class 1262 OID 16517)
 -- Name: kodeholik; Type: DATABASE; Schema: -; Owner: postgres
 --
 
@@ -966,7 +966,8 @@ CREATE TABLE schema_problem.solution_code (
     solution_id integer NOT NULL,
     problem_id integer,
     language_id integer NOT NULL,
-    code text NOT NULL
+    code text NOT NULL,
+    submission_id integer
 );
 
 
@@ -1234,7 +1235,7 @@ ALTER TABLE schema_user.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 5261 (class 0 OID 18801)
+-- TOC entry 5262 (class 0 OID 18801)
 -- Dependencies: 265
 -- Data for Name: chapter; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1246,7 +1247,7 @@ INSERT INTO schema_course.chapter OVERRIDING SYSTEM VALUE VALUES (5, 1, 'thunghi
 
 
 --
--- TOC entry 5263 (class 0 OID 18807)
+-- TOC entry 5264 (class 0 OID 18807)
 -- Dependencies: 267
 -- Data for Name: course; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1264,7 +1265,7 @@ INSERT INTO schema_course.course OVERRIDING SYSTEM VALUE VALUES (10, 'aádfasdfa
 
 
 --
--- TOC entry 5264 (class 0 OID 18813)
+-- TOC entry 5265 (class 0 OID 18813)
 -- Dependencies: 268
 -- Data for Name: course_comment; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1282,7 +1283,7 @@ INSERT INTO schema_course.course_comment VALUES (1, 13, NULL, NULL, NULL, NULL, 
 
 
 --
--- TOC entry 5266 (class 0 OID 18817)
+-- TOC entry 5267 (class 0 OID 18817)
 -- Dependencies: 270
 -- Data for Name: course_rating; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1296,7 +1297,7 @@ INSERT INTO schema_course.course_rating OVERRIDING SYSTEM VALUE VALUES (6, 7, 1,
 
 
 --
--- TOC entry 5268 (class 0 OID 18826)
+-- TOC entry 5269 (class 0 OID 18826)
 -- Dependencies: 272
 -- Data for Name: course_topic; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1323,7 +1324,7 @@ INSERT INTO schema_course.course_topic VALUES (10, 2);
 
 
 --
--- TOC entry 5269 (class 0 OID 18829)
+-- TOC entry 5270 (class 0 OID 18829)
 -- Dependencies: 273
 -- Data for Name: course_user; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1332,7 +1333,7 @@ INSERT INTO schema_course.course_user VALUES (2, 1, '2025-03-13 20:27:01.198');
 
 
 --
--- TOC entry 5270 (class 0 OID 18833)
+-- TOC entry 5271 (class 0 OID 18833)
 -- Dependencies: 274
 -- Data for Name: lesson; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1371,7 +1372,7 @@ INSERT INTO schema_course.lesson OVERRIDING SYSTEM VALUE VALUES (34, 1, 'Thu ngh
 
 
 --
--- TOC entry 5272 (class 0 OID 18839)
+-- TOC entry 5273 (class 0 OID 18839)
 -- Dependencies: 276
 -- Data for Name: lesson_problem; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1382,7 +1383,7 @@ INSERT INTO schema_course.lesson_problem VALUES (22, 43);
 
 
 --
--- TOC entry 5273 (class 0 OID 18842)
+-- TOC entry 5274 (class 0 OID 18842)
 -- Dependencies: 277
 -- Data for Name: user_lesson_progress; Type: TABLE DATA; Schema: schema_course; Owner: postgres
 --
@@ -1391,7 +1392,7 @@ INSERT INTO schema_course.user_lesson_progress VALUES (1, 5);
 
 
 --
--- TOC entry 5244 (class 0 OID 17050)
+-- TOC entry 5245 (class 0 OID 17050)
 -- Dependencies: 248
 -- Data for Name: comment; Type: TABLE DATA; Schema: schema_discussion; Owner: postgres
 --
@@ -1476,7 +1477,7 @@ INSERT INTO schema_discussion.comment OVERRIDING SYSTEM VALUE VALUES (75, 'iiiii
 
 
 --
--- TOC entry 5245 (class 0 OID 17103)
+-- TOC entry 5246 (class 0 OID 17103)
 -- Dependencies: 249
 -- Data for Name: comment_vote; Type: TABLE DATA; Schema: schema_discussion; Owner: postgres
 --
@@ -1508,7 +1509,7 @@ INSERT INTO schema_discussion.comment_vote VALUES (1, 78);
 
 
 --
--- TOC entry 5256 (class 0 OID 18648)
+-- TOC entry 5257 (class 0 OID 18648)
 -- Dependencies: 260
 -- Data for Name: exam; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
@@ -1527,12 +1528,12 @@ INSERT INTO schema_exam.exam OVERRIDING SYSTEM VALUE VALUES (16, 'code2', 'Test 
 INSERT INTO schema_exam.exam OVERRIDING SYSTEM VALUE VALUES (17, 'code3', 'Test for C 1', 'Test 3', '2024-01-04 23:25:00', '2024-01-05 01:25:00', 'END', '2020-02-05 01:25:00', 76, NULL, NULL, 125);
 INSERT INTO schema_exam.exam OVERRIDING SYSTEM VALUE VALUES (39, '6abd4451-1ada-4b20-b725-eba554fee68e', 'test test test', 'test test test', '2025-12-03 00:00:00', '2025-12-03 01:30:00', 'NOT_STARTED', '2025-03-11 11:16:23.605108', 76, '2025-03-11 11:16:41.603206', 76, 0);
 INSERT INTO schema_exam.exam OVERRIDING SYSTEM VALUE VALUES (14, 'df64708b-4872-4fd7-913d-030ee5dfef78', 'Exam for Java. Trial #2', 'Trial test for java', '2025-03-06 19:45:07', '2025-03-07 11:25:00', 'END', '2025-03-03 18:56:14.865331', 76, NULL, NULL, 6);
-INSERT INTO schema_exam.exam OVERRIDING SYSTEM VALUE VALUES (25, 'f10b5f86-ae42-40f1-b554-abc55a1e0078', 'Exam for Java. Trial #6', 'Sixth Trial test for Java in FPT University', '2025-03-06 08:00:00', '2025-03-07 18:25:00', 'END', '2025-03-06 20:04:02.80897', 76, '2025-03-06 20:53:42.530983', 76, 2);
 INSERT INTO schema_exam.exam OVERRIDING SYSTEM VALUE VALUES (40, 'd3906ec6-c0c8-49c4-810f-fb7c769312d8', 'aaaaaaaaaaaaaaaaaaaaaaaa', 'aaaaaaaaaaaaaaaaaaaaaaaa', '2025-03-22 00:00:00', '2025-03-22 01:30:00', 'NOT_STARTED', '2025-03-11 15:51:26.175971', 76, '2025-03-13 07:15:50.430723', 76, 0);
+INSERT INTO schema_exam.exam OVERRIDING SYSTEM VALUE VALUES (25, 'f10b5f86-ae42-40f1-b554-abc55a1e0078', 'Exam for Java. Trial #6', 'Sixth Trial test for Java in FPT University', '2025-03-16 23:43:00', '2025-03-07 18:25:00', 'NOT_STARTED', '2025-03-06 20:04:02.80897', 76, '2025-03-06 20:53:42.530983', 76, 3);
 
 
 --
--- TOC entry 5260 (class 0 OID 18723)
+-- TOC entry 5261 (class 0 OID 18723)
 -- Dependencies: 264
 -- Data for Name: exam_language_support; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
@@ -1549,7 +1550,7 @@ INSERT INTO schema_exam.exam_language_support VALUES (40, 1);
 
 
 --
--- TOC entry 5257 (class 0 OID 18672)
+-- TOC entry 5258 (class 0 OID 18672)
 -- Dependencies: 261
 -- Data for Name: exam_participant; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
@@ -1566,10 +1567,11 @@ INSERT INTO schema_exam.exam_participant VALUES (25, 90, 2);
 INSERT INTO schema_exam.exam_participant VALUES (25, 92, 1);
 INSERT INTO schema_exam.exam_participant VALUES (25, 94, 1.5);
 INSERT INTO schema_exam.exam_participant VALUES (25, 84, 10);
+INSERT INTO schema_exam.exam_participant VALUES (25, 3, 0);
 
 
 --
--- TOC entry 5258 (class 0 OID 18688)
+-- TOC entry 5259 (class 0 OID 18688)
 -- Dependencies: 262
 -- Data for Name: exam_problem; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
@@ -1603,7 +1605,7 @@ INSERT INTO schema_exam.exam_problem VALUES (40, 24, 1);
 
 
 --
--- TOC entry 5259 (class 0 OID 18703)
+-- TOC entry 5260 (class 0 OID 18703)
 -- Dependencies: 263
 -- Data for Name: exam_submission; Type: TABLE DATA; Schema: schema_exam; Owner: postgres
 --
@@ -1617,7 +1619,7 @@ INSERT INTO schema_exam.exam_submission VALUES (25, 84, 112, 194, 3);
 
 
 --
--- TOC entry 5254 (class 0 OID 18615)
+-- TOC entry 5255 (class 0 OID 18615)
 -- Dependencies: 258
 -- Data for Name: language_support; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1664,7 +1666,7 @@ INSERT INTO schema_problem.language_support VALUES (112, 2);
 
 
 --
--- TOC entry 5230 (class 0 OID 16730)
+-- TOC entry 5231 (class 0 OID 16730)
 -- Dependencies: 234
 -- Data for Name: problem; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1854,7 +1856,7 @@ Return the final value of original.', 'EASY', 0.00, 0, 'PUBLIC', '2025-01-02 12:
 
 
 --
--- TOC entry 5252 (class 0 OID 17620)
+-- TOC entry 5253 (class 0 OID 17620)
 -- Dependencies: 256
 -- Data for Name: problem_comment; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1919,7 +1921,7 @@ INSERT INTO schema_problem.problem_comment VALUES (96, 76);
 
 
 --
--- TOC entry 5251 (class 0 OID 17556)
+-- TOC entry 5252 (class 0 OID 17556)
 -- Dependencies: 255
 -- Data for Name: problem_input_parameter; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1942,7 +1944,7 @@ INSERT INTO schema_problem.problem_input_parameter OVERRIDING SYSTEM VALUE VALUE
 
 
 --
--- TOC entry 5233 (class 0 OID 16777)
+-- TOC entry 5234 (class 0 OID 16777)
 -- Dependencies: 237
 -- Data for Name: problem_skill; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -1996,7 +1998,7 @@ INSERT INTO schema_problem.problem_skill VALUES (112, 37);
 
 
 --
--- TOC entry 5235 (class 0 OID 16793)
+-- TOC entry 5236 (class 0 OID 16793)
 -- Dependencies: 239
 -- Data for Name: problem_solution; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2004,7 +2006,6 @@ INSERT INTO schema_problem.problem_skill VALUES (112, 37);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (14, 62, 'Kodeholik - Editorial', 'test', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (82, 98, 'Kodeholik - Editorial', 'The problem requires transforming one string into another using three operations: insert, delete, or replace. This is a classic Dynamic Programming problem, where we aim to minimize the cost of edits. The solution involves comparing prefixes of both strings to compute the minimum operations required.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (127, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, '2025-02-27 16:50:33.627593', 1, NULL, NULL, 6);
-INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (128, 96, 'Just a little hhihi code', 'We dont need to do this problem. This problem is so easy.', false, 0, '2025-02-27 17:09:44.072222', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (39, 88, 'Kodeholik - Editorial', 'We can solve the problem by iterating through the numbers 1 to n, and use linear search to determine whether each number is in the array. The first number we cannot find is the smallest missing integer. This approach would result in a quadratic time complexity.We need to determine whether an element is in the array in constant time. Array indexing provides constant lookup time. We need to check the existence of a relatively small range of values, positive numbers between 1 and n, so we can use an array like a hash table by using the index as a key and the value as a presence indicator. The default value is false, which represents a missing number, and we set the value to true for keys that exist in nums. Numbers not in the range 1 to n are not relevant in the search for the first missing positive, so we do not mark them in the seen array. To solve the problem, we can create an array of size n + 1. For each positive number less than n in nums, we set seen[num] to true. Then, we iterate through the integers 1 to n and return the first number that is not marked as seen in the array. If the array contains all of the elements 1 to n, we return n + 1.', true, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (98, 96, 'Easiest solution', 'Remember how we do multiplication?
 
@@ -2015,6 +2016,7 @@ Things to note:
 
 The product of two numbers cannot exceed the sum of the two lengths. (e.g. 99 * 99 cannot be five digit)', false, 0, '2025-01-18 16:25:12.583489', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (163, 112, 'Kodeholik - Editorial', 'The solution follows a greedy approach to determine the correct starting station efficiently. Step 1: Compute Net Gain at Each Station Calculate the net gas available at each station as: diff[𝑖]=gas[𝑖]−cost[𝑖]. Maintain a to variable to track the total sum of all diff[i] values. Key Insight: If sum(gas) < sum(cost), meaning to < 0, it is impossible to complete the circuit, so return -1. Step 2: Find the Valid Starting Index. Initialize index = 0 to track the potential starting station.. Traverse the array while maintaining a to variable to track the gas balance..If to (current gas balance) becomes negative at any station: --> Reset the index to i+1 (next station). --> Reset to = 0 (restart counting from this new index).', true, 0, '2025-03-09 19:36:26.554979', 22, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (128, 96, 'Just a little hhihi code', 'We dont need to do this problem. This problem is so easy.', false, 0, '2025-02-27 17:09:44.072222', 1, '2025-03-16 15:30:59.573046', 1, 0);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (118, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, NULL, 1, NULL, 1, 0);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (119, 96, 'Approach 1: Brute Force', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, NULL, 1, NULL, 1, 0);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (100, 96, 'Easy Java solution', 'Complexity
@@ -2083,10 +2085,52 @@ INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (116,
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (117, 96, 'Try it if you are stuck in other solution', '', false, 0, '2025-01-18 16:25:12.583489', 2, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (133, 96, 'Just a funny code', 'Our goal is to multiply two integer numbers that are represented as strings. However, we are not allowed to use a built-in BigInteger library or convert the inputs to integers directly. So how can we multiply the two input strings? We can try to break the problem down into manageable chunks, as is done in elementary mathematics. Thus, we will focus on one digit at a time, just like in the addition example, except here we will be multiplying both numbers digit by digit.', false, 0, '2025-02-27 21:38:27.874022', 1, NULL, NULL, 0);
 INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (135, 100, 'Kodeholik - Editorial', 'We can solve the problem by using remainder', true, 0, '2025-03-02 01:28:27.007599', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (172, 112, 'Best Java Solution', '# Intuition 
+ 
+### First
+To improve our runtime complexity, we need a more efficient way to check if the complement exists in the array. If the complement exists, we need to get its index. What is the best way to maintain a mapping of each element in the array to its index? A hash table.
+
+We can reduce the lookup time from O(n) to O(1) by trading space for speed. A hash table is well suited for this purpose because it supports fast lookup in near constant time. I say "near" because if a collision occurred, a lookup could degenerate to O(n) time. However, lookup in a hash table should be amortized O(1) time as long as the hash function was chosen carefully.
+ # Approach 
+A simple implementation uses two iterations. In the first iteration, we add each element''s value as a key and its index as a value to the hash table. Then, in the second iteration, we check if each element''s complement (target−nums[i]) exists in the hash table. If it does exist, we return current element''s index and its complement''s index. Beware that the complement must not be nums[i] itself!
+ # Complexity 
+ - Time complexity: O(n).
+    - We traverse the list containing n elements exactly twice. Since the hash table reduces the lookup time to O(1), the overall time complexity is O(n)
+ - Space complexity:O(n).
+   - The extra space required depends on the number of items stored in the hash table, which stores exactly n elements.
+ <!-- Add your space complexity here, e.g. $$O(n)$$ -->
+ # Code 
+ <!--
+Please select a code for your solution by clicking the ''Add Submission'' button. 
+If you want to remove a selected code, click the ''X'' icon in the button have id that you want to removed. 
+You cannot delete or edit the selected code here. 
+Please choose at least one code.
+-->', false, 0, '2025-03-17 00:13:55.386411', 1, NULL, NULL, 0);
+INSERT INTO schema_problem.problem_solution OVERRIDING SYSTEM VALUE VALUES (173, 112, 'Best Java Solution', '# Intuition 
+ 
+### First
+To improve our runtime complexity, we need a more efficient way to check if the complement exists in the array. If the complement exists, we need to get its index. What is the best way to maintain a mapping of each element in the array to its index? A hash table.
+
+We can reduce the lookup time from O(n) to O(1) by trading space for speed. A hash table is well suited for this purpose because it supports fast lookup in near constant time. I say "near" because if a collision occurred, a lookup could degenerate to O(n) time. However, lookup in a hash table should be amortized O(1) time as long as the hash function was chosen carefully.
+ # Approach 
+A simple implementation uses two iterations. In the first iteration, we add each element''s value as a key and its index as a value to the hash table. Then, in the second iteration, we check if each element''s complement (target−nums[i]) exists in the hash table. If it does exist, we return current element''s index and its complement''s index. Beware that the complement must not be nums[i] itself!
+ # Complexity 
+ - Time complexity: O(n).
+    - We traverse the list containing n elements exactly twice. Since the hash table reduces the lookup time to O(1), the overall time complexity is O(n)
+ - Space complexity:O(n).
+   - The extra space required depends on the number of items stored in the hash table, which stores exactly n elements.
+ <!-- Add your space complexity here, e.g. $$O(n)$$ -->
+ # Code 
+ <!--
+Please select a code for your solution by clicking the ''Add Submission'' button. 
+If you want to remove a selected code, click the ''X'' icon in the button have id that you want to removed. 
+You cannot delete or edit the selected code here. 
+Please choose at least one code.
+-->', false, 0, '2025-03-17 00:13:55.415605', 1, NULL, NULL, 0);
 
 
 --
--- TOC entry 5253 (class 0 OID 17636)
+-- TOC entry 5254 (class 0 OID 17636)
 -- Dependencies: 257
 -- Data for Name: problem_solution_comment; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2109,7 +2153,7 @@ INSERT INTO schema_problem.problem_solution_comment VALUES (127, 78);
 
 
 --
--- TOC entry 5249 (class 0 OID 17327)
+-- TOC entry 5250 (class 0 OID 17327)
 -- Dependencies: 253
 -- Data for Name: problem_solution_skill; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -2127,7 +2171,7 @@ INSERT INTO schema_problem.problem_solution_skill VALUES (163, 11);
 
 
 --
--- TOC entry 5242 (class 0 OID 17004)
+-- TOC entry 5243 (class 0 OID 17004)
 -- Dependencies: 246
 -- Data for Name: problem_submission; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -4597,7 +4641,7 @@ INSERT INTO schema_problem.problem_submission OVERRIDING SYSTEM VALUE VALUES (23
 
 
 --
--- TOC entry 5238 (class 0 OID 16868)
+-- TOC entry 5239 (class 0 OID 16868)
 -- Dependencies: 242
 -- Data for Name: problem_template; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -4638,7 +4682,7 @@ public static boolean isPalindrome(int x) {
 
 
 --
--- TOC entry 5232 (class 0 OID 16762)
+-- TOC entry 5233 (class 0 OID 16762)
 -- Dependencies: 236
 -- Data for Name: problem_topic; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -4683,7 +4727,7 @@ INSERT INTO schema_problem.problem_topic VALUES (100, 9);
 
 
 --
--- TOC entry 5236 (class 0 OID 16840)
+-- TOC entry 5237 (class 0 OID 16840)
 -- Dependencies: 240
 -- Data for Name: solution_code; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -4738,22 +4782,22 @@ res.add(Arrays.asList(nums[lo++], nums[hi--]));
 }
 }
 return res;
-}');
+}', NULL);
 INSERT INTO schema_problem.solution_code VALUES (82, 98, 1, 'public static int solve(int i, int j, String s1, String s2, int dp[][]) {if (i == 0 && j == 0) {if (s1.charAt(i) == s2.charAt(j))return 0;else
 return 1;}if (j == -1)
 return i + 1;if (i == -1)
 return j + 1;if (dp[i][j] != -1)
 return dp[i][j];
-int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}');
-INSERT INTO schema_problem.solution_code VALUES (100, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (101, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (102, 96, 1, 'public static String multiply(String num1, String num2) { \n int len1 = num1.length(), len2 = num2.length(); \n int[] prod = new int [len1 + len2]; \n int currIdx = prod.length-1; \n for(int i = len1-1; i >= 0; i--) { \n int idx = currIdx--; \n for(int j = len2-1; j >= 0; j--) { \n int a = num1.charAt(i) - ''0''; \n int b = num2.charAt(j) - ''0''; \n int res = a * b + prod[idx]; \n prod[idx] = res % 10; \n prod[--idx] += res / 10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int num : prod) { \n if(num == 0 && sb.length() == 0) continue; \n sb.append(num); \n } \n if(sb.length() == 0) return "0"; \n return sb.toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (103, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (104, 96, 1, 'public static String multiply(String num1, String num2) { \n BigInteger a = new BigInteger(num1); \n BigInteger b = new BigInteger(num2); \n BigInteger c = a.multiply(b); \n return String.valueOf(c); \n }');
-INSERT INTO schema_problem.solution_code VALUES (105, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }');
-INSERT INTO schema_problem.solution_code VALUES (106, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (107, 96, 1, 'public static String multiply(String num1, String num2) { \n BigInteger a = new BigInteger(num1); \n BigInteger b = new BigInteger(num2); \n BigInteger c = a.multiply(b); \n return String.valueOf(c); \n }');
-INSERT INTO schema_problem.solution_code VALUES (108, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
+int insert = 300000000;int replace = 30000000;int delete = 30000000;if (s1.charAt(i) == s2.charAt(j))return dp[i][j] = solve(i - 1, j - 1, s1, s2, dp);else {insert = 1 + solve(i, j - 1, s1, s2, dp); replace = 1 + solve(i - 1, j - 1, s1, s2, dp);delete = 1 + solve(i - 1, j, s1, s2, dp);}return dp[i][j] = Math.min(insert, Math.min(replace, delete));}publicstatic int minDistance(String word1, String word2) {int dp[][] = new int[word1.length()][word2.length()];for (int[] I : dp)Arrays.fill(I, -1);return solve(word1.length() - 1, word2.length() - 1, word1, word2, dp);}', NULL);
+INSERT INTO schema_problem.solution_code VALUES (100, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (101, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (102, 96, 1, 'public static String multiply(String num1, String num2) { \n int len1 = num1.length(), len2 = num2.length(); \n int[] prod = new int [len1 + len2]; \n int currIdx = prod.length-1; \n for(int i = len1-1; i >= 0; i--) { \n int idx = currIdx--; \n for(int j = len2-1; j >= 0; j--) { \n int a = num1.charAt(i) - ''0''; \n int b = num2.charAt(j) - ''0''; \n int res = a * b + prod[idx]; \n prod[idx] = res % 10; \n prod[--idx] += res / 10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int num : prod) { \n if(num == 0 && sb.length() == 0) continue; \n sb.append(num); \n } \n if(sb.length() == 0) return "0"; \n return sb.toString(); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (103, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (104, 96, 1, 'public static String multiply(String num1, String num2) { \n BigInteger a = new BigInteger(num1); \n BigInteger b = new BigInteger(num2); \n BigInteger c = a.multiply(b); \n return String.valueOf(c); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (105, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (106, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (107, 96, 1, 'public static String multiply(String num1, String num2) { \n BigInteger a = new BigInteger(num1); \n BigInteger b = new BigInteger(num2); \n BigInteger c = a.multiply(b); \n return String.valueOf(c); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (108, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }', NULL);
 INSERT INTO schema_problem.solution_code VALUES (39, 88, 1, 'public static int firstMissingPositive(int[] nums) {
 int n = nums.length;
 boolean[] seen = new boolean[n + 1];
@@ -4774,8 +4818,8 @@ boolean[] seen = new boolean[n + 1];
 // If seen contains all elements 1 to n 
 // the smallest missing positive number is n + 1 
  return n + 1; 
- }');
-INSERT INTO schema_problem.solution_code VALUES (109, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
+ }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (109, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }', NULL);
 INSERT INTO schema_problem.solution_code VALUES (135, 100, 1, 'public static boolean isPalindrome(int x) { 
  if (x < 0) { 
  return false; 
@@ -4787,7 +4831,7 @@ INSERT INTO schema_problem.solution_code VALUES (135, 100, 1, 'public static boo
  x /= 10; 
  } 
  return reverse == xcopy; 
- }');
+ }', NULL);
 INSERT INTO schema_problem.solution_code VALUES (135, 100, 2, 'bool isPalindrome(int x){ 
  if(x<0 || x!=0 && x%10 ==0 ) return false; 
  int check=0; 
@@ -4796,21 +4840,21 @@ INSERT INTO schema_problem.solution_code VALUES (135, 100, 2, 'bool isPalindrome
  x/=10; 
  } 
  return (x==check || x==check/10); 
- }');
-INSERT INTO schema_problem.solution_code VALUES (110, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (112, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (113, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (114, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (115, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (116, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }');
-INSERT INTO schema_problem.solution_code VALUES (117, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (98, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }');
-INSERT INTO schema_problem.solution_code VALUES (99, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }');
-INSERT INTO schema_problem.solution_code VALUES (111, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }');
-INSERT INTO schema_problem.solution_code VALUES (127, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
-INSERT INTO schema_problem.solution_code VALUES (128, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
-INSERT INTO schema_problem.solution_code VALUES (129, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
-INSERT INTO schema_problem.solution_code VALUES (133, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}');
+ }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (110, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (112, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (113, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (114, 96, 1, 'public static String multiply(String nums1, String nums2) { \n if(nums1.equals("0") || nums2.equals("0")) return "0"; \n if(nums1.equals("1")) return nums2; \n if(nums2.equals("1")) return nums1; \n int arr[]=new int[nums1.length()+nums2.length()]; \n for(int i=nums1.length()-1;i>=0;i--){ \n for(int j=nums2.length()-1;j>=0;j--){ \n int prod=(nums1.charAt(i)-''0'')*(nums2.charAt(j)-''0''); \n prod+=arr[i+j+1]; \n arr[i+j+1]=prod%10; \n arr[i+j]+=prod/10; \n } \n } \n StringBuilder ans=new StringBuilder(); \n for(int i=0;i<arr.length;i++){ \n if(ans.length()==0 && arr[i]==0) continue; \n ans.append(arr[i]); \n } \n return ans.toString();\n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (115, 96, 1, 'public static String multiply(String num1, String num2) { \n int[] num = new int[num1.length()+num2.length()]; \n int len1 = num1.length(), len2 = num2.length(); \n for(int i=len1-1;i>=0;i--){ \n for(int j=len2-1;j>=0;j--){ \n int temp = (num1.charAt(i)-''0'')*(num2.charAt(j)-''0''); \n num[i+j] += (temp+num[i+j+1])/10; \n num[i+j+1] = (num[i+j+1]+temp)%10; \n } \n } \n StringBuilder sb = new StringBuilder(); \n for(int i: num) if(sb.length()>0||i>0)  sb.append(i); \n return (sb.length()==0)?\"0\":sb.toString(); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (116, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (117, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (98, 96, 1, 'public static String multiply(String num1, String num2) {\n BigInteger n1 = new BigInteger(num1);\n BigInteger n2 = new BigInteger(num2);\n BigInteger n3 = n1.multiply(n2);\n return n3.toString();\n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (99, 96, 1, 'public static String multiply(String num1, String num2) { \n return String.valueOf((new java.math.BigInteger(num1)).multiply(new java.math.BigInteger(num2))); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (111, 96, 1, 'public static String multiply(String a, String b) { \n if (a.equals(\"0\") || b.equals(\"0\")) { \n return \"0\"; \n } \n int m = a.length() - 1, n = b.length() - 1, carry = 0; \n String product = \"\"; \n for (int i = 0; i <= m + n || carry != 0; ++i) { \n for (int j = Math.max(0, i - n); j <= Math.min(i, m); ++j) { \n carry += (a.charAt(m - j) - ''0'') * (b.charAt(n - i + j) - ''0''); \n } \n product += (char)(carry % 10 + ''0''); \n carry /= 10; \n } \n return new StringBuilder(product).reverse().toString(); \n }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (127, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', NULL);
+INSERT INTO schema_problem.solution_code VALUES (128, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', NULL);
+INSERT INTO schema_problem.solution_code VALUES (129, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', NULL);
+INSERT INTO schema_problem.solution_code VALUES (133, 96, 1, 'public static String multiply(String num1, String num2) {int m = num1.length(), n = num2.length();int[] pos = new int[m + n];for(int i = m - 1; i >= 0; i--) {for(int j = n - 1; j >= 0; j--) {int mul = (num1.charAt(i) - ''0'') * (num2.charAt(j) - ''0'');int p1 = i + j, p2 = i + j + 1; int sum = mul + pos[p2];pos[p1] += sum / 10;pos[p2] = (sum) % 10;}} StringBuilder sb = new StringBuilder();for(int p : pos) if(!(sb.length() == 0 && p == 0))sb.append(p);return sb.length() == 0 ? "0" : sb.toString();}', NULL);
 INSERT INTO schema_problem.solution_code VALUES (163, 112, 1, '//Test 
 
 public static int canCompleteCircuit(int[] gas, int[] cost) { 
@@ -4834,7 +4878,7 @@ public static int canCompleteCircuit(int[] gas, int[] cost) {
  } 
  } 
  return index; 
- }');
+ }', NULL);
 INSERT INTO schema_problem.solution_code VALUES (163, 112, 2, '//Test 
 
 int canCompleteCircuit(int* gas, int gasSize, int* cost, int costSize){ 
@@ -4848,11 +4892,55 @@ int canCompleteCircuit(int* gas, int gasSize, int* cost, int costSize){
  } 
 } 
  return sum < 0 ? -1 : start_index; 
- }');
+ }', NULL);
+INSERT INTO schema_problem.solution_code VALUES (172, 112, 1, '    public static int canCompleteCircuit(int[] gas, int[] cost) {
+        int len = gas.length;
+        int[] diff = new int[len];
+        int to = 0;
+        for (int i = 0; i < len; i++) {
+            diff[i] += (gas[i] - cost[i]);
+            to += diff[i];
+        }
+        if (to < 0) {
+            return -1;
+        }
+        int index = 0;
+        to = 0;
+        for (int i = 0; i < len; i++) {
+            to += diff[i];
+            if (to < 0) {
+                index = i + 1;
+                to = 0;
+            }
+        }
+        return index;
+    }', 215);
+INSERT INTO schema_problem.solution_code VALUES (173, 112, 1, '    public static int canCompleteCircuit(int[] gas, int[] cost) {
+        int len = gas.length;
+        int[] diff = new int[len];
+        int to = 0;
+        for (int i = 0; i < len; i++) {
+            diff[i] += (gas[i] - cost[i]);
+            to += diff[i];
+        }
+        if (to < 0) {
+            return -1;
+        }
+        int index = 0;
+        to = 0;
+        for (int i = 0; i < len; i++) {
+            to += diff[i];
+            if (to < 0) {
+                index = i + 1;
+                to = 0;
+            }
+        }
+        return index;
+    }', 215);
 
 
 --
--- TOC entry 5246 (class 0 OID 17133)
+-- TOC entry 5247 (class 0 OID 17133)
 -- Dependencies: 250
 -- Data for Name: solution_vote; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -4862,7 +4950,7 @@ INSERT INTO schema_problem.solution_vote VALUES (1, 100);
 
 
 --
--- TOC entry 5240 (class 0 OID 16887)
+-- TOC entry 5241 (class 0 OID 16887)
 -- Dependencies: 244
 -- Data for Name: test_case; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -4959,7 +5047,7 @@ INSERT INTO schema_problem.test_case OVERRIDING SYSTEM VALUE VALUES (167, 98, '[
 
 
 --
--- TOC entry 5231 (class 0 OID 16747)
+-- TOC entry 5232 (class 0 OID 16747)
 -- Dependencies: 235
 -- Data for Name: user_favourite; Type: TABLE DATA; Schema: schema_problem; Owner: postgres
 --
@@ -4972,7 +5060,7 @@ INSERT INTO schema_problem.user_favourite VALUES (1, 112);
 
 
 --
--- TOC entry 5226 (class 0 OID 16686)
+-- TOC entry 5227 (class 0 OID 16686)
 -- Dependencies: 230
 -- Data for Name: language; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
@@ -4983,7 +5071,7 @@ INSERT INTO schema_setting.language OVERRIDING SYSTEM VALUE VALUES (35, 'Javascr
 
 
 --
--- TOC entry 5222 (class 0 OID 16650)
+-- TOC entry 5223 (class 0 OID 16650)
 -- Dependencies: 226
 -- Data for Name: skill; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
@@ -5007,7 +5095,7 @@ INSERT INTO schema_setting.skill OVERRIDING SYSTEM VALUE VALUES (37, 'Three Dime
 
 
 --
--- TOC entry 5224 (class 0 OID 16668)
+-- TOC entry 5225 (class 0 OID 16668)
 -- Dependencies: 228
 -- Data for Name: topic; Type: TABLE DATA; Schema: schema_setting; Owner: postgres
 --
@@ -5029,7 +5117,7 @@ INSERT INTO schema_setting.topic OVERRIDING SYSTEM VALUE VALUES (22, 'Top Interv
 
 
 --
--- TOC entry 5228 (class 0 OID 16704)
+-- TOC entry 5229 (class 0 OID 16704)
 -- Dependencies: 232
 -- Data for Name: notification; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
@@ -5097,7 +5185,7 @@ INSERT INTO schema_user.notification OVERRIDING SYSTEM VALUE VALUES (60, 2, 'Wel
 
 
 --
--- TOC entry 5248 (class 0 OID 17244)
+-- TOC entry 5249 (class 0 OID 17244)
 -- Dependencies: 252
 -- Data for Name: transaction; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
@@ -5105,7 +5193,7 @@ INSERT INTO schema_user.notification OVERRIDING SYSTEM VALUE VALUES (60, 2, 'Wel
 
 
 --
--- TOC entry 5220 (class 0 OID 16570)
+-- TOC entry 5221 (class 0 OID 16570)
 -- Dependencies: 224
 -- Data for Name: users; Type: TABLE DATA; Schema: schema_user; Owner: postgres
 --
@@ -5137,7 +5225,7 @@ INSERT INTO schema_user.users OVERRIDING SYSTEM VALUE VALUES (1, 'Mast', 'Trần
 
 
 --
--- TOC entry 5280 (class 0 OID 0)
+-- TOC entry 5281 (class 0 OID 0)
 -- Dependencies: 266
 -- Name: chapter_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -5146,7 +5234,7 @@ SELECT pg_catalog.setval('schema_course.chapter_id_seq', 5, true);
 
 
 --
--- TOC entry 5281 (class 0 OID 0)
+-- TOC entry 5282 (class 0 OID 0)
 -- Dependencies: 269
 -- Name: course_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -5155,7 +5243,7 @@ SELECT pg_catalog.setval('schema_course.course_id_seq', 10, true);
 
 
 --
--- TOC entry 5282 (class 0 OID 0)
+-- TOC entry 5283 (class 0 OID 0)
 -- Dependencies: 271
 -- Name: course_rating_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -5164,7 +5252,7 @@ SELECT pg_catalog.setval('schema_course.course_rating_id_seq', 6, true);
 
 
 --
--- TOC entry 5283 (class 0 OID 0)
+-- TOC entry 5284 (class 0 OID 0)
 -- Dependencies: 275
 -- Name: lesson_id_seq; Type: SEQUENCE SET; Schema: schema_course; Owner: postgres
 --
@@ -5173,7 +5261,7 @@ SELECT pg_catalog.setval('schema_course.lesson_id_seq', 34, true);
 
 
 --
--- TOC entry 5284 (class 0 OID 0)
+-- TOC entry 5285 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: discussion_id_seq; Type: SEQUENCE SET; Schema: schema_discussion; Owner: postgres
 --
@@ -5182,7 +5270,7 @@ SELECT pg_catalog.setval('schema_discussion.discussion_id_seq', 78, true);
 
 
 --
--- TOC entry 5285 (class 0 OID 0)
+-- TOC entry 5286 (class 0 OID 0)
 -- Dependencies: 259
 -- Name: exam_id_seq; Type: SEQUENCE SET; Schema: schema_exam; Owner: postgres
 --
@@ -5191,7 +5279,7 @@ SELECT pg_catalog.setval('schema_exam.exam_id_seq', 58, true);
 
 
 --
--- TOC entry 5286 (class 0 OID 0)
+-- TOC entry 5287 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: problem_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -5200,7 +5288,7 @@ SELECT pg_catalog.setval('schema_problem.problem_id_seq', 112, true);
 
 
 --
--- TOC entry 5287 (class 0 OID 0)
+-- TOC entry 5288 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: problem_input_parameter_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -5209,7 +5297,7 @@ SELECT pg_catalog.setval('schema_problem.problem_input_parameter_id_seq', 294, t
 
 
 --
--- TOC entry 5288 (class 0 OID 0)
+-- TOC entry 5289 (class 0 OID 0)
 -- Dependencies: 245
 -- Name: problem_submission_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -5218,16 +5306,16 @@ SELECT pg_catalog.setval('schema_problem.problem_submission_id_seq', 232, true);
 
 
 --
--- TOC entry 5289 (class 0 OID 0)
+-- TOC entry 5290 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: problemsolution_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
 
-SELECT pg_catalog.setval('schema_problem.problemsolution_id_seq', 163, true);
+SELECT pg_catalog.setval('schema_problem.problemsolution_id_seq', 173, true);
 
 
 --
--- TOC entry 5290 (class 0 OID 0)
+-- TOC entry 5291 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: problemtemplate_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -5236,7 +5324,7 @@ SELECT pg_catalog.setval('schema_problem.problemtemplate_id_seq', 161, true);
 
 
 --
--- TOC entry 5291 (class 0 OID 0)
+-- TOC entry 5292 (class 0 OID 0)
 -- Dependencies: 243
 -- Name: testcase_id_seq; Type: SEQUENCE SET; Schema: schema_problem; Owner: postgres
 --
@@ -5245,7 +5333,7 @@ SELECT pg_catalog.setval('schema_problem.testcase_id_seq', 321, true);
 
 
 --
--- TOC entry 5292 (class 0 OID 0)
+-- TOC entry 5293 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: language_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
@@ -5254,7 +5342,7 @@ SELECT pg_catalog.setval('schema_setting.language_id_seq', 35, true);
 
 
 --
--- TOC entry 5293 (class 0 OID 0)
+-- TOC entry 5294 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: skill_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
@@ -5263,7 +5351,7 @@ SELECT pg_catalog.setval('schema_setting.skill_id_seq', 37, true);
 
 
 --
--- TOC entry 5294 (class 0 OID 0)
+-- TOC entry 5295 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: topic_id_seq; Type: SEQUENCE SET; Schema: schema_setting; Owner: postgres
 --
@@ -5272,7 +5360,7 @@ SELECT pg_catalog.setval('schema_setting.topic_id_seq', 22, true);
 
 
 --
--- TOC entry 5295 (class 0 OID 0)
+-- TOC entry 5296 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: notification_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
@@ -5281,7 +5369,7 @@ SELECT pg_catalog.setval('schema_user.notification_id_seq', 60, true);
 
 
 --
--- TOC entry 5296 (class 0 OID 0)
+-- TOC entry 5297 (class 0 OID 0)
 -- Dependencies: 251
 -- Name: transaction_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
@@ -5290,7 +5378,7 @@ SELECT pg_catalog.setval('schema_user.transaction_id_seq', 1, false);
 
 
 --
--- TOC entry 5297 (class 0 OID 0)
+-- TOC entry 5298 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: schema_user; Owner: postgres
 --
@@ -5692,7 +5780,7 @@ ALTER TABLE ONLY schema_user.users
 
 
 --
--- TOC entry 5055 (class 2606 OID 18863)
+-- TOC entry 5056 (class 2606 OID 18863)
 -- Name: chapter chapter_course_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5701,7 +5789,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 5056 (class 2606 OID 18868)
+-- TOC entry 5057 (class 2606 OID 18868)
 -- Name: chapter chapter_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5710,7 +5798,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 5057 (class 2606 OID 18873)
+-- TOC entry 5058 (class 2606 OID 18873)
 -- Name: chapter chapter_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5719,7 +5807,7 @@ ALTER TABLE ONLY schema_course.chapter
 
 
 --
--- TOC entry 5060 (class 2606 OID 18878)
+-- TOC entry 5061 (class 2606 OID 18878)
 -- Name: course_comment course_comment_course_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5728,7 +5816,7 @@ ALTER TABLE ONLY schema_course.course_comment
 
 
 --
--- TOC entry 5058 (class 2606 OID 18883)
+-- TOC entry 5059 (class 2606 OID 18883)
 -- Name: course course_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5737,7 +5825,7 @@ ALTER TABLE ONLY schema_course.course
 
 
 --
--- TOC entry 5061 (class 2606 OID 18888)
+-- TOC entry 5062 (class 2606 OID 18888)
 -- Name: course_rating course_rating_course_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5746,7 +5834,7 @@ ALTER TABLE ONLY schema_course.course_rating
 
 
 --
--- TOC entry 5062 (class 2606 OID 18893)
+-- TOC entry 5063 (class 2606 OID 18893)
 -- Name: course_rating course_rating_user_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5755,7 +5843,7 @@ ALTER TABLE ONLY schema_course.course_rating
 
 
 --
--- TOC entry 5059 (class 2606 OID 18898)
+-- TOC entry 5060 (class 2606 OID 18898)
 -- Name: course course_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5764,7 +5852,7 @@ ALTER TABLE ONLY schema_course.course
 
 
 --
--- TOC entry 5065 (class 2606 OID 18903)
+-- TOC entry 5066 (class 2606 OID 18903)
 -- Name: course_user course_user_course_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5773,7 +5861,7 @@ ALTER TABLE ONLY schema_course.course_user
 
 
 --
--- TOC entry 5066 (class 2606 OID 18908)
+-- TOC entry 5067 (class 2606 OID 18908)
 -- Name: course_user course_user_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5782,7 +5870,7 @@ ALTER TABLE ONLY schema_course.course_user
 
 
 --
--- TOC entry 5063 (class 2606 OID 18913)
+-- TOC entry 5064 (class 2606 OID 18913)
 -- Name: course_topic fk_course; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5791,7 +5879,7 @@ ALTER TABLE ONLY schema_course.course_topic
 
 
 --
--- TOC entry 5064 (class 2606 OID 18918)
+-- TOC entry 5065 (class 2606 OID 18918)
 -- Name: course_topic fk_topic; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5800,7 +5888,7 @@ ALTER TABLE ONLY schema_course.course_topic
 
 
 --
--- TOC entry 5067 (class 2606 OID 18923)
+-- TOC entry 5068 (class 2606 OID 18923)
 -- Name: lesson lesson_chapter_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5809,7 +5897,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 5068 (class 2606 OID 18928)
+-- TOC entry 5069 (class 2606 OID 18928)
 -- Name: lesson lesson_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5818,7 +5906,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 5070 (class 2606 OID 18933)
+-- TOC entry 5071 (class 2606 OID 18933)
 -- Name: lesson_problem lesson_problem_lesson_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5827,7 +5915,7 @@ ALTER TABLE ONLY schema_course.lesson_problem
 
 
 --
--- TOC entry 5071 (class 2606 OID 18938)
+-- TOC entry 5072 (class 2606 OID 18938)
 -- Name: lesson_problem lesson_problem_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5836,7 +5924,7 @@ ALTER TABLE ONLY schema_course.lesson_problem
 
 
 --
--- TOC entry 5069 (class 2606 OID 18943)
+-- TOC entry 5070 (class 2606 OID 18943)
 -- Name: lesson lesson_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5845,7 +5933,7 @@ ALTER TABLE ONLY schema_course.lesson
 
 
 --
--- TOC entry 5072 (class 2606 OID 18948)
+-- TOC entry 5073 (class 2606 OID 18948)
 -- Name: user_lesson_progress user_lesson_progress_lesson_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5854,7 +5942,7 @@ ALTER TABLE ONLY schema_course.user_lesson_progress
 
 
 --
--- TOC entry 5073 (class 2606 OID 18953)
+-- TOC entry 5074 (class 2606 OID 18953)
 -- Name: user_lesson_progress user_lesson_progress_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_course; Owner: postgres
 --
 
@@ -5863,7 +5951,7 @@ ALTER TABLE ONLY schema_course.user_lesson_progress
 
 
 --
--- TOC entry 5029 (class 2606 OID 17113)
+-- TOC entry 5030 (class 2606 OID 17113)
 -- Name: comment_vote comment_vote_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -5872,7 +5960,7 @@ ALTER TABLE ONLY schema_discussion.comment_vote
 
 
 --
--- TOC entry 5030 (class 2606 OID 17108)
+-- TOC entry 5031 (class 2606 OID 17108)
 -- Name: comment_vote comment_vote_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -5881,7 +5969,7 @@ ALTER TABLE ONLY schema_discussion.comment_vote
 
 
 --
--- TOC entry 5026 (class 2606 OID 18405)
+-- TOC entry 5027 (class 2606 OID 18405)
 -- Name: comment discussion_comment_reply_fk; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -5890,7 +5978,7 @@ ALTER TABLE ONLY schema_discussion.comment
 
 
 --
--- TOC entry 5027 (class 2606 OID 17062)
+-- TOC entry 5028 (class 2606 OID 17062)
 -- Name: comment discussion_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -5899,7 +5987,7 @@ ALTER TABLE ONLY schema_discussion.comment
 
 
 --
--- TOC entry 5028 (class 2606 OID 17067)
+-- TOC entry 5029 (class 2606 OID 17067)
 -- Name: comment discussion_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_discussion; Owner: postgres
 --
 
@@ -5908,7 +5996,7 @@ ALTER TABLE ONLY schema_discussion.comment
 
 
 --
--- TOC entry 5044 (class 2606 OID 18657)
+-- TOC entry 5045 (class 2606 OID 18657)
 -- Name: exam exam_created_by_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -5917,7 +6005,7 @@ ALTER TABLE ONLY schema_exam.exam
 
 
 --
--- TOC entry 5053 (class 2606 OID 18728)
+-- TOC entry 5054 (class 2606 OID 18728)
 -- Name: exam_language_support exam_language_support_exam_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -5926,7 +6014,7 @@ ALTER TABLE ONLY schema_exam.exam_language_support
 
 
 --
--- TOC entry 5054 (class 2606 OID 18733)
+-- TOC entry 5055 (class 2606 OID 18733)
 -- Name: exam_language_support exam_language_support_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -5935,7 +6023,7 @@ ALTER TABLE ONLY schema_exam.exam_language_support
 
 
 --
--- TOC entry 5046 (class 2606 OID 18677)
+-- TOC entry 5047 (class 2606 OID 18677)
 -- Name: exam_participant exam_participant_exam_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -5944,7 +6032,7 @@ ALTER TABLE ONLY schema_exam.exam_participant
 
 
 --
--- TOC entry 5047 (class 2606 OID 18682)
+-- TOC entry 5048 (class 2606 OID 18682)
 -- Name: exam_participant exam_participant_participant_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -5953,7 +6041,7 @@ ALTER TABLE ONLY schema_exam.exam_participant
 
 
 --
--- TOC entry 5048 (class 2606 OID 18693)
+-- TOC entry 5049 (class 2606 OID 18693)
 -- Name: exam_problem exam_problem_exam_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -5962,7 +6050,7 @@ ALTER TABLE ONLY schema_exam.exam_problem
 
 
 --
--- TOC entry 5049 (class 2606 OID 18698)
+-- TOC entry 5050 (class 2606 OID 18698)
 -- Name: exam_problem exam_problem_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -5971,7 +6059,7 @@ ALTER TABLE ONLY schema_exam.exam_problem
 
 
 --
--- TOC entry 5050 (class 2606 OID 18708)
+-- TOC entry 5051 (class 2606 OID 18708)
 -- Name: exam_submission exam_submission_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -5980,7 +6068,7 @@ ALTER TABLE ONLY schema_exam.exam_submission
 
 
 --
--- TOC entry 5051 (class 2606 OID 18713)
+-- TOC entry 5052 (class 2606 OID 18713)
 -- Name: exam_submission exam_submission_submission_id_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -5989,7 +6077,7 @@ ALTER TABLE ONLY schema_exam.exam_submission
 
 
 --
--- TOC entry 5045 (class 2606 OID 18662)
+-- TOC entry 5046 (class 2606 OID 18662)
 -- Name: exam exam_updated_by_fkey; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -5998,7 +6086,7 @@ ALTER TABLE ONLY schema_exam.exam
 
 
 --
--- TOC entry 5052 (class 2606 OID 18718)
+-- TOC entry 5053 (class 2606 OID 18718)
 -- Name: exam_submission fk_exam_participant; Type: FK CONSTRAINT; Schema: schema_exam; Owner: postgres
 --
 
@@ -6016,7 +6104,7 @@ ALTER TABLE ONLY schema_problem.problem_solution
 
 
 --
--- TOC entry 5036 (class 2606 OID 18387)
+-- TOC entry 5037 (class 2606 OID 18387)
 -- Name: problem_input_parameter language_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6025,7 +6113,7 @@ ALTER TABLE ONLY schema_problem.problem_input_parameter
 
 
 --
--- TOC entry 5021 (class 2606 OID 18607)
+-- TOC entry 5022 (class 2606 OID 18607)
 -- Name: test_case language_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6034,7 +6122,7 @@ ALTER TABLE ONLY schema_problem.test_case
 
 
 --
--- TOC entry 5042 (class 2606 OID 18625)
+-- TOC entry 5043 (class 2606 OID 18625)
 -- Name: language_support language_support_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6043,7 +6131,7 @@ ALTER TABLE ONLY schema_problem.language_support
 
 
 --
--- TOC entry 5043 (class 2606 OID 18620)
+-- TOC entry 5044 (class 2606 OID 18620)
 -- Name: language_support language_support_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6052,7 +6140,7 @@ ALTER TABLE ONLY schema_problem.language_support
 
 
 --
--- TOC entry 5038 (class 2606 OID 17630)
+-- TOC entry 5039 (class 2606 OID 17630)
 -- Name: problem_comment problem_comment_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6061,7 +6149,7 @@ ALTER TABLE ONLY schema_problem.problem_comment
 
 
 --
--- TOC entry 5039 (class 2606 OID 17625)
+-- TOC entry 5040 (class 2606 OID 17625)
 -- Name: problem_comment problem_comment_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6079,7 +6167,7 @@ ALTER TABLE ONLY schema_problem.problem
 
 
 --
--- TOC entry 5037 (class 2606 OID 17561)
+-- TOC entry 5038 (class 2606 OID 17561)
 -- Name: problem_input_parameter problem_input_parameter_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6088,7 +6176,7 @@ ALTER TABLE ONLY schema_problem.problem_input_parameter
 
 
 --
--- TOC entry 5040 (class 2606 OID 17646)
+-- TOC entry 5041 (class 2606 OID 17646)
 -- Name: problem_solution_comment problem_solution_comment_comment_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6097,7 +6185,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_comment
 
 
 --
--- TOC entry 5041 (class 2606 OID 17641)
+-- TOC entry 5042 (class 2606 OID 17641)
 -- Name: problem_solution_comment problem_solution_comment_problem_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6106,7 +6194,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_comment
 
 
 --
--- TOC entry 5034 (class 2606 OID 17332)
+-- TOC entry 5035 (class 2606 OID 17332)
 -- Name: problem_solution_skill problem_solution_skill_problem_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6115,7 +6203,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_skill
 
 
 --
--- TOC entry 5035 (class 2606 OID 17337)
+-- TOC entry 5036 (class 2606 OID 17337)
 -- Name: problem_solution_skill problem_solution_skill_skill_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6124,7 +6212,7 @@ ALTER TABLE ONLY schema_problem.problem_solution_skill
 
 
 --
--- TOC entry 5023 (class 2606 OID 17021)
+-- TOC entry 5024 (class 2606 OID 17021)
 -- Name: problem_submission problem_submission_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6133,7 +6221,7 @@ ALTER TABLE ONLY schema_problem.problem_submission
 
 
 --
--- TOC entry 5024 (class 2606 OID 17433)
+-- TOC entry 5025 (class 2606 OID 17433)
 -- Name: problem_submission problem_submission_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6142,7 +6230,7 @@ ALTER TABLE ONLY schema_problem.problem_submission
 
 
 --
--- TOC entry 5025 (class 2606 OID 17011)
+-- TOC entry 5026 (class 2606 OID 17011)
 -- Name: problem_submission problem_submission_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6187,7 +6275,7 @@ ALTER TABLE ONLY schema_problem.problem_solution
 
 
 --
--- TOC entry 5019 (class 2606 OID 16880)
+-- TOC entry 5020 (class 2606 OID 16880)
 -- Name: problem_template problemtemplate_language_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6196,7 +6284,7 @@ ALTER TABLE ONLY schema_problem.problem_template
 
 
 --
--- TOC entry 5020 (class 2606 OID 17423)
+-- TOC entry 5021 (class 2606 OID 17423)
 -- Name: problem_template problemtemplate_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6223,7 +6311,7 @@ ALTER TABLE ONLY schema_problem.problem_topic
 
 
 --
--- TOC entry 5031 (class 2606 OID 17143)
+-- TOC entry 5032 (class 2606 OID 17143)
 -- Name: solution_vote solution_vote_solution_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6232,7 +6320,7 @@ ALTER TABLE ONLY schema_problem.solution_vote
 
 
 --
--- TOC entry 5032 (class 2606 OID 17138)
+-- TOC entry 5033 (class 2606 OID 17138)
 -- Name: solution_vote solution_vote_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6268,7 +6356,16 @@ ALTER TABLE ONLY schema_problem.solution_code
 
 
 --
--- TOC entry 5022 (class 2606 OID 17428)
+-- TOC entry 5019 (class 2606 OID 18958)
+-- Name: solution_code submission_id_fk; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
+--
+
+ALTER TABLE ONLY schema_problem.solution_code
+    ADD CONSTRAINT submission_id_fk FOREIGN KEY (submission_id) REFERENCES schema_problem.problem_submission(id) NOT VALID;
+
+
+--
+-- TOC entry 5023 (class 2606 OID 17428)
 -- Name: test_case testcase_problem_id_fkey; Type: FK CONSTRAINT; Schema: schema_problem; Owner: postgres
 --
 
@@ -6367,7 +6464,7 @@ ALTER TABLE ONLY schema_user.notification
 
 
 --
--- TOC entry 5033 (class 2606 OID 17251)
+-- TOC entry 5034 (class 2606 OID 17251)
 -- Name: transaction transaction_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
@@ -6375,7 +6472,7 @@ ALTER TABLE ONLY schema_user.transaction
     ADD CONSTRAINT transaction_user_id_fkey FOREIGN KEY (user_id) REFERENCES schema_user.users(id);
 
 
--- Completed on 2025-03-15 21:57:00
+-- Completed on 2025-03-17 00:16:41
 
 --
 -- PostgreSQL database dump complete

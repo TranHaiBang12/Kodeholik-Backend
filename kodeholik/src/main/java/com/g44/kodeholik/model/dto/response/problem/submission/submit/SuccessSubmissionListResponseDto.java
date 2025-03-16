@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 public class SuccessSubmissionListResponseDto {
     private Long id;
 
+    private String code;
+
     @JsonSerialize(using = TimestampSerializer.class)
     private Long createdAt;
 

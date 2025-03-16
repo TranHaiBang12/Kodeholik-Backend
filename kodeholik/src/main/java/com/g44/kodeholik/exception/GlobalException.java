@@ -136,6 +136,20 @@ public class GlobalException {
                                 HttpStatus.BAD_REQUEST);
         }
 
+        // handle Exam not start
+        @ExceptionHandler(ExamNotReadyToStartException.class)
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
+        @ResponseBody
+        public ResponseEntity<ErrorResponse> handleBadRequestException(ExamNotReadyToStartException ex) {
+                Map<String, String> map = new HashMap();
+                map.put("message", ex.getMessage());
+                map.put("details", ex.getDetails());
+                map.put("startTime", ex.getStartTime());
+
+                return new ResponseEntity(map,
+                                HttpStatus.BAD_REQUEST);
+        }
+
         // handle cac loi unauthorized
         @ExceptionHandler(UnauthorizedException.class)
         @ResponseStatus(HttpStatus.UNAUTHORIZED)

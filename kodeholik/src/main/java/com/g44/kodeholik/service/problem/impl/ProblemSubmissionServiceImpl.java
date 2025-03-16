@@ -310,6 +310,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
             SuccessSubmissionListResponseDto successSubmissionListResponseDto = new SuccessSubmissionListResponseDto();
             if (!excludes.contains(problemSubmissions.get(i).getId())) {
                 successSubmissionListResponseDto.setId(problemSubmissions.get(i).getId());
+                successSubmissionListResponseDto.setCode(problemSubmissions.get(i).getCode());
                 successSubmissionListResponseDto.setLanguageName(problemSubmissions.get(i).getLanguage().getName());
                 successSubmissionListResponseDto.setCreatedAt(problemSubmissions.get(i).getCreatedAt().getTime());
                 successSubmissionListResponseDtos.add(successSubmissionListResponseDto);

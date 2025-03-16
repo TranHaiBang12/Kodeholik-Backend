@@ -51,4 +51,8 @@ public class SolutionCode {
     private Language language;
 
     private String code;
+
+    @ManyToOne
+    @JoinColumn(name = "submission_id", referencedColumnName = "id")
+    private ProblemSubmission problemSubmission;
 }

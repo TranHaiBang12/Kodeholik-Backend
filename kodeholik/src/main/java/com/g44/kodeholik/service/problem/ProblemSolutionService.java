@@ -40,8 +40,9 @@ public interface ProblemSolutionService {
 
         public void unupvoteSolution(Long solutionId, Users user);
 
-        public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user);
+        public ProblemSolutionDto postSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user);
 
-        public void editSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user, Long solutionId,
+        public ProblemSolutionDto editSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user,
+                        Long solutionId,
                         Set<Skill> skills);
 }

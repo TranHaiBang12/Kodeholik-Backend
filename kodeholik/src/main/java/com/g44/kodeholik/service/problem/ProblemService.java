@@ -137,9 +137,9 @@ public interface ProblemService {
 
         public List<SubmissionListResponseDto> getSubmissionListByUserAndProblem(String link);
 
-        public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto);
+        public ProblemSolutionDto postSolution(ShareSolutionRequestDto shareSolutionRequestDto);
 
-        public void editSolution(Long solutionId, ShareSolutionRequestDto shareSolutionRequestDto);
+        public ProblemSolutionDto editSolution(Long solutionId, ShareSolutionRequestDto shareSolutionRequestDto);
 
         public SubmissionResponseDto getSubmissionDetail(Long submissionId);
 

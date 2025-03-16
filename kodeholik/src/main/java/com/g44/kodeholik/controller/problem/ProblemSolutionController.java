@@ -11,11 +11,13 @@ import com.g44.kodeholik.service.problem.ProblemService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/problem-solution")
@@ -72,15 +75,16 @@ public class ProblemSolutionController {
     }
 
     @PostMapping("/post-solution")
-    public ResponseEntity<Void> postSolution(@RequestBody @Valid ShareSolutionRequestDto shareSolutionRequestDto) {
+    public ResponseEntity<ProblemSolutionDto> postSolution(
+            @RequestBody @Valid ShareSolutionRequestDto shareSolutionRequestDto) {
         problemService.postSolution(shareSolutionRequestDto);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(problemService.postSolution(shareSolutionRequestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/edit-solution/{id}")
-    public ResponseEntity<Void> editSolution(@PathVariable Long id,
+    public ResponseEntity<ProblemSolutionDto> editSolution(@PathVariable Long id,
             @RequestBody @Valid ShareSolutionRequestDto shareSolutionRequestDto) {
-        problemService.editSolution(id, shareSolutionRequestDto);
-        return ResponseEntity.noContent().build();
+        ;
+        return new ResponseEntity<>(problemService.editSolution(id, shareSolutionRequestDto), HttpStatus.OK);
     }
 }

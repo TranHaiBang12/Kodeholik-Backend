@@ -1404,7 +1404,7 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto) {
+    public ProblemSolutionDto postSolution(ShareSolutionRequestDto shareSolutionRequestDto) {
         Users user = userService.getCurrentUser();
         List<ProblemSubmission> problemSubmissions = new ArrayList<>();
         Problem problem = getActivePublicProblemByLink(shareSolutionRequestDto.getLink());
@@ -1415,7 +1415,7 @@ public class ProblemServiceImpl implements ProblemService {
         }
         shareSolutionRequestDto.setSubmissions(problemSubmissions);
 
-        problemSolutionService.postSolution(shareSolutionRequestDto, user);
+        return problemSolutionService.postSolution(shareSolutionRequestDto, user);
     }
 
     @Override
@@ -1434,7 +1434,7 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void editSolution(Long solutionId, ShareSolutionRequestDto shareSolutionRequestDto) {
+    public ProblemSolutionDto editSolution(Long solutionId, ShareSolutionRequestDto shareSolutionRequestDto) {
         Users user = userService.getCurrentUser();
         Set<Skill> skills = tagService.getSkillsByNameList(shareSolutionRequestDto.getSkills());
         List<ProblemSubmission> problemSubmissions = new ArrayList<>();
@@ -1443,7 +1443,7 @@ public class ProblemServiceImpl implements ProblemService {
             problemSubmissions.add(problemSubmissionService.getProblemSubmissionById(submissionIds.get(i)));
         }
         shareSolutionRequestDto.setSubmissions(problemSubmissions);
-        problemSolutionService.editSolution(shareSolutionRequestDto, user, solutionId, skills);
+        return problemSolutionService.editSolution(shareSolutionRequestDto, user, solutionId, skills);
     }
 
     @Override

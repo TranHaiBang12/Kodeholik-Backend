@@ -24,5 +24,7 @@ public class ExamListStudentResponseDto {
     @JsonSerialize(using = TimestampSerializer.class)
     private Long endTime;
 
+    private String result;
+
     private ExamStatus status;
 }

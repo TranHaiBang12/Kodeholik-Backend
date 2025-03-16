@@ -18,8 +18,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
+import com.g44.kodeholik.controller.admin.AdminController;
 import com.g44.kodeholik.exception.BadRequestException;
+import com.g44.kodeholik.exception.ExamNotReadyToStartException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.exam.AddExamRequestDto;
@@ -73,6 +74,8 @@ import com.g44.kodeholik.service.user.NotificationService;
 import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
 import com.g44.kodeholik.util.mapper.request.exam.EditExamBasicRequestMapper;
+import com.g44.kodeholik.util.mapper.request.user.AddUserAvatarFileMapper;
+import com.g44.kodeholik.util.mapper.request.user.AddUserRequestMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamListResponseMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamListStudentResponseMapper;
 import com.g44.kodeholik.util.mapper.response.exam.ExamResponseMapper;
@@ -87,6 +90,12 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor
 public class ExamServiceImpl implements ExamService {
+
+    private final AdminController adminController;
+
+    private final AddUserRequestMapper addUserRequestMapper;
+
+    private final AddUserAvatarFileMapper addUserAvatarFileMapper;
 
     private final ExamRepository examRepository;
 
@@ -552,9 +561,10 @@ public class ExamServiceImpl implements ExamService {
             throw new BadRequestException("The exam has already started or ended.",
                     "The exam has already started or ended.");
         }
+        String formattedDate = sdf.format(exam.getStartTime());
         if (!(after5Minutes.getTime() >= exam.getStartTime().getTime())) {
-            String formattedDate = sdf.format(exam.getStartTime());
-            throw new BadRequestException("The exam is not ready to start. Time start is " + formattedDate,
+            throw new ExamNotReadyToStartException("The exam is not ready to start. Time start is " + formattedDate,
+                    "The exam is not ready to start. Time start is " + formattedDate,
                     formattedDate);
         }
 
@@ -570,9 +580,10 @@ public class ExamServiceImpl implements ExamService {
         }
 
         Map<String, String> response = new HashMap<>();
-        response.put("Token", tokenService.generateAccessToken(currentUser.getUsername()));
-        response.put("Code", code);
-        response.put("Username", currentUser.getUsername());
+        response.put("token", tokenService.generateAccessToken(currentUser.getUsername()));
+        response.put("code", code);
+        response.put("username", currentUser.getUsername());
+        response.put("startTime", formattedDate);
         return response;
     }
 
@@ -692,7 +703,25 @@ public class ExamServiceImpl implements ExamService {
         Users user = userService.getCurrentUser();
         Page<ExamParticipant> exams = examParticipantRepository.findByStatus(status, user, title, startTimestamp,
                 endTimestamp, pageable);
-        return exams.map(examListStudentResponseMapper::mapFrom);
+
+        Users currentUser = userService.getCurrentUser();
+        Page<ExamListStudentResponseDto> results = exams.map(examListStudentResponseMapper::mapFrom);
+        for (ExamListStudentResponseDto examListStudentResponseDto : results) {
+            if (examListStudentResponseDto.getStatus() == ExamStatus.NOT_STARTED) {
+                examListStudentResponseDto.setResult("This exam does't have result yet");
+            } else {
+                Optional<ExamParticipant> examParticipantOptional = examParticipantRepository
+                        .findByExamAndParticipant(
+                                getExamByCode(examListStudentResponseDto.getCode()),
+                                currentUser);
+                if (examParticipantOptional.isPresent()) {
+                    if (!examSubmissionRepository.findByExamParticipant(examParticipantOptional.get()).isEmpty()) {
+                        examListStudentResponseDto.setResult(String.valueOf(examParticipantOptional.get().getGrade()));
+                    }
+                }
+            }
+        }
+        return results;
     }
 
     @Override

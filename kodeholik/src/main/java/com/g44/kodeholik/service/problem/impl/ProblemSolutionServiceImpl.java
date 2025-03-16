@@ -196,7 +196,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     }
 
     @Override
-    public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user) {
+    public ProblemSolutionDto postSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user) {
 
         if (shareSolutionRequestDto.getLink() == null) {
             throw new BadRequestException("Link cannot be null", "Link cannot be null");
@@ -248,15 +248,17 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             solutionCode.setLanguage(problemSubmission.getLanguage());
             solutionCode.setProblem(problemSubmission.getProblem());
             solutionCode.setSolution(problemSolution);
+            solutionCode.setProblemSubmission(problemSubmission);
             solutionCodes.add(solutionCode);
         }
         problemSolution.setSolutionCodes(solutionCodes);
         problemSolutionRepository.save(problemSolution);
+        return problemSolutionMapper.mapFrom(problemSolution);
 
     }
 
     @Override
-    public void editSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user, Long solutionId,
+    public ProblemSolutionDto editSolution(ShareSolutionRequestDto shareSolutionRequestDto, Users user, Long solutionId,
             Set<Skill> skills) {
         ProblemSolution problemSolution = findSolutionById(solutionId);
         if (!problemSolution.getCreatedBy().getEmail().equals(user.getEmail())) {
@@ -300,6 +302,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             solutionCode.setLanguage(problemSubmission.getLanguage());
             solutionCode.setProblem(problemSubmission.getProblem());
             solutionCode.setSolution(problemSolution);
+            solutionCode.setProblemSubmission(problemSubmission);
             solutionCodes.add(solutionCode);
         }
         Set<SolutionCode> solutionCodeList = problemSolution.getSolutionCodes();
@@ -307,6 +310,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         solutionCodeList.addAll(solutionCodes);
         problemSolution.setSolutionCodes(solutionCodeList);
         problemSolutionRepository.save(problemSolution);
+        return problemSolutionMapper.mapFrom(problemSolution);
+
     }
 
 }
