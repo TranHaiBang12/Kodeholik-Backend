@@ -65,10 +65,10 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
 
     @Override
     public String generateSignedUrl(String fileName) {
-        String filePath = VIDEO_PREFIX + fileName;
+        String filePath = fileName;
         BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, filePath).build();
 
-        URL signedUrl = storage.signUrl(blobInfo, 30, TimeUnit.MINUTES, Storage.SignUrlOption.withV4Signature());
+        URL signedUrl = storage.signUrl(blobInfo, 1, TimeUnit.HOURS, Storage.SignUrlOption.withV4Signature());
 
         return signedUrl.toString();
     }

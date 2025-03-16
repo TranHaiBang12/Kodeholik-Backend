@@ -1,6 +1,7 @@
 package com.g44.kodeholik.util.mapper.response.course;
 
 import com.g44.kodeholik.model.dto.response.course.CourseRatingResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.course.CourseRating;
 import com.g44.kodeholik.util.mapper.Mapper;
 import jakarta.annotation.PostConstruct;
@@ -19,10 +20,9 @@ public class CourseRatingResponseMapper implements Mapper<CourseRating, CourseRa
         modelMapper.createTypeMap(CourseRating.class, CourseRatingResponseDto.class)
                 .addMappings(mapper -> {
                     mapper.map(src -> src.getCourse().getId(), CourseRatingResponseDto::setCourseId);
-                    mapper.map(src -> src.getUser().getId(), CourseRatingResponseDto::setUserId);
+                    mapper.map(src -> new UserResponseDto(src.getUser()), CourseRatingResponseDto::setUser);
                 });
     }
-
 
     @Override
     public CourseRating mapTo(CourseRatingResponseDto b) {
@@ -30,7 +30,20 @@ public class CourseRatingResponseMapper implements Mapper<CourseRating, CourseRa
     }
 
     @Override
-    public CourseRatingResponseDto mapFrom(CourseRating a) {
-        return modelMapper.map(a, CourseRatingResponseDto.class);
+    public CourseRatingResponseDto mapFrom(CourseRating courseRating) {
+        if (courseRating == null) {
+            return null;
+        }
+        return CourseRatingResponseDto.builder()
+                .id(courseRating.getId())
+                .courseId(courseRating.getCourse().getId())
+                .user(new UserResponseDto(courseRating.getUser()))
+                .rating(courseRating.getRating())
+                .comment(courseRating.getComment())
+                .createdAt(courseRating.getCreatedAt() != null ? courseRating.getCreatedAt().getTime() : null)
+                .updatedAt(courseRating.getUpdatedAt() != null ? courseRating.getUpdatedAt().getTime() : null)
+                .build();
     }
 }
+
+

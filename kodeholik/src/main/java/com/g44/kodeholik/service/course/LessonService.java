@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.g44.kodeholik.model.dto.request.course.LessonRequestDto;
 import com.g44.kodeholik.model.dto.response.course.LessonResponseDto;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -24,4 +25,6 @@ public interface LessonService {
     public List<Long> getCompletedLessons();
 
     public List<LessonResponseDto> getLessonByChapterId(Long id);
+
+    public ResponseEntity<byte[]> downloadFile(String fileName);
 }

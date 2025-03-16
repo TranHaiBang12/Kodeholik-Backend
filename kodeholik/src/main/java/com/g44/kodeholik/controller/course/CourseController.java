@@ -92,24 +92,11 @@ public class CourseController {
         return ResponseEntity.ok("User unenrolled successfully!");
     }
 
-//    @GetMapping("/discussion/{courseId}")
-//    public ResponseEntity<List<Comment>> getCourseComments(@PathVariable Long courseId) {
-//        List<Comment> comments = courseCommentService.getAllCommentsByCourse(courseId);
-//        return ResponseEntity.ok(comments);
-//    }
-
     @PostMapping("/rate")
     public ResponseEntity<CourseRatingResponseDto> rateCourse(@RequestBody @Valid CourseRatingRequestDto requestDto) {
         CourseRatingResponseDto responseDto = courseRatingService.rateCourse(requestDto);
         return ResponseEntity.ok(responseDto);
     }
-//
-//    @PostMapping("/comment/{courseId}")
-//    public ResponseEntity<CommentResponseDto> addComment(@PathVariable Long courseId ,
-//                                                         @RequestBody @Valid AddCommentRequestDto request ) {
-//        Comment comment = courseCommentService.addCommentToCourse(courseId, request);
-//        return ResponseEntity.ok(new CommentResponseDto(comment));
-//    }
 
     @PostMapping("/comment")
     public ResponseEntity<Void> createComment(@RequestBody AddCommentRequestDto requestDto) {

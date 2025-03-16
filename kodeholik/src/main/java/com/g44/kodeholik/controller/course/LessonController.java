@@ -6,6 +6,7 @@ import com.g44.kodeholik.repository.course.LessonRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
 import jakarta.validation.Valid;
+import lombok.extern.log4j.Log4j2;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -29,8 +30,10 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/lesson")
@@ -59,10 +62,34 @@ public class LessonController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Void> addLesson(@ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
+    public ResponseEntity<Map<String, String>> addLesson(@ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
+        log.info("Received request to add lesson:");
+        log.info("Title: {}", lessonRequestDto.getTitle());
+        log.info("Description: {}", lessonRequestDto.getDescription());
+        log.info("Chapter ID: {}", lessonRequestDto.getChapterId());
+        log.info("Display Order: {}", lessonRequestDto.getDisplayOrder());
+        log.info("Type: {}", lessonRequestDto.getType());
+        log.info("Status: {}", lessonRequestDto.getStatus());
+
+        if (lessonRequestDto.getVideoFile() != null) {
+            log.info("Video file received: {}", lessonRequestDto.getVideoFile().getOriginalFilename());
+            log.info("File size: {} bytes", lessonRequestDto.getVideoFile().getSize());
+            log.info("File type: {}", lessonRequestDto.getVideoFile().getContentType());
+        } else {
+            log.warn("Video file is null!");
+        }
+
+        // Gọi service để xử lý
         lessonService.addLesson(lessonRequestDto);
-        return ResponseEntity.status(HttpStatus.SC_CREATED).build();
+
+        // Trả về response JSON
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Lesson created successfully");
+
+        return ResponseEntity.status(HttpStatus.SC_CREATED).body(response);
     }
+
+
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateLesson(@PathVariable Long id,
@@ -79,28 +106,7 @@ public class LessonController {
 
     @GetMapping("/download-file")
     public ResponseEntity<byte[]> downloadFile(@RequestParam String key) {
-        try {
-            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .build();
-
-            ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);
-            if (objectBytes == null) {
-                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build();
-            }
-
-            byte[] fileBytes = objectBytes.asByteArray();
-            String contentType = objectBytes.response().contentType();
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + key + "\"")
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .body(fileBytes);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
-        }
+        return lessonService.downloadFile(key);
     }
 
     @PostMapping("/complete/{lessonId}")

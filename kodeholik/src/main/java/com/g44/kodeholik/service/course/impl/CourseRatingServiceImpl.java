@@ -80,7 +80,6 @@ public class CourseRatingServiceImpl implements CourseRatingService {
         return courseRatings.stream()
                 .map(courseRatingResponseMapper::mapFrom)
                 .collect(Collectors.toList());
-
     }
 
     @Override
