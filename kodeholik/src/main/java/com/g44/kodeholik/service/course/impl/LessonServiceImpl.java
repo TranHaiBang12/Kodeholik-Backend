@@ -92,10 +92,16 @@ public class LessonServiceImpl implements LessonService {
         log.info("Fetching lesson with ID: {}", id);
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
-        String videoUrl = gcsService.generateSignedUrl(lesson.getVideoUrl());
-        lesson.setVideoUrl(videoUrl);
+
+        String videoUrl = lesson.getVideoUrl();
+        if (videoUrl != null && videoUrl.startsWith("videos/")) {
+            videoUrl = gcsService.generateSignedUrl(videoUrl);
+            lesson.setVideoUrl(videoUrl);
+        }
+
         return lessonResponseMapper.mapFrom(lesson);
     }
+
 
     @Override
     public void addLesson(LessonRequestDto lessonRequestDto) {
