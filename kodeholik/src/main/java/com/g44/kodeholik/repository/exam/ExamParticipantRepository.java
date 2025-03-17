@@ -27,8 +27,14 @@ public interface ExamParticipantRepository extends JpaRepository<ExamParticipant
             Timestamp end,
             Users user);
 
-    @Query("SELECT e FROM ExamParticipant e WHERE e.exam.status = :status AND e.participant = :user")
-    public Page<ExamParticipant> findByStatus(ExamStatus status, Users user, Pageable pageable);
+    @Query("SELECT e FROM ExamParticipant e WHERE e.participant = :user AND (cast(:title as text) IS NULL OR (e.exam.title LIKE '%' || cast(:title as text) || '%')) AND (COALESCE(:status, e.exam.status) = e.exam.status) AND (e.exam.startTime >= :start AND e.exam.endTime <= :end)")
+    public Page<ExamParticipant> findByStatus(
+            ExamStatus status,
+            Users user,
+            String title,
+            Timestamp start,
+            Timestamp end,
+            Pageable pageable);
 
     public List<ExamParticipant> findByParticipant(Users participant);
 }

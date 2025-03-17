@@ -23,4 +23,6 @@ public class NotStartedExamListDto {
     @JsonSerialize(using = TimestampSerializer.class)
     private Long endTime;
 
+    private boolean canEnroll;
+
 }

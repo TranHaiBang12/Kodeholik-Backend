@@ -50,6 +50,9 @@ import com.g44.kodeholik.util.mapper.request.user.AddUserAvatarFileMapper;
 import com.g44.kodeholik.util.mapper.request.user.AddUserRequestMapper;
 import com.g44.kodeholik.util.mapper.response.user.ProfileResponseMapper;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 class UserServiceImplTest {
 
     @Mock
@@ -281,8 +284,9 @@ class UserServiceImplTest {
 
         when(profileResponseMapper.mapFrom(any(Users.class))).thenReturn(expectedProfile);
         when(userService.getProfileCurrentUser()).thenReturn(expectedProfile);
+        HttpServletRequest request = mock(HttpServletRequest.class);
 
-        ProfileResponseDto result = userService.editProfile(requestDto);
+        ProfileResponseDto result = userService.editProfile(requestDto, request);
 
         assertNotNull(result);
         assertEquals("newUser", result.getUsername());
@@ -320,8 +324,9 @@ class UserServiceImplTest {
         expectedProfile.setAvatar("new-avatar.jpg");
 
         when(profileResponseMapper.mapFrom(any(Users.class))).thenReturn(expectedProfile);
+        HttpServletRequest request = mock(HttpServletRequest.class);
 
-        ProfileResponseDto result = userService.editProfile(requestDto);
+        ProfileResponseDto result = userService.editProfile(requestDto, request);
 
         assertNotNull(result);
         assertEquals("newUser", result.getUsername());
@@ -357,9 +362,10 @@ class UserServiceImplTest {
         expectedProfile.setAvatar("new-avatar.jpg");
 
         when(profileResponseMapper.mapFrom(any(Users.class))).thenReturn(expectedProfile);
+        HttpServletRequest request = mock(HttpServletRequest.class);
 
         BadRequestException badRequestException = assertThrows(BadRequestException.class,
-                () -> userService.editProfile(requestDto));
+                () -> userService.editProfile(requestDto, request));
         assertEquals("Username already exists", badRequestException.getMessage());
         assertEquals("Username already exists", badRequestException.getDetails());
     }

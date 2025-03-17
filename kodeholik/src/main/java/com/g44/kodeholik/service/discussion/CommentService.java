@@ -20,9 +20,9 @@ public interface CommentService {
 
     public void saveComment(Comment comment);
 
-    public void addComment(AddCommentRequestDto addCommentRequestDto);
+    public CommentResponseDto addComment(AddCommentRequestDto addCommentRequestDto);
 
-    public void editComment(Long commentId, String newComment);
+    public CommentResponseDto editComment(Long commentId, String newComment);
 
     public void upvoteComment(Long commentId);
 

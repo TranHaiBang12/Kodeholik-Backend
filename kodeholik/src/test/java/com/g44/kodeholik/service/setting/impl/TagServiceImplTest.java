@@ -1,6 +1,10 @@
 package com.g44.kodeholik.service.setting.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.request.setting.AddTagRequestDto;
 import com.g44.kodeholik.model.dto.request.setting.EditTagRequestDto;
 import com.g44.kodeholik.model.entity.setting.Language;
@@ -89,6 +95,26 @@ public class TagServiceImplTest {
     }
 
     @Test
+    public void testAddTagLanguageDuplicateName() {
+        AddTagRequestDto dto = new AddTagRequestDto();
+        dto.setName("English");
+        dto.setType(TagType.LANGUAGE);
+        Language language = new Language();
+
+        Users user = new Users();
+        user.setId(1L);
+
+        when(languageRepository.findByName(anyString())).thenReturn(Optional.of(language));
+        when(userService.getCurrentUser()).thenReturn(user);
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> tagServiceImpl.addTag(dto));
+        assertEquals("Language already exists", badRequestException.getMessage());
+        assertEquals("Language already exists", badRequestException.getDetails());
+
+    }
+
+    @Test
     public void testAddTagTopic() {
         AddTagRequestDto dto = new AddTagRequestDto();
         dto.setName("Java");
@@ -102,6 +128,26 @@ public class TagServiceImplTest {
         tagServiceImpl.addTag(dto);
 
         verify(topicRepository, times(1)).save(any(Topic.class));
+    }
+
+    @Test
+    public void testAddTagTopicDuplicateName() {
+        AddTagRequestDto dto = new AddTagRequestDto();
+        dto.setName("English");
+        dto.setType(TagType.TOPIC);
+        Topic topic = new Topic();
+
+        Users user = new Users();
+        user.setId(1L);
+
+        when(topicRepository.findByName(anyString())).thenReturn(Optional.of(topic));
+        when(userService.getCurrentUser()).thenReturn(user);
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> tagServiceImpl.addTag(dto));
+        assertEquals("Topic already exists", badRequestException.getMessage());
+        assertEquals("Topic already exists", badRequestException.getDetails());
+
     }
 
     @Test
@@ -122,38 +168,149 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void testEditTagSkill() {
-        EditTagRequestDto dto = new EditTagRequestDto();
-        dto.setId(1L);
+    public void testAddTagSkillDuplicateName() {
+        AddTagRequestDto dto = new AddTagRequestDto();
         dto.setName("Java");
         dto.setLevel(Level.ADVANCED);
         dto.setType(TagType.SKILL);
         Skill skill = new Skill();
-        when(skillRepository.findById(dto.getId())).thenReturn(Optional.of(skill));
+
+        Users user = new Users();
+        user.setId(1L);
+
+        when(skillRepository.findByName(anyString())).thenReturn(Optional.of(skill));
+        when(userService.getCurrentUser()).thenReturn(user);
+
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> tagServiceImpl.addTag(dto));
+        assertEquals("Skill already exists", badRequestException.getMessage());
+        assertEquals("Skill already exists", badRequestException.getDetails());
+
+    }
+
+    @Test
+    public void testEditTagSkill() {
+        EditTagRequestDto dto = new EditTagRequestDto();
+        dto.setName("Java");
+        dto.setLevel(Level.ADVANCED);
+        dto.setType(TagType.SKILL);
+        Skill skill = new Skill();
+        skill.setName("Java");
+        Long id = 1L;
+
+        when(skillRepository.findById(anyLong())).thenReturn(Optional.of(skill));
 
         Users user = new Users();
         user.setId(1L);
 
         when(userService.getCurrentUser()).thenReturn(user);
-        tagServiceImpl.editTag(dto);
+        tagServiceImpl.editTag(id, dto);
+
+        verify(skillRepository, times(1)).save(skill);
+    }
+
+    @Test
+    public void testEditTagSkillDuplicateName() {
+        EditTagRequestDto dto = new EditTagRequestDto();
+        dto.setName("Java1");
+        dto.setLevel(Level.ADVANCED);
+        dto.setType(TagType.SKILL);
+        Skill skill = new Skill();
+        skill.setName("Java");
+        Long id = 1L;
+
+        when(skillRepository.findById(anyLong()))
+                .thenReturn(Optional.of(skill));
+        when(skillRepository.findByName(anyString()))
+                .thenReturn(Optional.of(new Skill()));
+        Users user = new Users();
+        user.setId(1L);
+
+        when(userService.getCurrentUser()).thenReturn(user);
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> tagServiceImpl.editTag(id, dto));
+        assertEquals("Skill already exists", badRequestException.getMessage());
+        assertEquals("Skill already exists", badRequestException.getDetails());
+    }
+
+    @Test
+    public void testEditTagSkillNotDuplicateName() {
+        EditTagRequestDto dto = new EditTagRequestDto();
+        dto.setName("Java1");
+        dto.setLevel(Level.ADVANCED);
+        dto.setType(TagType.SKILL);
+        Skill skill = new Skill();
+        skill.setName("Java");
+        Long id = 1L;
+
+        when(skillRepository.findById(anyLong())).thenReturn(Optional.of(skill));
+        when(skillRepository.findByName(anyString())).thenReturn(Optional.empty());
+        Users user = new Users();
+        user.setId(1L);
+
+        when(userService.getCurrentUser()).thenReturn(user);
+        tagServiceImpl.editTag(id, dto);
 
         verify(skillRepository, times(1)).save(skill);
     }
 
     @Test
     public void testEditTagTopic() {
+        Long id = 1L;
+
         EditTagRequestDto dto = new EditTagRequestDto();
-        dto.setId(1L);
         dto.setName("Spring");
         dto.setType(TagType.TOPIC);
         Topic topic = new Topic();
-        when(topicRepository.findById(dto.getId())).thenReturn(Optional.of(topic));
+        topic.setName("Spring");
+        when(topicRepository.findById(anyLong())).thenReturn(Optional.of(topic));
 
         Users user = new Users();
         user.setId(1L);
 
         when(userService.getCurrentUser()).thenReturn(user);
-        tagServiceImpl.editTag(dto);
+        tagServiceImpl.editTag(id, dto);
+
+        verify(topicRepository, times(1)).save(topic);
+    }
+
+    @Test
+    public void testEditTagTopicDuplicateName() {
+        EditTagRequestDto dto = new EditTagRequestDto();
+        dto.setName("Spring1");
+        dto.setType(TagType.TOPIC);
+        Topic topic = new Topic();
+        topic.setName("Spring");
+        Long id = 1L;
+
+        when(topicRepository.findById(anyLong())).thenReturn(Optional.of(topic));
+        when(topicRepository.findByName(anyString())).thenReturn(Optional.of(new Topic()));
+        Users user = new Users();
+        user.setId(1L);
+
+        when(userService.getCurrentUser()).thenReturn(user);
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> tagServiceImpl.editTag(id, dto));
+        assertEquals("Topic already exists", badRequestException.getMessage());
+        assertEquals("Topic already exists", badRequestException.getDetails());
+    }
+
+    @Test
+    public void testEditTagTopicNotDuplicateName() {
+        EditTagRequestDto dto = new EditTagRequestDto();
+        dto.setName("Spring1");
+        dto.setType(TagType.TOPIC);
+        Topic topic = new Topic();
+        topic.setName("Spring");
+        Long id = 1L;
+
+        when(topicRepository.findById(anyLong())).thenReturn(Optional.of(topic));
+        when(topicRepository.findByName(anyString())).thenReturn(Optional.empty());
+        Users user = new Users();
+        user.setId(1L);
+
+        when(userService.getCurrentUser()).thenReturn(user);
+        tagServiceImpl.editTag(id, dto);
 
         verify(topicRepository, times(1)).save(topic);
     }
@@ -161,17 +318,59 @@ public class TagServiceImplTest {
     @Test
     public void testEditTagLanguage() {
         EditTagRequestDto dto = new EditTagRequestDto();
-        dto.setId(1L);
-        dto.setName("English");
+        Long id = 1L;
+        dto.setName("Java");
         dto.setType(TagType.LANGUAGE);
         Language language = new Language();
-        when(languageRepository.findById(dto.getId())).thenReturn(Optional.of(language));
+        language.setName("Java");
+        when(languageRepository.findById(anyLong())).thenReturn(Optional.of(language));
 
         Users user = new Users();
         user.setId(1L);
 
         when(userService.getCurrentUser()).thenReturn(user);
-        tagServiceImpl.editTag(dto);
+        tagServiceImpl.editTag(id, dto);
+
+        verify(languageRepository, times(1)).save(language);
+    }
+
+    @Test
+    public void testEditTagLanguageDuplicateName() {
+        EditTagRequestDto dto = new EditTagRequestDto();
+        dto.setName("Java1");
+        dto.setType(TagType.LANGUAGE);
+        Language language = new Language();
+        language.setName("Java");
+        Long id = 1L;
+
+        when(languageRepository.findById(anyLong())).thenReturn(Optional.of(language));
+        when(languageRepository.findByName(anyString())).thenReturn(Optional.of(new Language()));
+        Users user = new Users();
+        user.setId(1L);
+
+        when(userService.getCurrentUser()).thenReturn(user);
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> tagServiceImpl.editTag(id, dto));
+        assertEquals("Language already exists", badRequestException.getMessage());
+        assertEquals("Language already exists", badRequestException.getDetails());
+    }
+
+    @Test
+    public void testEditTagLanguageNotDuplicateName() {
+        EditTagRequestDto dto = new EditTagRequestDto();
+        dto.setName("Java1");
+        dto.setType(TagType.LANGUAGE);
+        Language language = new Language();
+        language.setName("Java");
+        Long id = 1L;
+
+        when(languageRepository.findById(anyLong())).thenReturn(Optional.of(language));
+        when(languageRepository.findByName(anyString())).thenReturn(Optional.empty());
+        Users user = new Users();
+        user.setId(1L);
+
+        when(userService.getCurrentUser()).thenReturn(user);
+        tagServiceImpl.editTag(id, dto);
 
         verify(languageRepository, times(1)).save(language);
     }

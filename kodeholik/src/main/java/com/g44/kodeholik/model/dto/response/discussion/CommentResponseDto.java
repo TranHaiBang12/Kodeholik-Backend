@@ -36,6 +36,10 @@ public class CommentResponseDto {
 
     private Long replyId;
 
+    private boolean isUser;
+
+    private boolean canEdit;
+
     public CommentResponseDto(Comment comment) {
         this.id = comment.getId();
         this.comment = comment.getComment();

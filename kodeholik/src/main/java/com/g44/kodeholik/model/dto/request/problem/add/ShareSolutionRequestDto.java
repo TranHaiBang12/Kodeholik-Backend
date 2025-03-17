@@ -2,6 +2,7 @@ package com.g44.kodeholik.model.dto.request.problem.add;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 public class ShareSolutionRequestDto {
     private String link;
 
+    @JsonIgnore
     private Problem problem;
 
     @NotNull(message = "MSG34")
@@ -35,5 +37,6 @@ public class ShareSolutionRequestDto {
 
     private List<Long> submissionId;
 
+    @JsonIgnore
     private List<ProblemSubmission> submissions;
 }

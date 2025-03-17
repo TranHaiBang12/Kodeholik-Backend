@@ -14,8 +14,8 @@ public class CompileErrorResposneDto extends SubmissionResponseDto {
     private Long createdAt;
 
     public CompileErrorResposneDto(String message, String code, String languageName, Timestamp createdAt,
-            SubmissionStatus status) {
-        super(code, languageName, status);
+            SubmissionStatus status, Long submissionId) {
+        super(submissionId, code, languageName, status);
         this.message = message;
         this.createdAt = createdAt.getTime();
     }
@@ -26,6 +26,14 @@ public class CompileErrorResposneDto extends SubmissionResponseDto {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Long getSubmissionId() {
+        return submissionId;
+    }
+
+    public void setSubmissionId(Long submissionId) {
+        this.submissionId = submissionId;
     }
 
     @Override

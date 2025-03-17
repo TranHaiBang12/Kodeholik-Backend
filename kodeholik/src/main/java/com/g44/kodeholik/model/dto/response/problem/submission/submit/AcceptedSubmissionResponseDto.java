@@ -15,8 +15,8 @@ public class AcceptedSubmissionResponseDto extends SubmissionResponseDto {
     private Long createdAt;
 
     public AcceptedSubmissionResponseDto(String executionTime, double memoryUsage, String code, String languageName,
-            int noTestcase, Timestamp createdAt, SubmissionStatus status) {
-        super(code, languageName, status);
+            int noTestcase, Timestamp createdAt, SubmissionStatus status, Long submissionId) {
+        super(submissionId, code, languageName, status);
         this.executionTime = executionTime;
         this.memoryUsage = memoryUsage;
         this.noTestcase = noTestcase;
@@ -53,6 +53,14 @@ public class AcceptedSubmissionResponseDto extends SubmissionResponseDto {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getSubmissionId() {
+        return submissionId;
+    }
+
+    public void setSubmissionId(Long submissionId) {
+        this.submissionId = submissionId;
     }
 
     @Override

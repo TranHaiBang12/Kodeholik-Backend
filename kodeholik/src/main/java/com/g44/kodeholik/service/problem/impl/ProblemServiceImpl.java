@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.g44.kodeholik.controller.problem.ProblemSolutionController;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.exception.TestCaseNotPassedException;
@@ -90,6 +91,7 @@ import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.InputType;
 import com.g44.kodeholik.model.enums.problem.ProblemStatus;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.model.enums.setting.Level;
 import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.repository.elasticsearch.ProblemElasticsearchRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
@@ -106,6 +108,8 @@ import com.g44.kodeholik.service.problem.SolutionCodeService;
 import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.setting.TagService;
 import com.g44.kodeholik.service.user.UserService;
+import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
+import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
 import com.g44.kodeholik.util.mapper.request.problem.ProblemRequestMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ListProblemAdminResponseMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemBasicResponseMapper;
@@ -170,8 +174,6 @@ public class ProblemServiceImpl implements ProblemService {
     private final LambdaService lambdaService;
 
     private final ProblemBasicResponseMapper problemBasicResponseMapper;
-
-    private final SolutionCodeMapper solutionCodeMapper;
 
     private final CommentRepository commentRepository;
 
@@ -269,13 +271,24 @@ public class ProblemServiceImpl implements ProblemService {
         for (Skill skill : problem.getSkills()) {
             skills.add(skill.getName());
         }
-
         problemDescriptionResponseDto = problemDescriptionMapper.mapFrom(problem);
         problemDescriptionResponseDto.setNoComment(commentRepository.countByProblemsContains(problem));
         problemDescriptionResponseDto.setTopicList(topics);
         problemDescriptionResponseDto
                 .setNoAccepted(problemSubmissionService.countByIsAcceptedAndProblem(true, problem));
         problemDescriptionResponseDto.setSkillList(skills);
+        if (problemSubmissionService.checkIsCurrentUserSolvedProblem(problem)) {
+            problemDescriptionResponseDto.setSolved(true);
+        } else {
+            problemDescriptionResponseDto.setSolved(false);
+        }
+
+        Users currentUser = userService.getCurrentUser();
+        if (problem.getUsersFavourite().contains(currentUser)) {
+            problemDescriptionResponseDto.setFavourite(true);
+        } else {
+            problemDescriptionResponseDto.setFavourite(false);
+        }
         return problemDescriptionResponseDto;
     }
 
@@ -452,10 +465,11 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public SubmissionResponseDto submitProblem(String link, ProblemCompileRequestDto problemCompileRequestDto) {
         Problem problem = getActivePublicProblemByLink(link);
+        Users currentUser = userService.getCurrentUser();
         Language language = languageService.findByName(problemCompileRequestDto.getLanguageName());
         return problemSubmissionService.submitProblem(problem, problemCompileRequestDto,
                 problemTestCaseService.getTestCaseByProblemAndLanguage(problem, language),
-                findByProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()));
+                findByProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()), currentUser);
     }
 
     @Override
@@ -496,6 +510,7 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public List<NoAchivedInformationResponseDto> getListNoAchievedInformationByCurrentUser() {
         Users user = userService.getCurrentUser();
+        log.info(user);
         long problemSize = problemRepository.findAll().size();
         List<NoAchivedInformationResponseDto> result = new ArrayList<>();
         NoAchivedInformationResponseDto achievedEasy = getNoAchieved(user, Difficulty.EASY);
@@ -999,7 +1014,7 @@ public class ProblemServiceImpl implements ProblemService {
                             solutionCodeDto.getSolutionLanguage().toLowerCase(),
                             responseResult.getNoSuccessTestcase(),
                             Timestamp.from(Instant.now()),
-                            SubmissionStatus.SUCCESS);
+                            SubmissionStatus.SUCCESS, 0L);
                     break;
                 case "FAILED":
                     submissionResponseDto = new FailedSubmissionResponseDto(
@@ -1009,7 +1024,7 @@ public class ProblemServiceImpl implements ProblemService {
                             solutionCodeDto.getSolutionCode(),
                             solutionCodeDto.getSolutionLanguage().toLowerCase(),
                             Timestamp.from(Instant.now()),
-                            SubmissionStatus.FAILED);
+                            SubmissionStatus.FAILED, 0L);
                     return false;
                 default:
                     submissionResponseDto = new CompileErrorResposneDto(
@@ -1017,7 +1032,7 @@ public class ProblemServiceImpl implements ProblemService {
                             solutionCodeDto.getSolutionCode(),
                             solutionCodeDto.getSolutionLanguage().toLowerCase(),
                             Timestamp.from(Instant.now()),
-                            SubmissionStatus.FAILED);
+                            SubmissionStatus.FAILED, 0L);
                     return false;
             }
 
@@ -1310,6 +1325,7 @@ public class ProblemServiceImpl implements ProblemService {
             skills.add(skill.getName());
         }
         problemSolutionDto.setId(solutionId);
+        problemSolutionDto.setNoUpvote(problemSolution.getNoUpvote());
         problemSolutionDto.setSkills(skills);
         problemSolutionDto.setProblem(problemResponseMapper.mapFrom(problemSolution.getProblem()));
         problemSolutionDto.setTitle(problemSolution.getTitle());
@@ -1318,7 +1334,12 @@ public class ProblemServiceImpl implements ProblemService {
         problemSolutionDto.setSolutionCodes(solutionCodeDtos);
         problemSolutionDto
                 .setCurrentUserCreated(currentUser.getId().longValue() == problemSolution.getCreatedBy().getId());
+        if (problemSolution.getUserVote().contains(currentUser)) {
+            problemSolutionDto.setCurrentUserVoted(true);
+        } else {
+            problemSolutionDto.setCurrentUserVoted(false);
 
+        }
         if (problemSolution.getCreatedBy() != null) {
             UserResponseDto createdUser = userResponseMapper.mapFrom(problemSolution.getCreatedBy());
             problemSolutionDto.setCreatedBy(createdUser);
@@ -1390,7 +1411,7 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void postSolution(ShareSolutionRequestDto shareSolutionRequestDto) {
+    public ProblemSolutionDto postSolution(ShareSolutionRequestDto shareSolutionRequestDto) {
         Users user = userService.getCurrentUser();
         List<ProblemSubmission> problemSubmissions = new ArrayList<>();
         Problem problem = getActivePublicProblemByLink(shareSolutionRequestDto.getLink());
@@ -1401,7 +1422,7 @@ public class ProblemServiceImpl implements ProblemService {
         }
         shareSolutionRequestDto.setSubmissions(problemSubmissions);
 
-        problemSolutionService.postSolution(shareSolutionRequestDto, user);
+        return problemSolutionService.postSolution(shareSolutionRequestDto, user);
     }
 
     @Override
@@ -1420,7 +1441,7 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void editSolution(Long solutionId, ShareSolutionRequestDto shareSolutionRequestDto) {
+    public ProblemSolutionDto editSolution(Long solutionId, ShareSolutionRequestDto shareSolutionRequestDto) {
         Users user = userService.getCurrentUser();
         Set<Skill> skills = tagService.getSkillsByNameList(shareSolutionRequestDto.getSkills());
         List<ProblemSubmission> problemSubmissions = new ArrayList<>();
@@ -1429,7 +1450,7 @@ public class ProblemServiceImpl implements ProblemService {
             problemSubmissions.add(problemSubmissionService.getProblemSubmissionById(submissionIds.get(i)));
         }
         shareSolutionRequestDto.setSubmissions(problemSubmissions);
-        problemSolutionService.editSolution(shareSolutionRequestDto, user, solutionId, skills);
+        return problemSolutionService.editSolution(shareSolutionRequestDto, user, solutionId, skills);
     }
 
     @Override
@@ -1513,6 +1534,8 @@ public class ProblemServiceImpl implements ProblemService {
     public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto) {
         ExamResultOverviewResponseDto result = new ExamResultOverviewResponseDto();
         double grade = 0;
+        Users currentUser = userService.getCurrentUser();
+
         List<ProblemResultOverviewResponseDto> problemResultDetails = new ArrayList();
         for (int i = 0; i < submitExamRequestDto.size(); i++) {
             ProblemCompileRequestDto problemCompileRequestDto = new ProblemCompileRequestDto();
@@ -1525,7 +1548,7 @@ public class ProblemServiceImpl implements ProblemService {
                     problemTestCaseService.getTestCaseByProblemAndLanguage(problem,
                             languageService.findByName(submitExamRequestDto.get(i).getLanguageName())),
                     findByAllProblemAndLanguage(problem.getLink(), submitExamRequestDto.get(i).getLanguageName()),
-                    submitExamRequestDto.get(i).getPoint());
+                    submitExamRequestDto.get(i).getPoint(), currentUser);
             grade += problemResultDetailResponseDto.getPoint();
             problemResultDetails.add(problemResultDetailResponseDto);
         }
@@ -1624,6 +1647,30 @@ public class ProblemServiceImpl implements ProblemService {
             results.add(problemInputParameterResponseDto);
         }
         return results;
+    }
+
+    @Override
+    public List<Map<String, String>> getNumberSkillUserSolved(Level level) {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getNumberSkillUserSolved(currentUser, level);
+    }
+
+    @Override
+    public List<Map<String, String>> getNumberTopicUserSolved() {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getNumberTopicUserSolved(currentUser);
+    }
+
+    @Override
+    public List<Map<String, String>> getNumberLanguageUserSolved() {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getNumberLanguageUserSolved(currentUser);
+    }
+
+    @Override
+    public Map<String, String> getAcceptanceRateAndNoSubmissionByUser() {
+        Users currentUser = userService.getCurrentUser();
+        return problemSubmissionService.getAcceptanceRateAndNoSubmissionByUser(currentUser);
     }
 
 }

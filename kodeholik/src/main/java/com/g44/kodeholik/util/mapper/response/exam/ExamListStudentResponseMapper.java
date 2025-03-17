@@ -25,6 +25,7 @@ public class ExamListStudentResponseMapper implements Mapper<ExamParticipant, Ex
     public ExamListStudentResponseDto mapFrom(ExamParticipant a) {
         ExamListStudentResponseDto examListStudentResponseDto = new ExamListStudentResponseDto();
         examListStudentResponseDto.setCode(a.getExam().getCode());
+        examListStudentResponseDto.setTitle(a.getExam().getTitle());
         examListStudentResponseDto.setEndTime(a.getExam().getEndTime().getTime());
         examListStudentResponseDto.setStartTime(a.getExam().getStartTime().getTime());
         examListStudentResponseDto.setStatus(a.getExam().getStatus());

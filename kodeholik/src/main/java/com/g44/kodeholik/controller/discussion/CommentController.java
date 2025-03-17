@@ -1,6 +1,7 @@
 package com.g44.kodeholik.controller.discussion;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -57,15 +58,15 @@ public class CommentController {
     }
 
     @PostMapping("/post")
-    public ResponseEntity<Void> postComment(@RequestBody @Valid AddCommentRequestDto addCommentRequestDto) {
-        commentService.addComment(addCommentRequestDto);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<CommentResponseDto> postComment(
+            @RequestBody @Valid AddCommentRequestDto addCommentRequestDto) {
+        return new ResponseEntity<>(commentService.addComment(addCommentRequestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<Void> editComment(@PathVariable Long id, @RequestBody String newComment) {
+    public ResponseEntity<CommentResponseDto> editComment(@PathVariable Long id, @RequestBody String newComment) {
         commentService.editComment(id, newComment);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(commentService.editComment(id, newComment), HttpStatus.OK);
     }
 
     @PutMapping("/upvote/{id}")

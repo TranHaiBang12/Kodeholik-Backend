@@ -21,6 +21,8 @@ import com.g44.kodeholik.service.problem.ProblemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -109,10 +111,13 @@ public class ExamController {
 
     @GetMapping("/list")
     public ResponseEntity<Page<ExamListStudentResponseDto>> getListExam(
-            @RequestParam ExamStatus status,
+            @RequestParam(required = false) ExamStatus status,
             @RequestParam int page,
-            @RequestParam(required = false) Integer size) {
-        Page<ExamListStudentResponseDto> ePage = examService.getListExam(status, page, size);
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) Date start,
+            @RequestParam(required = false) Date end) {
+        Page<ExamListStudentResponseDto> ePage = examService.getListExam(status, page, size, title, start, end);
         if (ePage.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

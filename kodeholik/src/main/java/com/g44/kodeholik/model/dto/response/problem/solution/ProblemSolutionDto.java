@@ -28,9 +28,13 @@ public class ProblemSolutionDto {
 
     private List<String> skills;
 
+    private int noUpvote;
+
     private List<SolutionCodeDto> solutionCodes;
 
     private boolean isCurrentUserCreated;
+
+    private boolean isCurrentUserVoted;
 
     private UserResponseDto createdBy;
 

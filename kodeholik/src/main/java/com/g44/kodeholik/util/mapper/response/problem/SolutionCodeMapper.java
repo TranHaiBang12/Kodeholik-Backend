@@ -25,6 +25,7 @@ public class SolutionCodeMapper implements Mapper<SolutionCode, SolutionCodeDto>
         SolutionCodeDto result = new SolutionCodeDto();
         result.setSolutionCode(a.getCode());
         result.setSolutionLanguage(a.getLanguage().getName());
+        result.setSubmissionId(a.getProblemSubmission().getId());
         return result;
 
     }

@@ -12,7 +12,8 @@ import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 
 @Repository
 public interface ProblemElasticsearchRepository
-    extends ElasticsearchRepository<ProblemElasticsearch, Long> {
+ extends ElasticsearchRepository<ProblemElasticsearch, Long>
+{
 
   @Query("""
       {

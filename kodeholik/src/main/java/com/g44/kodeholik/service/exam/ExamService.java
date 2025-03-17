@@ -1,5 +1,7 @@
 package com.g44.kodeholik.service.exam;
 
+import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +60,8 @@ public interface ExamService {
 
         public ExamResultOverviewResponseDto viewResult(String code);
 
-        public Page<ExamListStudentResponseDto> getListExam(ExamStatus status, int page, Integer size);
+        public Page<ExamListStudentResponseDto> getListExam(ExamStatus status, int page, Integer size, String title,
+                        Date start, Date end);
 
         public List<Map<String, String>> getAllParticipantsInExam(String code);
 

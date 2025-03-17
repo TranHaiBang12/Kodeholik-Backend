@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 public class ExamResultOverviewResponseDto {
     private double grade;
 
+    private int noProblems;
+
     private List<ProblemResultOverviewResponseDto> problemResults;
 
 }

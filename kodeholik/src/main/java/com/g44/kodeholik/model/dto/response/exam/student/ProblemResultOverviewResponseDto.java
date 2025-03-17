@@ -3,6 +3,7 @@ package com.g44.kodeholik.model.dto.response.exam.student;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,13 +22,11 @@ public class ProblemResultOverviewResponseDto {
 
     private String title;
 
-    private String code;
-
-    private String languageName;
-
     private int noTestCasePassed;
 
     private String percentPassed;
+
+    private SubmissionResponseDto submissionResponseDto;
 
     private double point;
 

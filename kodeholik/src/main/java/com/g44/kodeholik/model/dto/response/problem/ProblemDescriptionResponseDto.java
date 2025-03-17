@@ -18,6 +18,8 @@ public class ProblemDescriptionResponseDto {
 
     private String title;
 
+    private String link;
+
     private String description;
 
     private Difficulty difficulty;
@@ -33,4 +35,8 @@ public class ProblemDescriptionResponseDto {
     private List<String> topicList;
 
     private List<String> skillList;
+
+    private boolean isSolved;
+
+    private boolean isFavourite;
 }

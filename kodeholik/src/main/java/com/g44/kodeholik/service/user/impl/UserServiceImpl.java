@@ -12,13 +12,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.g44.kodeholik.config.MessageProperties;
 import com.g44.kodeholik.exception.BadRequestException;
+import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.user.AddUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
@@ -47,6 +51,7 @@ import com.g44.kodeholik.util.mapper.response.user.UserResponseMapper;
 import com.g44.kodeholik.util.password.PasswordUtils;
 import com.g44.kodeholik.util.validation.Validation;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -76,6 +81,8 @@ public class UserServiceImpl implements UserService {
     private final NotificationServiceImpl notificationService;
 
     private final EditUserAvatarFileMapper editUserAvatarFileMapper;
+
+    private final UserDetailsService userDetailService;
 
     @Override
     public Users getUserById(Long userId) {
@@ -212,7 +219,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ProfileResponseDto editProfile(EditProfileRequestDto editProfileRequestDto) {
+    public ProfileResponseDto editProfile(EditProfileRequestDto editProfileRequestDto, HttpServletRequest request) {
         Users user = getCurrentUser();
 
         if (!user.getUsername().equals(editProfileRequestDto.getUsername())) {
@@ -220,13 +227,23 @@ public class UserServiceImpl implements UserService {
         }
 
         List<MultipartFile> multipartFiles = new ArrayList();
-        multipartFiles.add(editProfileRequestDto.getAvatar());
-        String avatarKey = s3Service.uploadFileNameTypeFile(multipartFiles, FileNameType.AVATAR).get(0);
-
-        user.setAvatar(avatarKey);
+        if (editProfileRequestDto.getAvatar() != null) {
+            multipartFiles.add(editProfileRequestDto.getAvatar());
+            String avatarKey = s3Service.uploadFileNameTypeFile(multipartFiles, FileNameType.AVATAR).get(0);
+            user.setAvatar(avatarKey);
+        }
         user.setFullname(editProfileRequestDto.getFullname());
-        user.setUsername(editProfileRequestDto.getUsername());
-        return getProfileCurrentUser();
+        userRepository.save(user);
+        return getProfileUser(user);
+    }
+
+    public ProfileResponseDto getProfileUser(Users user) {
+        ProfileResponseDto profileResponseDto = profileResponseMapper.mapFrom(user);
+        if (profileResponseDto.getAvatar() == null) {
+            profileResponseDto.setAvatar(
+                    s3Service.getPresignedUrl("kodeholik-avatar-image-0e609cfa-d0dd-4cd8-8ce6-6c896389a724"));
+        }
+        return profileResponseDto;
     }
 
     @Override
