@@ -20,11 +20,13 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Page<Course> findByStatusIn(List<CourseStatus> statuses, Pageable pageable);
 
-    Page<Course> findByTitleContainingIgnoreCaseAndStatusIn(String title, List<CourseStatus> statuses, Pageable pageable);
+    Page<Course> findByTitleContainingIgnoreCaseAndStatusIn(String title, List<CourseStatus> statuses,
+            Pageable pageable);
 
     Page<Course> findByTopicsInAndStatusIn(List<Topic> topics, List<CourseStatus> statuses, Pageable pageable);
 
-    Page<Course> findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(String title, List<Topic> topics, List<CourseStatus> statuses, Pageable pageable);
+    Page<Course> findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(String title, List<Topic> topics,
+            List<CourseStatus> statuses, Pageable pageable);
+
+    List<Course> findTop5ByOrderByNumberOfParticipantDescRateDesc();
 }
-
-

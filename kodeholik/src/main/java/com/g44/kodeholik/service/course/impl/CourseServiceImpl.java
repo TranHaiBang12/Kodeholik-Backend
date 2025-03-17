@@ -10,6 +10,7 @@ import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 import com.g44.kodeholik.model.entity.course.CourseUser;
 import com.g44.kodeholik.model.entity.course.Lesson;
+import com.g44.kodeholik.model.entity.course.TopCourse;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
@@ -17,11 +18,13 @@ import com.g44.kodeholik.model.enums.s3.FileNameType;
 import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.repository.course.CourseUserRepository;
 import com.g44.kodeholik.repository.course.LessonRepository;
+import com.g44.kodeholik.repository.course.TopCourseRepository;
 import com.g44.kodeholik.repository.course.UserLessonProgressRepository;
 import com.g44.kodeholik.repository.setting.TopicRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.setting.TopicService;
+import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
 import com.g44.kodeholik.util.mapper.response.course.CourseDetailResponseMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -80,6 +83,8 @@ public class CourseServiceImpl implements CourseService {
 
     private final LessonRepository lessonRepository;
 
+    private final TopCourseRepository topCourseRepository;
+
     private final UserLessonProgressRepository userLessonProgressRepository;
 
     @Override
@@ -116,8 +121,6 @@ public class CourseServiceImpl implements CourseService {
 
         courseRepository.save(course);
     }
-
-
 
     @Override
     public void editCourse(Long courseId, CourseRequestDto requestDto, MultipartFile imageFile) {
@@ -205,7 +208,8 @@ public class CourseServiceImpl implements CourseService {
         } else if (title.isEmpty()) {
             courses = courseRepository.findByTopicsInAndStatusIn(topics, allowedStatuses, pageable);
         } else {
-            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(title, topics, allowedStatuses, pageable);
+            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(title, topics,
+                    allowedStatuses, pageable);
         }
 
         List<Long> completedLessons = currentUser != null ? getCompletedLessons() : Collections.emptyList();
@@ -220,7 +224,6 @@ public class CourseServiceImpl implements CourseService {
                 .map(progress -> progress.getLesson().getId())
                 .collect(Collectors.toList());
     }
-
 
     @Transactional
     @Override
@@ -267,5 +270,31 @@ public class CourseServiceImpl implements CourseService {
         Users user = userService.getCurrentUser();
 
         return courseUserRepository.existsByCourseAndUser(course, user);
+    }
+
+    @Override
+    public void addTop5PopularCourse() {
+        List<Course> courses = courseRepository.findTop5ByOrderByNumberOfParticipantDescRateDesc();
+        topCourseRepository.deleteAll();
+        int top = 5;
+        for (int i = 0; i < courses.size(); i++) {
+            TopCourse topCourse = new TopCourse();
+            topCourse.setCourse(courses.get(i));
+            topCourse.setDisplayOrder(top);
+            if (top > 0) {
+                top--;
+            }
+            topCourseRepository.save(topCourse);
+        }
+    }
+
+    @Override
+    public List<CourseResponseDto> getTop5PopularCourse() {
+        List<TopCourse> topCourses = topCourseRepository.findByOrderByDisplayOrderDesc();
+        List<CourseResponseDto> result = new ArrayList();
+        for (int i = 0; i < topCourses.size(); i++) {
+            result.add(courseResponseMapper.mapFrom(topCourses.get(i).getCourse()));
+        }
+        return result;
     }
 }

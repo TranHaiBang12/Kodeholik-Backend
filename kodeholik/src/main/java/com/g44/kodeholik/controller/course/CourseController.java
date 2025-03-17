@@ -37,6 +37,10 @@ public class CourseController {
     private final CourseCommentService courseCommentService;
     private final CourseRatingService courseRatingService;
 
+    @GetMapping("/top-popular")
+    public ResponseEntity<List<CourseResponseDto>> getTop5PopularCourse() {
+        return ResponseEntity.status(HttpStatus.SC_OK).body(courseService.getTop5PopularCourse());
+    }
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<CourseDetailResponseDto> getCourseDetail(@PathVariable Long id) {
@@ -74,8 +78,7 @@ public class CourseController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "title") CourseSortField sortBy,
-            @RequestParam(defaultValue = "true") Boolean ascending
-    ) {
+            @RequestParam(defaultValue = "true") Boolean ascending) {
         Page<CourseResponseDto> courses = courseService.searchCourses(request, page, size, sortBy, ascending);
         return ResponseEntity.ok(courses);
     }
@@ -88,7 +91,7 @@ public class CourseController {
 
     @DeleteMapping("/unenroll/{courseId}")
     public ResponseEntity<String> unenrollUserFromCourse(@PathVariable Long courseId) {
-        courseService.unenrollUserFromCourse( courseId);
+        courseService.unenrollUserFromCourse(courseId);
         return ResponseEntity.ok("User unenrolled successfully!");
     }
 
