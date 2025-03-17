@@ -70,8 +70,6 @@ public class LessonController {
         return ResponseEntity.status(HttpStatus.SC_CREATED).body(response);
     }
 
-
-
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateLesson(@PathVariable Long id,
             @ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
