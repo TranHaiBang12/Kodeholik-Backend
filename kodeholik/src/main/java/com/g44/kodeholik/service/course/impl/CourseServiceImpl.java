@@ -3,16 +3,21 @@ package com.g44.kodeholik.service.course.impl;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 import com.g44.kodeholik.model.entity.course.CourseUser;
+import com.g44.kodeholik.model.entity.course.Lesson;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
 import com.g44.kodeholik.model.enums.s3.FileNameType;
+import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.repository.course.CourseUserRepository;
+import com.g44.kodeholik.repository.course.LessonRepository;
+import com.g44.kodeholik.repository.course.UserLessonProgressRepository;
 import com.g44.kodeholik.repository.setting.TopicRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
@@ -73,12 +78,9 @@ public class CourseServiceImpl implements CourseService {
 
     private final S3Service s3Service;
 
-    @Override
-    public Page<CourseResponseDto> getAllCourse(Pageable pageable) {
-        Page<Course> coursePage = courseRepository
-                .findByStatus(CourseStatus.ACTIVATED, pageable);
-        return coursePage.map(courseResponseMapper::mapFrom);
-    }
+    private final LessonRepository lessonRepository;
+
+    private final UserLessonProgressRepository userLessonProgressRepository;
 
     @Override
     public CourseDetailResponseDto getCourseById(Long courseId) {
@@ -144,8 +146,6 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.save(course);
     }
 
-
-
     @Override
     public void deleteCourse(Long courseId) {
         courseRepository.findById(courseId)
@@ -169,7 +169,6 @@ public class CourseServiceImpl implements CourseService {
 
         Sort.Direction direction = (ascending != null && ascending) ? Sort.Direction.ASC : Sort.Direction.DESC;
 
-        // Xác định field để sort
         String sortField;
         switch (sortBy) {
             case createdAt:
@@ -185,21 +184,43 @@ public class CourseServiceImpl implements CourseService {
         Sort sort = Sort.by(direction, sortField);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        CourseStatus activeStatus = CourseStatus.ACTIVATED;
+        Users currentUser = null;
+        try {
+            currentUser = userService.getCurrentUser();
+        } catch (Exception e) {
+        }
+
+        List<CourseStatus> allowedStatuses;
+        if (currentUser == null || currentUser.getRole() == UserRole.STUDENT) {
+            allowedStatuses = Collections.singletonList(CourseStatus.ACTIVATED);
+        } else {
+            allowedStatuses = Arrays.asList(CourseStatus.values());
+        }
 
         Page<Course> courses;
         if (title.isEmpty() && topics.isEmpty()) {
-            courses = courseRepository.findByStatus(activeStatus, pageable);
+            courses = courseRepository.findByStatusIn(allowedStatuses, pageable);
         } else if (!title.isEmpty() && topics.isEmpty()) {
-            courses = courseRepository.findByTitleContainingIgnoreCaseAndStatus(title, activeStatus, pageable);
+            courses = courseRepository.findByTitleContainingIgnoreCaseAndStatusIn(title, allowedStatuses, pageable);
         } else if (title.isEmpty()) {
-            courses = courseRepository.findByTopicsInAndStatus(topics, activeStatus, pageable);
+            courses = courseRepository.findByTopicsInAndStatusIn(topics, allowedStatuses, pageable);
         } else {
-            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsInAndStatus(title, topics, activeStatus, pageable);
+            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(title, topics, allowedStatuses, pageable);
         }
 
-        return courses.map(courseResponseMapper::mapFrom);
+        List<Long> completedLessons = currentUser != null ? getCompletedLessons() : Collections.emptyList();
+
+        return courses.map(course -> courseResponseMapper.mapFromCourseAndLesson(course, completedLessons));
     }
+
+    public List<Long> getCompletedLessons() {
+        Users currentUser = userService.getCurrentUser();
+        return userLessonProgressRepository.findByUserId(currentUser.getId())
+                .stream()
+                .map(progress -> progress.getLesson().getId())
+                .collect(Collectors.toList());
+    }
+
 
     @Transactional
     @Override
@@ -236,5 +257,15 @@ public class CourseServiceImpl implements CourseService {
         courseUserRepository.delete(courseUser);
         course.setNumberOfParticipant(Math.max(course.getNumberOfParticipant() - 1, 0));
         courseRepository.save(course);
+    }
+
+    @Override
+    public boolean isUserEnrolled(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new EntityNotFoundException("Course not found"));
+
+        Users user = userService.getCurrentUser();
+
+        return courseUserRepository.existsByCourseAndUser(course, user);
     }
 }

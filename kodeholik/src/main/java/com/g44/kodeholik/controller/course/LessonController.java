@@ -6,6 +6,7 @@ import com.g44.kodeholik.repository.course.LessonRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
 import jakarta.validation.Valid;
+import lombok.extern.log4j.Log4j2;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -27,7 +28,12 @@ import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/lesson")
@@ -56,17 +62,19 @@ public class LessonController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Void> addLesson(@ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
+    public ResponseEntity<Map<String, String>> addLesson(@ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
         lessonService.addLesson(lessonRequestDto);
-        return ResponseEntity.status(HttpStatus.SC_CREATED).build();
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Lesson created successfully");
+
+        return ResponseEntity.status(HttpStatus.SC_CREATED).body(response);
     }
 
-
-
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateLesson(@PathVariable Long id, @RequestBody @Valid LessonRequestDto lessonRequestDto) {
+    public ResponseEntity<?> updateLesson(@PathVariable Long id,
+            @ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
         lessonService.editLesson(id, lessonRequestDto);
-        return ResponseEntity.status(HttpStatus.SC_CREATED).build();
+        return ResponseEntity.status(HttpStatus.SC_OK).build();
     }
 
     @DeleteMapping("/delete/{id}")
@@ -77,26 +85,25 @@ public class LessonController {
 
     @GetMapping("/download-file")
     public ResponseEntity<byte[]> downloadFile(@RequestParam String key) {
-        try {
-            // Gửi yêu cầu tải file từ S3
-            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .build();
+        return lessonService.downloadFile(key);
+    }
 
-            ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);
+    @PostMapping("/complete/{lessonId}")
+    public ResponseEntity<?> markLessonAsCompleted(@PathVariable Long lessonId) {
+        lessonService.markLessonAsCompleted(lessonId);
+        return ResponseEntity.ok().body("Lesson marked as completed");
+    }
 
-            byte[] fileBytes = objectBytes.asByteArray();
-            String contentType = objectBytes.response().contentType();
+    @GetMapping("/completed-lessons")
+    public ResponseEntity<List<Long>> getCompletedLessons() {
+        List<Long> completedLessons = lessonService.getCompletedLessons();
+        return ResponseEntity.ok(completedLessons);
+    }
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + key + "\"")
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .body(fileBytes);
-
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/by-chapter/{chapterId}")
+    public ResponseEntity<List<LessonResponseDto>> getLessonsByChapter(@PathVariable Long chapterId) {
+        List<LessonResponseDto> lessons = lessonService.getLessonByChapterId(chapterId);
+        return ResponseEntity.ok(lessons);
     }
 
 }

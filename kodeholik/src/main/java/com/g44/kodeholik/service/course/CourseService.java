@@ -11,8 +11,6 @@ import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface CourseService {
-    public Page<CourseResponseDto> getAllCourse(Pageable pageable);
-
     public CourseDetailResponseDto getCourseById(Long courseId);
 
     public void addCourse(CourseRequestDto courseRequestDto, MultipartFile imageFile);
@@ -27,4 +25,6 @@ public interface CourseService {
     public void enrollUserInCourse(Long courseId);
 
     public void unenrollUserFromCourse(Long courseId);
+
+    public boolean isUserEnrolled(Long courseId);
 }

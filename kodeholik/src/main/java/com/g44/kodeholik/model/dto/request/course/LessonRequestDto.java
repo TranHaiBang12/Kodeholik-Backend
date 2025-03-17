@@ -2,6 +2,7 @@ package com.g44.kodeholik.model.dto.request.course;
 
 import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.model.enums.course.LessonType;
+import com.g44.kodeholik.model.enums.course.LessonVideoType;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,4 +38,17 @@ public class LessonRequestDto {
     private MultipartFile attachedFile;
 
     private MultipartFile videoFile;
+
+    private String youtubeUrl;
+
+    private LessonVideoType videoType;
+
+    private List<String> problemIds = new ArrayList<>();
+
+    public void setProblemIds(String problemIdsStr) {
+        if (problemIdsStr != null && !problemIdsStr.isEmpty()) {
+            this.problemIds = Arrays.asList(problemIdsStr.split(","));
+        }
+    }
+
 }

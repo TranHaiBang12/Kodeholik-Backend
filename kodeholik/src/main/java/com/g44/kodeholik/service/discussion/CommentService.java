@@ -32,4 +32,5 @@ public interface CommentService {
 
     public int countCommentReply(Long commentId);
 
+    public Page<CommentResponseDto> getCommentsByCourseId(Long courseId, int page, String sortBy, Boolean ascending);
 }

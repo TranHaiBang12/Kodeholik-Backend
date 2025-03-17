@@ -10,10 +10,7 @@ import com.g44.kodeholik.model.enums.course.ChapterStatus;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldNameConstants;
 
 @Entity
@@ -31,10 +28,16 @@ public class Chapter {
 
     @ManyToOne
     @JoinColumn(name = "course_id", referencedColumnName = "id")
+    @ToString.Exclude
     private Course course;
 
+    @Column(name = "title", length = 100, nullable = false)
     private String title;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "display_order")
     private int displayOrder;
 
     @Enumerated(EnumType.STRING)

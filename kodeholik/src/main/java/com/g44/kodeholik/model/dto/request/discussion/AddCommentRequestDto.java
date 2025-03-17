@@ -1,18 +1,21 @@
 package com.g44.kodeholik.model.dto.request.discussion;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class AddCommentRequestDto {
-    @NotBlank(message = "Nội dung bình luận không được để trống")
-    @Size(max = 1000, message = "Bình luận không được vượt quá 1000 ký tự")
+
+    @NotNull(message = "Comment cannot be null")
     private String comment;
+
+    private Long commentReply;
+
+    private Long courseId;
 }

@@ -9,11 +9,14 @@ import com.g44.kodeholik.util.mapper.Mapper;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collections;
+
 @Component
 @RequiredArgsConstructor
 public class ChapterResponseMapper implements Mapper<Chapter, ChapterResponseDto> {
 
     private final ModelMapper mapper;
+    private final LessonResponseMapper lessonResponseMapper;
 
     @Override
     public Chapter mapTo(ChapterResponseDto b) {
@@ -21,8 +24,28 @@ public class ChapterResponseMapper implements Mapper<Chapter, ChapterResponseDto
     }
 
     @Override
-    public ChapterResponseDto mapFrom(Chapter a) {
-        return mapper.map(a, ChapterResponseDto.class);
+    public ChapterResponseDto mapFrom(Chapter chapter) {
+        return ChapterResponseDto.builder()
+                .id(chapter.getId())
+                .courseId(chapter.getCourse() != null ? chapter.getCourse().getId() : null)
+                .title(chapter.getTitle())
+                .description(chapter.getDescription())
+                .displayOrder(chapter.getDisplayOrder())
+                .status(chapter.getStatus())
+                .lessons(chapter.getLessons() != null
+                        ? chapter.getLessons().stream().map(lessonResponseMapper::mapFrom).toList()
+                        : Collections.emptyList())
+                .build();
+    }
+
+    public ChapterResponseDto mapDetailFrom(Chapter chapter) {
+        return ChapterResponseDto.builder()
+                .id(chapter.getId())
+                .title(chapter.getTitle())
+                .courseId(chapter.getCourse().getId())
+                .description(chapter.getDescription())
+                .status(chapter.getStatus())
+                .build();
     }
 
 }

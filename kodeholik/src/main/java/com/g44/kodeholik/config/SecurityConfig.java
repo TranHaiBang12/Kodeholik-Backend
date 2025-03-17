@@ -62,6 +62,13 @@ public class SecurityConfig {
                         "/api/v1/problem/activate-problem/**",
                         "/api/v1/problem/deactivate-problem/**",
                         "/api/v1/problem/list-problem",
+                        "/api/v1/course/add",
+                        "/api/v1/course/update/**",
+                        "/api/v1/chapter/add",
+                        "/api/v1/chapter/update/**",
+                        "/api/v1/lesson/add",
+                        "/api/v1/lesson/update/**",
+                        "/api/v1/chapter/list-problem",
                         "/api/v1/problem/private-problem"
         };
 

@@ -373,4 +373,10 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = getCommentById(commentId);
         return commentRepository.countByCommentReply(comment);
     }
+
+    @Override
+    public Page<CommentResponseDto> getCommentsByCourseId(Long courseId, int page, String sortBy, Boolean ascending) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCommentsByCourseId'");
+    }
 }
