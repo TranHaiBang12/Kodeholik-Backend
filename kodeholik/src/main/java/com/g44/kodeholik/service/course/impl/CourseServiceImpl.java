@@ -4,10 +4,12 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
+import com.g44.kodeholik.model.entity.course.Chapter;
 import com.g44.kodeholik.model.entity.course.CourseUser;
 import com.g44.kodeholik.model.entity.course.Lesson;
 import com.g44.kodeholik.model.entity.setting.Topic;
@@ -68,7 +70,7 @@ public class CourseServiceImpl implements CourseService {
 
     private final UserService userService;
 
-    private final UserRepository userRepository;
+    private final UserLessonProgressRepository userLessonProgressRepository;
 
     private final CourseUserRepository courseUserRepository;
 
@@ -80,13 +82,40 @@ public class CourseServiceImpl implements CourseService {
 
     private final LessonRepository lessonRepository;
 
-    private final UserLessonProgressRepository userLessonProgressRepository;
-
     @Override
     public CourseDetailResponseDto getCourseById(Long courseId) {
+        // Lấy course cùng với chapters và lessons
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found"));
-        return courseDetailResponseMapper.mapFrom(course);
+
+        // Lấy danh sách chapters của course
+        List<Chapter> chapters = course.getChapters();
+        if (chapters == null || chapters.isEmpty()) {
+            return courseDetailResponseMapper.mapFromCourseAndLesson(course, Collections.emptyList(), Collections.emptyList());
+        }
+
+        // Lấy danh sách tất cả lesson từ các chapters
+        List<Long> lessonIds = chapters.stream()
+                .flatMap(chapter -> {
+                    List<Lesson> lessons = chapter.getLessons();
+                    return lessons != null ? lessons.stream() : Stream.empty();
+                })
+                .map(Lesson::getId)
+                .collect(Collectors.toList());
+
+        // Lấy người dùng hiện tại
+        Users currentUser = userService.getCurrentUser();
+        Long userId = currentUser.getId();
+
+        // Lấy danh sách lesson đã "hoàn thành" của người dùng từ user_lesson_progress
+        List<Long> completedLessons = userLessonProgressRepository.findByUserId(userId)
+                .stream()
+                .map(userLessonProgress -> userLessonProgress.getId().getLessonId())
+                .filter(lessonId -> lessonIds.contains(lessonId)) // Chỉ lấy lesson thuộc course này
+                .collect(Collectors.toList());
+
+        // Ánh xạ với mapper
+        return courseDetailResponseMapper.mapFromCourseAndLesson(course, lessonIds, completedLessons);
     }
 
     @Override

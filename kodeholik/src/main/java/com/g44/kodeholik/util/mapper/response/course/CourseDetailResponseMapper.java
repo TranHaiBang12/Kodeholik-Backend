@@ -1,15 +1,19 @@
 package com.g44.kodeholik.util.mapper.response.course;
 
+import com.g44.kodeholik.model.dto.response.course.ChapterResponseDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
+import com.g44.kodeholik.model.dto.response.setting.TopicResponseDto;
 import com.g44.kodeholik.model.entity.course.Course;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.repository.course.LessonRepository;
 import com.g44.kodeholik.util.mapper.Mapper;
+import com.g44.kodeholik.util.mapper.response.tag.TagResponseMapperTopic;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,7 +24,8 @@ public class CourseDetailResponseMapper implements Mapper<Course, CourseDetailRe
 
     private final ModelMapper modelMapper;
 
-    private final LessonRepository lessonRepository;
+    private final TagResponseMapperTopic topicResponseMapper;
+    private final ChapterResponseMapper chapterResponseMapper;
 
     @Override
     public Course mapTo(CourseDetailResponseDto b) {
@@ -38,6 +43,20 @@ public class CourseDetailResponseMapper implements Mapper<Course, CourseDetailRe
 
         double progress = totalLessons > 0 ? (completedCount * 100.0) / totalLessons : 0.0;
 
+        // Ánh xạ topics
+        List<TopicResponseDto> topicDtos = course.getTopics() != null
+                ? course.getTopics().stream()
+                .map(topicResponseMapper::mapFromTopic)
+                .collect(Collectors.toList())
+                : Collections.emptyList();
+
+        // Ánh xạ chapters
+        List<ChapterResponseDto> chapterDtos = course.getChapters() != null
+                ? course.getChapters().stream()
+                .map(chapterResponseMapper::mapFrom)
+                .collect(Collectors.toList())
+                : Collections.emptyList();
+
         return CourseDetailResponseDto.builder()
                 .id(course.getId())
                 .title(course.getTitle())
@@ -46,6 +65,8 @@ public class CourseDetailResponseMapper implements Mapper<Course, CourseDetailRe
                 .rate(course.getRate())
                 .numberOfParticipant(course.getNumberOfParticipant())
                 .progress(progress)
+                .topics(topicDtos)
+                .chapters(chapterDtos)
                 .build();
     }
 }
