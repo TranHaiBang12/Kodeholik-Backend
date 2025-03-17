@@ -10,5 +10,6 @@ import java.util.List;
 @Repository
 public interface LessonProblemRepository extends JpaRepository<LessonProblem, LessonProblemId> {
     List<LessonProblem> findByLesson_Id(Long lessonId);
+    void deleteByLesson_Id(Long lessonId);
 }
 

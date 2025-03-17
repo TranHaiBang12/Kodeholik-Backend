@@ -22,6 +22,7 @@ import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
 import com.g44.kodeholik.util.string.YoutubeUrlParser;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -100,6 +101,8 @@ public class LessonServiceImpl implements LessonService {
 
         List<LessonProblemResponseDto> lessonProblemDtos = lessonProblems.stream()
                 .map(lp -> new LessonProblemResponseDto(
+                        lp.getProblem().getTitle(),
+                        lp.getProblem().getDifficulty(),
                         lp.getProblem().getLink()
                 ))
                 .collect(Collectors.toList());
@@ -184,57 +187,83 @@ public class LessonServiceImpl implements LessonService {
 
 
     @Override
+    @Transactional
     public void editLesson(Long lessonId, LessonRequestDto lessonRequestDto) {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
 
-        Chapter chapter = chapterRepository.findById(lessonRequestDto.getChapterId())
-                .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
-        lesson.setChapter(chapter);
-        lesson.setTitle(lessonRequestDto.getTitle());
-        lesson.setDescription(lessonRequestDto.getDescription());
-        lesson.setUpdatedAt(Timestamp.from(Instant.now()));
-        lesson.setUpdatedBy(userService.getCurrentUser());
+        // Update lesson properties using mapper
+        lessonRequestMapper.updateFromDto(lessonRequestDto, lesson);
+
+        // Update chapter if changed
+        if (lessonRequestDto.getChapterId() != null &&
+                !lessonRequestDto.getChapterId().equals(lesson.getChapter().getId())) {
+            Chapter chapter = chapterRepository.findById(lessonRequestDto.getChapterId())
+                    .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
+            lesson.setChapter(chapter);
+        }
 
         try {
-            // Xử lý file đính kèm (S3)
+            // Handle attached file update
             if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
+                if (lesson.getAttachedFile() != null) {
+                    s3Service.deleteFileFromS3(lesson.getAttachedFile());
+                }
                 String s3Key = "lessons/" + UUID.randomUUID() + "-" + lessonRequestDto.getAttachedFile().getOriginalFilename();
                 s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
                 lesson.setAttachedFile(s3Key);
+                lesson.setStatus(LessonStatus.ACTIVATED);
             }
 
-            if (lessonRequestDto.getVideoType() == LessonVideoType.YOUTUBE) {
-                // Nếu là YouTube, cập nhật videoId từ URL
-                lesson.setVideoUrl(YoutubeUrlParser.extractVideoId(lessonRequestDto.getYoutubeUrl()));
-                lesson.setStatus(LessonStatus.ACTIVATED);
-            } else if (lessonRequestDto.getVideoType() == LessonVideoType.VIDEO_FILE
-                    && lessonRequestDto.getVideoFile() != null
-                    && !lessonRequestDto.getVideoFile().isEmpty()) {
-                // Đọc file thành byte[]
-                byte[] fileBytes = lessonRequestDto.getVideoFile().getBytes();
-                String originalFileName = lessonRequestDto.getVideoFile().getOriginalFilename();
-                String contentType = lessonRequestDto.getVideoFile().getContentType();
+            // Handle video update
+            if (lessonRequestDto.getVideoType() != null) {
+                if (lessonRequestDto.getVideoType() == LessonVideoType.YOUTUBE) {
+                    String videoId = YoutubeUrlParser.extractVideoId(lessonRequestDto.getYoutubeUrl());
+                    lesson.setVideoUrl(videoId);
+                    lesson.setStatus(LessonStatus.ACTIVATED);
+                }
+                else if (lessonRequestDto.getVideoType() == LessonVideoType.VIDEO_FILE &&
+                        lessonRequestDto.getVideoFile() != null &&
+                        !lessonRequestDto.getVideoFile().isEmpty()) {
+                    byte[] fileBytes = lessonRequestDto.getVideoFile().getBytes();
+                    String originalFileName = lessonRequestDto.getVideoFile().getOriginalFilename();
+                    String contentType = lessonRequestDto.getVideoFile().getContentType();
 
-                // Đặt trạng thái IN_PROGRESS trước khi upload video mới
-                lesson.setVideoUrl("uploading...");
-                lesson.setStatus(LessonStatus.IN_PROGRESS);
-                lessonRepository.save(lesson);
+                    lesson.setVideoUrl("uploading...");
+                    lesson.setStatus(LessonStatus.IN_PROGRESS);
+                    lessonRepository.save(lesson);
 
-                // Upload video lên GCS **ASYNC**
-                gcsService.uploadVideo(fileBytes, originalFileName, contentType)
-                        .thenAccept(gcsPath -> {
-                            lesson.setVideoUrl(gcsPath);
-                            lesson.setStatus(LessonStatus.ACTIVATED); // Chuyển sang ACTIVATED khi upload xong
-                            lessonRepository.save(lesson);
-                        })
-                        .exceptionally(ex -> {
-                            log.error("Failed to upload video to GCS", ex);
-                            return null;
-                        });
+                    gcsService.uploadVideo(fileBytes, originalFileName, contentType)
+                            .thenAccept(gcsPath -> {
+                                lesson.setVideoUrl(gcsPath);
+                                lesson.setStatus(LessonStatus.ACTIVATED);
+                                lessonRepository.save(lesson);
+                            })
+                            .exceptionally(ex -> {
+                                log.error("Failed to update video to GCS", ex);
+                                return null;
+                            });
+                }
+            }
+
+            // Update problems if provided
+            if (lessonRequestDto.getProblemIds() != null) {
+                lessonProblemRepository.deleteByLesson_Id(lesson.getId());
+                if (!lessonRequestDto.getProblemIds().isEmpty()) {
+                    List<LessonProblem> lessonProblems = lessonRequestDto.getProblemIds().stream()
+                            .map(problemLink -> problemRepository.findByLink(problemLink)
+                                    .map(problem -> new LessonProblem(lesson, problem))
+                                    .orElse(null))
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+                    if (!lessonProblems.isEmpty()) {
+                        lessonProblemRepository.saveAll(lessonProblems);
+                    }
+                }
             }
 
             lessonRepository.save(lesson);
+
         } catch (Exception e) {
             log.error("Error occurred while editing lesson", e);
             throw new RuntimeException("Failed to edit lesson: " + e.getMessage());

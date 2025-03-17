@@ -26,4 +26,8 @@ public class LessonRequestMapper implements Mapper<Lesson, LessonRequestDto> {
 
     }
 
+    public void updateFromDto(LessonRequestDto dto, Lesson lesson) {
+        modelMapper.map(dto, lesson);
+    }
+
 }

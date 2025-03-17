@@ -9,9 +9,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.g44.kodeholik.model.entity.course.Course;
 import com.g44.kodeholik.model.entity.course.Lesson;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
     Page<Lesson> findByStatusIn(List<LessonStatus> statuses, Pageable pageable);
     Page<Course> findById(Long id, Pageable pageable);
