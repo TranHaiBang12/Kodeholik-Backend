@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.g44.kodeholik.controller.problem.ProblemSolutionController;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.exception.TestCaseNotPassedException;
@@ -107,6 +108,8 @@ import com.g44.kodeholik.service.problem.SolutionCodeService;
 import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.setting.TagService;
 import com.g44.kodeholik.service.user.UserService;
+import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
+import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
 import com.g44.kodeholik.util.mapper.request.problem.ProblemRequestMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ListProblemAdminResponseMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemBasicResponseMapper;
@@ -171,8 +174,6 @@ public class ProblemServiceImpl implements ProblemService {
     private final LambdaService lambdaService;
 
     private final ProblemBasicResponseMapper problemBasicResponseMapper;
-
-    private final SolutionCodeMapper solutionCodeMapper;
 
     private final CommentRepository commentRepository;
 
@@ -464,10 +465,11 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public SubmissionResponseDto submitProblem(String link, ProblemCompileRequestDto problemCompileRequestDto) {
         Problem problem = getActivePublicProblemByLink(link);
+        Users currentUser = userService.getCurrentUser();
         Language language = languageService.findByName(problemCompileRequestDto.getLanguageName());
         return problemSubmissionService.submitProblem(problem, problemCompileRequestDto,
                 problemTestCaseService.getTestCaseByProblemAndLanguage(problem, language),
-                findByProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()));
+                findByProblemAndLanguage(link, problemCompileRequestDto.getLanguageName()), currentUser);
     }
 
     @Override
@@ -1012,7 +1014,7 @@ public class ProblemServiceImpl implements ProblemService {
                             solutionCodeDto.getSolutionLanguage().toLowerCase(),
                             responseResult.getNoSuccessTestcase(),
                             Timestamp.from(Instant.now()),
-                            SubmissionStatus.SUCCESS);
+                            SubmissionStatus.SUCCESS, 0L);
                     break;
                 case "FAILED":
                     submissionResponseDto = new FailedSubmissionResponseDto(
@@ -1022,7 +1024,7 @@ public class ProblemServiceImpl implements ProblemService {
                             solutionCodeDto.getSolutionCode(),
                             solutionCodeDto.getSolutionLanguage().toLowerCase(),
                             Timestamp.from(Instant.now()),
-                            SubmissionStatus.FAILED);
+                            SubmissionStatus.FAILED, 0L);
                     return false;
                 default:
                     submissionResponseDto = new CompileErrorResposneDto(
@@ -1030,7 +1032,7 @@ public class ProblemServiceImpl implements ProblemService {
                             solutionCodeDto.getSolutionCode(),
                             solutionCodeDto.getSolutionLanguage().toLowerCase(),
                             Timestamp.from(Instant.now()),
-                            SubmissionStatus.FAILED);
+                            SubmissionStatus.FAILED, 0L);
                     return false;
             }
 
@@ -1332,7 +1334,12 @@ public class ProblemServiceImpl implements ProblemService {
         problemSolutionDto.setSolutionCodes(solutionCodeDtos);
         problemSolutionDto
                 .setCurrentUserCreated(currentUser.getId().longValue() == problemSolution.getCreatedBy().getId());
+        if (problemSolution.getUserVote().contains(currentUser)) {
+            problemSolutionDto.setCurrentUserVoted(true);
+        } else {
+            problemSolutionDto.setCurrentUserVoted(false);
 
+        }
         if (problemSolution.getCreatedBy() != null) {
             UserResponseDto createdUser = userResponseMapper.mapFrom(problemSolution.getCreatedBy());
             problemSolutionDto.setCreatedBy(createdUser);
@@ -1527,6 +1534,8 @@ public class ProblemServiceImpl implements ProblemService {
     public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto) {
         ExamResultOverviewResponseDto result = new ExamResultOverviewResponseDto();
         double grade = 0;
+        Users currentUser = userService.getCurrentUser();
+
         List<ProblemResultOverviewResponseDto> problemResultDetails = new ArrayList();
         for (int i = 0; i < submitExamRequestDto.size(); i++) {
             ProblemCompileRequestDto problemCompileRequestDto = new ProblemCompileRequestDto();
@@ -1539,7 +1548,7 @@ public class ProblemServiceImpl implements ProblemService {
                     problemTestCaseService.getTestCaseByProblemAndLanguage(problem,
                             languageService.findByName(submitExamRequestDto.get(i).getLanguageName())),
                     findByAllProblemAndLanguage(problem.getLink(), submitExamRequestDto.get(i).getLanguageName()),
-                    submitExamRequestDto.get(i).getPoint());
+                    submitExamRequestDto.get(i).getPoint(), currentUser);
             grade += problemResultDetailResponseDto.getPoint();
             problemResultDetails.add(problemResultDetailResponseDto);
         }

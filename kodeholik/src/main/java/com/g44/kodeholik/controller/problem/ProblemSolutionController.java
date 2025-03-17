@@ -77,7 +77,6 @@ public class ProblemSolutionController {
     @PostMapping("/post-solution")
     public ResponseEntity<ProblemSolutionDto> postSolution(
             @RequestBody @Valid ShareSolutionRequestDto shareSolutionRequestDto) {
-        problemService.postSolution(shareSolutionRequestDto);
         return new ResponseEntity<>(problemService.postSolution(shareSolutionRequestDto), HttpStatus.CREATED);
     }
 

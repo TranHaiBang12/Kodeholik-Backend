@@ -30,7 +30,7 @@ public interface ProblemSubmissionService {
         public SubmissionResponseDto submitProblem(Problem problem,
                         ProblemCompileRequestDto problemCompileRequestDto,
                         List<TestCase> testCases,
-                        ProblemTemplate problemTemplate);
+                        ProblemTemplate problemTemplate, Users currentUser);
 
         public RunProblemResponseDto run(Problem problem,
                         ProblemCompileRequestDto problemCompileRequestDto,
@@ -40,7 +40,7 @@ public interface ProblemSubmissionService {
         public ProblemResultOverviewResponseDto submitExam(Problem problem,
                         ProblemCompileRequestDto problemCompileRequestDto,
                         List<TestCase> testCases,
-                        ProblemTemplate problemTemplate, double point);
+                        ProblemTemplate problemTemplate, double point, Users currentUser);
 
         public long getNumberAcceptedSubmission(Problem problem);
 

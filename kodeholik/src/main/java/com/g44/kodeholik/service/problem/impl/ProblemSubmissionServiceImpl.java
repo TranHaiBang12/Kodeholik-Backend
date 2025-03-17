@@ -85,7 +85,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
 
     @Override
     public SubmissionResponseDto submitProblem(Problem problem, ProblemCompileRequestDto problemCompileRequestDto,
-            List<TestCase> testCases, ProblemTemplate problemTemplate) {
+            List<TestCase> testCases, ProblemTemplate problemTemplate, Users currentUser) {
         if (problemCompileRequestDto.getCode().isEmpty()) {
             throw new BadRequestException("Code is required", "Code is required");
         }
@@ -114,7 +114,18 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
             status = result;
         }
         log.info(responseResult.getResults());
-
+        problemSubmission.setProblem(problem);
+        problemSubmission.setNoTestCasePassed(responseResult.getNoSuccessTestcase());
+        problemSubmission.setUser(currentUser);
+        problemSubmission.setCode(problemCompileRequestDto.getCode());
+        problemSubmission
+                .setLanguage(languageService.findByName(languageName));
+        problemSubmission.setCreatedAt(Timestamp.from(Instant.now()));
+        if (responseResult.getTime() != null)
+            problemSubmission.setExecutionTime(Double.parseDouble(responseResult.getTime()));
+        else
+            problemSubmission.setExecutionTime(0);
+        problemSubmission.setMemoryUsage(responseResult.getMemoryUsage());
         switch (status) {
             case "ACCEPTED":
                 submissionResponseDto = new AcceptedSubmissionResponseDto(
@@ -124,7 +135,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         languageName,
                         responseResult.getNoSuccessTestcase(),
                         Timestamp.from(Instant.now()),
-                        SubmissionStatus.SUCCESS);
+                        SubmissionStatus.SUCCESS, 0L);
                 problemSubmission.setAccepted(true);
                 problemSubmission.setStatus(SubmissionStatus.SUCCESS);
                 break;
@@ -136,7 +147,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         problemCompileRequestDto.getCode(),
                         languageName,
                         Timestamp.from(Instant.now()),
-                        SubmissionStatus.FAILED);
+                        SubmissionStatus.FAILED, 0L);
                 problemSubmission.setStatus(SubmissionStatus.FAILED);
                 problemSubmission.setAccepted(false);
                 problemSubmission.setInputWrong(gson.toJson(responseResult.getInputWrong()));
@@ -147,25 +158,14 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         problemCompileRequestDto.getCode(),
                         languageName,
                         Timestamp.from(Instant.now()),
-                        SubmissionStatus.FAILED);
+                        SubmissionStatus.FAILED, 0L);
                 problemSubmission.setStatus(SubmissionStatus.FAILED);
                 problemSubmission.setAccepted(false);
                 problemSubmission.setMessage(status);
                 break;
         }
-        problemSubmission.setProblem(problem);
-        problemSubmission.setNoTestCasePassed(responseResult.getNoSuccessTestcase());
-        problemSubmission.setUser(userService.getUserById(1L));
-        problemSubmission.setCode(problemCompileRequestDto.getCode());
-        problemSubmission
-                .setLanguage(languageService.findByName(languageName));
-        problemSubmission.setCreatedAt(Timestamp.from(Instant.now()));
-        if (responseResult.getTime() != null)
-            problemSubmission.setExecutionTime(Double.parseDouble(responseResult.getTime()));
-        else
-            problemSubmission.setExecutionTime(0);
-        problemSubmission.setMemoryUsage(responseResult.getMemoryUsage());
         problemSubmissionRepository.save(problemSubmission);
+        submissionResponseDto.setSubmissionId(problemSubmission.getId());
         problem.setNoSubmission(problem.getNoSubmission() + 1);
         double acceptanceRate = ((double) getNumberAcceptedSubmission(problem)
                 / (double) problem.getNoSubmission())
@@ -342,7 +342,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         problemSubmission.getLanguage().getName(),
                         problemSubmission.getNoTestCasePassed(),
                         problemSubmission.getCreatedAt(),
-                        SubmissionStatus.SUCCESS);
+                        SubmissionStatus.SUCCESS, problemSubmission.getId());
                 break;
             case "FAILED":
                 if (problemSubmission.getMessage() == null) {
@@ -353,14 +353,14 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                             problemSubmission.getCode(),
                             problemSubmission.getLanguage().getName(),
                             problemSubmission.getCreatedAt(),
-                            SubmissionStatus.FAILED);
+                            SubmissionStatus.FAILED, problemSubmission.getId());
                 } else {
                     submissionResponseDto = new CompileErrorResposneDto(
                             problemSubmission.getMessage(),
                             problemSubmission.getCode(),
                             problemSubmission.getLanguage().getName(),
                             problemSubmission.getCreatedAt(),
-                            SubmissionStatus.FAILED);
+                            SubmissionStatus.FAILED, problemSubmission.getId());
                 }
                 break;
             default:
@@ -369,7 +369,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         problemSubmission.getCode(),
                         problemSubmission.getLanguage().getName(),
                         problemSubmission.getCreatedAt(),
-                        SubmissionStatus.FAILED);
+                        SubmissionStatus.FAILED, problemSubmission.getId());
                 break;
         }
         return submissionResponseDto;
@@ -486,7 +486,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     @Override
     public ProblemResultOverviewResponseDto submitExam(Problem problem,
             ProblemCompileRequestDto problemCompileRequestDto,
-            List<TestCase> testCases, ProblemTemplate problemTemplate, double point) {
+            List<TestCase> testCases, ProblemTemplate problemTemplate, double point, Users currentUser) {
 
         ProblemResultOverviewResponseDto problemResultDetailResponseDto = new ProblemResultOverviewResponseDto();
 
@@ -554,7 +554,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         languageName,
                         responseResult.getNoSuccessTestcase(),
                         Timestamp.from(Instant.now()),
-                        SubmissionStatus.SUCCESS);
+                        SubmissionStatus.SUCCESS, 0L);
                 problemSubmission.setAccepted(true);
                 problemSubmission.setStatus(SubmissionStatus.SUCCESS);
                 break;
@@ -566,7 +566,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         problemCompileRequestDto.getCode(),
                         languageName,
                         Timestamp.from(Instant.now()),
-                        SubmissionStatus.FAILED);
+                        SubmissionStatus.FAILED, 0L);
                 problemSubmission.setStatus(SubmissionStatus.FAILED);
                 problemSubmission.setAccepted(false);
                 problemSubmission.setInputWrong(gson.toJson(responseResult.getInputWrong()));
@@ -577,7 +577,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                         problemCompileRequestDto.getCode(),
                         languageName,
                         Timestamp.from(Instant.now()),
-                        SubmissionStatus.FAILED);
+                        SubmissionStatus.FAILED, 0L);
                 problemSubmission.setStatus(SubmissionStatus.FAILED);
                 problemSubmission.setAccepted(false);
                 problemSubmission.setMessage(status);
@@ -585,7 +585,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         }
         problemSubmission.setProblem(problem);
         problemSubmission.setNoTestCasePassed(responseResult.getNoSuccessTestcase());
-        problemSubmission.setUser(userService.getUserById(1L));
+        problemSubmission.setUser(currentUser);
         problemSubmission.setCode(problemCompileRequestDto.getCode());
         problemSubmission
                 .setLanguage(languageService.findByName(languageName));
@@ -596,6 +596,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
             problemSubmission.setExecutionTime(0);
         problemSubmission.setMemoryUsage(responseResult.getMemoryUsage());
         problemSubmissionRepository.save(problemSubmission);
+        submissionResponseDto.setSubmissionId(problemSubmission.getId());
         problem.setNoSubmission(problem.getNoSubmission() + 1);
         double acceptanceRate = ((double) getNumberAcceptedSubmission(problem)
                 / (double) problem.getNoSubmission())

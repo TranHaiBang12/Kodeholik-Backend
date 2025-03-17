@@ -8,6 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public abstract class SubmissionResponseDto {
+    protected Long submissionId;
     protected String code;
     protected String languageName;
     protected SubmissionStatus status;

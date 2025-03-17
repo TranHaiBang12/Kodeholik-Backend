@@ -29,7 +29,11 @@ import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.repository.problem.ProblemSolutionRepository;
+import com.g44.kodeholik.repository.setting.SkillRepository;
 import com.g44.kodeholik.service.problem.ProblemSolutionService;
+import com.g44.kodeholik.service.setting.TagService;
+import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
+import com.g44.kodeholik.util.mapper.request.user.AddUserAvatarFileMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemSolutionMapper;
 import com.g44.kodeholik.util.mapper.response.problem.SolutionListResponseMapper;
 
@@ -47,6 +51,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     private final ProblemSolutionMapper problemSolutionMapper;
 
     private final SolutionListResponseMapper solutionListResponseMapper;
+
+    private final TagService tagService;
 
     @Override
     public ProblemSolution save(ProblemSolution problemSolution) {
@@ -79,7 +85,9 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
     public ProblemSolutionDto findSolutionDtoById(Long id) {
         ProblemSolution solution = problemSolutionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Solution not found", "Solution not found"));
-        return problemSolutionMapper.mapFrom(solution);
+        ProblemSolutionDto problemSolutionDto = problemSolutionMapper.mapFrom(solution);
+
+        return problemSolutionDto;
     }
 
     @Override
@@ -141,11 +149,9 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                             false,
                             pageable);
         }
-        List<ProblemSolution> solutionList = solution.getContent();
+        solutionListResponseMapper.currentUser = currentUser;
         Page<SolutionListResponseDto> solutionPage = solution.map(solutionListResponseMapper::mapFrom);
-        int index = 0;
         for (SolutionListResponseDto solutionListResponseDto : solutionPage) {
-            solutionListResponseDto.setNoUpvote(solutionList.get(index).getNoUpvote());
             solutionListResponseDto.setCurrentUserCreated(
                     currentUser.getId().longValue() == solutionListResponseDto.getCreatedBy().getId());
 
@@ -220,6 +226,11 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .createdBy(user)
                 .createdAt(Timestamp.from(Instant.now()))
                 .build();
+        Set<Skill> skills = tagService.getSkillsByNameList(shareSolutionRequestDto.getSkills());
+        log.info(skills);
+        log.info(shareSolutionRequestDto.getSkills());
+
+        problemSolution.setSkills(skills);
         Set<SolutionCode> solutionCodes = new HashSet();
         List<String> codeList = new ArrayList();
         List<ProblemSubmission> problemSubmissionList = shareSolutionRequestDto.getSubmissions();
@@ -286,6 +297,13 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             }
             SolutionCode solutionCode = new SolutionCode();
             String code = problemSubmission.getCode();
+            for (SolutionCode stc : solutionCodes) {
+                if (stc.getLanguage().equals(problemSubmission.getLanguage())) {
+                    throw new BadRequestException(
+                            "At each solution, you can only post 1 language",
+                            "At each solution, you can only post 1 language");
+                }
+            }
             if (!codeList.contains(code)) {
                 solutionCode.setCode(code);
                 codeList.add(code);
@@ -309,6 +327,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         solutionCodeList.retainAll(solutionCodes);
         solutionCodeList.addAll(solutionCodes);
         problemSolution.setSolutionCodes(solutionCodeList);
+
         problemSolutionRepository.save(problemSolution);
         return problemSolutionMapper.mapFrom(problemSolution);
 

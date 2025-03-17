@@ -7,9 +7,10 @@ import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListRespons
 import com.g44.kodeholik.model.dto.response.user.EmployeeResponseDto;
 import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.problem.ProblemSolution;
+import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.util.mapper.Mapper;
-
+import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -20,6 +21,8 @@ public class SolutionListResponseMapper implements Mapper<ProblemSolution, Solut
 
     private final S3Service s3Service;
 
+    public Users currentUser;
+
     @Override
     public ProblemSolution mapTo(SolutionListResponseDto b) {
         return mapper.map(b, ProblemSolution.class);
@@ -29,6 +32,12 @@ public class SolutionListResponseMapper implements Mapper<ProblemSolution, Solut
     public SolutionListResponseDto mapFrom(ProblemSolution a) {
         SolutionListResponseDto solutionListResponseDto = mapper.map(a, SolutionListResponseDto.class);
         updateAvatar(solutionListResponseDto.getCreatedBy());
+        if (a.getUserVote().contains(currentUser)) {
+            solutionListResponseDto.setCurrentUserVoted(true);
+        } else {
+            solutionListResponseDto.setCurrentUserVoted(false);
+        }
+        solutionListResponseDto.setNoUpvote(a.getNoUpvote());
         return solutionListResponseDto;
     }
 

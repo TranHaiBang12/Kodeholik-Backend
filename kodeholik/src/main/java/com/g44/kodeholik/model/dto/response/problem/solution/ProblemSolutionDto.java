@@ -34,6 +34,8 @@ public class ProblemSolutionDto {
 
     private boolean isCurrentUserCreated;
 
+    private boolean isCurrentUserVoted;
+
     private UserResponseDto createdBy;
 
     private UserResponseDto updatedBy;

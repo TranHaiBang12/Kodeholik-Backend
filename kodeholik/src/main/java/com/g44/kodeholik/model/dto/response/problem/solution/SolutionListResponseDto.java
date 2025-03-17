@@ -31,4 +31,6 @@ public class SolutionListResponseDto {
     private UserResponseDto createdBy;
 
     private boolean isCurrentUserCreated;
+
+    private boolean isCurrentUserVoted;
 }

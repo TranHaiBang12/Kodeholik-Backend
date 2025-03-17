@@ -18,12 +18,20 @@ public class FailedSubmissionResponseDto extends SubmissionResponseDto {
     private Long createdAt;
 
     public FailedSubmissionResponseDto(int noSuccessTestcase, int noTestcase, TestResult inputWrong, String code,
-            String languageName, Timestamp createdAt, SubmissionStatus status) {
-        super(code, languageName, status);
+            String languageName, Timestamp createdAt, SubmissionStatus status, Long submissionId) {
+        super(submissionId, code, languageName, status);
         this.noSuccessTestcase = noSuccessTestcase;
         this.noTestcase = noTestcase;
         this.inputWrong = inputWrong;
         this.createdAt = createdAt.getTime();
+    }
+
+    public Long getSubmissionId() {
+        return submissionId;
+    }
+
+    public void setSubmissionId(Long submissionId) {
+        this.submissionId = submissionId;
     }
 
     public int getNoSuccessTestcase() {
