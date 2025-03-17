@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.exam.impl;
 import java.sql.Timestamp;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -784,6 +785,12 @@ public class ExamServiceImpl implements ExamService {
         return examResultOverviewResponseDto;
     }
 
+    private long getMinuteDifference(Timestamp ts1, Timestamp ts2) {
+        Instant instant1 = ts1.toInstant();
+        Instant instant2 = ts2.toInstant();
+        return Duration.between(instant1, instant2).toMinutes();
+    }
+
     @Override
     public void sendNotiToUserExamAboutToStart() {
         Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -802,7 +809,8 @@ public class ExamServiceImpl implements ExamService {
                             "", NotificationType.SYSTEM);
                     emailService.sendEmailNotifyExam30Minutes(user.getEmail(), "[KODEHOLIK] Exam Reminder",
                             user.getUsername(),
-                            formattedDate, examList.get(i).getCode());
+                            formattedDate, examList.get(i).getCode(),
+                            getMinuteDifference(examList.get(i).getStartTime(), examList.get(i).getEndTime()));
                 }
             }
         }
@@ -817,7 +825,7 @@ public class ExamServiceImpl implements ExamService {
                     redisService.saveKeyCheckExamReminder(user.getUsername(), examList5Minutes.get(i).getCode(), 5);
                     notificationService.saveNotification(user, "There is a exam that will start on " + formattedDate,
                             "", NotificationType.SYSTEM);
-                    emailService.sendEmailNotifyExam30Minutes(user.getEmail(), "[KODEHOLIK] Exam Reminder",
+                    emailService.sendEmailNotifyExam5Minutes(user.getEmail(), "[KODEHOLIK] Exam Reminder",
                             user.getUsername(),
                             formattedDate, examList5Minutes.get(i).getCode());
                 }

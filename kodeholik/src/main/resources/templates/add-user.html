@@ -170,10 +170,10 @@
                     <!-- Header -->
                     <tr>
                         <td class="header" style="background-color: #121221; padding: 25px 20px; text-align: center;">
-                            <div style="display: flex; align-items: center; justify-content: center;">
+                            <div style="display: flex !important; margin: auto">
                                 <img style="width: 50px; height: 50px" src="https://i.ibb.co/1GDGJC0x/kodeholik-logo.png" />
                                 <h1 class="logo"
-                                    style="color: #98ff99; font-size: 28px; font-weight: bold; letter-spacing: 1px; margin: 0;">
+                                    style="color: #98ff99; font-size: 28px; font-weight: bold; letter-spacing: 1px; margin-top: 5px;">
                                     Kodeholik</h1>
                             </div>
                         </td>
@@ -182,11 +182,11 @@
                     <!-- Content -->
                     <tr>
                         <td class="content" style="padding: 30px 40px; line-height: 1.6; color: #b9c5e5;">
-                            <div class="greeting">
+                            <div class="greeting" style="color: #b9c5e5 !important;">
                                 Hello, <span style="font-weight: bold;" th:text="${username}">User</span>
                             </div>
 
-                            <div class="message">
+                            <div class="message" style="color: #b9c5e5 !important;">
                                 Your account has been created by Kodeholik's admin. Below is the password (For security
                                 reasons, please <span class="highlight"
                                     style="font-weight: bold; text-decoration: underline; text-underline-offset: 3px;">DO
@@ -200,6 +200,10 @@
                                     style="font-size: 24px; font-weight: bold; font-family: monospace; letter-spacing: 1px; color: #98ff99;">
                                     #Haibang20042003</div>
                             </div>
+
+                            <a href="http://localhost:5174/login" class="cta-button" style="display: block; background-color: #98ff99; color: #121221; text-decoration: none; text-align: center; padding: 12px 25px; border-radius: 4px; font-weight: bold; margin: 25px 0;">
+                                Log In to Your Account
+                            </a>
                         </td>
                     </tr>
 

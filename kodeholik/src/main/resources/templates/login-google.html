@@ -178,22 +178,22 @@
                     <!-- Header -->
                     <tr>
                         <td class="header" style="background-color: #121221; padding: 25px 20px; text-align: center;">
-                            <div style="display: flex; align-items: center; justify-content: center;">
+                            <div style="display: flex !important; margin: auto">
                                 <img style="width: 50px; height: 50px" src="https://i.ibb.co/1GDGJC0x/kodeholik-logo.png" />
                                 <h1 class="logo"
-                                    style="color: #98ff99; font-size: 28px; font-weight: bold; letter-spacing: 1px; margin: 0;">
+                                    style="color: #98ff99; font-size: 28px; font-weight: bold; letter-spacing: 1px; margin-top: 5px;">
                                     Kodeholik</h1>
                             </div>
                         </td>
                     </tr>
                     <!-- Content -->
                     <tr>
-                        <td class="content" style="padding: 30px 40px; line-height: 1.6; color: #b9c5e5;">
-                            <div class="greeting" style="margin-bottom: 15px;">
+                        <td class="content" style="padding: 30px 40px; line-height: 1.6; color: #b9c5e5 !important;">
+                            <div class="greeting" style="margin-bottom: 15px; color: #b9c5e5 !important;">
                                 Hello, <span style="font-weight: bold;" th:text="${username}">User</span>
                             </div>
                             
-                            <div class="message" style="margin-bottom: 25px; font-size: 16px;">
+                            <div class="message" style="margin-bottom: 25px; font-size: 16px; color: #b9c5e5 !important;">
                                 We have received your request to log in with Google. Since you have not logged into the system before, we have created a default password for you to use for future logins.
                             </div>
                             
@@ -202,23 +202,23 @@
                                     <div style="width: 24px; height: 24px; margin-right: 10px; background-color: white; border-radius: 50%; display: inline-block; vertical-align: middle;">
                                         <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" width="24" height="24" alt="Google" style="border-radius: 50%;">
                                     </div>
-                                    <span style="vertical-align: middle;">You've successfully connected with Google</span>
+                                    <span style="vertical-align: middle; color: #b9c5e5 !important ">You've successfully connected with Google</span>
                                 </div>
                                 <div style="font-size: 14px; color: #b9c5e5;">
                                     Email: <span style="color: #98ff99;" th:text="${email}">user@gmail.com</span>
                                 </div>
                             </div>
                             
-                            <div class="security-notice" style="background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid #98ff99; padding: 15px; margin: 20px 0; font-size: 14px;">
+                            <div class="security-notice" style="background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid #98ff99; padding: 15px; margin: 20px 0; font-size: 14px; color: #b9c5e5 !important">
                                 For security reasons, please <span class="warning" style="font-weight: bold; text-decoration: underline; text-underline-offset: 3px;">DO NOT</span> share this password with anyone and change it after logging in successfully.
                             </div>
                             
                             <div class="password-container" style="background-color: #121221; border-radius: 6px; padding: 20px; margin: 25px 0; text-align: center; border: 1px solid #333344;">
-                                <div class="password-label" style="font-size: 14px; color: #b9c5e5; margin-bottom: 10px;">Your Default Password</div>
+                                <div class="password-label" style="font-size: 14px; color: #b9c5e5 !important; margin-bottom: 10px;">Your Default Password</div>
                                 <div class="password" th:text="${password}" style="font-size: 24px; font-weight: bold; font-family: monospace; letter-spacing: 1px; color: #98ff99; word-break: break-all; background-color: #1a1a2e; padding: 10px; border-radius: 4px; display: inline-block;">#Haibang20042003</div>
                             </div>
                             
-                            <a href="#" class="cta-button" style="display: block; background-color: #98ff99; color: #121221; text-decoration: none; text-align: center; padding: 12px 25px; border-radius: 4px; font-weight: bold; margin: 25px 0;">
+                            <a href="http://localhost:5174/login" class="cta-button" style="display: block; background-color: #98ff99; color: #121221; text-decoration: none; text-align: center; padding: 12px 25px; border-radius: 4px; font-weight: bold; margin: 25px 0;">
                                 Log In to Your Account
                             </a>
                         </td>

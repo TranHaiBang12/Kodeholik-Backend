@@ -54,10 +54,11 @@ public class EmailServiceImpl implements EmailService {
     @Async("emailTaskExecutor")
 
     @Override
-    public void sendEmailLoginGoogle(String to, String subject, String username, String password) {
+    public void sendEmailLoginGoogle(String to, String subject, String username, String password, String email) {
         Context context = new Context();
         context.setVariable("username", username);
         context.setVariable("password", password);
+        context.setVariable("email", email);
         sendEmail(to, subject, context, "login-google");
 
     }
@@ -74,14 +75,17 @@ public class EmailServiceImpl implements EmailService {
 
     @Async("emailTaskExecutor")
     @Override
-    public void sendEmailNotifyExam30Minutes(String to, String subject, String username, String date, String code) {
+    public void sendEmailNotifyExam30Minutes(String to, String subject, String username, String date, String code,
+            long duration) {
         Context context = new Context();
         context.setVariable("username", username);
         context.setVariable("date", date);
         context.setVariable("code", code);
+        context.setVariable("duration", duration + " minutes");
         sendEmail(to, subject, context, "exam-noti-30");
     }
 
+    @Async("emailTaskExecutor")
     @Override
     public void sendEmailNotifyExam5Minutes(String to, String subject, String username, String date, String code) {
         Context context = new Context();
