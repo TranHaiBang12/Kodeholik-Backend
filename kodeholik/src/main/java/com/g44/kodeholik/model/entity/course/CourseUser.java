@@ -44,6 +44,18 @@ public class CourseUser {
     @Column(name = "enrolled_at", nullable = false, updatable = false)
     private Timestamp enrolledAt;
 
+    @Column(name = "study_streak")
+    private int studyStreak;
+
+    @Column(name = "study_time")
+    private Long studyTime;
+
+    @Column(name = "last_studied_start", nullable = false, updatable = false)
+    private Timestamp lastStudiedStartAt;
+
+    @Column(name = "last_studied_end", nullable = false, updatable = false)
+    private Timestamp lastStudiedEndAt;
+
     public CourseUser(Course course, Users user) {
         this.course = course;
         this.user = user;

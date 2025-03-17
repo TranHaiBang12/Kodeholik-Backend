@@ -1,5 +1,6 @@
 package com.g44.kodeholik.service.email.impl;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -8,6 +9,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import com.g44.kodeholik.exception.EmailSendingException;
+import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.email.EmailService;
 
 import jakarta.mail.internet.MimeMessage;
@@ -33,7 +35,6 @@ public class EmailServiceImpl implements EmailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
-
             javaMailSender.send(message);
         } catch (Exception e) {
             throw new EmailSendingException("Error sending email", "Error sending email");

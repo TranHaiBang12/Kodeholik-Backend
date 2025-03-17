@@ -10,4 +10,6 @@ public interface ScheduleService {
     public void syncProblemToElasticsearch();
 
     public void addTop5PopularCourse();
+
+    public void sendEmailRemindUserStudy();
 }

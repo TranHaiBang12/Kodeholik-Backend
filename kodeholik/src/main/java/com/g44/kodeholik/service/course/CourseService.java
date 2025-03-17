@@ -34,4 +34,10 @@ public interface CourseService {
     public void addTop5PopularCourse();
 
     public List<CourseResponseDto> getTop5PopularCourse();
+
+    public void registerStartTime(Long courseId);
+
+    public void registerEndTime(Long courseId);
+
+    public void sendEmailBasedOnStudyStreak();
 }

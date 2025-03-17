@@ -73,4 +73,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         courseService.addTop5PopularCourse();
     }
 
+    @Transactional
+    // chay vao giay 0 phut 0 gio` 0 moi. ngay` moi. thang' moi. ngay` trg tuan`
+    @Scheduled(cron = "0 0 0 * * *")
+    @Override
+    public void sendEmailRemindUserStudy() {
+        courseService.sendEmailBasedOnStudyStreak();
+    }
+
 }

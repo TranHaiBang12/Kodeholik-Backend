@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ExamProblemDetailResponseDto {
+    private String problemLink;
     private String problemTitle;
 
     private String problemDescription;

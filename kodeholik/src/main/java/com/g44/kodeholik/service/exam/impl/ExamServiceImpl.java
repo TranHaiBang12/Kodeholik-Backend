@@ -414,6 +414,7 @@ public class ExamServiceImpl implements ExamService {
             for (int i = 0; i < examProblems.size(); i++) {
                 Problem problem = examProblems.get(i).getProblem();
                 ExamProblemDetailResponseDto examProblemDetailResponseDto = new ExamProblemDetailResponseDto();
+                examProblemDetailResponseDto.setProblemLink(problem.getLink());
                 examProblemDetailResponseDto.setProblemTitle(problem.getTitle());
                 examProblemDetailResponseDto.setProblemDescription(problem.getDescription());
 

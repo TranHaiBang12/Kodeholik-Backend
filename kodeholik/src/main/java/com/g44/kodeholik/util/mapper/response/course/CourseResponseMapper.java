@@ -6,6 +6,8 @@ import com.g44.kodeholik.model.entity.course.Chapter;
 import com.g44.kodeholik.model.entity.course.Lesson;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.repository.course.LessonRepository;
+import com.g44.kodeholik.service.aws.s3.S3Service;
+import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
 import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -24,16 +26,21 @@ import java.util.stream.Collectors;
 public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
 
     private final ModelMapper modelMapper;
+
+    private final S3Service s3Service;
+
     private final LessonRepository lessonRepository;
 
-//    @PostConstruct
-//    public void configureMapper() {
-//        modelMapper.createTypeMap(Course.class, CourseResponseDto.class)
-//                .addMappings(mapper -> mapper.map(Course::getChapters, CourseResponseDto::setChapters));
-//
-//        modelMapper.createTypeMap(Chapter.class, ChapterResponseDto.class)
-//                .addMappings(mapper -> mapper.map(Chapter::getLessons, ChapterResponseDto::setLessons));
-//    }
+    // @PostConstruct
+    // public void configureMapper() {
+    // modelMapper.createTypeMap(Course.class, CourseResponseDto.class)
+    // .addMappings(mapper -> mapper.map(Course::getChapters,
+    // CourseResponseDto::setChapters));
+    //
+    // modelMapper.createTypeMap(Chapter.class, ChapterResponseDto.class)
+    // .addMappings(mapper -> mapper.map(Chapter::getLessons,
+    // ChapterResponseDto::setLessons));
+    // }
 
     @Override
     public Course mapTo(CourseResponseDto b) {
@@ -42,17 +49,21 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
 
     @Override
     public CourseResponseDto mapFrom(Course course) {
+        String image = course.getImage();
+        if (image != null && image.startsWith("kodeholik")) {
+            image = s3Service.getPresignedUrl(image);
+        }
         return CourseResponseDto.builder()
                 .id(course.getId())
                 .title(course.getTitle())
-                .image(course.getImage())
+                .image(image)
                 .status(course.getStatus())
                 .rate(course.getRate())
                 .createdAt(course.getCreatedAt() != null ? course.getCreatedAt().getTime() : null)
                 .numberOfParticipant(course.getNumberOfParticipant())
                 .topics(course.getTopics().stream().map(Topic::getName).collect(Collectors.toList()))
                 .build();
-//        return modelMapper.map(course, CourseResponseDto.class);
+        // return modelMapper.map(course, CourseResponseDto.class);
     }
 
     public CourseResponseDto mapFromCourseAndLesson(Course course, List<Long> completedLessons) {

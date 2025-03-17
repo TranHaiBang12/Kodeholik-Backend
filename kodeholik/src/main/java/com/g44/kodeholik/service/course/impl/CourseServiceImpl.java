@@ -1,7 +1,12 @@
 package com.g44.kodeholik.service.course.impl;
 
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +42,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.course.CourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
@@ -240,6 +246,8 @@ public class CourseServiceImpl implements CourseService {
         log.info(course);
         log.info(user);
         CourseUser courseUser = new CourseUser(course, user);
+        courseUser.setStudyStreak(0);
+        courseUser.setStudyTime(0L);
         courseUserRepository.save(courseUser);
 
         course.setNumberOfParticipant(course.getNumberOfParticipant() + 1);
@@ -297,4 +305,171 @@ public class CourseServiceImpl implements CourseService {
         }
         return result;
     }
+
+    private Course getEntityCourseById(Long courseId) {
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new NotFoundException("Course not found", "Course not found"));
+    }
+
+    @Override
+    public void registerStartTime(Long courseId) {
+        Users currentUser = userService.getCurrentUser();
+        Course course = getEntityCourseById(courseId);
+        CourseUser courseUser = courseUserRepository.findByCourseAndUser(course, currentUser)
+                .orElseThrow(() -> new ForbiddenException("This user is not participated in this course",
+                        "This user is not participated in this course"));
+        courseUser.setLastStudiedStartAt(Timestamp.from(Instant.now()));
+    }
+
+    @Override
+    public void registerEndTime(Long courseId) {
+        Users currentUser = userService.getCurrentUser();
+        Course course = getEntityCourseById(courseId);
+        CourseUser courseUser = courseUserRepository.findByCourseAndUser(course, currentUser)
+                .orElseThrow(() -> new ForbiddenException("This user is not participated in this course",
+                        "This user is not participated in this course"));
+
+        Timestamp now = Timestamp.from(Instant.now());
+        courseUser.setLastStudiedEndAt(now);
+        courseUser.setStudyTime(isSameDay(courseUser.getLastStudiedStartAt(), courseUser.getLastStudiedEndAt())
+                ? courseUser.getStudyTime()
+                        + getMinuteDifference(courseUser.getLastStudiedStartAt(), courseUser.getLastStudiedEndAt())
+                : courseUser.getStudyTime()
+                        + getMinuteDifference(getMidnightTimestamp(courseUser.getLastStudiedStartAt()),
+                                courseUser.getLastStudiedEndAt()));
+    }
+
+    @Override
+    public void sendEmailBasedOnStudyStreak() {
+        List<CourseUser> courseUsers = courseUserRepository.findAll();
+        for (int i = 0; i < courseUsers.size(); i++) {
+            sendEmailBasedOnStudyStreakForEachCourseUser(courseUsers.get(i));
+        }
+    }
+
+    private void sendEmailBasedOnStudyStreakForEachCourseUser(CourseUser courseUser) {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        if (courseUser.getLastStudiedStartAt() != null && isSameDay(courseUser.getLastStudiedStartAt(), yesterday)) {
+            // nguoi dung da hoc xong trong hom qua
+            if (courseUser.getLastStudiedEndAt() != null
+                    && (courseUser.getLastStudiedEndAt().getTime() >= courseUser.getLastStudiedStartAt().getTime())) {
+                // hoc du 10 phut
+                if (courseUser.getStudyTime() >= 10) {
+                    achieveNewStudyStreak(courseUser);
+                }
+                // hoc chua du 10 phut
+                else {
+                    loseStudyStreak(courseUser);
+                }
+            }
+            // nguoi dung chua hoc xong va van dang hoc
+            else {
+                long duration = courseUser.getStudyTime()
+                        + getMinuteDifference(courseUser.getLastStudiedStartAt(), Timestamp.from(Instant.now()));
+                // hoc hon 10 phut
+                if (duration >= 10) {
+                    achieveNewStudyStreak(courseUser);
+                }
+                // hoc chua du 10 phut
+                else {
+                    loseStudyStreak(courseUser);
+                }
+            }
+        }
+        // chua hoc trong hom qua
+        else {
+            loseStudyStreak(courseUser);
+        }
+        courseUser.setStudyTime(0L);
+        courseUserRepository.save(courseUser);
+    }
+
+    private void achieveNewStudyStreak(CourseUser courseUser) {
+        long oldStudyStreak = courseUser.getStudyStreak();
+        courseUser.setStudyStreak(courseUser.getStudyStreak() > 0 ? courseUser.getStudyStreak() + 1 : 1);
+        sendEmailAchieveNewStudyStreak(oldStudyStreak, courseUser.getStudyStreak(), courseUser.getCourse().getTitle());
+    }
+
+    private void loseStudyStreak(CourseUser courseUser) {
+        long oldStudyStreak = courseUser.getStudyStreak();
+        courseUser.setStudyStreak(courseUser.getStudyStreak() > 0 ? -1 : courseUser.getStudyStreak() - 1);
+        sendEmailLoseStudyStreak(oldStudyStreak, courseUser.getStudyStreak(), courseUser.getCourse().getTitle());
+    }
+
+    private void sendEmailAchieveNewStudyStreak(long oldStudyStreak, long newStudyStreak, String courseTitle) {
+        // nguoi dung quay tro lai hoc
+        if (oldStudyStreak < 0) {
+
+        } else {
+            if (newStudyStreak == 1 || newStudyStreak == 2 || newStudyStreak == 3) {
+
+            } else if (newStudyStreak == 5) {
+
+            } else if (newStudyStreak == 10) {
+
+            } else if (newStudyStreak == 20) {
+
+            } else if (newStudyStreak == 30) {
+
+            }
+        }
+    }
+
+    private void sendEmailLoseStudyStreak(long oldStudyStreak, long newStudyStreak, String courseTitle) {
+        // nguoi dung nghi 1 hom sau 1 tgian hoc
+        if (oldStudyStreak > 0) {
+
+        } else {
+            if (newStudyStreak == -1
+                    || newStudyStreak == -2
+                    || newStudyStreak == -3
+                    || newStudyStreak == -4
+                    || newStudyStreak == -5
+                    || newStudyStreak == -6
+                    || newStudyStreak == -7
+                    || newStudyStreak == -8
+                    || newStudyStreak == -9
+                    || newStudyStreak == -10) {
+
+            } else if (newStudyStreak == -15) {
+
+            } else if (newStudyStreak == -20) {
+
+            } else if (newStudyStreak == -30) {
+
+            } else if (newStudyStreak == -60) {
+
+            }
+        }
+    }
+
+    private boolean isSameDay(Timestamp lastStudiedStartAt, LocalDate yesterday) {
+        LocalDate date1 = lastStudiedStartAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return date1.equals(yesterday);
+    }
+
+    private boolean isSameDay(Timestamp lastStudiedStartAt, Timestamp lastStudiedEndAt) {
+        LocalDate date1 = lastStudiedStartAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate date2 = lastStudiedEndAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return date1.equals(date2);
+    }
+
+    private long getMinuteDifference(Timestamp ts1, Timestamp ts2) {
+        Instant instant1 = ts1.toInstant();
+        Instant instant2 = ts2.toInstant();
+        return Duration.between(instant1, instant2).toMinutes();
+    }
+
+    public static Timestamp getMidnightTimestamp(Timestamp timestamp) {
+        // Chuyển Timestamp -> LocalDateTime
+        LocalDateTime localDateTime = timestamp.toInstant()
+                .atZone(ZoneId.systemDefault()) // Dùng múi giờ hệ thống
+                .toLocalDate()
+                .atStartOfDay(); // Đặt về 00:00:00
+
+        // Chuyển LocalDateTime -> Timestamp
+        return Timestamp.valueOf(localDateTime);
+    }
+
 }
