@@ -50,19 +50,21 @@ public class CourseDetailResponseMapper implements Mapper<Course, CourseDetailRe
                 .collect(Collectors.toList())
                 : Collections.emptyList();
 
-        // Ánh xạ chapters
+        // Ánh xạ chapters với completedLessons
         List<ChapterResponseDto> chapterDtos = course.getChapters() != null
                 ? course.getChapters().stream()
-                .map(chapterResponseMapper::mapFrom)
+                .map(chapter -> chapterResponseMapper.mapFrom(chapter, completedLessons))
                 .collect(Collectors.toList())
                 : Collections.emptyList();
 
         return CourseDetailResponseDto.builder()
                 .id(course.getId())
+                .description(course.getDescription())
                 .title(course.getTitle())
                 .image(course.getImage())
                 .status(course.getStatus())
                 .rate(course.getRate())
+                .updatedAt(course.getUpdatedAt().getTime())
                 .numberOfParticipant(course.getNumberOfParticipant())
                 .progress(progress)
                 .topics(topicDtos)

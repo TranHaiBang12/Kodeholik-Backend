@@ -1,5 +1,6 @@
 package com.g44.kodeholik.util.mapper.response.course;
 
+import com.g44.kodeholik.model.dto.response.course.LessonResponseDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,7 @@ import com.g44.kodeholik.util.mapper.Mapper;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +27,16 @@ public class ChapterResponseMapper implements Mapper<Chapter, ChapterResponseDto
 
     @Override
     public ChapterResponseDto mapFrom(Chapter chapter) {
+        return mapFrom(chapter, Collections.emptyList()); // Mặc định nếu không có completedLessons
+    }
+
+    public ChapterResponseDto mapFrom(Chapter chapter, List<Long> completedLessons) {
+        List<LessonResponseDto> lessonDtos = chapter.getLessons() != null
+                ? chapter.getLessons().stream()
+                .map(lesson -> lessonResponseMapper.mapFrom(lesson, completedLessons))
+                .toList()
+                : Collections.emptyList();
+
         return ChapterResponseDto.builder()
                 .id(chapter.getId())
                 .courseId(chapter.getCourse() != null ? chapter.getCourse().getId() : null)
@@ -32,9 +44,7 @@ public class ChapterResponseMapper implements Mapper<Chapter, ChapterResponseDto
                 .description(chapter.getDescription())
                 .displayOrder(chapter.getDisplayOrder())
                 .status(chapter.getStatus())
-                .lessons(chapter.getLessons() != null
-                        ? chapter.getLessons().stream().map(lessonResponseMapper::mapFrom).toList()
-                        : Collections.emptyList())
+                .lessons(lessonDtos)
                 .build();
     }
 
@@ -47,5 +57,4 @@ public class ChapterResponseMapper implements Mapper<Chapter, ChapterResponseDto
                 .status(chapter.getStatus())
                 .build();
     }
-
 }

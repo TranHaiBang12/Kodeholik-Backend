@@ -82,19 +82,27 @@ public class CourseServiceImpl implements CourseService {
 
     private final LessonRepository lessonRepository;
 
+    public List<Long> getCompletedLessons() {
+        Users currentUser = userService.getCurrentUser();
+        if (currentUser == null) {
+            return Collections.emptyList();
+        }
+        return userLessonProgressRepository.findByUserId(currentUser.getId())
+                .stream()
+                .map(progress -> progress.getLesson().getId())
+                .collect(Collectors.toList());
+    }
+
     @Override
     public CourseDetailResponseDto getCourseById(Long courseId) {
-        // Lấy course cùng với chapters và lessons
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found"));
 
-        // Lấy danh sách chapters của course
         List<Chapter> chapters = course.getChapters();
         if (chapters == null || chapters.isEmpty()) {
             return courseDetailResponseMapper.mapFromCourseAndLesson(course, Collections.emptyList(), Collections.emptyList());
         }
 
-        // Lấy danh sách tất cả lesson từ các chapters
         List<Long> lessonIds = chapters.stream()
                 .flatMap(chapter -> {
                     List<Lesson> lessons = chapter.getLessons();
@@ -103,18 +111,12 @@ public class CourseServiceImpl implements CourseService {
                 .map(Lesson::getId)
                 .collect(Collectors.toList());
 
-        // Lấy người dùng hiện tại
-        Users currentUser = userService.getCurrentUser();
-        Long userId = currentUser.getId();
-
-        // Lấy danh sách lesson đã "hoàn thành" của người dùng từ user_lesson_progress
-        List<Long> completedLessons = userLessonProgressRepository.findByUserId(userId)
+        // Sử dụng getCompletedLessons() để lấy danh sách lesson đã hoàn thành
+        List<Long> completedLessons = getCompletedLessons()
                 .stream()
-                .map(userLessonProgress -> userLessonProgress.getId().getLessonId())
                 .filter(lessonId -> lessonIds.contains(lessonId)) // Chỉ lấy lesson thuộc course này
                 .collect(Collectors.toList());
 
-        // Ánh xạ với mapper
         return courseDetailResponseMapper.mapFromCourseAndLesson(course, lessonIds, completedLessons);
     }
 
@@ -242,13 +244,6 @@ public class CourseServiceImpl implements CourseService {
         return courses.map(course -> courseResponseMapper.mapFromCourseAndLesson(course, completedLessons));
     }
 
-    public List<Long> getCompletedLessons() {
-        Users currentUser = userService.getCurrentUser();
-        return userLessonProgressRepository.findByUserId(currentUser.getId())
-                .stream()
-                .map(progress -> progress.getLesson().getId())
-                .collect(Collectors.toList());
-    }
 
 
     @Transactional

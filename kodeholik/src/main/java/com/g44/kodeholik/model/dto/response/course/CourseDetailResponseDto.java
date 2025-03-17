@@ -1,8 +1,10 @@
 package com.g44.kodeholik.model.dto.response.course;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.g44.kodeholik.model.dto.response.setting.TopicResponseDto;
 import com.g44.kodeholik.model.enums.course.ChapterStatus;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
+import com.g44.kodeholik.util.serializer.TimestampSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +28,9 @@ public class CourseDetailResponseDto {
     private CourseStatus status;
 
     private Double rate;
+
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long updatedAt;
 
     private Integer numberOfParticipant;
 
