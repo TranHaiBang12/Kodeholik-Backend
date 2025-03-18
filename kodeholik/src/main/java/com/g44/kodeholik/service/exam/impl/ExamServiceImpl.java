@@ -760,7 +760,9 @@ public class ExamServiceImpl implements ExamService {
         Users user = userService.getUserById(userId);
         Exam exam = getExamByCode(code);
         ExamResultOverviewResponseDto examResultOverviewResponseDto = new ExamResultOverviewResponseDto();
-
+        if (exam.getStatus() != ExamStatus.END) {
+            throw new BadRequestException("This exam is not ended yet", "This exam is not ended yet");
+        }
         ExamParticipant examParticipant = examParticipantRepository.findByExamAndParticipant(exam, user)
                 .orElseThrow(() -> new NotFoundException("Exam not found", "Exam not found"));
         examResultOverviewResponseDto.setGrade(examParticipant.getGrade());
