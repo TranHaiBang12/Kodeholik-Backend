@@ -11,13 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class ExamProblemDetailResponseDto {
-    private String problemLink;
+public class ExamDetailResponseDto {
+    private long duration;
 
-    private String problemTitle;
-
-    private String problemDescription;
-
-    private List<ExamCompileInformationResponseDto> compileInformation;
-
+    private List<ExamProblemDetailResponseDto> problems;
 }

@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.exam.impl;
 import java.sql.Timestamp;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamListStudentResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
@@ -184,6 +186,7 @@ public class ExamServiceImpl implements ExamService {
 
         exam = examRepository.save(exam);
 
+        List<ExamProblem> examProblems = new ArrayList();
         for (ExamProblemRequestDto problemExam : problemExams) {
             Problem problem = problemService.getProblemByExamProblemRequest(problemExam);
             if (!checkLanguageSupportEquals(languages, problem.getLanguageSupport())) {
@@ -192,8 +195,9 @@ public class ExamServiceImpl implements ExamService {
             }
             ExamProblemId examProblemId = new ExamProblemId(exam.getId(), problem.getId());
             ExamProblem examProblem = new ExamProblem(examProblemId, exam, problem, problemExam.getProblemPoint());
-            examProblemRepository.save(examProblem);
+            examProblems.add(examProblem);
         }
+        examProblemRepository.saveAll(examProblems);
 
         ExamResponseDto examResponseDto = getExamDetailByCode(code);
         eventPublisher.publishEvent(new ExamStartEvent(this, code, exam.getStartTime().toInstant()));
@@ -248,12 +252,15 @@ public class ExamServiceImpl implements ExamService {
         }
         exam = examRepository.save(exam);
         examProblemRepository.deleteByExam(exam);
+        List<ExamProblem> examProblems = new ArrayList();
+
         for (ExamProblemRequestDto problemExam : problemExams) {
             Problem problem = problemService.getProblemByExamProblemRequest(problemExam);
             ExamProblemId examProblemId = new ExamProblemId(exam.getId(), problem.getId());
             ExamProblem examProblem = new ExamProblem(examProblemId, exam, problem, problemExam.getProblemPoint());
-            examProblemRepository.save(examProblem);
+            examProblems.add(examProblem);
         }
+        examProblemRepository.saveAll(examProblems);
 
         eventPublisher.publishEvent(new ExamStartEvent(this, code, exam.getStartTime().toInstant()));
         ExamResponseDto examResponseDto = getExamDetailByCode(code);
@@ -391,7 +398,8 @@ public class ExamServiceImpl implements ExamService {
 
     @Transactional
     @Override
-    public List<ExamProblemDetailResponseDto> getProblemDetailInExam(String code) {
+    public ExamDetailResponseDto getProblemDetailInExam(String code) {
+        ExamDetailResponseDto examDetailResponseDto = new ExamDetailResponseDto();
         List<ExamProblemDetailResponseDto> result = new ArrayList();
         Exam exam = getExamByCode(code);
         Map<String, Object> mapError = new HashMap<String, Object>();
@@ -414,6 +422,7 @@ public class ExamServiceImpl implements ExamService {
             for (int i = 0; i < examProblems.size(); i++) {
                 Problem problem = examProblems.get(i).getProblem();
                 ExamProblemDetailResponseDto examProblemDetailResponseDto = new ExamProblemDetailResponseDto();
+                examProblemDetailResponseDto.setProblemLink(problem.getLink());
                 examProblemDetailResponseDto.setProblemTitle(problem.getTitle());
                 examProblemDetailResponseDto.setProblemDescription(problem.getDescription());
 
@@ -430,7 +439,10 @@ public class ExamServiceImpl implements ExamService {
                 result.add(examProblemDetailResponseDto);
             }
         }
-        return result;
+        examDetailResponseDto.setDuration(getMinuteDifference(exam.getStartTime(), exam.getEndTime()) * 60);
+        examDetailResponseDto.setProblems(result);
+        log.info(examDetailResponseDto);
+        return examDetailResponseDto;
     }
 
     @Override
@@ -515,7 +527,8 @@ public class ExamServiceImpl implements ExamService {
             }
         }
         if (mapError.isEmpty()) {
-            ExamResultOverviewResponseDto examResultResponseDto = problemService.submitExam(submitExamRequestDto);
+            ExamResultOverviewResponseDto examResultResponseDto = problemService.submitExam(submitExamRequestDto,
+                    currentUser);
             List<ProblemResultOverviewResponseDto> problemResultDetailResponseDtoList = examResultResponseDto
                     .getProblemResults();
 
@@ -588,7 +601,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public List<ExamProblemDetailResponseDto> startExam(String code) {
+    public ExamDetailResponseDto startExam(String code) {
         Exam exam = getExamByCode(code);
         exam.setStatus(ExamStatus.IN_PROGRESS);
         examRepository.save(exam);
@@ -747,7 +760,9 @@ public class ExamServiceImpl implements ExamService {
         Users user = userService.getUserById(userId);
         Exam exam = getExamByCode(code);
         ExamResultOverviewResponseDto examResultOverviewResponseDto = new ExamResultOverviewResponseDto();
-
+        if (exam.getStatus() != ExamStatus.END) {
+            throw new BadRequestException("This exam is not ended yet", "This exam is not ended yet");
+        }
         ExamParticipant examParticipant = examParticipantRepository.findByExamAndParticipant(exam, user)
                 .orElseThrow(() -> new NotFoundException("Exam not found", "Exam not found"));
         examResultOverviewResponseDto.setGrade(examParticipant.getGrade());
@@ -783,6 +798,12 @@ public class ExamServiceImpl implements ExamService {
         return examResultOverviewResponseDto;
     }
 
+    private long getMinuteDifference(Timestamp ts1, Timestamp ts2) {
+        Instant instant1 = ts1.toInstant();
+        Instant instant2 = ts2.toInstant();
+        return Duration.between(instant1, instant2).toMinutes();
+    }
+
     @Override
     public void sendNotiToUserExamAboutToStart() {
         Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -801,7 +822,8 @@ public class ExamServiceImpl implements ExamService {
                             "", NotificationType.SYSTEM);
                     emailService.sendEmailNotifyExam30Minutes(user.getEmail(), "[KODEHOLIK] Exam Reminder",
                             user.getUsername(),
-                            formattedDate, examList.get(i).getCode());
+                            formattedDate, examList.get(i).getCode(),
+                            getMinuteDifference(examList.get(i).getStartTime(), examList.get(i).getEndTime()));
                 }
             }
         }
@@ -816,7 +838,7 @@ public class ExamServiceImpl implements ExamService {
                     redisService.saveKeyCheckExamReminder(user.getUsername(), examList5Minutes.get(i).getCode(), 5);
                     notificationService.saveNotification(user, "There is a exam that will start on " + formattedDate,
                             "", NotificationType.SYSTEM);
-                    emailService.sendEmailNotifyExam30Minutes(user.getEmail(), "[KODEHOLIK] Exam Reminder",
+                    emailService.sendEmailNotifyExam5Minutes(user.getEmail(), "[KODEHOLIK] Exam Reminder",
                             user.getUsername(),
                             formattedDate, examList5Minutes.get(i).getCode());
                 }

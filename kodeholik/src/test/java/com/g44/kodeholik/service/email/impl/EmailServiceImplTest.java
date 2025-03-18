@@ -25,144 +25,145 @@ import jakarta.mail.internet.MimeMessage;
 @ExtendWith(MockitoExtension.class)
 public class EmailServiceImplTest {
 
-    @Mock
-    private JavaMailSender javaMailSender;
+        @Mock
+        private JavaMailSender javaMailSender;
 
-    @Mock
-    private TemplateEngine templateEngine;
+        @Mock
+        private TemplateEngine templateEngine;
 
-    @InjectMocks
-    private EmailServiceImpl emailServiceImpl;
+        @InjectMocks
+        private EmailServiceImpl emailServiceImpl;
 
-    @Mock
-    private MimeMessage mimeMessage;
+        @Mock
+        private MimeMessage mimeMessage;
 
-    @Mock
-    private MimeMessageHelper mimeMessageHelper;
+        @Mock
+        private MimeMessageHelper mimeMessageHelper;
 
-    @BeforeEach
-    public void setUp() {
-        doNothing().when(javaMailSender).send(any(MimeMessage.class));
-    }
+        @BeforeEach
+        public void setUp() {
+                doNothing().when(javaMailSender).send(any(MimeMessage.class));
+        }
 
-    @Test
-    public void testSendEmailResetPassword() {
+        @Test
+        public void testSendEmailResetPassword() {
 
-        String username = "test";
-        String link = "test-link";
+                String username = "test";
+                String link = "test-link";
 
-        MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+                MimeMessage mimeMessage = mock(MimeMessage.class);
+                when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        // Mock TemplateEngine đúng template name
-        when(templateEngine.process(eq("reset-password"),
-                any(Context.class)))
-                .thenReturn("<html>Email Content</html>");
+                // Mock TemplateEngine đúng template name
+                when(templateEngine.process(eq("reset-password"),
+                                any(Context.class)))
+                                .thenReturn("<html>Email Content</html>");
 
-        // Gọi phương thức cần test
-        emailServiceImpl.sendEmailResetPassword(
-                "test@example.com",
-                "Reset Password",
-                username,
-                link);
+                // Gọi phương thức cần test
+                emailServiceImpl.sendEmailResetPassword(
+                                "test@example.com",
+                                "Reset Password",
+                                username,
+                                link);
 
-        verify(javaMailSender, times(1))
-                .send(any(MimeMessage.class));
-    }
+                verify(javaMailSender, times(1))
+                                .send(any(MimeMessage.class));
+        }
 
-    @Test
-    public void testSendEmailLoginGoogle() {
+        @Test
+        public void testSendEmailLoginGoogle() {
 
-        String username = "test";
-        String password = "test";
+                String username = "test";
+                String password = "test";
 
-        MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+                MimeMessage mimeMessage = mock(MimeMessage.class);
+                when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        // Mock TemplateEngine đúng template name
-        when(templateEngine.process(eq("login-google"),
-                any(Context.class)))
-                .thenReturn("<html>Email Content</html>");
+                // Mock TemplateEngine đúng template name
+                when(templateEngine.process(eq("login-google"),
+                                any(Context.class)))
+                                .thenReturn("<html>Email Content</html>");
 
-        // Gọi phương thức cần test
-        emailServiceImpl.sendEmailLoginGoogle("test@example.com",
-                "Reset Password",
-                username,
-                password);
+                // Gọi phương thức cần test
+                emailServiceImpl.sendEmailLoginGoogle("test@example.com",
+                                "Reset Password",
+                                username,
+                                password,
+                                "test@example.com");
 
-        verify(javaMailSender, times(1))
-                .send(any(MimeMessage.class));
-    }
+                verify(javaMailSender, times(1))
+                                .send(any(MimeMessage.class));
+        }
 
-    @Test
-    public void testSendEmailAddUser() {
-        String username = "test";
-        String password = "test";
+        @Test
+        public void testSendEmailAddUser() {
+                String username = "test";
+                String password = "test";
 
-        MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+                MimeMessage mimeMessage = mock(MimeMessage.class);
+                when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        // Mock TemplateEngine đúng template name
-        when(templateEngine.process(eq("add-user"),
-                any(Context.class)))
-                .thenReturn("<html>Email Content</html>");
+                // Mock TemplateEngine đúng template name
+                when(templateEngine.process(eq("add-user"),
+                                any(Context.class)))
+                                .thenReturn("<html>Email Content</html>");
 
-        // Gọi phương thức cần test
-        emailServiceImpl.sendEmailAddUser("test@example.com",
-                "Reset Password",
-                username,
-                password);
+                // Gọi phương thức cần test
+                emailServiceImpl.sendEmailAddUser("test@example.com",
+                                "Reset Password",
+                                username,
+                                password);
 
-        verify(javaMailSender, times(1))
-                .send(any(MimeMessage.class));
-    }
+                verify(javaMailSender, times(1))
+                                .send(any(MimeMessage.class));
+        }
 
-    @Test
-    public void testSendEmailNotifyExam30Minutes() {
-        String username = "test";
-        String date = "03-10-2025, 16:25";
-        String code = "test";
+        @Test
+        public void testSendEmailNotifyExam30Minutes() {
+                String username = "test";
+                String date = "03-10-2025, 16:25";
+                String code = "test";
 
-        MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+                MimeMessage mimeMessage = mock(MimeMessage.class);
+                when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        // Mock TemplateEngine đúng template name
-        when(templateEngine.process(eq("exam-noti-30"),
-                any(Context.class)))
-                .thenReturn("<html>Email Content</html>");
+                // Mock TemplateEngine đúng template name
+                when(templateEngine.process(eq("exam-noti-30"),
+                                any(Context.class)))
+                                .thenReturn("<html>Email Content</html>");
 
-        // Gọi phương thức cần test
-        emailServiceImpl.sendEmailNotifyExam30Minutes("test@example.com",
-                "Reset Password",
-                username,
-                date, code);
+                // Gọi phương thức cần test
+                emailServiceImpl.sendEmailNotifyExam30Minutes("test@example.com",
+                                "Reset Password",
+                                username,
+                                date, code, 0L);
 
-        verify(javaMailSender, times(1))
-                .send(any(MimeMessage.class));
-    }
+                verify(javaMailSender, times(1))
+                                .send(any(MimeMessage.class));
+        }
 
-    @Test
-    public void testSendEmailNotifyExam5Minutes() {
-        String username = "test";
-        String date = "03-10-2025, 16:25";
-        String code = "test";
+        @Test
+        public void testSendEmailNotifyExam5Minutes() {
+                String username = "test";
+                String date = "03-10-2025, 16:25";
+                String code = "test";
 
-        MimeMessage mimeMessage = mock(MimeMessage.class);
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+                MimeMessage mimeMessage = mock(MimeMessage.class);
+                when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        // Mock TemplateEngine đúng template name
-        when(templateEngine.process(eq("exam-noti-5"),
-                any(Context.class)))
-                .thenReturn("<html>Email Content</html>");
+                // Mock TemplateEngine đúng template name
+                when(templateEngine.process(eq("exam-noti-5"),
+                                any(Context.class)))
+                                .thenReturn("<html>Email Content</html>");
 
-        // Gọi phương thức cần test
-        emailServiceImpl.sendEmailNotifyExam5Minutes("test@example.com",
-                "Reset Password",
-                username,
-                date, code);
+                // Gọi phương thức cần test
+                emailServiceImpl.sendEmailNotifyExam5Minutes("test@example.com",
+                                "Reset Password",
+                                username,
+                                date, code);
 
-        verify(javaMailSender, times(1))
-                .send(any(MimeMessage.class));
-    }
+                verify(javaMailSender, times(1))
+                                .send(any(MimeMessage.class));
+        }
 
 }

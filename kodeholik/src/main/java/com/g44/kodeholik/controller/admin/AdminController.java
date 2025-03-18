@@ -45,7 +45,7 @@ public class AdminController {
 
     @PostMapping("/list-user")
     public ResponseEntity<Page<ProfileResponseDto>> getListUsers(
-            @RequestBody FilterUserRequestDto filterUserRequestDto) {
+            @RequestBody @Valid FilterUserRequestDto filterUserRequestDto) {
         Page<ProfileResponseDto> results = userService.getListOfUsers(filterUserRequestDto);
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -67,7 +67,7 @@ public class AdminController {
 
     @PutMapping("/edit-user/{id}")
     public ResponseEntity<ProfileResponseDto> editUser(@PathVariable Long id,
-            @ModelAttribute EditUserAvatarFileDto editUserAvatarFileDto) {
+            @ModelAttribute @Valid EditUserAvatarFileDto editUserAvatarFileDto) {
         return ResponseEntity.ok(userService.editUserByAdmin(id, editUserAvatarFileDto));
     }
 
@@ -97,7 +97,7 @@ public class AdminController {
 
     @PostMapping("/list-tag")
     public ResponseEntity<Page<TagResponseDto>> getListTag(
-            @RequestBody FilterTagRequestDto filterTagRequestDto) {
+            @RequestBody @Valid FilterTagRequestDto filterTagRequestDto) {
         Page<TagResponseDto> result = tagService.getListTag(filterTagRequestDto);
         if (result.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -106,13 +106,13 @@ public class AdminController {
     }
 
     @PostMapping("/add-tag")
-    public ResponseEntity<?> addTag(@RequestBody AddTagRequestDto addTagRequestDto) {
+    public ResponseEntity<?> addTag(@RequestBody @Valid AddTagRequestDto addTagRequestDto) {
         tagService.addTag(addTagRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/edit-tag/{id}")
-    public ResponseEntity<?> editTag(@PathVariable Long id, @RequestBody EditTagRequestDto editTagRequestDto) {
+    public ResponseEntity<?> editTag(@PathVariable Long id, @RequestBody @Valid EditTagRequestDto editTagRequestDto) {
         tagService.editTag(id, editTagRequestDto);
         return ResponseEntity.noContent().build();
     }

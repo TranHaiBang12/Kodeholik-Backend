@@ -47,6 +47,8 @@ public class SecurityConfig {
                         "/api/v1/problem/description/**",
                         "/api/v1/problem/compile-information/**",
                         "/api/v1/course/list/**",
+                        "/api/v1/course/top-popular",
+                        "/api/v1/openai/**",
                         "/api/v1/course/detail/**",
                         "/api/v1/course/search/**",
                         "/api/v1/tag/all-skill/**",

@@ -11,6 +11,7 @@ import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.service.user.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -29,7 +30,8 @@ public class UserController {
     private final UserService userService;
 
     @PutMapping("/edit-profile")
-    public ResponseEntity<ProfileResponseDto> editProfile(@ModelAttribute EditProfileRequestDto editProfileRequestDto,
+    public ResponseEntity<ProfileResponseDto> editProfile(
+            @ModelAttribute @Valid EditProfileRequestDto editProfileRequestDto,
             HttpServletRequest request) {
         return ResponseEntity.ok(userService.editProfile(editProfileRequestDto, request));
     }

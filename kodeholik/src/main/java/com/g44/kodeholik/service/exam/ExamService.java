@@ -15,6 +15,7 @@ import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamListStudentResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
@@ -44,14 +45,14 @@ public interface ExamService {
 
         public List<String> getCodeFromExamReadyToStarted();
 
-        public List<ExamProblemDetailResponseDto> getProblemDetailInExam(String code);
+        public ExamDetailResponseDto getProblemDetailInExam(String code);
 
         public double submitExam(List<SubmitExamRequestDto> submitExamRequestDto, String code,
                         String username);
 
         public Object generateTokenForExam(String code);
 
-        public List<ExamProblemDetailResponseDto> startExam(String code);
+        public ExamDetailResponseDto startExam(String code);
 
         public RunProblemResponseDto runExam(String examCode, String link,
                         ProblemCompileRequestDto problemCompileRequestDto);

@@ -3,6 +3,9 @@ package com.g44.kodeholik.service.course;
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -27,4 +30,14 @@ public interface CourseService {
     public void unenrollUserFromCourse(Long courseId);
 
     public boolean isUserEnrolled(Long courseId);
+
+    public void addTop5PopularCourse();
+
+    public List<CourseResponseDto> getTop5PopularCourse();
+
+    public void registerStartTime(Long courseId);
+
+    public void registerEndTime(Long courseId);
+
+    public void sendEmailBasedOnStudyStreak();
 }

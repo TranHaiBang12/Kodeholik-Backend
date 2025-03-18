@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
         String password = PasswordUtils.generatePassword();
         Users user = addUser(addUserRequestDto, UserStatus.ACTIVATED, password);
         emailService.sendEmailLoginGoogle(user.getEmail(), "[KODEHOLIK] First Time Login", user.getUsername(),
-                password);
+                password, user.getEmail());
         notificationService.saveNotification(user, "Welcome to Kodeholik",
                 null, NotificationType.SYSTEM);
         return user;
