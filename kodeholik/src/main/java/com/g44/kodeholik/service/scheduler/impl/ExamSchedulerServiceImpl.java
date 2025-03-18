@@ -62,7 +62,7 @@ public class ExamSchedulerServiceImpl implements ExamSchedulerService {
         ExamDetailResponseDto examProblemDetailResponseDtos = examService.startExam(code);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("code", code);
-        map.put("problems", examProblemDetailResponseDtos);
+        map.put("details", examProblemDetailResponseDtos);
         publisher.startExam(map);
     }
 }

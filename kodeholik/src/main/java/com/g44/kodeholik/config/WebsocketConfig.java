@@ -44,7 +44,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws/notification") // API WebSocket cho client kết nối
 
                 .addInterceptors(new JwtNotiHandShakeInterceptor(tokenService, websocketSessionManager))
-                .setAllowedOrigins("*")
+                .setAllowedOrigins(feUrl, adminFeUrl)
 
                 .withSockJS();
     }
