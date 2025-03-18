@@ -20,7 +20,8 @@ public class OpenAIController {
 
     @GetMapping("/test")
     public ResponseEntity<String> getContentEmailReminder() {
-        return ResponseEntity.ok(openAIService.generateContentEmailReminder());
+        return ResponseEntity.ok(openAIService.generateContentEmailReminder(
+                "Hãy tạo một email nhắc nhở Bằng vào học sau khi đã không học trong 5 ngày liên tiếp. Bạn có thể viết với thái độ nghiêm túc, động viên cậu ấy tiếp tục học, không cần viết những phần như chào hay trân trọng, chỉ tập trung vào nội dung"));
     }
 
 }

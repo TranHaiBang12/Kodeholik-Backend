@@ -11,6 +11,7 @@ import org.thymeleaf.context.Context;
 import com.g44.kodeholik.exception.EmailSendingException;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.email.EmailService;
+import com.g44.kodeholik.service.openai.OpenAIService;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,8 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
 
     private final TemplateEngine templateEngine;
+
+    private final OpenAIService openAIService;
 
     @Async("emailTaskExecutor")
     private void sendEmail(String to, String subject, Context context, String template) {
@@ -93,6 +96,16 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("date", date);
         context.setVariable("code", code);
         sendEmail(to, subject, context, "exam-noti-5");
+    }
+
+    @Async("emailTaskExecutor")
+    @Override
+    public void sendEmailRemindLearning(String to, String subject, String username, String content) {
+        Context context = new Context();
+        content = openAIService.generateContentEmailReminder(content);
+        context.setVariable("username", username);
+        context.setVariable("content", content);
+        sendEmail(to, subject, context, "learn-reminder");
     }
 
 }

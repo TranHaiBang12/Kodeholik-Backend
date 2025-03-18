@@ -31,12 +31,10 @@ import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
 import com.g44.kodeholik.model.enums.user.UserRole;
-import com.g44.kodeholik.repository.*;
 import com.g44.kodeholik.repository.exam.ExamParticipantRepository;
 import com.g44.kodeholik.repository.exam.ExamProblemRepository;
 import com.g44.kodeholik.repository.exam.ExamRepository;
 import com.g44.kodeholik.repository.exam.ExamSubmissionRepository;
-import com.g44.kodeholik.service.*;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.email.EmailService;
 import com.g44.kodeholik.service.problem.ProblemService;
@@ -185,8 +183,8 @@ class ExamServiceImplTest {
                 List<ExamProblemRequestDto> examProblemRequestDtos = List.of(examProblemRequestDto);
 
                 AddExamRequestDto addExamRequestDto = new AddExamRequestDto();
-                addExamRequestDto.setStartTime(Timestamp.from(Instant.now().plusSeconds(3600)));
-                addExamRequestDto.setEndTime(Timestamp.from(Instant.now().plusSeconds(7200)));
+                addExamRequestDto.setStartTime(Timestamp.from(Instant.now().minusSeconds(3600)));
+                addExamRequestDto.setEndTime(Timestamp.from(Instant.now().minusSeconds(7200)));
                 addExamRequestDto.setLanguageSupports(Collections.singletonList("Java"));
                 addExamRequestDto.setProblemRequests(examProblemRequestDtos);
 

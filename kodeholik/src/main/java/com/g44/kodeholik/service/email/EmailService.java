@@ -12,4 +12,6 @@ public interface EmailService {
 
     public void sendEmailNotifyExam5Minutes(String to, String subject, String username, String date, String code);
 
+    public void sendEmailRemindLearning(String to, String subject, String username, String content);
+
 }

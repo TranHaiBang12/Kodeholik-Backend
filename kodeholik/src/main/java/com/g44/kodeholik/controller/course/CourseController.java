@@ -28,6 +28,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequiredArgsConstructor
@@ -123,6 +126,18 @@ public class CourseController {
     public ResponseEntity<Boolean> checkUserEnrollment(@PathVariable Long courseId) {
         boolean isEnrolled = courseService.isUserEnrolled(courseId);
         return ResponseEntity.ok(isEnrolled);
+    }
+
+    @PutMapping("/register-start/{courseId}")
+    public ResponseEntity<Void> registerStart(@PathVariable Long courseId) {
+        courseService.registerStartTime(courseId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/register-end/{courseId}")
+    public ResponseEntity<Void> registerEnd(@PathVariable Long courseId) {
+        courseService.registerEndTime(courseId);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -27,11 +27,10 @@ public class OpenAIServiceImpl implements OpenAIService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
-    public String generateContentEmailReminder() {
+    public String generateContentEmailReminder(String content) {
         Message message = new Message();
         message.setRole("user");
-        message.setContent("Hãy tạo một email nhắc nhở hài hước, cá nhân hóa cho "
-                + "Bằng" + " về việc học sau 1 ngày chưa vào học");
+        message.setContent(content);
 
         OpenAIRequestDto request = new OpenAIRequestDto();
         request.setMessages(Collections.singletonList(message));
