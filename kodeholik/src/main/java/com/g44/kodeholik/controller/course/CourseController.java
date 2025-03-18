@@ -10,6 +10,7 @@ import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.service.course.CourseCommentService;
 import com.g44.kodeholik.service.course.CourseRatingService;
+import com.g44.kodeholik.util.validation.image.ValidImage;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -46,7 +47,7 @@ public class CourseController {
     @PostMapping("/add")
     public ResponseEntity<?> addCourse(
             @Valid @RequestPart("data") CourseRequestDto requestDto,
-            @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+            @ValidImage @RequestPart(value = "image", required = false) MultipartFile imageFile) {
 
         courseService.addCourse(requestDto, imageFile);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
@@ -56,7 +57,7 @@ public class CourseController {
     public ResponseEntity<?> editCourse(
             @PathVariable Long id,
             @Valid @RequestPart("data") CourseRequestDto requestDto,
-            @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+            @ValidImage @RequestPart(value = "image", required = false) MultipartFile imageFile) {
 
         courseService.editCourse(id, requestDto, imageFile);
         return ResponseEntity.ok().build();
@@ -105,8 +106,14 @@ public class CourseController {
     }
 
     @GetMapping("/discussion/{courseId}")
-    public ResponseEntity<List<CommentResponseDto>> getDiscussionByCourseId(@PathVariable Long courseId) {
-        List<CommentResponseDto> discussions = courseCommentService.getDiscussionByCourseId(courseId);
+    public ResponseEntity<Page<CommentResponseDto>> getCourseDiscussions(
+            @PathVariable Long courseId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "noUpvote") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection) {
+
+        Page<CommentResponseDto> discussions = courseCommentService.getDiscussionByCourseId(courseId, page, size, sortBy, sortDirection);
         return ResponseEntity.ok(discussions);
     }
 

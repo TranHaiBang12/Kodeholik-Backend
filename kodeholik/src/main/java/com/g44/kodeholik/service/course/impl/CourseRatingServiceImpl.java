@@ -9,6 +9,7 @@ import com.g44.kodeholik.model.entity.course.CourseRating;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.repository.course.CourseRatingRepository;
 import com.g44.kodeholik.repository.course.CourseRepository;
+import com.g44.kodeholik.repository.course.CourseUserRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.course.CourseRatingService;
 import com.g44.kodeholik.service.user.UserService;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 public class CourseRatingServiceImpl implements CourseRatingService {
     private final CourseRatingRepository courseRatingRepository;
     private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
+    private final CourseUserRepository courseUserRepository;
     private final UserService userService;
     private final CourseRatingResponseMapper courseRatingResponseMapper;
 
@@ -38,12 +39,18 @@ public class CourseRatingServiceImpl implements CourseRatingService {
         Course course = courseRepository.findById(requestDto.getCourseId())
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found"));
 
-        // Check if the user has already rated the course
+        // Kiểm tra xem người dùng đã enroll vào course chưa
+        boolean alreadyEnrolled = courseUserRepository.existsByCourseAndUser(course, currentUser);
+        if (alreadyEnrolled) {
+            throw new BadRequestException("You must enroll in the course before rating", "User not enrolled");
+        }
+
+        // Kiểm tra xem người dùng đã rate course chưa
         if (courseRatingRepository.findByCourseIdAndUserId(course.getId(), currentUser.getId()).isPresent()) {
             throw new BadRequestException("You have already rated this course", "User can rate only once per course");
         }
 
-        // Create new rating
+        // Tạo mới CourseRating
         CourseRating courseRating = CourseRating.builder()
                 .course(course)
                 .user(currentUser)
@@ -54,8 +61,8 @@ public class CourseRatingServiceImpl implements CourseRatingService {
                 .build();
 
         courseRatingRepository.save(courseRating);
-        updateCourseRating(course);
-        return courseRatingResponseMapper.mapFrom(courseRating);
+        updateCourseRating(course); // Giả định đây là method cập nhật rating trung bình của course
+        return new CourseRatingResponseDto(courseRating); // Sử dụng constructor của DTO
     }
 
     private void updateCourseRating(Course course) {

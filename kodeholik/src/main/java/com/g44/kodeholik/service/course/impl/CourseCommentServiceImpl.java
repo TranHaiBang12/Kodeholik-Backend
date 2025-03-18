@@ -15,6 +15,10 @@ import com.g44.kodeholik.service.course.CourseCommentService;
 import com.g44.kodeholik.service.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -64,22 +68,42 @@ public class CourseCommentServiceImpl implements CourseCommentService {
     }
 
     @Override
-    public List<CommentResponseDto> getDiscussionByCourseId(Long courseId) {
+    public Page<CommentResponseDto> getDiscussionByCourseId(Long courseId, int page, int size, String sortBy, String sortDirection) {
         if (!courseRepository.existsById(courseId)) {
             throw new RuntimeException("Course not found");
         }
 
-        List<Comment> comments = courseCommentRepository.findCommentsByCourseId(courseId);
+        // Xử lý direction
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
 
-        return comments.stream()
-                .map(comment -> {
-                    CommentResponseDto dto = new CommentResponseDto(comment);
-                    dto.setReplyId(comment.getCommentReply() != null ? comment.getCommentReply().getId() : null);
-                    dto.setNoReply(commentRepository.countByCommentReply(comment)); // ✅ Gọi repository để đếm số reply
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        // Tạo Sort object dựa trên sortBy
+        Sort sort;
+        if ("noUpvote".equalsIgnoreCase(sortBy)) {
+            sort = Sort.by(direction, "comment.noUpvote");
+        } else if ("createdAt".equalsIgnoreCase(sortBy)) {
+            sort = Sort.by(direction, "comment.createdAt");
+        } else {
+            // Mặc định sort theo noUpvote giảm dần nếu tham số không hợp lệ
+            sort = Sort.by(Sort.Direction.DESC, "comment.noUpvote");
+        }
+
+        // Tạo Pageable object
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Lấy dữ liệu từ repository
+        Page<CourseComment> courseComments = courseCommentRepository.findByCourseId(courseId, pageable);
+
+        // Chuyển đổi sang CommentResponseDto
+        return courseComments.map(courseComment -> {
+            Comment comment = courseComment.getComment();
+            CommentResponseDto dto = new CommentResponseDto(comment);
+            dto.setReplyId(comment.getCommentReply() != null ? comment.getCommentReply().getId() : null);
+            dto.setNoReply(commentRepository.countByCommentReply(comment));
+            return dto;
+        });
     }
+
+
 
 }
 

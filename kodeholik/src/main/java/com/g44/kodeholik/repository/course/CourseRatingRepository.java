@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface CourseRatingRepository extends JpaRepository<CourseRating, Long> {
     Optional<CourseRating> findByCourseIdAndUserId(Long courseId, Long userId);
-
+    boolean existsByCourseIdAndUserId(Long courseId, Long userId);
     List<CourseRating> findByCourseId(Long courseId);
 }
