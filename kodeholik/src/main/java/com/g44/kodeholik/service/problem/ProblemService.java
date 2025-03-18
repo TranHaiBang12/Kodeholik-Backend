@@ -169,7 +169,8 @@ public interface ProblemService {
 
         public Problem getProblemByExamProblemRequest(ExamProblemRequestDto request);
 
-        public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto);
+        public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto,
+                        Users currentUser);
 
         public RunProblemResponseDto runExam(String link, ProblemCompileRequestDto problemCompileRequestDto);
 

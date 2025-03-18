@@ -63,7 +63,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public void runOnStart() {
         syncProblemToElasticsearch();
         addTop5PopularCourse();
-        // sendEmailRemindUserStudy();
+        sendEmailRemindUserStudy();
     }
 
     @Transactional

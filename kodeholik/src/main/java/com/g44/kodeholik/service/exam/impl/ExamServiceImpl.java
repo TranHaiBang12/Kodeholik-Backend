@@ -434,7 +434,7 @@ public class ExamServiceImpl implements ExamService {
                 result.add(examProblemDetailResponseDto);
             }
         }
-        examDetailResponseDto.setDuration(getMinuteDifference(exam.getStartTime(), exam.getEndTime()));
+        examDetailResponseDto.setDuration(getMinuteDifference(exam.getStartTime(), exam.getEndTime()) * 60);
         examDetailResponseDto.setProblems(result);
         return examDetailResponseDto;
     }
@@ -521,7 +521,8 @@ public class ExamServiceImpl implements ExamService {
             }
         }
         if (mapError.isEmpty()) {
-            ExamResultOverviewResponseDto examResultResponseDto = problemService.submitExam(submitExamRequestDto);
+            ExamResultOverviewResponseDto examResultResponseDto = problemService.submitExam(submitExamRequestDto,
+                    currentUser);
             List<ProblemResultOverviewResponseDto> problemResultDetailResponseDtoList = examResultResponseDto
                     .getProblemResults();
 

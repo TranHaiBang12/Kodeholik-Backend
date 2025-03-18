@@ -21,6 +21,7 @@ import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
 import com.g44.kodeholik.model.entity.exam.Exam;
@@ -573,7 +574,8 @@ class ExamServiceImplTest {
                 when(userService.getUserByUsernameOrEmail(anyString())).thenReturn(user);
                 when(examParticipantRepository.findByExamAndParticipant(any(Exam.class), any(Users.class)))
                                 .thenReturn(Optional.of(new ExamParticipant()));
-                when(problemService.submitExam(anyList())).thenReturn(new ExamResultOverviewResponseDto());
+                when(problemService.submitExam(anyList(), any(Users.class)))
+                                .thenReturn(new ExamResultOverviewResponseDto());
 
                 double grade = examService.submitExam(Collections.emptyList(), "code", "username");
 
@@ -688,7 +690,7 @@ class ExamServiceImplTest {
                 when(examRepository.findByCode(anyString())).thenReturn(Optional.of(exam));
                 when(examRepository.save(any(Exam.class))).thenReturn(exam);
 
-                List<ExamProblemDetailResponseDto> response = examService.startExam("code");
+                ExamDetailResponseDto response = examService.startExam("code");
 
                 assertNotNull(response);
                 verify(examRepository, times(1)).save(any(Exam.class));

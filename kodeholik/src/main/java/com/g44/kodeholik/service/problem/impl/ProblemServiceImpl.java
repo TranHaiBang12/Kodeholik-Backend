@@ -1531,10 +1531,10 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto) {
+    public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto,
+            Users currentUser) {
         ExamResultOverviewResponseDto result = new ExamResultOverviewResponseDto();
         double grade = 0;
-        Users currentUser = userService.getCurrentUser();
 
         List<ProblemResultOverviewResponseDto> problemResultDetails = new ArrayList();
         for (int i = 0; i < submitExamRequestDto.size(); i++) {
