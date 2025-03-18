@@ -186,6 +186,7 @@ public class ExamServiceImpl implements ExamService {
 
         exam = examRepository.save(exam);
 
+        List<ExamProblem> examProblems = new ArrayList();
         for (ExamProblemRequestDto problemExam : problemExams) {
             Problem problem = problemService.getProblemByExamProblemRequest(problemExam);
             if (!checkLanguageSupportEquals(languages, problem.getLanguageSupport())) {
@@ -194,8 +195,9 @@ public class ExamServiceImpl implements ExamService {
             }
             ExamProblemId examProblemId = new ExamProblemId(exam.getId(), problem.getId());
             ExamProblem examProblem = new ExamProblem(examProblemId, exam, problem, problemExam.getProblemPoint());
-            examProblemRepository.save(examProblem);
+            examProblems.add(examProblem);
         }
+        examProblemRepository.saveAll(examProblems);
 
         ExamResponseDto examResponseDto = getExamDetailByCode(code);
         eventPublisher.publishEvent(new ExamStartEvent(this, code, exam.getStartTime().toInstant()));
@@ -250,12 +252,15 @@ public class ExamServiceImpl implements ExamService {
         }
         exam = examRepository.save(exam);
         examProblemRepository.deleteByExam(exam);
+        List<ExamProblem> examProblems = new ArrayList();
+
         for (ExamProblemRequestDto problemExam : problemExams) {
             Problem problem = problemService.getProblemByExamProblemRequest(problemExam);
             ExamProblemId examProblemId = new ExamProblemId(exam.getId(), problem.getId());
             ExamProblem examProblem = new ExamProblem(examProblemId, exam, problem, problemExam.getProblemPoint());
-            examProblemRepository.save(examProblem);
+            examProblems.add(examProblem);
         }
+        examProblemRepository.saveAll(examProblems);
 
         eventPublisher.publishEvent(new ExamStartEvent(this, code, exam.getStartTime().toInstant()));
         ExamResponseDto examResponseDto = getExamDetailByCode(code);
