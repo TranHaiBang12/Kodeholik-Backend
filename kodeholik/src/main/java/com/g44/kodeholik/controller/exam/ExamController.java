@@ -9,6 +9,7 @@ import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamListStudentResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
@@ -63,11 +64,9 @@ public class ExamController {
     }
 
     @GetMapping("/detail/{code}")
-    public ResponseEntity<List<ExamProblemDetailResponseDto>> getExamDetail(@PathVariable String code) {
-        List<ExamProblemDetailResponseDto> result = examService.getProblemDetailInExam(code);
-        if (result.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+    public ResponseEntity<ExamDetailResponseDto> getExamDetail(@PathVariable String code) {
+        ExamDetailResponseDto result = examService.getProblemDetailInExam(code);
+
         return ResponseEntity.ok(result);
     }
 

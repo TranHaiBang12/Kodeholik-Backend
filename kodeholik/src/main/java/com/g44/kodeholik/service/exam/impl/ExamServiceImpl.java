@@ -36,6 +36,7 @@ import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamListStudentResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
@@ -392,7 +393,8 @@ public class ExamServiceImpl implements ExamService {
 
     @Transactional
     @Override
-    public List<ExamProblemDetailResponseDto> getProblemDetailInExam(String code) {
+    public ExamDetailResponseDto getProblemDetailInExam(String code) {
+        ExamDetailResponseDto examDetailResponseDto = new ExamDetailResponseDto();
         List<ExamProblemDetailResponseDto> result = new ArrayList();
         Exam exam = getExamByCode(code);
         Map<String, Object> mapError = new HashMap<String, Object>();
@@ -432,7 +434,9 @@ public class ExamServiceImpl implements ExamService {
                 result.add(examProblemDetailResponseDto);
             }
         }
-        return result;
+        examDetailResponseDto.setDuration(getMinuteDifference(exam.getStartTime(), exam.getEndTime()));
+        examDetailResponseDto.setProblems(result);
+        return examDetailResponseDto;
     }
 
     @Override
@@ -590,7 +594,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public List<ExamProblemDetailResponseDto> startExam(String code) {
+    public ExamDetailResponseDto startExam(String code) {
         Exam exam = getExamByCode(code);
         exam.setStatus(ExamStatus.IN_PROGRESS);
         examRepository.save(exam);

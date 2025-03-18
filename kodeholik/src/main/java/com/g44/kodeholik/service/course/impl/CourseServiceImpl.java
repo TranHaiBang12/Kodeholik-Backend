@@ -336,7 +336,7 @@ public class CourseServiceImpl implements CourseService {
 
         Timestamp now = Timestamp.from(Instant.now());
         courseUser.setLastStudiedEndAt(now);
-        log.info(now);
+        log.info(courseUser.getLastStudiedEndAt());
         // courseUser.setStudyTime(isSameDay(courseUser.getLastStudiedStartAt(),
         // courseUser.getLastStudiedEndAt())
         // ? courseUser.getStudyTime()

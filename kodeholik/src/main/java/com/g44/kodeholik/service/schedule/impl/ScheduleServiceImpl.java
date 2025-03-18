@@ -44,7 +44,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 5000)
+    // @Scheduled(fixedRate = 5000)
     @Override
     public void remindExam() {
         examService.sendNotiToUserExamAboutToStart();
@@ -63,7 +63,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public void runOnStart() {
         syncProblemToElasticsearch();
         addTop5PopularCourse();
-        sendEmailRemindUserStudy();
+        // sendEmailRemindUserStudy();
     }
 
     @Transactional

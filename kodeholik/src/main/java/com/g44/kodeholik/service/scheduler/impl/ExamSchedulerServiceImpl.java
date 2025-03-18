@@ -12,6 +12,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
+import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
 import com.g44.kodeholik.service.exam.ExamService;
 import com.g44.kodeholik.service.publisher.Publisher;
@@ -58,7 +59,7 @@ public class ExamSchedulerServiceImpl implements ExamSchedulerService {
     @Transactional
     public void sendExamToUsers(String code) {
         log.info("Start: " + code);
-        List<ExamProblemDetailResponseDto> examProblemDetailResponseDtos = examService.startExam(code);
+        ExamDetailResponseDto examProblemDetailResponseDtos = examService.startExam(code);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("code", code);
         map.put("problems", examProblemDetailResponseDtos);
