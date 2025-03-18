@@ -12,7 +12,7 @@ import jakarta.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ImageValidator.class)
 public @interface ValidImage {
-    String message() default "Only accept file with .png or .jpeg extension";
+    String message() default "MSG59";
 
     Class<?>[] groups() default {};
 
