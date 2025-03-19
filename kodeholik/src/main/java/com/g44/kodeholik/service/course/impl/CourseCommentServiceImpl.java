@@ -1,7 +1,9 @@
 package com.g44.kodeholik.service.course.impl;
 
+import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.discussion.AddCommentRequestDto;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.course.Course;
 import com.g44.kodeholik.model.entity.course.CourseComment;
 import com.g44.kodeholik.model.entity.course.CourseCommentId;
@@ -22,6 +24,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,37 +77,89 @@ public class CourseCommentServiceImpl implements CourseCommentService {
             throw new RuntimeException("Course not found");
         }
 
-        // Xử lý direction
         Sort.Direction direction = Sort.Direction.fromString(sortDirection);
-
-        // Tạo Sort object dựa trên sortBy
         Sort sort;
         if ("noUpvote".equalsIgnoreCase(sortBy)) {
             sort = Sort.by(direction, "comment.noUpvote");
         } else if ("createdAt".equalsIgnoreCase(sortBy)) {
             sort = Sort.by(direction, "comment.createdAt");
         } else {
-            // Mặc định sort theo noUpvote giảm dần nếu tham số không hợp lệ
             sort = Sort.by(Sort.Direction.DESC, "comment.noUpvote");
         }
 
-        // Tạo Pageable object
         Pageable pageable = PageRequest.of(page, size, sort);
+        Page<CourseComment> courseComments = courseCommentRepository.findByCourseIdAndCommentCommentReplyIsNull(courseId, pageable);
+        Users currentUser = userService.getCurrentUser();
 
-        // Lấy dữ liệu từ repository
-        Page<CourseComment> courseComments = courseCommentRepository.findByCourseId(courseId, pageable);
-
-        // Chuyển đổi sang CommentResponseDto
         return courseComments.map(courseComment -> {
             Comment comment = courseComment.getComment();
             CommentResponseDto dto = new CommentResponseDto(comment);
-            dto.setReplyId(comment.getCommentReply() != null ? comment.getCommentReply().getId() : null);
+            dto.setReplyId(null);
             dto.setNoReply(commentRepository.countByCommentReply(comment));
+
+            UserResponseDto userDto = new UserResponseDto(comment.getCreatedBy());
+            dto.setCreatedBy(userDto);
+            if (userDto.getId().equals(currentUser.getId())) {
+                dto.setUser(true);
+                if (isWithinSevenDays(Instant.ofEpochMilli(dto.getCreatedAt()), Instant.now())) {
+                    dto.setCanEdit(true);
+                }
+            }
+
+            dto.setVoted(comment.getUserVote().contains(currentUser));
+
             return dto;
         });
     }
 
+    public boolean isWithinSevenDays(Instant t1, Instant t2) {
+        return ChronoUnit.DAYS.between(t1, t2) <= 7;
+    }
 
+    public Comment getCommentById(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Comment not found", "Comment not found"));
+    }
+
+    @Override
+    public List<CommentResponseDto> getAllCommentReplyByComment(Long commentId) {
+        // Lấy comment gốc (root comment)
+        Comment comment = getCommentById(commentId);
+        List<Comment> comments = commentRepository.findByCommentReply(comment);
+
+
+        Users currentUser = userService.getCurrentUser();
+
+
+        return comments.stream()
+                .map(c -> {
+                    // Sử dụng constructor của CommentResponseDto
+                    CommentResponseDto dto = new CommentResponseDto(c);
+
+                    // Set replyId (ID của root comment)
+                    dto.setReplyId(c.getCommentReply().getId());
+
+                    // Đếm số replies của reply (nếu có replies con)
+                    dto.setNoReply(commentRepository.countByCommentReply(c));
+
+                    // Set thông tin user và quyền chỉnh sửa
+                    UserResponseDto userDto = new UserResponseDto(c.getCreatedBy());
+                    dto.setCreatedBy(userDto);
+                    if (userDto.getId().equals(currentUser.getId())) {
+                        dto.setUser(true);
+                        if (isWithinSevenDays(Instant.ofEpochMilli(dto.getCreatedAt()), Instant.now())) {
+                            dto.setCanEdit(true);
+                        }
+                    } else {
+                        dto.setUser(false);
+                    }
+
+                    dto.setVoted(c.getUserVote().contains(currentUser));
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 
 }
 

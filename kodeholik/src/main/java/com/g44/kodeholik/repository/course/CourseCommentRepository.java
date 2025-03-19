@@ -18,5 +18,6 @@ public interface CourseCommentRepository extends JpaRepository<CourseComment, Co
 
     @Query("SELECT cc.comment FROM CourseComment cc WHERE cc.course.id = :courseId")
     List<Comment> findCommentsByCourseId(@Param("courseId") Long courseId);
+    Page<CourseComment> findByCourseIdAndCommentCommentReplyIsNull(Long courseId, Pageable pageable);
 
 }

@@ -11,5 +11,6 @@ public interface CourseCommentService {
 //    List<Comment> getAllCommentsByCourse(Long courseId);
     public void createComment(AddCommentRequestDto requestDto);
     Page<CommentResponseDto> getDiscussionByCourseId(Long courseId, int page, int size, String sortBy, String sortDirection);
+    List<CommentResponseDto> getAllCommentReplyByComment(Long commentId);
 }
 

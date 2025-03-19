@@ -147,4 +147,12 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/list-reply/{id}")
+    public ResponseEntity<List<CommentResponseDto>> getListReplyByCommentId(@PathVariable Long id) {
+        if (courseCommentService.getAllCommentReplyByComment(id).isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(courseCommentService.getAllCommentReplyByComment(id));
+    }
+
 }
