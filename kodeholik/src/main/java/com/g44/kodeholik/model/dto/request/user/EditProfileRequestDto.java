@@ -2,6 +2,8 @@ package com.g44.kodeholik.model.dto.request.user;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.g44.kodeholik.util.validation.image.ValidImage;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class EditProfileRequestDto {
+    @ValidImage
     private MultipartFile avatar;
 
     @NotNull(message = "MSG02")
