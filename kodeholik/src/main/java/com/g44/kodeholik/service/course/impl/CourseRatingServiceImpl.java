@@ -41,7 +41,7 @@ public class CourseRatingServiceImpl implements CourseRatingService {
 
         // Kiểm tra xem người dùng đã enroll vào course chưa
         boolean alreadyEnrolled = courseUserRepository.existsByCourseAndUser(course, currentUser);
-        if (alreadyEnrolled) {
+        if (!alreadyEnrolled) {
             throw new BadRequestException("You must enroll in the course before rating", "User not enrolled");
         }
 
