@@ -68,6 +68,10 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
 
     public CourseResponseDto mapFromCourseAndLesson(Course course, List<Long> completedLessons) {
         List<Lesson> lessons = lessonRepository.findByChapter_Course_Id(course.getId());
+        String image = course.getImage();
+        if (image != null && image.startsWith("kodeholik")) {
+            image = s3Service.getPresignedUrl(image);
+        }
         int totalLessons = lessons.size();
         int completedCount = (int) lessons.stream()
                 .filter(lesson -> completedLessons.contains(lesson.getId()))
@@ -78,7 +82,7 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
         return CourseResponseDto.builder()
                 .id(course.getId())
                 .title(course.getTitle())
-                .image(course.getImage())
+                .image(image)
                 .status(course.getStatus())
                 .rate(course.getRate())
                 .createdAt(course.getCreatedAt() != null ? course.getCreatedAt().getTime() : null)

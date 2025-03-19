@@ -7,6 +7,7 @@ import com.g44.kodeholik.model.dto.response.setting.TopicResponseDto;
 import com.g44.kodeholik.model.entity.course.Course;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.repository.course.LessonRepository;
+import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.util.mapper.Mapper;
 import com.g44.kodeholik.util.mapper.response.tag.TagResponseMapperTopic;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class CourseDetailResponseMapper implements Mapper<Course, CourseDetailRe
 
     private final TagResponseMapperTopic topicResponseMapper;
     private final ChapterResponseMapper chapterResponseMapper;
+    private final S3Service s3Service;
 
     @Override
     public Course mapTo(CourseDetailResponseDto b) {
@@ -40,6 +42,10 @@ public class CourseDetailResponseMapper implements Mapper<Course, CourseDetailRe
     public CourseDetailResponseDto mapFromCourseAndLesson(Course course, List<Long> lessonIds, List<Long> completedLessons) {
         int totalLessons = lessonIds.size();
         int completedCount = completedLessons.size();
+        String image = course.getImage();
+        if (image != null && image.startsWith("kodeholik")) {
+            image = s3Service.getPresignedUrl(image);
+        }
 
         double progress = totalLessons > 0 ? (completedCount * 100.0) / totalLessons : 0.0;
 
@@ -61,7 +67,7 @@ public class CourseDetailResponseMapper implements Mapper<Course, CourseDetailRe
                 .id(course.getId())
                 .description(course.getDescription())
                 .title(course.getTitle())
-                .image(course.getImage())
+                .image(image)
                 .status(course.getStatus())
                 .rate(course.getRate())
                 .updatedAt(course.getUpdatedAt().getTime())
