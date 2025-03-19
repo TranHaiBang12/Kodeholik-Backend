@@ -4,6 +4,7 @@ import com.g44.kodeholik.model.enums.course.CourseStatus;
 
 import com.g44.kodeholik.util.validation.image.ValidImage;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -26,7 +27,7 @@ public class CourseRequestDto {
 
     private CourseStatus status;
 
-    @NotNull
+    @NotEmpty
     private Set<Long> topicIds;
 
     @ValidImage
