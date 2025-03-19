@@ -52,14 +52,16 @@ public class LambdaServiceImpl implements LambdaService {
             // log.info(result);
             result = StringEscapeUtils.unescapeJson(result);
             result = result.replace("\\", "");
-            result = result.replace("\"\"", "\"");
             result = result.substring(1, result.length() - 1);
+            result = result.replace("\"[", "[");
+            result = result.replace("]\"", "]");
+            result = result.replace("\"\"", "\"");
             // log.info(result);
             return result;
         } catch (Exception e) {
+            log.info(e.getMessage());
             throw new BadRequestException("Request on lambda failed", "Request on lambda failed");
         }
 
     }
-
 }

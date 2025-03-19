@@ -109,8 +109,17 @@ public class ExcelServiceImpl implements ExcelService {
                     break outerLoop;
                 }
                 if (inputCell.getCellType() == CellType.NUMERIC) {
-                    DecimalFormat df = new DecimalFormat("#");
-                    input = df.format(inputCell.getNumericCellValue());
+                    double numericValue = inputCell.getNumericCellValue();
+                    // log.info(inputCell.getNumericCellValue() + " " + Math.floor(numericValue) + "
+                    // "
+                    // + (numericValue == Math.floor(numericValue)));
+                    // Kiểm tra nếu là số nguyên
+                    if (numericValue == Math.floor(numericValue)) {
+                        long intValue = (long) numericValue; // Ép kiểu về long
+                        input = String.valueOf(intValue); // Lấy số nguyên
+                    } else {
+                        input = String.valueOf(numericValue); // Lấy số thực
+                    }
                 } else {
                     input = inputCell.toString();
                 }
@@ -119,8 +128,16 @@ public class ExcelServiceImpl implements ExcelService {
             Cell cell = row.getCell(expectedOutputIndex);
             String expectedOutput;
             if (cell.getCellType() == CellType.NUMERIC) {
-                DecimalFormat df = new DecimalFormat("#");
-                expectedOutput = df.format(cell.getNumericCellValue());
+                double numericValue = cell.getNumericCellValue();
+                // log.info(numericValue + " " + Math.floor(numericValue) + " "
+                // + (numericValue == Math.floor(numericValue)));
+                // Kiểm tra nếu là số nguyên
+                if (numericValue == Math.floor(numericValue)) {
+                    long intValue = (long) numericValue; // Ép kiểu về long
+                    expectedOutput = String.valueOf(intValue); // Lấy số nguyên
+                } else {
+                    expectedOutput = String.valueOf(numericValue); // Lấy số thực
+                }
             } else {
                 expectedOutput = cell.toString();
             }
