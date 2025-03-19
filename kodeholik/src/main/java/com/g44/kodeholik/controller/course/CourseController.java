@@ -50,10 +50,9 @@ public class CourseController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addCourse(
-            @Valid @RequestPart("data") CourseRequestDto requestDto,
-            @ValidImage @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+            @ModelAttribute @Valid CourseRequestDto requestDto) {
 
-        courseService.addCourse(requestDto, imageFile);
+        courseService.addCourse(requestDto);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
 

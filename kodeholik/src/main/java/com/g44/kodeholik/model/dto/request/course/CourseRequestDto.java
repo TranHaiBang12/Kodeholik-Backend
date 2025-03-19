@@ -17,17 +17,16 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class CourseRequestDto {
-    @Size(min = 10, max = 5000, message = "MSG29")
-    @NotBlank(message = "MSG34")
+    @Size(min = 10, max = 200, message = "MSG34")
     private String title;
 
     @Size(min = 10, max = 5000, message = "MSG29")
-    @NotBlank(message = "MSG35")
     private String description;
 
-    @NotNull
     private CourseStatus status;
 
     private Set<Long> topicIds;
+
+    private MultipartFile imageFile;
 }
 

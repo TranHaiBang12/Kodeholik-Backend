@@ -61,7 +61,7 @@ public class CourseRatingServiceImpl implements CourseRatingService {
                 .build();
 
         courseRatingRepository.save(courseRating);
-        updateCourseRating(course); // Giả định đây là method cập nhật rating trung bình của course
+        updateCourseRating(course);
         return new CourseRatingResponseDto(courseRating); // Sử dụng constructor của DTO
     }
 

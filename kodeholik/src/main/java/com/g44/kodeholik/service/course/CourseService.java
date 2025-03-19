@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface CourseService {
     public CourseDetailResponseDto getCourseById(Long courseId);
 
-    public void addCourse(CourseRequestDto courseRequestDto, MultipartFile imageFile);
+    public void addCourse(CourseRequestDto courseRequestDto);
 
     public void editCourse(Long courseId, CourseRequestDto courseRequestDto, MultipartFile imageFile);
 

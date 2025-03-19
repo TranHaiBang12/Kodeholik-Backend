@@ -137,7 +137,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void addCourse(CourseRequestDto requestDto, MultipartFile imageFile) {
+    public void addCourse(CourseRequestDto requestDto) {
         Course course = new Course();
         course.setTitle(requestDto.getTitle());
         course.setDescription(requestDto.getDescription());
@@ -152,8 +152,8 @@ public class CourseServiceImpl implements CourseService {
         course.setTopics(topics);
 
         // Upload ảnh lên AWS S3 nếu có
-        if (imageFile != null && !imageFile.isEmpty()) {
-            course.setImage(s3Service.uploadFileNameTypeFile(List.of(imageFile), FileNameType.COURSE).getFirst());
+        if (requestDto.getImageFile() != null && !requestDto.getImageFile().isEmpty()) {
+            course.setImage(s3Service.uploadFileNameTypeFile(List.of(requestDto.getImageFile()), FileNameType.COURSE).getFirst());
         }
 
         // Cập nhật người tạo course

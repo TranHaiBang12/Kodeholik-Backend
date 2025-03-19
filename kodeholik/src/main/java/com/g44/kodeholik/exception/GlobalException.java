@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -62,6 +63,15 @@ public class GlobalException {
         public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
                 return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
                                 HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(BindException.class)
+        public ResponseEntity<Map<String, String>> handleBindException(BindException ex) {
+                Map<String, String> errors = new HashMap<>();
+                ex.getBindingResult().getFieldErrors().forEach(error ->
+                        errors.put(error.getField(), error.getDefaultMessage()));
+
+                return ResponseEntity.badRequest().body(errors);
         }
 
         // handle jwt k dung dinh dang
@@ -185,15 +195,15 @@ public class GlobalException {
                                 HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        @ExceptionHandler(Exception.class)
-        @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-        @ResponseBody
-        public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
-                log.info(ex.getMessage());
-                return new ResponseEntity(new ErrorResponse(ex.getMessage(),
-                                ex.getMessage()),
-                                HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+//        @ExceptionHandler(Exception.class)
+//        @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//        @ResponseBody
+//        public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
+//                log.info(ex.getMessage());
+//                return new ResponseEntity(new ErrorResponse(ex.getMessage(),
+//                                ex.getMessage()),
+//                                HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
 
         @ExceptionHandler(BadCredentialsException.class)
         @ResponseStatus(HttpStatus.UNAUTHORIZED)
