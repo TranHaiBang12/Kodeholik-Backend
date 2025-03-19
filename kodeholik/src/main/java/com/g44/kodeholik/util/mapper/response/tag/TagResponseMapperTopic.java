@@ -1,5 +1,6 @@
 package com.g44.kodeholik.util.mapper.response.tag;
 
+import com.g44.kodeholik.model.dto.response.setting.TopicResponseDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,13 @@ public class TagResponseMapperTopic implements Mapper<Topic, TagResponseDto> {
         tagResponseDto.setType(TagType.TOPIC);
         updateAvatar(tagResponseDto.getCreatedBy());
         return tagResponseDto;
+    }
+
+    public TopicResponseDto mapFromTopic(Topic a) {
+        return TopicResponseDto.builder()
+                .id(a.getId())
+                .name(a.getName())
+                .build();
     }
 
     private void updateAvatar(UserResponseDto user) {

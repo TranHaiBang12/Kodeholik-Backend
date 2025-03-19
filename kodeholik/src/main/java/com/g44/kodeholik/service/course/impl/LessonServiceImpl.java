@@ -313,11 +313,16 @@ public class LessonServiceImpl implements LessonService {
     @Override
     public List<Long> getCompletedLessons() {
         Users currentUser = userService.getCurrentUser();
+        if (currentUser == null) {
+            return Collections.emptyList();
+        }
         return userLessonProgressRepository.findByUserId(currentUser.getId())
                 .stream()
                 .map(progress -> progress.getLesson().getId())
                 .collect(Collectors.toList());
     }
+
+
 
     @Override
     public List<LessonResponseDto> getLessonByChapterId(Long id) {

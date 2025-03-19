@@ -9,10 +9,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
+import com.g44.kodeholik.model.entity.course.Chapter;
 import com.g44.kodeholik.model.entity.course.CourseUser;
 import com.g44.kodeholik.model.entity.course.CourseUserId;
 import com.g44.kodeholik.model.entity.course.Lesson;
@@ -79,7 +81,7 @@ public class CourseServiceImpl implements CourseService {
 
     private final UserService userService;
 
-    private final UserRepository userRepository;
+    private final UserLessonProgressRepository userLessonProgressRepository;
 
     private final CourseUserRepository courseUserRepository;
 
@@ -91,9 +93,18 @@ public class CourseServiceImpl implements CourseService {
 
     private final LessonRepository lessonRepository;
 
-    private final TopCourseRepository topCourseRepository;
+    public List<Long> getCompletedLessons() {
+        Users currentUser = userService.getCurrentUser();
+        if (currentUser == null) {
+            return Collections.emptyList();
+        }
+        return userLessonProgressRepository.findByUserId(currentUser.getId())
+                .stream()
+                .map(progress -> progress.getLesson().getId())
+                .collect(Collectors.toList());
+    }
 
-    private final UserLessonProgressRepository userLessonProgressRepository;
+    private final TopCourseRepository topCourseRepository;
 
     private final EmailService emailService;
 
@@ -101,7 +112,28 @@ public class CourseServiceImpl implements CourseService {
     public CourseDetailResponseDto getCourseById(Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found"));
-        return courseDetailResponseMapper.mapFrom(course);
+
+        List<Chapter> chapters = course.getChapters();
+        if (chapters == null || chapters.isEmpty()) {
+            return courseDetailResponseMapper.mapFromCourseAndLesson(course, Collections.emptyList(),
+                    Collections.emptyList());
+        }
+
+        List<Long> lessonIds = chapters.stream()
+                .flatMap(chapter -> {
+                    List<Lesson> lessons = chapter.getLessons();
+                    return lessons != null ? lessons.stream() : Stream.empty();
+                })
+                .map(Lesson::getId)
+                .collect(Collectors.toList());
+
+        // Sử dụng getCompletedLessons() để lấy danh sách lesson đã hoàn thành
+        List<Long> completedLessons = getCompletedLessons()
+                .stream()
+                .filter(lessonId -> lessonIds.contains(lessonId)) // Chỉ lấy lesson thuộc course này
+                .collect(Collectors.toList());
+
+        return courseDetailResponseMapper.mapFromCourseAndLesson(course, lessonIds, completedLessons);
     }
 
     @Override
@@ -225,14 +257,6 @@ public class CourseServiceImpl implements CourseService {
         List<Long> completedLessons = currentUser != null ? getCompletedLessons() : Collections.emptyList();
 
         return courses.map(course -> courseResponseMapper.mapFromCourseAndLesson(course, completedLessons));
-    }
-
-    public List<Long> getCompletedLessons() {
-        Users currentUser = userService.getCurrentUser();
-        return userLessonProgressRepository.findByUserId(currentUser.getId())
-                .stream()
-                .map(progress -> progress.getLesson().getId())
-                .collect(Collectors.toList());
     }
 
     @Transactional
