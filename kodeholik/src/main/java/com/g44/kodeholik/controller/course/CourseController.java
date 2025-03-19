@@ -59,10 +59,9 @@ public class CourseController {
     @PutMapping("/update/{id}")
     public ResponseEntity<?> editCourse(
             @PathVariable Long id,
-            @Valid @RequestPart("data") CourseRequestDto requestDto,
-            @ValidImage @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+            @ModelAttribute @Valid CourseRequestDto requestDto) {
 
-        courseService.editCourse(id, requestDto, imageFile);
+        courseService.editCourse(id, requestDto);
         return ResponseEntity.ok().build();
     }
 

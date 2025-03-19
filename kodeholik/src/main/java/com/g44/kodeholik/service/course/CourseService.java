@@ -18,7 +18,7 @@ public interface CourseService {
 
     public void addCourse(CourseRequestDto courseRequestDto);
 
-    public void editCourse(Long courseId, CourseRequestDto courseRequestDto, MultipartFile imageFile);
+    public void editCourse(Long courseId, CourseRequestDto courseRequestDto);
 
     public void deleteCourse(Long courseId);
 

@@ -165,7 +165,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void editCourse(Long courseId, CourseRequestDto requestDto, MultipartFile imageFile) {
+    public void editCourse(Long courseId, CourseRequestDto requestDto) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
@@ -180,8 +180,8 @@ public class CourseServiceImpl implements CourseService {
         course.setTopics(topics);
 
         // Cập nhật ảnh nếu có ảnh mới
-        if (imageFile != null && !imageFile.isEmpty()) {
-            course.setImage(s3Service.uploadFileNameTypeFile(List.of(imageFile), FileNameType.COURSE).getFirst());
+        if (requestDto.getImageFile() != null && !requestDto.getImageFile().isEmpty()) {
+            course.setImage(s3Service.uploadFileNameTypeFile(List.of(requestDto.getImageFile()), FileNameType.COURSE).getFirst());
         }
 
         // Cập nhật người chỉnh sửa course
