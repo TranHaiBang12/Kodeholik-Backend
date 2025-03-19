@@ -2,6 +2,7 @@ package com.g44.kodeholik.model.dto.request.course;
 
 import com.g44.kodeholik.model.enums.course.CourseStatus;
 
+import com.g44.kodeholik.util.validation.image.ValidImage;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -25,8 +26,10 @@ public class CourseRequestDto {
 
     private CourseStatus status;
 
+    @NotNull
     private Set<Long> topicIds;
 
+    @ValidImage
     private MultipartFile imageFile;
 }
 
