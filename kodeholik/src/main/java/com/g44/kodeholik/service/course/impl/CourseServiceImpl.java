@@ -147,9 +147,15 @@ public class CourseServiceImpl implements CourseService {
         course.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-        // Lấy danh sách topics
         Set<Topic> topics = topicService.getTopicsByIds(requestDto.getTopicIds());
-        course.setTopics(topics);
+        // Kiểm tra xem tất cả topicIds có tồn tại không
+        if (topics.size() != requestDto.getTopicIds().size()) {
+            Set<Long> foundIds = topics.stream().map(Topic::getId).collect(Collectors.toSet());
+            Set<Long> missingIds = new HashSet<>(requestDto.getTopicIds());
+            missingIds.removeAll(foundIds);
+            throw new IllegalArgumentException("Các topic ID không tồn tại: " + missingIds);
+        }
+
 
         // Upload ảnh lên AWS S3 nếu có
         if (requestDto.getImageFile() != null && !requestDto.getImageFile().isEmpty()) {
