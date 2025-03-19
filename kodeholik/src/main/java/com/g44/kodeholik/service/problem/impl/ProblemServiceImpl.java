@@ -556,8 +556,10 @@ public class ProblemServiceImpl implements ProblemService {
                     submissionResponseDto);
         }
         Problem problem = addProblemBasic(problemBasicAddDto, languages);
-        addProblemInputParameter(problemInputParameterDto, problem, problemBasicAddDto.getLanguageSupport());
-        addProblemEditorial(problemEditorialDto, problem, problemBasicAddDto.getLanguageSupport());
+        addProblemInputParameter(problemInputParameterDto, problem,
+                problemBasicAddDto.getLanguageSupport());
+        addProblemEditorial(problemEditorialDto, problem,
+                problemBasicAddDto.getLanguageSupport());
         addProblemTestCase(problemTestCaseDtos, problem, problemInputParameterDto);
         // syncProblemsToElasticsearch();
     }
@@ -870,8 +872,10 @@ public class ProblemServiceImpl implements ProblemService {
                 return "double";
             case "BOOLEAN":
                 return "bool"; // Trong C, không có kiểu boolean, thường dùng int (0: false, 1: true)
+            case "ARR_CHAR":
+                return "char*";
             case "STRING":
-                return "char*"; // Chuỗi trong C là con trỏ đến mảng ký tự
+                return "string"; // Chuỗi trong C là con trỏ đến mảng ký tự
             case "OBJECT":
                 return "void*"; // Con trỏ void cho kiểu dữ liệu không xác định
 
@@ -898,7 +902,8 @@ public class ProblemServiceImpl implements ProblemService {
 
             case "ARR_OBJECT":
                 return "Object" + dimension;
-
+            case "ARR_CHAR":
+                return "char" + dimension;
             case "MAP":
                 return "Map";
             case "LIST":
@@ -917,6 +922,8 @@ public class ProblemServiceImpl implements ProblemService {
                 return "String";
             case "OBJECT":
                 return "Object";
+            case "CHAR":
+                return "char";
             default:
                 return type;
         }
@@ -997,12 +1004,15 @@ public class ProblemServiceImpl implements ProblemService {
             submissionResponseDto = null;
             try {
                 responseResult = gson.fromJson(result, ResponseResult.class);
+                log.info(result);
+                log.info(responseResult);
                 if (responseResult.isAccepted()) {
                     status = "ACCEPTED";
                 } else {
                     status = "FAILED";
                 }
             } catch (Exception e) {
+                log.info(e.getMessage());
                 status = result;
             }
             switch (status) {
