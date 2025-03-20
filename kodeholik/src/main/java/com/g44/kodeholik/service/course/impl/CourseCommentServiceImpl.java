@@ -13,6 +13,7 @@ import com.g44.kodeholik.repository.course.CourseCommentRepository;
 import com.g44.kodeholik.repository.course.CourseRepository;
 import com.g44.kodeholik.repository.discussion.CommentRepository;
 import com.g44.kodeholik.repository.user.UserRepository;
+import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.course.CourseCommentService;
 import com.g44.kodeholik.service.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,6 +38,7 @@ public class CourseCommentServiceImpl implements CourseCommentService {
     private final CommentRepository commentRepository;
     private final CourseRepository courseRepository;
     private final UserService userService;
+    private final S3Service s3Service;
 
 
     @Override
@@ -98,6 +100,9 @@ public class CourseCommentServiceImpl implements CourseCommentService {
             dto.setNoReply(commentRepository.countByCommentReply(comment));
 
             UserResponseDto userDto = new UserResponseDto(comment.getCreatedBy());
+            if (userDto.getAvatar() != null && userDto.getAvatar().startsWith("kodeholik")) {
+                userDto.setAvatar(s3Service.getPresignedUrl(userDto.getAvatar()));
+            }
             dto.setCreatedBy(userDto);
             if (userDto.getId().equals(currentUser.getId())) {
                 dto.setUser(true);
