@@ -149,6 +149,8 @@ public class CourseCommentServiceImpl implements CourseCommentService {
 
                     // Set thông tin user và quyền chỉnh sửa
                     UserResponseDto userDto = new UserResponseDto(c.getCreatedBy());
+                    if (userDto.getAvatar() != null && userDto.getAvatar().startsWith("kodeholik")) {
+                        userDto.setAvatar(s3Service.getPresignedUrl(userDto.getAvatar()));
                     dto.setCreatedBy(userDto);
                     if (userDto.getId().equals(currentUser.getId())) {
                         dto.setUser(true);
