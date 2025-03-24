@@ -55,6 +55,13 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/login-admin")
+    public ResponseEntity<?> loginAdmin(@RequestBody @Valid LoginRequestDto loginRequestDto,
+            HttpServletResponse response) {
+        authService.loginAdmin(loginRequestDto, response);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDto changePasswordRequestDto,
             HttpServletResponse response) {

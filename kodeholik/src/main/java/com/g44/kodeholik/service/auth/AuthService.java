@@ -15,6 +15,8 @@ public interface AuthService {
 
     public void loginNormal(LoginRequestDto loginRequest, HttpServletResponse response);
 
+    public void loginAdmin(LoginRequestDto loginRequest, HttpServletResponse response);
+
     public Users checkUsernameExists(String username);
 
     public void resetPasswordInit(String username);

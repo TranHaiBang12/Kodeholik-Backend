@@ -1,42 +1,30 @@
 {
   "settings": {
-    "index.refresh_interval": "30s",
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  },
-  "doc": {
-    "title": "Updated Title"
-  },
-  "doc_as_upsert": true,
-  "mappings": {
-    "properties": {
-      "difficulty": {
-        "type": "keyword"
-      },
-      "titleSearchAndSort": {
-        "type": "keyword"
-      }
-    }
-  },
-  "analysis": {
-    "analyzer": {
-      "autocomplete": {
-        "type": "custom",
-        "tokenizer": "autocomplete_tokenizer",
-        "filter": [
-          "lowercase"
-        ]
-      }
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "refresh_interval": "30s"
     },
-    "tokenizer": {
-      "autocomplete_tokenizer": {
-        "type": "edge_ngram",
-        "min_gram": 2,
-        "max_gram": 20,
-        "token_chars": [
-          "letter",
-          "digit"
-        ]
+    "analysis": {
+      "tokenizer": {
+        "autocomplete_tokenizer": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 20,
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
+        }
+      },
+      "analyzer": {
+        "autocomplete": {
+          "type": "custom",
+          "tokenizer": "autocomplete_tokenizer",
+          "filter": [
+            "lowercase"
+          ]
+        }
       }
     }
   }

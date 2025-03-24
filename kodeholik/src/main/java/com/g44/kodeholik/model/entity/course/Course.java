@@ -31,6 +31,8 @@ public class Course {
 
     private String title;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private String image;

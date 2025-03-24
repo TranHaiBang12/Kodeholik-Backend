@@ -7,17 +7,12 @@
 
 -- Started on 2025-03-24 10:06:21
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
+\c postgres;
+
+-- Ngắt tất cả kết nối đến database `kodeholik`
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+WHERE pg_stat_activity.datname = 'kodeholik' AND pid <> pg_backend_pid();
 
 DROP DATABASE IF EXISTS kodeholik;
 --
@@ -25,24 +20,13 @@ DROP DATABASE IF EXISTS kodeholik;
 -- Name: kodeholik; Type: DATABASE; Schema: -; Owner: postgres
 --
 
-CREATE DATABASE kodeholik WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Vietnamese_Vietnam.1258';
+CREATE DATABASE kodeholik WITH TEMPLATE = template0 ENCODING = 'UTF8' ;
 
 
-ALTER DATABASE kodeholik OWNER TO postgres;
+ALTER DATABASE kodeholik OWNER TO kodeholik;
 
 \connect kodeholik
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
 
 --
 -- TOC entry 11 (class 2615 OID 18769)
@@ -52,7 +36,7 @@ SET row_security = off;
 CREATE SCHEMA schema_course;
 
 
-ALTER SCHEMA schema_course OWNER TO postgres;
+ALTER SCHEMA schema_course OWNER TO kodeholik;
 
 --
 -- TOC entry 9 (class 2615 OID 16537)
@@ -62,7 +46,7 @@ ALTER SCHEMA schema_course OWNER TO postgres;
 CREATE SCHEMA schema_discussion;
 
 
-ALTER SCHEMA schema_discussion OWNER TO postgres;
+ALTER SCHEMA schema_discussion OWNER TO kodeholik;
 
 --
 -- TOC entry 10 (class 2615 OID 16536)
@@ -72,7 +56,7 @@ ALTER SCHEMA schema_discussion OWNER TO postgres;
 CREATE SCHEMA schema_exam;
 
 
-ALTER SCHEMA schema_exam OWNER TO postgres;
+ALTER SCHEMA schema_exam OWNER TO kodeholik;
 
 --
 -- TOC entry 8 (class 2615 OID 16534)
@@ -82,7 +66,7 @@ ALTER SCHEMA schema_exam OWNER TO postgres;
 CREATE SCHEMA schema_problem;
 
 
-ALTER SCHEMA schema_problem OWNER TO postgres;
+ALTER SCHEMA schema_problem OWNER TO kodeholik;
 
 --
 -- TOC entry 7 (class 2615 OID 16533)
@@ -92,7 +76,7 @@ ALTER SCHEMA schema_problem OWNER TO postgres;
 CREATE SCHEMA schema_setting;
 
 
-ALTER SCHEMA schema_setting OWNER TO postgres;
+ALTER SCHEMA schema_setting OWNER TO kodeholik;
 
 --
 -- TOC entry 6 (class 2615 OID 16532)
@@ -102,7 +86,7 @@ ALTER SCHEMA schema_setting OWNER TO postgres;
 CREATE SCHEMA schema_user;
 
 
-ALTER SCHEMA schema_user OWNER TO postgres;
+ALTER SCHEMA schema_user OWNER TO kodeholik;
 
 --
 -- TOC entry 1034 (class 1247 OID 18771)
@@ -115,7 +99,7 @@ CREATE TYPE schema_course.chapter_status AS ENUM (
 );
 
 
-ALTER TYPE schema_course.chapter_status OWNER TO postgres;
+ALTER TYPE schema_course.chapter_status OWNER TO kodeholik;
 
 --
 -- TOC entry 1037 (class 1247 OID 18776)
@@ -128,7 +112,7 @@ CREATE TYPE schema_course.course_status AS ENUM (
 );
 
 
-ALTER TYPE schema_course.course_status OWNER TO postgres;
+ALTER TYPE schema_course.course_status OWNER TO kodeholik;
 
 --
 -- TOC entry 1040 (class 1247 OID 18782)
@@ -142,7 +126,7 @@ CREATE TYPE schema_course.lesson_status AS ENUM (
 );
 
 
-ALTER TYPE schema_course.lesson_status OWNER TO postgres;
+ALTER TYPE schema_course.lesson_status OWNER TO kodeholik;
 
 --
 -- TOC entry 1043 (class 1247 OID 18790)
@@ -158,7 +142,7 @@ CREATE TYPE schema_course.lesson_type AS ENUM (
 );
 
 
-ALTER TYPE schema_course.lesson_type OWNER TO postgres;
+ALTER TYPE schema_course.lesson_type OWNER TO kodeholik;
 
 --
 -- TOC entry 908 (class 1247 OID 18631)
@@ -172,7 +156,7 @@ CREATE TYPE schema_exam.exam_status AS ENUM (
 );
 
 
-ALTER TYPE schema_exam.exam_status OWNER TO postgres;
+ALTER TYPE schema_exam.exam_status OWNER TO kodeholik;
 
 --
 -- TOC entry 992 (class 1247 OID 17382)
@@ -186,7 +170,7 @@ CREATE TYPE schema_problem.difficulty AS ENUM (
 );
 
 
-ALTER TYPE schema_problem.difficulty OWNER TO postgres;
+ALTER TYPE schema_problem.difficulty OWNER TO kodeholik;
 
 --
 -- TOC entry 1010 (class 1247 OID 17534)
@@ -211,7 +195,7 @@ CREATE TYPE schema_problem.input_type AS ENUM (
 );
 
 
-ALTER TYPE schema_problem.input_type OWNER TO postgres;
+ALTER TYPE schema_problem.input_type OWNER TO kodeholik;
 
 --
 -- TOC entry 986 (class 1247 OID 17350)
@@ -224,7 +208,7 @@ CREATE TYPE schema_problem.problem_status AS ENUM (
 );
 
 
-ALTER TYPE schema_problem.problem_status OWNER TO postgres;
+ALTER TYPE schema_problem.problem_status OWNER TO kodeholik;
 
 --
 -- TOC entry 1022 (class 1247 OID 18584)
@@ -237,7 +221,7 @@ CREATE TYPE schema_problem.submission_status AS ENUM (
 );
 
 
-ALTER TYPE schema_problem.submission_status OWNER TO postgres;
+ALTER TYPE schema_problem.submission_status OWNER TO kodeholik;
 
 --
 -- TOC entry 1031 (class 1247 OID 17677)
@@ -251,7 +235,7 @@ CREATE TYPE schema_setting.level AS ENUM (
 );
 
 
-ALTER TYPE schema_setting.level OWNER TO postgres;
+ALTER TYPE schema_setting.level OWNER TO kodeholik;
 
 --
 -- TOC entry 1025 (class 1247 OID 18591)
@@ -264,7 +248,7 @@ CREATE TYPE schema_user.notification_type AS ENUM (
 );
 
 
-ALTER TYPE schema_user.notification_type OWNER TO postgres;
+ALTER TYPE schema_user.notification_type OWNER TO kodeholik;
 
 --
 -- TOC entry 971 (class 1247 OID 17230)
@@ -277,7 +261,7 @@ CREATE TYPE schema_user.transaction_status AS ENUM (
 );
 
 
-ALTER TYPE schema_user.transaction_status OWNER TO postgres;
+ALTER TYPE schema_user.transaction_status OWNER TO kodeholik;
 
 --
 -- TOC entry 968 (class 1247 OID 17224)
@@ -290,7 +274,7 @@ CREATE TYPE schema_user.transaction_type AS ENUM (
 );
 
 
-ALTER TYPE schema_user.transaction_type OWNER TO postgres;
+ALTER TYPE schema_user.transaction_type OWNER TO kodeholik;
 
 --
 -- TOC entry 1007 (class 1247 OID 17494)
@@ -305,7 +289,7 @@ CREATE TYPE schema_user.user_role AS ENUM (
 );
 
 
-ALTER TYPE schema_user.user_role OWNER TO postgres;
+ALTER TYPE schema_user.user_role OWNER TO kodeholik;
 
 --
 -- TOC entry 1004 (class 1247 OID 17504)
@@ -319,9 +303,8 @@ CREATE TYPE schema_user.user_status AS ENUM (
 );
 
 
-ALTER TYPE schema_user.user_status OWNER TO postgres;
+ALTER TYPE schema_user.user_status OWNER TO kodeholik;
 
-SET default_tablespace = kodeholik_course_data;
 
 SET default_table_access_method = heap;
 
@@ -344,7 +327,7 @@ CREATE TABLE schema_course.chapter (
 );
 
 
-ALTER TABLE schema_course.chapter OWNER TO postgres;
+ALTER TABLE schema_course.chapter OWNER TO kodeholik;
 
 --
 -- TOC entry 266 (class 1259 OID 18806)
@@ -381,7 +364,7 @@ CREATE TABLE schema_course.course (
 );
 
 
-ALTER TABLE schema_course.course OWNER TO postgres;
+ALTER TABLE schema_course.course OWNER TO kodeholik;
 
 --
 -- TOC entry 268 (class 1259 OID 18813)
@@ -400,7 +383,7 @@ CREATE TABLE schema_course.course_comment (
 );
 
 
-ALTER TABLE schema_course.course_comment OWNER TO postgres;
+ALTER TABLE schema_course.course_comment OWNER TO kodeholik;
 
 --
 -- TOC entry 269 (class 1259 OID 18816)
@@ -417,7 +400,6 @@ ALTER TABLE schema_course.course ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTIT
 );
 
 
-SET default_tablespace = '';
 
 --
 -- TOC entry 270 (class 1259 OID 18817)
@@ -436,7 +418,7 @@ CREATE TABLE schema_course.course_rating (
 );
 
 
-ALTER TABLE schema_course.course_rating OWNER TO postgres;
+ALTER TABLE schema_course.course_rating OWNER TO kodeholik;
 
 --
 -- TOC entry 271 (class 1259 OID 18825)
@@ -464,7 +446,7 @@ CREATE TABLE schema_course.course_topic (
 );
 
 
-ALTER TABLE schema_course.course_topic OWNER TO postgres;
+ALTER TABLE schema_course.course_topic OWNER TO kodeholik;
 
 --
 -- TOC entry 273 (class 1259 OID 18829)
@@ -482,9 +464,8 @@ CREATE TABLE schema_course.course_user (
 );
 
 
-ALTER TABLE schema_course.course_user OWNER TO postgres;
+ALTER TABLE schema_course.course_user OWNER TO kodeholik;
 
-SET default_tablespace = kodeholik_course_data;
 
 --
 -- TOC entry 274 (class 1259 OID 18833)
@@ -508,7 +489,7 @@ CREATE TABLE schema_course.lesson (
 );
 
 
-ALTER TABLE schema_course.lesson OWNER TO postgres;
+ALTER TABLE schema_course.lesson OWNER TO kodeholik;
 
 --
 -- TOC entry 275 (class 1259 OID 18838)
@@ -536,9 +517,8 @@ CREATE TABLE schema_course.lesson_problem (
 );
 
 
-ALTER TABLE schema_course.lesson_problem OWNER TO postgres;
+ALTER TABLE schema_course.lesson_problem OWNER TO kodeholik;
 
-SET default_tablespace = '';
 
 --
 -- TOC entry 279 (class 1259 OID 18966)
@@ -552,7 +532,7 @@ CREATE TABLE schema_course.top_course (
 );
 
 
-ALTER TABLE schema_course.top_course OWNER TO postgres;
+ALTER TABLE schema_course.top_course OWNER TO kodeholik;
 
 --
 -- TOC entry 278 (class 1259 OID 18965)
@@ -580,9 +560,8 @@ CREATE TABLE schema_course.user_lesson_progress (
 );
 
 
-ALTER TABLE schema_course.user_lesson_progress OWNER TO postgres;
+ALTER TABLE schema_course.user_lesson_progress OWNER TO kodeholik;
 
-SET default_tablespace = kodeholik_discussion_data;
 
 --
 -- TOC entry 248 (class 1259 OID 17050)
@@ -601,7 +580,7 @@ CREATE TABLE schema_discussion.comment (
 );
 
 
-ALTER TABLE schema_discussion.comment OWNER TO postgres;
+ALTER TABLE schema_discussion.comment OWNER TO kodeholik;
 
 --
 -- TOC entry 249 (class 1259 OID 17103)
@@ -614,7 +593,7 @@ CREATE TABLE schema_discussion.comment_vote (
 );
 
 
-ALTER TABLE schema_discussion.comment_vote OWNER TO postgres;
+ALTER TABLE schema_discussion.comment_vote OWNER TO kodeholik;
 
 --
 -- TOC entry 247 (class 1259 OID 17049)
@@ -631,7 +610,6 @@ ALTER TABLE schema_discussion.comment ALTER COLUMN id ADD GENERATED ALWAYS AS ID
 );
 
 
-SET default_tablespace = kodeholik_exam_data;
 
 --
 -- TOC entry 260 (class 1259 OID 18648)
@@ -654,7 +632,7 @@ CREATE TABLE schema_exam.exam (
 );
 
 
-ALTER TABLE schema_exam.exam OWNER TO postgres;
+ALTER TABLE schema_exam.exam OWNER TO kodeholik;
 
 --
 -- TOC entry 259 (class 1259 OID 18647)
@@ -682,7 +660,7 @@ CREATE TABLE schema_exam.exam_language_support (
 );
 
 
-ALTER TABLE schema_exam.exam_language_support OWNER TO postgres;
+ALTER TABLE schema_exam.exam_language_support OWNER TO kodeholik;
 
 --
 -- TOC entry 261 (class 1259 OID 18672)
@@ -696,7 +674,7 @@ CREATE TABLE schema_exam.exam_participant (
 );
 
 
-ALTER TABLE schema_exam.exam_participant OWNER TO postgres;
+ALTER TABLE schema_exam.exam_participant OWNER TO kodeholik;
 
 --
 -- TOC entry 262 (class 1259 OID 18688)
@@ -710,7 +688,7 @@ CREATE TABLE schema_exam.exam_problem (
 );
 
 
-ALTER TABLE schema_exam.exam_problem OWNER TO postgres;
+ALTER TABLE schema_exam.exam_problem OWNER TO kodeholik;
 
 --
 -- TOC entry 263 (class 1259 OID 18703)
@@ -726,9 +704,8 @@ CREATE TABLE schema_exam.exam_submission (
 );
 
 
-ALTER TABLE schema_exam.exam_submission OWNER TO postgres;
+ALTER TABLE schema_exam.exam_submission OWNER TO kodeholik;
 
-SET default_tablespace = kodeholik_problem_data;
 
 --
 -- TOC entry 258 (class 1259 OID 18615)
@@ -741,7 +718,7 @@ CREATE TABLE schema_problem.language_support (
 );
 
 
-ALTER TABLE schema_problem.language_support OWNER TO postgres;
+ALTER TABLE schema_problem.language_support OWNER TO kodeholik;
 
 --
 -- TOC entry 234 (class 1259 OID 16730)
@@ -765,7 +742,7 @@ CREATE TABLE schema_problem.problem (
 );
 
 
-ALTER TABLE schema_problem.problem OWNER TO postgres;
+ALTER TABLE schema_problem.problem OWNER TO kodeholik;
 
 --
 -- TOC entry 256 (class 1259 OID 17620)
@@ -778,7 +755,7 @@ CREATE TABLE schema_problem.problem_comment (
 );
 
 
-ALTER TABLE schema_problem.problem_comment OWNER TO postgres;
+ALTER TABLE schema_problem.problem_comment OWNER TO kodeholik;
 
 --
 -- TOC entry 233 (class 1259 OID 16729)
@@ -808,7 +785,7 @@ CREATE TABLE schema_problem.problem_input_parameter (
 );
 
 
-ALTER TABLE schema_problem.problem_input_parameter OWNER TO postgres;
+ALTER TABLE schema_problem.problem_input_parameter OWNER TO kodeholik;
 
 --
 -- TOC entry 254 (class 1259 OID 17555)
@@ -836,7 +813,7 @@ CREATE TABLE schema_problem.problem_skill (
 );
 
 
-ALTER TABLE schema_problem.problem_skill OWNER TO postgres;
+ALTER TABLE schema_problem.problem_skill OWNER TO kodeholik;
 
 --
 -- TOC entry 239 (class 1259 OID 16793)
@@ -858,7 +835,7 @@ CREATE TABLE schema_problem.problem_solution (
 );
 
 
-ALTER TABLE schema_problem.problem_solution OWNER TO postgres;
+ALTER TABLE schema_problem.problem_solution OWNER TO kodeholik;
 
 --
 -- TOC entry 257 (class 1259 OID 17636)
@@ -871,7 +848,7 @@ CREATE TABLE schema_problem.problem_solution_comment (
 );
 
 
-ALTER TABLE schema_problem.problem_solution_comment OWNER TO postgres;
+ALTER TABLE schema_problem.problem_solution_comment OWNER TO kodeholik;
 
 --
 -- TOC entry 253 (class 1259 OID 17327)
@@ -884,7 +861,7 @@ CREATE TABLE schema_problem.problem_solution_skill (
 );
 
 
-ALTER TABLE schema_problem.problem_solution_skill OWNER TO postgres;
+ALTER TABLE schema_problem.problem_solution_skill OWNER TO kodeholik;
 
 --
 -- TOC entry 246 (class 1259 OID 17004)
@@ -909,7 +886,7 @@ CREATE TABLE schema_problem.problem_submission (
 );
 
 
-ALTER TABLE schema_problem.problem_submission OWNER TO postgres;
+ALTER TABLE schema_problem.problem_submission OWNER TO kodeholik;
 
 --
 -- TOC entry 245 (class 1259 OID 17003)
@@ -926,7 +903,6 @@ ALTER TABLE schema_problem.problem_submission ALTER COLUMN id ADD GENERATED ALWA
 );
 
 
-SET default_tablespace = '';
 
 --
 -- TOC entry 242 (class 1259 OID 16868)
@@ -943,9 +919,8 @@ CREATE TABLE schema_problem.problem_template (
 );
 
 
-ALTER TABLE schema_problem.problem_template OWNER TO postgres;
+ALTER TABLE schema_problem.problem_template OWNER TO kodeholik;
 
-SET default_tablespace = kodeholik_problem_data;
 
 --
 -- TOC entry 236 (class 1259 OID 16762)
@@ -958,7 +933,7 @@ CREATE TABLE schema_problem.problem_topic (
 );
 
 
-ALTER TABLE schema_problem.problem_topic OWNER TO postgres;
+ALTER TABLE schema_problem.problem_topic OWNER TO kodeholik;
 
 --
 -- TOC entry 238 (class 1259 OID 16792)
@@ -1004,7 +979,7 @@ CREATE TABLE schema_problem.solution_code (
 );
 
 
-ALTER TABLE schema_problem.solution_code OWNER TO postgres;
+ALTER TABLE schema_problem.solution_code OWNER TO kodeholik;
 
 --
 -- TOC entry 250 (class 1259 OID 17133)
@@ -1017,7 +992,7 @@ CREATE TABLE schema_problem.solution_vote (
 );
 
 
-ALTER TABLE schema_problem.solution_vote OWNER TO postgres;
+ALTER TABLE schema_problem.solution_vote OWNER TO kodeholik;
 
 --
 -- TOC entry 244 (class 1259 OID 16887)
@@ -1034,7 +1009,7 @@ CREATE TABLE schema_problem.test_case (
 );
 
 
-ALTER TABLE schema_problem.test_case OWNER TO postgres;
+ALTER TABLE schema_problem.test_case OWNER TO kodeholik;
 
 --
 -- TOC entry 243 (class 1259 OID 16886)
@@ -1062,9 +1037,8 @@ CREATE TABLE schema_problem.user_favourite (
 );
 
 
-ALTER TABLE schema_problem.user_favourite OWNER TO postgres;
+ALTER TABLE schema_problem.user_favourite OWNER TO kodeholik;
 
-SET default_tablespace = kodeholik_setting_data;
 
 --
 -- TOC entry 230 (class 1259 OID 16686)
@@ -1081,7 +1055,7 @@ CREATE TABLE schema_setting.language (
 );
 
 
-ALTER TABLE schema_setting.language OWNER TO postgres;
+ALTER TABLE schema_setting.language OWNER TO kodeholik;
 
 --
 -- TOC entry 229 (class 1259 OID 16685)
@@ -1114,7 +1088,7 @@ CREATE TABLE schema_setting.skill (
 );
 
 
-ALTER TABLE schema_setting.skill OWNER TO postgres;
+ALTER TABLE schema_setting.skill OWNER TO kodeholik;
 
 --
 -- TOC entry 225 (class 1259 OID 16649)
@@ -1146,7 +1120,7 @@ CREATE TABLE schema_setting.topic (
 );
 
 
-ALTER TABLE schema_setting.topic OWNER TO postgres;
+ALTER TABLE schema_setting.topic OWNER TO kodeholik;
 
 --
 -- TOC entry 227 (class 1259 OID 16667)
@@ -1163,7 +1137,6 @@ ALTER TABLE schema_setting.topic ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTIT
 );
 
 
-SET default_tablespace = kodeholik_user_data;
 
 --
 -- TOC entry 232 (class 1259 OID 16704)
@@ -1180,7 +1153,7 @@ CREATE TABLE schema_user.notification (
 );
 
 
-ALTER TABLE schema_user.notification OWNER TO postgres;
+ALTER TABLE schema_user.notification OWNER TO kodeholik;
 
 --
 -- TOC entry 231 (class 1259 OID 16703)
@@ -1215,7 +1188,7 @@ CREATE TABLE schema_user.transaction (
 );
 
 
-ALTER TABLE schema_user.transaction OWNER TO postgres;
+ALTER TABLE schema_user.transaction OWNER TO kodeholik;
 
 --
 -- TOC entry 251 (class 1259 OID 17243)
@@ -1250,7 +1223,7 @@ CREATE TABLE schema_user.users (
 );
 
 
-ALTER TABLE schema_user.users OWNER TO postgres;
+ALTER TABLE schema_user.users OWNER TO kodeholik;
 
 --
 -- TOC entry 223 (class 1259 OID 16569)
@@ -12752,7 +12725,6 @@ SELECT pg_catalog.setval('schema_user.transaction_id_seq', 1, false);
 SELECT pg_catalog.setval('schema_user.users_id_seq', 102, true);
 
 
-SET default_tablespace = '';
 
 --
 -- TOC entry 4990 (class 2606 OID 18846)
@@ -12916,7 +12888,6 @@ ALTER TABLE ONLY schema_problem.language_support
     ADD CONSTRAINT language_support_pkey PRIMARY KEY (problem_id, language_id);
 
 
-SET default_tablespace = kodeholik_problem_data;
 
 --
 -- TOC entry 4949 (class 2606 OID 18360)
@@ -12927,7 +12898,6 @@ ALTER TABLE ONLY schema_problem.solution_code
     ADD CONSTRAINT pk PRIMARY KEY (solution_id, language_id);
 
 
-SET default_tablespace = '';
 
 --
 -- TOC entry 4972 (class 2606 OID 17624)
@@ -13145,7 +13115,6 @@ ALTER TABLE ONLY schema_user.users
     ADD CONSTRAINT users_username_key UNIQUE (username);
 
 
-SET default_tablespace = kodeholik_problem_index;
 
 --
 -- TOC entry 4956 (class 1259 OID 19003)
