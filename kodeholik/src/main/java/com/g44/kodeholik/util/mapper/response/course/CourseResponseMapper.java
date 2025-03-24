@@ -70,7 +70,6 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
     }
 
     public CourseResponseDto mapFromCourseAndLesson(Course course, List<Long> completedLessons) {
-        // Lấy danh sách lessons từ repository
         List<Lesson> lessons = lessonRepository.findByChapter_Course_Id(course.getId());
 
         // Xử lý URL hình ảnh
@@ -86,16 +85,12 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
                 .count();
         double progress = totalLessons > 0 ? (completedCount * 100.0) / totalLessons : 0.0;
 
-        // Tính noChapter
         int noChapter = course.getChapters() != null ? course.getChapters().size() : 0;
 
-        // Tính noLesson (dựa trên danh sách lessons đã lấy)
-        int noLesson = totalLessons; // Vì lessons đã chứa tất cả bài học của course
+        int noLesson = totalLessons;
 
-        // Tính noVote (sử dụng repository)
         int noVote = courseRatingRepository.countByCourseId(course.getId());
 
-        // Xây dựng DTO
         return CourseResponseDto.builder()
                 .id(course.getId())
                 .title(course.getTitle())

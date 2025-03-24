@@ -14,11 +14,9 @@ import java.util.stream.Stream;
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
-import com.g44.kodeholik.model.entity.course.Chapter;
-import com.g44.kodeholik.model.entity.course.CourseUser;
-import com.g44.kodeholik.model.entity.course.CourseUserId;
-import com.g44.kodeholik.model.entity.course.Lesson;
-import com.g44.kodeholik.model.entity.course.TopCourse;
+import com.g44.kodeholik.model.dto.response.course.EnrolledUserResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
+import com.g44.kodeholik.model.entity.course.*;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
@@ -39,17 +37,13 @@ import jakarta.transaction.Transactional;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.course.CourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
-import com.g44.kodeholik.model.entity.course.Course;
 import com.g44.kodeholik.repository.course.CourseRepository;
 import com.g44.kodeholik.service.course.CourseService;
 import com.g44.kodeholik.service.email.EmailService;
@@ -392,6 +386,71 @@ public class CourseServiceImpl implements CourseService {
         List<CourseUser> courseUsers = courseUserRepository.findAll();
         for (int i = 0; i < courseUsers.size(); i++) {
             sendEmailBasedOnStudyStreakForEachCourseUser(courseUsers.get(i));
+        }
+    }
+
+    @Override
+    public Page<EnrolledUserResponseDto> getEnrolledUsersWithProgress(Long courseId, int page, int size, String sortBy, String sortDirection, String usernameSearch) {
+        Sort sort = "progress".equalsIgnoreCase(sortBy)
+                ? Sort.unsorted()
+                : Sort.by(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                validateSortField(sortBy));
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        //Lấy danh sách CourseUser với phân trang và tìm kiếm
+        Page<CourseUser> courseUsersPage;
+        if (usernameSearch != null && !usernameSearch.trim().isEmpty()) {
+            courseUsersPage = courseUserRepository.findByCourseIdAndUserUsernameContaining(
+                    courseId, usernameSearch, pageable);
+        } else {
+            courseUsersPage = courseUserRepository.findByCourseId(courseId, pageable);
+        }
+
+        //Lấy tổng số lesson và progress của tất cả user trong course
+        List<Lesson> lessons = lessonRepository.findByChapter_Course_Id(courseId);
+        int totalLessons = lessons.size();
+        List<UserLessonProgress> progresses = userLessonProgressRepository.findByLessonChapterCourseId(courseId);
+        Map<Long, Long> userCompletedLessons = progresses.stream()
+                .collect(Collectors.groupingBy(p -> p.getUser().getId(), Collectors.counting()));
+
+        //Map từ CourseUser sang EnrolledUserResponseDto và tính progress
+        List<EnrolledUserResponseDto> dtos = courseUsersPage.getContent().stream()
+                .map(courseUser -> {
+                    Long userId = courseUser.getUser().getId();
+                    int completedLessons = userCompletedLessons.getOrDefault(userId, 0L).intValue();
+                    double progress = totalLessons > 0 ? (completedLessons * 100.0) / totalLessons : 0.0;
+
+                    UserResponseDto userDto = new UserResponseDto(courseUser.getUser());
+                    return EnrolledUserResponseDto.builder()
+                            .user(userDto)
+                            .enrolledAt(courseUser.getEnrolledAt() != null ? courseUser.getEnrolledAt().getTime() : null)
+                            .progress(progress)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        //Sắp xếp trong bộ nhớ nếu sortBy là progress
+        if ("progress".equalsIgnoreCase(sortBy)) {
+            dtos.sort((a, b) -> sortDirection.equalsIgnoreCase("asc")
+                    ? Double.compare(a.getProgress(), b.getProgress())
+                    : Double.compare(b.getProgress(), a.getProgress()));
+        }
+
+        //Tạo Page từ danh sách đã sắp xếp
+        return new PageImpl<>(dtos, pageable, courseUsersPage.getTotalElements());
+    }
+
+    private String validateSortField(String sortBy) {
+        switch (sortBy.toLowerCase()) {
+            case "enrolledat":
+                return "enrolledAt";
+            case "username":
+                return "user.username";
+            case "progress":
+                return "enrolledAt";
+            default:
+                return "enrolledAt";
         }
     }
 

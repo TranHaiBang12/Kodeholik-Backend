@@ -6,6 +6,7 @@ import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 
 import java.util.List;
 
+import com.g44.kodeholik.model.dto.response.course.EnrolledUserResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -40,4 +41,6 @@ public interface CourseService {
     public void registerEndTime(Long courseId);
 
     public void sendEmailBasedOnStudyStreak();
+
+    public Page<EnrolledUserResponseDto> getEnrolledUsersWithProgress(Long courseId, int page, int size, String sortBy, String sortDirection, String usernameSearch);
 }
