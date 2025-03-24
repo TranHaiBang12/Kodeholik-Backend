@@ -35,6 +35,9 @@ import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResultExcelDto;
+import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResultOverviewDto;
+import com.g44.kodeholik.model.dto.response.exam.examiner.ProblemPoint;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamListStudentResponseDto;
@@ -64,6 +67,7 @@ import com.g44.kodeholik.repository.exam.ExamSubmissionRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.email.EmailService;
 import com.g44.kodeholik.service.exam.ExamService;
+import com.g44.kodeholik.service.excel.ExcelService;
 import com.g44.kodeholik.service.problem.ProblemService;
 import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 import com.g44.kodeholik.service.problem.ProblemTestCaseService;
@@ -92,12 +96,6 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor
 public class ExamServiceImpl implements ExamService {
-
-    private final AdminController adminController;
-
-    private final AddUserRequestMapper addUserRequestMapper;
-
-    private final AddUserAvatarFileMapper addUserAvatarFileMapper;
 
     private final ExamRepository examRepository;
 
@@ -142,6 +140,8 @@ public class ExamServiceImpl implements ExamService {
     private final NotStartedExamListMapper notStartedExamListMapper;
 
     private final EditExamBasicRequestMapper editExamBasicRequestMapper;
+
+    private final ExcelService excelService;
 
     @Override
     public ExamResponseDto createExam(AddExamRequestDto addExamRequestDto) {
@@ -760,8 +760,8 @@ public class ExamServiceImpl implements ExamService {
         Users user = userService.getUserById(userId);
         Exam exam = getExamByCode(code);
         ExamResultOverviewResponseDto examResultOverviewResponseDto = new ExamResultOverviewResponseDto();
-        if (exam.getStatus() != ExamStatus.END) {
-            throw new BadRequestException("This exam is not ended yet", "This exam is not ended yet");
+        if (exam.getStatus() == ExamStatus.NOT_STARTED) {
+            throw new BadRequestException("This exam is not started yet", "This exam is not started yet");
         }
         ExamParticipant examParticipant = examParticipantRepository.findByExamAndParticipant(exam, user)
                 .orElseThrow(() -> new NotFoundException("Exam not found", "Exam not found"));
@@ -958,6 +958,98 @@ public class ExamServiceImpl implements ExamService {
         eventPublisher.publishEvent(new ExamStartEvent(this, code, exam.getStartTime().toInstant()));
         ExamResponseDto examResponseDto = getExamDetailByCode(code);
         return examResponseDto;
+    }
+
+    @Override
+    public byte[] generateExamResultFile(String code) {
+        Exam exam = getExamByCode(code);
+        if (exam.getStatus() == ExamStatus.NOT_STARTED) {
+            throw new BadRequestException("This exam has not started yet", "This exam has not started yet");
+        }
+        List<ExamParticipant> examParticipants = examParticipantRepository.findByExam(exam);
+        List<ExamResultExcelDto> results = new ArrayList<>();
+        List<ExamProblem> examProblems = examProblemRepository.findByExam(exam);
+        for (ExamParticipant examParticipant : examParticipants) {
+            ExamResultExcelDto examResultExcelDto = new ExamResultExcelDto();
+            examResultExcelDto.setUsername(examParticipant.getParticipant().getUsername());
+            examResultExcelDto.setFullname(examParticipant.getParticipant().getFullname());
+            examResultExcelDto.setGrade(examParticipant.getGrade());
+            List<ExamSubmission> examSubmissions = examSubmissionRepository.findByExamParticipant(examParticipant);
+            List<ProblemPoint> problemPoints = new ArrayList<>();
+            if (examSubmissions.isEmpty()) {
+                examResultExcelDto.setSubmitted(false);
+                for (ExamProblem examProblem : examProblems) {
+                    ProblemPoint problemPoint = new ProblemPoint();
+                    problemPoint.setTitle(examProblem.getProblem().getTitle());
+                    problemPoint.setPoint(0);
+                    problemPoints.add(problemPoint);
+                }
+            } else {
+                examResultExcelDto.setSubmitted(true);
+                for (ExamSubmission examSubmission : examSubmissions) {
+                    ProblemPoint problemPoint = new ProblemPoint();
+                    problemPoint.setTitle(examSubmission.getProblem().getTitle());
+                    problemPoint.setPoint(examSubmission.getPoint());
+                    problemPoints.add(problemPoint);
+                }
+            }
+            examResultExcelDto.setProblemPoints(problemPoints);
+            results.add(examResultExcelDto);
+        }
+
+        return excelService.generateExamResultFile(results);
+    }
+
+    @Override
+    public ExamResultOverviewDto getResultOverviewInformation(String code) {
+        ExamResultOverviewDto result = new ExamResultOverviewDto();
+        Exam exam = getExamByCode(code);
+        List<ExamParticipant> examParticipants = examParticipantRepository.findByExam(exam);
+        int size = examParticipants.size();
+        int excellentGrade = 0, goodGrade = 0, badGrade = 0;
+
+        double grade = examSubmissionRepository.getAvgGrade(exam);
+        result.setAvgGrade(formatDouble(grade));
+
+        int numberSubmitted = examSubmissionRepository.getNumberSubmitted(exam).size();
+        log.info(numberSubmitted);
+        result.setSubmittedPercent(formatDouble(numberSubmitted * 100 / size) + "%");
+
+        List<Object[]> gradeDistribution = examParticipantRepository.getGradeDistribution(exam);
+        List<Object[]> gradeDistributionFormatted = new ArrayList<>();
+        for (int i = 0; i < gradeDistribution.size(); i++) {
+            if (((Number) gradeDistribution.get(i)[0]).doubleValue() < 6) {
+                badGrade += ((Number) gradeDistribution.get(i)[1]).intValue();
+            } else if (((Number) gradeDistribution.get(i)[0]).doubleValue() >= 6
+                    && ((Number) gradeDistribution.get(i)[0]).doubleValue() < 8) {
+                goodGrade += ((Number) gradeDistribution.get(i)[1]).intValue();
+            } else {
+                excellentGrade += ((Number) gradeDistribution.get(i)[1]).intValue();
+            }
+            Object[] gradeMapFormatted = new Object[2];
+            gradeMapFormatted[0] = gradeDistribution.get(i)[0];
+            gradeMapFormatted[1] = formatDouble(((Number) gradeDistribution.get(i)[1]).doubleValue() * 100 / size)
+                    + "%";
+            gradeDistributionFormatted.add(gradeMapFormatted);
+        }
+
+        result.setGradeDistribution(gradeDistributionFormatted);
+        result.setExcellentGradePercent(formatDouble(excellentGrade * 100 / size) + "%");
+        result.setGoodGradePercent(formatDouble(goodGrade * 100 / size) + "%");
+        result.setBadGradePercent(formatDouble(badGrade * 100 / size) + "%");
+
+        List<Object[]> avgProblemPoint = examSubmissionRepository.getAvgProblemPoint(exam);
+        List<Object[]> avgProblemPointFormatted = new ArrayList<>();
+
+        for (int i = 0; i < avgProblemPoint.size(); i++) {
+            Object[] problemPointFormatted = new Object[3];
+            problemPointFormatted[0] = avgProblemPoint.get(i)[0];
+            problemPointFormatted[1] = formatDouble((double) avgProblemPoint.get(i)[1]);
+            problemPointFormatted[2] = formatDouble((double) avgProblemPoint.get(i)[2]);
+            avgProblemPointFormatted.add(problemPointFormatted);
+        }
+        result.setAvgProblemPoints(avgProblemPointFormatted);
+        return result;
     }
 
 }

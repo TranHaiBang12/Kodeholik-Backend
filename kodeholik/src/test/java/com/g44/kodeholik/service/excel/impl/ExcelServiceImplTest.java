@@ -152,7 +152,7 @@ class ExcelServiceImplTest {
         when(objectMapper.readValue(anyString(), any(TypeReference.class)))
                 .thenReturn(inputVariables);
 
-        byte[] excelBytes = excelService.generateExcelFile(testCases, problem);
+        byte[] excelBytes = excelService.generateTestCaseFile(testCases, problem);
 
         assertNotNull(excelBytes);
         assertTrue(excelBytes.length > 0);

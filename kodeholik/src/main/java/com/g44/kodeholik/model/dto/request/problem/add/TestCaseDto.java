@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class TestCaseDto {
-    @NotBlank(message = "Please give a input for this test case")
+    @NotBlank(message = "MSG02")
     private Map<String, String> input;
 
-    @NotBlank(message = "Please give an expected output for this test case")
+    @NotBlank(message = "MSG02")
     private String expectedOutput;
 
-    @NotBlank(message = "Please give a value to know if this test case is sample or not")
+    @NotBlank(message = "MSG02")
     private Boolean isSample;
 }

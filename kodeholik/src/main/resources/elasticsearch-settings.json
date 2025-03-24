@@ -4,6 +4,10 @@
     "number_of_shards": 1,
     "number_of_replicas": 0
   },
+  "doc": {
+    "title": "Updated Title"
+  },
+  "doc_as_upsert": true,
   "mappings": {
     "properties": {
       "difficulty": {

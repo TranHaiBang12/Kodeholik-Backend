@@ -9,6 +9,7 @@ import com.g44.kodeholik.model.dto.request.exam.EditExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
+import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResultOverviewDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemShortResponseDto;
 import com.g44.kodeholik.service.exam.ExamService;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -108,5 +110,21 @@ public class ExaminerController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/result-excel/{code}")
+    public ResponseEntity<byte[]> downloadProblemTestcase(@PathVariable String code) {
+        byte[] excelFile = examService.generateExamResultFile(code);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=ExamResult.xlsx");
+        headers.add("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+        return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/result-overview/{code}")
+    public ResponseEntity<ExamResultOverviewDto> viewResultOverviewInformation(@PathVariable String code) {
+        return ResponseEntity.ok(examService.getResultOverviewInformation(code));
     }
 }

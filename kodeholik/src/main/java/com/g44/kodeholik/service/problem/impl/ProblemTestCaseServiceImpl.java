@@ -30,7 +30,7 @@ import lombok.extern.log4j.Log4j2;
 public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     private final ProblemTestCaseRepository problemTestCaseRepository;
     private final ProblemTemplateService problemTemplateService;
-    ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @Override
     public ProblemCompileResponseDto getProblemCompileInformationByProblem(Problem problem, Language language) {
@@ -40,6 +40,23 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         problemTemplateService.findByProblemAndLanguage(problem, language.getName()).getTemplateCode());
         List<TestCase> testCases = getSampleTestCaseByProblemWithFormat(problem, language);
         problemCompileResponseDto.setTestCases(testCases);
+
+        List<String> importCommands = new ArrayList<>();
+        if (language.getName().equals("Java")) {
+            importCommands.add("import java.util.*;");
+            importCommands.add("import java.math.*;");
+            importCommands.add("import java.io.*;");
+            importCommands.add("import static java.util.Map.entry;");
+        } else if (language.getName().equals("C")) {
+            importCommands.add("#include <stdio.h>");
+            importCommands.add("#include <stdlib.h>");
+            importCommands.add("#include <string.h>");
+            importCommands.add("#include <stdbool.h>");
+            importCommands.add("#include <ctype.h>");
+            importCommands.add("#include <limits.h>");
+            importCommands.add("#include <math.h>");
+        }
+        problemCompileResponseDto.setImportCommands(importCommands);
         return problemCompileResponseDto;
     }
 
@@ -105,9 +122,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         problemTestCase.get(i).getInput(),
                         new TypeReference<List<InputVariable>>() {
                         });
-                output = objectMapper.readValue(
-                        problemTestCase.get(i).getExpectedOutput().toString(),
-                        Object.class);
+                output = problemTestCase.get(i).getExpectedOutput();
 
             } catch (Exception e) {
                 log.info(e.getMessage());
@@ -196,6 +211,22 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                         problemTemplateService.findByProblemAndLanguage(problem, language.getName()).getTemplateCode());
         List<TestCase> testCases = getSampleTestCaseByProblemWithFormat(problem, language);
         examCompileInformationResponseDto.setTestCases(testCases);
+        List<String> importCommands = new ArrayList<>();
+        if (language.getName().equals("Java")) {
+            importCommands.add("import java.util.*;");
+            importCommands.add("import java.math.*;");
+            importCommands.add("import java.io.*;");
+            importCommands.add("import static java.util.Map.entry;");
+        } else if (language.getName().equals("C")) {
+            importCommands.add("#include <stdio.h>");
+            importCommands.add("#include <stdlib.h>");
+            importCommands.add("#include <string.h>");
+            importCommands.add("#include <stdbool.h>");
+            importCommands.add("#include <ctype.h>");
+            importCommands.add("#include <limits.h>");
+            importCommands.add("#include <math.h>");
+        }
+        examCompileInformationResponseDto.setImportCommands(importCommands);
         return examCompileInformationResponseDto;
     }
 

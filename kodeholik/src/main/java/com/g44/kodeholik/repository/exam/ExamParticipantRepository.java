@@ -16,25 +16,28 @@ import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
 
 public interface ExamParticipantRepository extends JpaRepository<ExamParticipant, ExamParticipantId> {
-    public List<ExamParticipant> findByExam(Exam exam);
+        public List<ExamParticipant> findByExam(Exam exam);
 
-    public Optional<ExamParticipant> findByExamAndParticipant(Exam exam, Users participant);
+        public Optional<ExamParticipant> findByExamAndParticipant(Exam exam, Users participant);
 
-    @Query("SELECT e FROM ExamParticipant e WHERE e.exam.code != :code AND e.exam.status = 'NOT_STARTED' AND e.participant = :user AND NOT (e.exam.startTime > :end OR e.exam.endTime < :start)")
-    List<ExamParticipant> checkDuplicateTimeExam(
-            String code,
-            Timestamp start,
-            Timestamp end,
-            Users user);
+        @Query("SELECT e FROM ExamParticipant e WHERE e.exam.code != :code AND e.exam.status = 'NOT_STARTED' AND e.participant = :user AND NOT (e.exam.startTime > :end OR e.exam.endTime < :start)")
+        List<ExamParticipant> checkDuplicateTimeExam(
+                        String code,
+                        Timestamp start,
+                        Timestamp end,
+                        Users user);
 
-    @Query("SELECT e FROM ExamParticipant e WHERE e.participant = :user AND (cast(:title as text) IS NULL OR (e.exam.title LIKE '%' || cast(:title as text) || '%')) AND (COALESCE(:status, e.exam.status) = e.exam.status) AND (e.exam.startTime >= :start AND e.exam.endTime <= :end)")
-    public Page<ExamParticipant> findByStatus(
-            ExamStatus status,
-            Users user,
-            String title,
-            Timestamp start,
-            Timestamp end,
-            Pageable pageable);
+        @Query("SELECT e FROM ExamParticipant e WHERE e.participant = :user AND (cast(:title as text) IS NULL OR (e.exam.title LIKE '%' || cast(:title as text) || '%')) AND (COALESCE(:status, e.exam.status) = e.exam.status) AND (e.exam.startTime >= :start AND e.exam.endTime <= :end)")
+        public Page<ExamParticipant> findByStatus(
+                        ExamStatus status,
+                        Users user,
+                        String title,
+                        Timestamp start,
+                        Timestamp end,
+                        Pageable pageable);
 
-    public List<ExamParticipant> findByParticipant(Users participant);
+        public List<ExamParticipant> findByParticipant(Users participant);
+
+        @Query("SELECT e.grade, COUNT(e.grade) FROM ExamParticipant e WHERE e.exam = :exam GROUP BY e.grade")
+        public List<Object[]> getGradeDistribution(Exam exam);
 }
