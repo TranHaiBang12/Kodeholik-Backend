@@ -35,4 +35,10 @@ public class CourseResponseDto {
     private List<String> topics;
 
     private Double progress;
+
+    private Integer noVote;
+
+    private Integer noChapter;
+
+    private Integer noLesson;
 }
