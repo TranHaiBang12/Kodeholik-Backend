@@ -110,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
 
         Users user = userRepository.existsByUsernameOrEmail(username)
                 .orElseThrow(() -> new NotFoundException("User not found", "User not found"));
-        if (userRepository.isUserNotAllowed(username) || user.getRole == UserRole.STUDENT) {
+        if (userRepository.isUserNotAllowed(username) || user.getRole() == UserRole.STUDENT) {
             throw new ForbiddenException("This account is not allowed to do this action",
                     "This account is not allowed to do this action");
         }
