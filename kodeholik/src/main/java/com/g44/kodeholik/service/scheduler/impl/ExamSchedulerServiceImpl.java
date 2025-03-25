@@ -49,7 +49,6 @@ public class ExamSchedulerServiceImpl implements ExamSchedulerService {
 
     @Override
     public void scheduleExamStart(String examCode, Instant startTime) {
-        log.info(examCode + " " + startTime);
         long delay = startTime.toEpochMilli() - System.currentTimeMillis();
         if (delay > 0) {
             scheduledTask = taskScheduler.schedule(() -> sendExamToUsers(examCode), startTime);
@@ -58,7 +57,6 @@ public class ExamSchedulerServiceImpl implements ExamSchedulerService {
 
     @Transactional
     public void sendExamToUsers(String code) {
-        log.info("Start: " + code);
         ExamDetailResponseDto examProblemDetailResponseDtos = examService.startExam(code);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("code", code);

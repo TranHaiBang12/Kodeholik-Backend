@@ -15,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -43,6 +44,7 @@ public class ProblemSubmission {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users user;
 
+    @Column(columnDefinition = "TEXT", name = "code")
     private String code;
 
     @ManyToOne
@@ -67,9 +69,10 @@ public class ProblemSubmission {
     @Column(name = "status")
     private SubmissionStatus status;
 
+    @Column(columnDefinition = "TEXT")
     private String message;
 
-    @Column(name = "input_wrong")
+    @Column(name = "input_wrong", columnDefinition = "TEXT")
     private String inputWrong;
 
     @Column(name = "no_testcase_passed")

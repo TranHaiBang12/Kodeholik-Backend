@@ -104,6 +104,24 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public void loginAdmin(LoginRequestDto loginRequest, HttpServletResponse response) {
+        verify(loginRequest);
+        String username = loginRequest.getUsername();
+
+        Users user = userRepository.existsByUsernameOrEmail(username)
+                .orElseThrow(() -> new NotFoundException("User not found", "User not found"));
+        if (userRepository.isUserNotAllowed(username) || user.getRole() == UserRole.STUDENT) {
+            throw new ForbiddenException("This account is not allowed to do this action",
+                    "This account is not allowed to do this action");
+        }
+
+        String accessToken = tokenService.generateAccessToken(user.getUsername());
+        tokenService.addTokenToCookie(accessToken, response, TokenType.ACCESS);
+        String refreshToken = tokenService.generateRefreshToken(user.getUsername(), new Date());
+        tokenService.addTokenToCookie(refreshToken, response, TokenType.REFRESH);
+    }
+
+    @Override
     public Users checkUsernameExists(String username) {
         return userRepository.existsByUsernameOrEmail(username)
                 .orElseThrow(() -> new NotFoundException("User not found", "User not found"));

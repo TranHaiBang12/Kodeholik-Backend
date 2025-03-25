@@ -29,7 +29,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
         response.setContentType("application/json");
-        log.info(authException);
+        log.info(authException.getMessage());
         if (authException instanceof BadCredentialsException
                 || authException instanceof InsufficientAuthenticationException) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

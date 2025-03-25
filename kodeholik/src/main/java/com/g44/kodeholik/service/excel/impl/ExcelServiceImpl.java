@@ -3,6 +3,7 @@ package com.g44.kodeholik.service.excel.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +26,8 @@ import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
 import com.g44.kodeholik.model.dto.request.problem.add.TestCaseDto;
+import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResultExcelDto;
+import com.g44.kodeholik.model.dto.response.exam.examiner.ProblemPoint;
 import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemTestCase;
 import com.g44.kodeholik.model.entity.setting.Language;
@@ -47,7 +50,6 @@ public class ExcelServiceImpl implements ExcelService {
     public Sheet readExcelSheet(MultipartFile file, String languageName) {
         try (InputStream inputStream = file.getInputStream();
                 Workbook workbook = new XSSFWorkbook(inputStream)) {
-            log.info(languageName + "TestCase");
             Sheet sheet = workbook.getSheet(languageName + "TestCase");
             return sheet;
         } catch (Exception ex) {
@@ -93,7 +95,6 @@ public class ExcelServiceImpl implements ExcelService {
         }
         int expectedOutputIndex = columnIndexMap.get("Expected Output");
         int isSampleIndex = columnIndexMap.get("Is Sample");
-        log.info(expectedOutputIndex + " " + isSampleIndex);
 
         // Duyệt các dòng dữ liệu (bỏ qua header - row 0)
         Iterator<Row> rowIterator = sheet.iterator();
@@ -109,34 +110,31 @@ public class ExcelServiceImpl implements ExcelService {
                     break outerLoop;
                 }
                 if (inputCell.getCellType() == CellType.NUMERIC) {
-                    double numericValue = inputCell.getNumericCellValue();
-                    // log.info(inputCell.getNumericCellValue() + " " + Math.floor(numericValue) + "
-                    // "
-                    // + (numericValue == Math.floor(numericValue)));
-                    // Kiểm tra nếu là số nguyên
-                    if (numericValue == Math.floor(numericValue)) {
-                        long intValue = (long) numericValue; // Ép kiểu về long
-                        input = String.valueOf(intValue); // Lấy số nguyên
+                    BigDecimal numericValue = BigDecimal.valueOf(inputCell.getNumericCellValue());
+
+                    // Kiểm tra nếu là số nguyên (phần thập phân == 0)
+                    if (numericValue.stripTrailingZeros().scale() <= 0) {
+                        input = String.valueOf(numericValue.toBigInteger()); // Chuyển thành số nguyên
                     } else {
-                        input = String.valueOf(numericValue); // Lấy số thực
+                        input = numericValue.toPlainString(); // Chuyển thành chuỗi số thực giữ nguyên định dạng
                     }
                 } else {
                     input = inputCell.toString();
                 }
+                log.info(input);
                 inputMap.put(inputNames.get(i), input);
             }
             Cell cell = row.getCell(expectedOutputIndex);
             String expectedOutput;
             if (cell.getCellType() == CellType.NUMERIC) {
-                double numericValue = cell.getNumericCellValue();
+                BigDecimal numericValue = BigDecimal.valueOf(cell.getNumericCellValue());
                 // log.info(numericValue + " " + Math.floor(numericValue) + " "
                 // + (numericValue == Math.floor(numericValue)));
                 // Kiểm tra nếu là số nguyên
-                if (numericValue == Math.floor(numericValue)) {
-                    long intValue = (long) numericValue; // Ép kiểu về long
-                    expectedOutput = String.valueOf(intValue); // Lấy số nguyên
+                if (numericValue.stripTrailingZeros().scale() <= 0) {
+                    expectedOutput = String.valueOf(numericValue.toBigInteger()); // Lấy số nguyên
                 } else {
-                    expectedOutput = String.valueOf(numericValue); // Lấy số thực
+                    expectedOutput = numericValue.toPlainString(); // Lấy số thực
                 }
             } else {
                 expectedOutput = cell.toString();
@@ -149,11 +147,12 @@ public class ExcelServiceImpl implements ExcelService {
 
         problemTestCaseDto.setTestCases(testCases);
         problemTestCaseDtoList.add(problemTestCaseDto);
+        log.info(problemTestCaseDtoList);
         return problemTestCaseDtoList;
     }
 
     @Override
-    public byte[] generateExcelFile(List<ProblemTestCase> problemTestCases, Problem problem) {
+    public byte[] generateTestCaseFile(List<ProblemTestCase> problemTestCases, Problem problem) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             Set<Language> languages = problem.getLanguageSupport();
@@ -198,15 +197,60 @@ public class ExcelServiceImpl implements ExcelService {
                         int k = 0;
                         while (k < inputVariablesList.get(m).size()) {
                             Object value = inputVariablesList.get(m).get(k).getValue();
-                            log.info(value);
                             row.createCell(k).setCellValue(value.toString());
                             k++;
                         }
                         m++;
-                        row.createCell(k++).setCellValue(data.getExpectedOutput().toString().replaceAll("\"", ""));
+                        row.createCell(k++).setCellValue(data.getExpectedOutput());
                         row.createCell(k++).setCellValue(data.isSample());
                     }
                 }
+            }
+            workbook.write(outputStream);
+
+            workbook.close();
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new BadRequestException("Error generating excel file", "Error generating excel file");
+        }
+    }
+
+    @Override
+    public byte[] generateExamResultFile(List<ExamResultExcelDto> examResultExcelDtos) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Result");
+            int rowNum = 1;
+
+            for (ExamResultExcelDto examResultExcelDto : examResultExcelDtos) {
+                List<ProblemPoint> problemPoints = examResultExcelDto.getProblemPoints();
+                List<String> columnHeaders = new ArrayList();
+
+                columnHeaders.add("Username");
+                columnHeaders.add("Full name");
+                for (int i = 0; i < problemPoints.size(); i++) {
+                    columnHeaders.add("Problem: " + problemPoints.get(i).getTitle());
+                }
+                columnHeaders.add("Grade");
+                columnHeaders.add("Is Submitted");
+
+                Row headerRow = sheet.createRow(0);
+                for (int i = 0; i < columnHeaders.size(); i++) {
+                    Cell cell = headerRow.createCell(i);
+                    cell.setCellValue(columnHeaders.get(i));
+                }
+
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(examResultExcelDto.getUsername());
+                row.createCell(1).setCellValue(examResultExcelDto.getFullname());
+
+                int m = 2;
+                for (int i = 0; i < problemPoints.size(); i++) {
+                    row.createCell(m++).setCellValue(problemPoints.get(i).getPoint());
+                }
+                row.createCell(m++).setCellValue(examResultExcelDto.getGrade());
+                row.createCell(m++).setCellValue(examResultExcelDto.isSubmitted());
             }
             workbook.write(outputStream);
 

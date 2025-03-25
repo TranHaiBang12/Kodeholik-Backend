@@ -16,7 +16,8 @@ public class GoogleCloudConfig {
 
     @Bean
     public Storage storage() throws IOException {
-        InputStream serviceAccountStream = new ClassPathResource("flowing-access-452711-a1-15e7d698efdf.json").getInputStream();
+        InputStream serviceAccountStream = new ClassPathResource("flowing-access-452711-a1-15e7d698efdf.json")
+                .getInputStream();
 
         return StorageOptions.newBuilder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccountStream))

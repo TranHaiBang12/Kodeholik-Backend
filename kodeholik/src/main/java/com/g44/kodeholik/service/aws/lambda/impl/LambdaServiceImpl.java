@@ -12,11 +12,17 @@ import com.amazonaws.services.lambda.model.InvokeResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
+import com.g44.kodeholik.model.dto.request.lambda.ResponseResult;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Service
+@RequiredArgsConstructor
 @Log4j2
 public class LambdaServiceImpl implements LambdaService {
 
@@ -30,16 +36,10 @@ public class LambdaServiceImpl implements LambdaService {
 
     private final ObjectMapper objectMapper;
 
-    public LambdaServiceImpl() {
-        awsLambda = AWSLambdaClientBuilder
-                .standard()
-                .withRegion(Regions.AP_SOUTHEAST_1)
-                .defaultClient();
-        objectMapper = new ObjectMapper();
-    }
-
     @Override
     public String invokeLambdaFunction(LambdaRequest codeRequest) {
+        String result = "";
+        String notFormatted = "";
         try {
             String payload = objectMapper.writeValueAsString(codeRequest);
             log.info(payload);
@@ -48,20 +48,31 @@ public class LambdaServiceImpl implements LambdaService {
                     .withPayload(payload);
 
             InvokeResult invokeResult = awsLambda.invoke(invokeRequest);
-            String result = new String(invokeResult.getPayload().array());
-            // log.info(result);
+            result = new String(invokeResult.getPayload().array());
+            notFormatted = result;
             result = StringEscapeUtils.unescapeJson(result);
             result = result.replace("\\", "");
             result = result.substring(1, result.length() - 1);
+
             result = result.replace("\"[", "[");
             result = result.replace("]\"", "]");
+            result = result.replace("\"{", "{");
+            result = result.replace("}\"", "}");
+
             result = result.replace("\"\"", "\"");
-            // log.info(result);
+            log.info(result);
+
+            objectMapper.readValue(result, ResponseResult.class);
             return result;
         } catch (Exception e) {
             log.info(e.getMessage());
-            throw new BadRequestException("Request on lambda failed", "Request on lambda failed");
+            notFormatted = notFormatted.replace("\\", "");
+            notFormatted = notFormatted.substring(1, notFormatted.length() - 1);
+            notFormatted = notFormatted.replace("\"\"", "\"");
+            log.info(notFormatted);
+            return notFormatted;
         }
 
     }
+
 }

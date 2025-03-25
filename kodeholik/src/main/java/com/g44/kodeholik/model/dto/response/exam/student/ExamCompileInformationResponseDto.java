@@ -19,4 +19,6 @@ public class ExamCompileInformationResponseDto {
     private String template;
 
     private List<TestCase> testCases;
+
+    private List<String> importCommands;
 }

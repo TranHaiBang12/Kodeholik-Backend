@@ -7,9 +7,11 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.g44.kodeholik.model.entity.setting.Language;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
@@ -50,6 +52,7 @@ public class SolutionCode {
     @JoinColumn(name = "language_id", referencedColumnName = "id")
     private Language language;
 
+    @Column(name = "code", columnDefinition = "TEXT")
     private String code;
 
     @ManyToOne

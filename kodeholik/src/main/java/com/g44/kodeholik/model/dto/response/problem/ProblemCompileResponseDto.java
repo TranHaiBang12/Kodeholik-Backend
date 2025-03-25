@@ -16,5 +16,6 @@ import lombok.NoArgsConstructor;
 public class ProblemCompileResponseDto {
     private String template;
     private List<TestCase> testCases;
+    private List<String> importCommands;
 
 }

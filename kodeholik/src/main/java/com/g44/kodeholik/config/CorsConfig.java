@@ -18,12 +18,15 @@ public class CorsConfig {
     @Value("${spring.application.fe-url}")
     private String frontendUrl;
 
+    @Value("${spring.application.admin-fe-url}")
+    private String adminFrontendUrl;
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174")); //
         // Domain của client
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174", "http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost", "http://localhost:81"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*")); // Cho phép tất cả headers
         configuration.setAllowCredentials(true); // Cho phép credentials

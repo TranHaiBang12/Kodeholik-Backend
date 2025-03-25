@@ -23,7 +23,6 @@ public class AddTagRequestDto {
     @NotNull(message = "MSG02")
     private TagType type;
 
-    @NotNull(message = "MSG02")
     private Level level;
 
     public AddTagRequestDto(String name, TagType type) {

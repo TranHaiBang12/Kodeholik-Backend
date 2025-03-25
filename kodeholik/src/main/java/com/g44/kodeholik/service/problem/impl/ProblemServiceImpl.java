@@ -1,6 +1,7 @@
 package com.g44.kodeholik.service.problem.impl;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -119,6 +120,9 @@ import com.g44.kodeholik.util.mapper.response.problem.SolutionCodeMapper;
 import com.g44.kodeholik.util.mapper.response.user.UserResponseMapper;
 import com.g44.kodeholik.util.string.StringUtils;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -763,11 +767,14 @@ public class ProblemServiceImpl implements ProblemService {
                 problemTestCase
                         .setInput(generateInputJson(problemInputParameterDtos, problemTestCaseDto, k));
                 k++;
-                if (problemInputParameterDtos.get(0).getReturnType() == InputType.STRING) {
-                    problemTestCase.setExpectedOutput("\"" + testCaseDtos.get(i).getExpectedOutput() + "\"");
-                } else {
-                    problemTestCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
-                }
+                // if (problemInputParameterDtos.get(0).getReturnType() == InputType.STRING) {
+                // problemTestCase.setExpectedOutput("\"" +
+                // testCaseDtos.get(i).getExpectedOutput() + "\"");
+                // } else {
+                // problemTestCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
+                // }
+                problemTestCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
+
                 problemTestCase.setProblem(problem);
                 problemTestCase.setSample(testCaseDtos.get(i).getIsSample().booleanValue());
                 problemTestCases.add(problemTestCase);
@@ -953,8 +960,9 @@ public class ProblemServiceImpl implements ProblemService {
                 Map<String, String> inputName = testCaseDtos.get(i).getInput();
                 for (int j = 0; j < inputDtos.size(); j++) {
                     String rawValue = inputName.get(inputDtos.get(j).getInputName());
-                    Object parsedValue = parseValue(rawValue, inputDtos.get(j).getInputType(), gson);
-
+                    // Object parsedValue = parseValue(rawValue, inputDtos.get(j).getInputType(),
+                    // gson);
+                    Object parsedValue = rawValue;
                     InputVariable input = new InputVariable(
                             inputDtos.get(j).getInputName(),
                             inputDtos.get(j).getInputType().toString(),
@@ -966,11 +974,14 @@ public class ProblemServiceImpl implements ProblemService {
                 TestCase testCase = new TestCase();
                 testCase.setInput(inputVariables);
                 inputs.add(inputVariables);
-                if (problemInputParameterDto.getReturnType() == InputType.STRING) {
-                    testCase.setExpectedOutput("\"" + testCaseDtos.get(i).getExpectedOutput() + "\"");
-                } else {
-                    testCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
-                }
+                // if (problemInputParameterDto.getReturnType() == InputType.STRING) {
+                // testCase.setExpectedOutput("\"" + testCaseDtos.get(i).getExpectedOutput() +
+                // "\"");
+                // } else {
+                // testCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
+                // }
+                testCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
+
                 testCases.add(testCase);
             }
 
@@ -981,6 +992,7 @@ public class ProblemServiceImpl implements ProblemService {
                     solutionCodeDto = solutionCodes.get(j);
                 }
             }
+            log.info(testCases);
             LambdaRequest lambdaRequest = new LambdaRequest();
             lambdaRequest.setCode(solutionCodeDto.getSolutionCode());
             lambdaRequest.setLanguage(solutionCodeDto.getSolutionLanguage());
@@ -997,6 +1009,7 @@ public class ProblemServiceImpl implements ProblemService {
                         problemInputParameterDto.getNoDimension()));
             }
             lambdaRequest.setTestCases(testCases);
+            log.info(lambdaRequest);
 
             String result = lambdaService.invokeLambdaFunction(lambdaRequest);
             String status = "";
@@ -1058,26 +1071,110 @@ public class ProblemServiceImpl implements ProblemService {
 
     }
 
+    public Object parseMultiDimArray(String rawValue, String type) {
+        JsonElement jsonElement = JsonParser.parseString(rawValue);
+        return parseJsonArray(jsonElement, type);
+    }
+
+    // Xử lý đệ quy để xác định cấp độ sâu của mảng
+    private Object parseJsonArray(JsonElement jsonElement, String typeData) {
+        if (!jsonElement.isJsonArray()) {
+            throw new IllegalArgumentException("Input is not a JSON array!");
+        }
+
+        JsonArray jsonArray = jsonElement.getAsJsonArray();
+        // Nếu phần tử đầu tiên là một mảng → Đệ quy
+        if (jsonArray.size() > 0 && jsonArray.get(0).isJsonArray()) {
+            JsonElement el = jsonArray.get(0);
+            int noDimension = 1;
+            while (el.isJsonArray()) {
+                el = el.getAsJsonArray().get(0);
+                noDimension++;
+            }
+            if (noDimension == 2) {
+                if (typeData.equals("INT")) {
+                    Type type = new TypeToken<List<List<Integer>>>() {
+                    }.getType();
+                    return gson.fromJson(jsonArray, type);
+                } else if (typeData.equals("DOUBLE")) {
+                    Type type = new TypeToken<List<List<Double>>>() {
+                    }.getType();
+                    return gson.fromJson(jsonArray, type);
+                } else if (typeData.equals("STRING")) {
+                    Type type = new TypeToken<List<List<String>>>() {
+                    }.getType();
+                    return gson.fromJson(jsonArray, type);
+                } else {
+                    Type type = new TypeToken<List<List<Object>>>() {
+                    }.getType();
+                    return gson.fromJson(jsonArray, type);
+                }
+            } else if (noDimension == 3) {
+                if (typeData.equals("INT")) {
+                    Type type = new TypeToken<List<List<List<Integer>>>>() {
+                    }.getType();
+                    return gson.fromJson(jsonArray, type);
+                } else if (typeData.equals("DOUBLE")) {
+                    Type type = new TypeToken<List<List<List<Double>>>>() {
+                    }.getType();
+                    return gson.fromJson(jsonArray, type);
+                } else if (typeData.equals("STRING")) {
+                    Type type = new TypeToken<List<List<List<String>>>>() {
+                    }.getType();
+                    return gson.fromJson(jsonArray, type);
+                } else {
+                    Type type = new TypeToken<List<List<List<Object>>>>() {
+                    }.getType();
+                    return gson.fromJson(jsonArray, type);
+                }
+            } else {
+                throw new BadRequestException("System only take three dimensional array",
+                        "System only take three dimensional array");
+            }
+        } else {
+            if (typeData.equals("INT")) {
+                Type type = new TypeToken<List<Integer>>() {
+                }.getType();
+                return gson.fromJson(jsonArray, type);
+            } else if (typeData.equals("DOUBLE")) {
+                Type type = new TypeToken<List<Double>>() {
+                }.getType();
+                return gson.fromJson(jsonArray, type);
+            } else if (typeData.equals("STRING")) {
+                Type type = new TypeToken<List<String>>() {
+                }.getType();
+                return gson.fromJson(jsonArray, type);
+            } else {
+                Type type = new TypeToken<List<Object>>() {
+                }.getType();
+                return gson.fromJson(jsonArray, type);
+            }
+        }
+
+    }
+
     public Object parseValue(String rawValue, InputType type, Gson gson) {
         if (rawValue == null || rawValue.equalsIgnoreCase("null")) {
             return null;
         }
-
         switch (type) {
             case ARR_INT:
-                return gson.fromJson(rawValue, new TypeToken<List<Integer>>() {
-                }.getType());
+                log.info("HIHI: " + parseMultiDimArray(rawValue, "INT"));
+                return parseMultiDimArray(rawValue, "INT");
             case ARR_DOUBLE:
-                return gson.fromJson(rawValue, new TypeToken<List<Double>>() {
-                }.getType());
+                return parseMultiDimArray(rawValue, "DOUBLE");
             case ARR_STRING:
-                return gson.fromJson(rawValue, new TypeToken<List<String>>() {
-                }.getType());
+                return parseMultiDimArray(rawValue, "STRING");
             case ARR_OBJECT:
-                return gson.fromJson(rawValue, new TypeToken<List<Object>>() {
-                }.getType());
+                return parseMultiDimArray(rawValue, "OBJECT");
             case MAP:
                 return gson.fromJson(rawValue, new TypeToken<Map<String, Object>>() {
+                }.getType());
+            case LIST:
+                return gson.fromJson(rawValue, new TypeToken<List<Object>>() {
+                }.getType());
+            case SET:
+                return gson.fromJson(rawValue, new TypeToken<Set>() {
                 }.getType());
             case INT:
                 return Integer.parseInt(rawValue);
@@ -1087,6 +1184,8 @@ public class ProblemServiceImpl implements ProblemService {
                 return Double.parseDouble(rawValue);
             case BOOLEAN:
                 return Boolean.parseBoolean(rawValue);
+            case CHAR:
+                return rawValue.charAt(0);
             case STRING:
                 return rawValue; // Không cần parse, giữ nguyên chuỗi
             case OBJECT:
@@ -1301,7 +1400,7 @@ public class ProblemServiceImpl implements ProblemService {
     public byte[] getExcelFile(String link) {
         Problem problem = getProblemByLink(link);
         List<ProblemTestCase> problemTestCases = problemTestCaseService.getTestCaseByProblemAndAllLanguage(problem);
-        return excelService.generateExcelFile(problemTestCases, problem);
+        return excelService.generateTestCaseFile(problemTestCases, problem);
     }
 
     @Override

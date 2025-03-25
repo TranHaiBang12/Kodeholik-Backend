@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class ProblemInputParameterDto {
     private TemplateCode templateCode;
 
-    @NotBlank(message = "Please input a function signature")
+    @NotBlank(message = "MSG02")
     private String functionSignature;
 
     private InputType returnType;

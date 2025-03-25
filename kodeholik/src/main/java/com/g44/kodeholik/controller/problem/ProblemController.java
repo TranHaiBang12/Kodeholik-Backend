@@ -86,7 +86,6 @@ public class ProblemController {
             @RequestPart("problemInputParameterDto") @Valid List<ProblemInputParameterDto> problemInputParameterDto,
             @RequestPart(name = "testCaseFile") MultipartFile testCaseFile) {
         // TODO: process POST request
-        log.info(problemInputParameterDto.get(1).getParameters());
         problemService.editProblem(link, problemBasicAddDto,
                 problemEditorialDto,
                 problemInputParameterDto,
@@ -120,7 +119,7 @@ public class ProblemController {
         byte[] excelFile = problemService.getExcelFile(link);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=data.xlsx");
+        headers.add("Content-Disposition", "attachment; filename=TestCase.xlsx");
         headers.add("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
         return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
