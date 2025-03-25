@@ -44,8 +44,7 @@ public class ProblemSubmission {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users user;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", name = "code")
     private String code;
 
     @ManyToOne
@@ -70,11 +69,9 @@ public class ProblemSubmission {
     @Column(name = "status")
     private SubmissionStatus status;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String message;
 
-    @Lob
     @Column(name = "input_wrong", columnDefinition = "TEXT")
     private String inputWrong;
 

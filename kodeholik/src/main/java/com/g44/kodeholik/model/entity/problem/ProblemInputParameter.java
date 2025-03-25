@@ -36,7 +36,6 @@ public class ProblemInputParameter {
     @JoinColumn(name = "problem_id", referencedColumnName = "id")
     private Problem problem;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String parameters;
 

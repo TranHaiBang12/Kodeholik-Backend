@@ -45,12 +45,12 @@ import lombok.experimental.FieldNameConstants;
 public class Problem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     private String title;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)

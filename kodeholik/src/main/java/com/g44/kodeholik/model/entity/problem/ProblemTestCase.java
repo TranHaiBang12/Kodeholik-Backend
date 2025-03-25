@@ -33,11 +33,9 @@ public class ProblemTestCase {
     @JoinColumn(name = "problem_id", referencedColumnName = "id")
     private Problem problem;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "input", columnDefinition = "TEXT")
     private String input;
 
-    @Lob
     @Column(name = "expected_output", columnDefinition = "TEXT")
     private String expectedOutput;
 

@@ -52,8 +52,7 @@ public class SolutionCode {
     @JoinColumn(name = "language_id", referencedColumnName = "id")
     private Language language;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "code", columnDefinition = "TEXT")
     private String code;
 
     @ManyToOne

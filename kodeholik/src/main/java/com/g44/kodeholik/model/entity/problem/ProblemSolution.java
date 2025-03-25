@@ -58,7 +58,6 @@ public class ProblemSolution {
 
     private String title;
 
-    @Lob
     @Column(name = "text_solution", columnDefinition = "TEXT")
     private String textSolution;
 
