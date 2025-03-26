@@ -46,6 +46,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/lambda/**",
             "/api/v1/auth/logout",
             "/api/v1/auth/login",
+            "/api/v1/auth/login-admin",
             "/api/v1/auth/login/**",
             "/api/v1/auth/reset-password-init",
             "/api/v1/auth/reset-password-check",

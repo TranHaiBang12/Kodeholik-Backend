@@ -36,6 +36,7 @@ public class SecurityConfig {
                         "/api/v1/lambda/**",
                         "/api/v1/auth/logout",
                         "/api/v1/auth/login",
+                        "/api/v1/auth/login-admin",
                         "/api/v1/auth/login/**",
                         "/api/v1/problem/no-achieved-info",
                         "/api/v1/auth/reset-password-init",
