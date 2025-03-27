@@ -144,8 +144,8 @@ public class CourseServiceImpl implements CourseService {
         course.setStatus(requestDto.getStatus());
         course.setNumberOfParticipant(0);
         course.setRate(0.0);
-        course.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-        course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+        course.setCreatedAt(new Timestamp(System.currentTimeMillis() + 25200000));
+        course.setUpdatedAt(new Timestamp(System.currentTimeMillis() + 25200000));
 
         // Lấy danh sách topics
         Set<Topic> topics = topicService.getTopicsByIds(requestDto.getTopicIds());
@@ -173,7 +173,7 @@ public class CourseServiceImpl implements CourseService {
         course.setTitle(requestDto.getTitle());
         course.setDescription(requestDto.getDescription());
         course.setStatus(requestDto.getStatus());
-        course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+        course.setUpdatedAt(new Timestamp(System.currentTimeMillis() + 25200000));
 
         // Cập nhật danh sách topics
         Set<Topic> topics = topicService.getTopicsByIds(requestDto.getTopicIds());

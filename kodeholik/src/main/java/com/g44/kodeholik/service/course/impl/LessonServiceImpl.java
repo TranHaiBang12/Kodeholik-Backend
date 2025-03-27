@@ -67,7 +67,7 @@ public class LessonServiceImpl implements LessonService {
     private final ProblemRepository problemRepository;
     private final LessonProblemRepository lessonProblemRepository;
 
-    public List<LessonStatus> getAllowedStatus(){
+    public List<LessonStatus> getAllowedStatus() {
         Users currentUser = userService.getCurrentUser();
         UserRole userRole = currentUser.getRole();
         List<LessonStatus> allowedStatuses;
@@ -103,18 +103,14 @@ public class LessonServiceImpl implements LessonService {
                 .map(lp -> new LessonProblemResponseDto(
                         lp.getProblem().getTitle(),
                         lp.getProblem().getDifficulty(),
-                        lp.getProblem().getLink()
-                ))
+                        lp.getProblem().getLink()))
                 .collect(Collectors.toList());
-
 
         LessonResponseDto lessonResponse = lessonResponseMapper.mapFrom(lesson);
         lessonResponse.setProblems(lessonProblemDtos);
 
         return lessonResponse;
     }
-
-
 
     @Override
     public void addLesson(LessonRequestDto lessonRequestDto) {
@@ -123,13 +119,14 @@ public class LessonServiceImpl implements LessonService {
         Chapter chapter = chapterRepository.findById(lessonRequestDto.getChapterId())
                 .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
         lesson.setChapter(chapter);
-        lesson.setCreatedAt(Timestamp.from(Instant.now()));
+        lesson.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         lesson.setCreatedBy(userService.getCurrentUser());
 
         try {
             // Upload file đính kèm lên S3 (nếu có)
             if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
-                String s3Key = "lessons/" + UUID.randomUUID() + "-" + lessonRequestDto.getAttachedFile().getOriginalFilename();
+                String s3Key = "lessons/" + UUID.randomUUID() + "-"
+                        + lessonRequestDto.getAttachedFile().getOriginalFilename();
                 s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
                 lesson.setAttachedFile(s3Key);
                 lesson.setStatus(LessonStatus.ACTIVATED);
@@ -185,7 +182,6 @@ public class LessonServiceImpl implements LessonService {
         }
     }
 
-
     @Override
     @Transactional
     public void editLesson(Long lessonId, LessonRequestDto lessonRequestDto) {
@@ -209,7 +205,8 @@ public class LessonServiceImpl implements LessonService {
                 if (lesson.getAttachedFile() != null) {
                     s3Service.deleteFileFromS3(lesson.getAttachedFile());
                 }
-                String s3Key = "lessons/" + UUID.randomUUID() + "-" + lessonRequestDto.getAttachedFile().getOriginalFilename();
+                String s3Key = "lessons/" + UUID.randomUUID() + "-"
+                        + lessonRequestDto.getAttachedFile().getOriginalFilename();
                 s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
                 lesson.setAttachedFile(s3Key);
                 lesson.setStatus(LessonStatus.ACTIVATED);
@@ -221,8 +218,7 @@ public class LessonServiceImpl implements LessonService {
                     String videoId = YoutubeUrlParser.extractVideoId(lessonRequestDto.getYoutubeUrl());
                     lesson.setVideoUrl(videoId);
                     lesson.setStatus(LessonStatus.ACTIVATED);
-                }
-                else if (lessonRequestDto.getVideoType() == LessonVideoType.VIDEO_FILE &&
+                } else if (lessonRequestDto.getVideoType() == LessonVideoType.VIDEO_FILE &&
                         lessonRequestDto.getVideoFile() != null &&
                         !lessonRequestDto.getVideoFile().isEmpty()) {
                     byte[] fileBytes = lessonRequestDto.getVideoFile().getBytes();
@@ -269,7 +265,6 @@ public class LessonServiceImpl implements LessonService {
             throw new RuntimeException("Failed to edit lesson: " + e.getMessage());
         }
     }
-
 
     @Override
     public void deleteLessonById(Long id) {
@@ -321,8 +316,6 @@ public class LessonServiceImpl implements LessonService {
                 .map(progress -> progress.getLesson().getId())
                 .collect(Collectors.toList());
     }
-
-
 
     @Override
     public List<LessonResponseDto> getLessonByChapterId(Long id) {

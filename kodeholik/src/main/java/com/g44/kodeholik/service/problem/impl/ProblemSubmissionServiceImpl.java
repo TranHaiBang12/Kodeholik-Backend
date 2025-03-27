@@ -125,7 +125,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
             problemSubmission.setCode(problemCompileRequestDto.getCode());
             problemSubmission
                     .setLanguage(languageService.findByName(languageName));
-            problemSubmission.setCreatedAt(Timestamp.from(Instant.now()));
+            problemSubmission.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
             if (responseResult.getTime() != null)
                 problemSubmission.setExecutionTime(Double.parseDouble(responseResult.getTime()));
             else

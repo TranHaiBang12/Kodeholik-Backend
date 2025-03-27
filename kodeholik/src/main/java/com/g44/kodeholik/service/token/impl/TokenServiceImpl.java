@@ -128,10 +128,10 @@ public class TokenServiceImpl implements TokenService {
         int expiryTime = 0;
         if (tokenType == TokenType.ACCESS) {
             cookieName = "access_token";
-            expiryTime = accessTokenExpiryTime;
+            expiryTime = accessTokenExpiryTime + 25200000; // 7 hours
         } else {
             cookieName = "refresh_token";
-            expiryTime = (int) extractExpiration(token).getTime();
+            expiryTime = refreshTokenExpiryTime + 25200000;
         }
         // Cookie tokenCookie = new Cookie(cookieName, token);
         // tokenCookie.setHttpOnly(true);
@@ -142,8 +142,8 @@ public class TokenServiceImpl implements TokenService {
 
         ResponseCookie tokenCookie = ResponseCookie.from(cookieName, token)
                 .httpOnly(true)
-                // .secure(true) // Cần thiết khi dùng SameSite=None
-                .sameSite("Lax")
+                .secure(true) // Cần thiết khi dùng SameSite=None
+                .sameSite("None")
                 .path("/")
                 .maxAge(expiryTime / 1000)
                 .build();
@@ -204,11 +204,15 @@ public class TokenServiceImpl implements TokenService {
         } else {
             cookieName = "refresh_token";
         }
-        Cookie cookie = new Cookie(cookieName, "");
-        cookie.setHttpOnly(true);
-        cookie.setPath("/"); // Đảm bảo cùng path với cookie ban đầu
-        cookie.setMaxAge(0); // Đặt thời gian sống về 0 để trình duyệt xóa cookie
-        response.addCookie(cookie);
+        ResponseCookie tokenCookie = ResponseCookie.from(cookieName, "")
+                .httpOnly(true)
+                .secure(true) // Cần thiết khi dùng SameSite=None
+                .sameSite("None")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, tokenCookie.toString());
+
     }
 
 }

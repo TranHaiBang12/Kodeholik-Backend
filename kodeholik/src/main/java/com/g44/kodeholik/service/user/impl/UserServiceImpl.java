@@ -1,32 +1,26 @@
 package com.g44.kodeholik.service.user.impl;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.g44.kodeholik.config.MessageProperties;
 import com.g44.kodeholik.exception.BadRequestException;
-import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.user.AddUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
-import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.EditProfileRequestDto;
 import com.g44.kodeholik.model.dto.request.user.EditUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.FilterUserRequestDto;
@@ -36,7 +30,6 @@ import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.s3.FileNameType;
 import com.g44.kodeholik.model.enums.user.NotificationType;
-import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.model.enums.user.UserStatus;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
@@ -49,7 +42,6 @@ import com.g44.kodeholik.util.mapper.request.user.EditUserAvatarFileMapper;
 import com.g44.kodeholik.util.mapper.response.user.ProfileResponseMapper;
 import com.g44.kodeholik.util.mapper.response.user.UserResponseMapper;
 import com.g44.kodeholik.util.password.PasswordUtils;
-import com.g44.kodeholik.util.validation.Validation;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -138,7 +130,7 @@ public class UserServiceImpl implements UserService {
         Users user = addUserRequestMapper.mapTo(addUserRequestDto);
         checkUsernameExisted(addUserRequestDto.getUsername());
         checkEmailExisted(addUserRequestDto.getEmail());
-        user.setCreatedDate(new java.sql.Date(Date.from(Instant.now()).getTime()));
+        user.setCreatedDate(new java.sql.Date(Date.from(Instant.now()).getTime() + 25200000));
         user.setPassword(PasswordUtils.encodePassword(password));
         user.setStatus(userStatus);
         return userRepository.save(user);
