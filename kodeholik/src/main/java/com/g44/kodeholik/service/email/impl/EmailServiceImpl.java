@@ -55,7 +55,6 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Async("emailTaskExecutor")
-
     @Override
     public void sendEmailLoginGoogle(String to, String subject, String username, String password, String email) {
         Context context = new Context();
@@ -67,7 +66,6 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Async("emailTaskExecutor")
-
     @Override
     public void sendEmailAddUser(String to, String subject, String username, String password) {
         Context context = new Context();
@@ -106,6 +104,15 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("username", username);
         context.setVariable("content", content);
         sendEmail(to, subject, context, "learn-reminder");
+    }
+
+    @Async("emailTaskExecutor")
+    @Override
+    public void sendEmailCompleteCourse(String to, String subject, String username, String content) {
+        Context context = new Context();
+        context.setVariable("username", username);
+        context.setVariable("content", content);
+        sendEmail(to, subject, context, "course-complete");
     }
 
 }

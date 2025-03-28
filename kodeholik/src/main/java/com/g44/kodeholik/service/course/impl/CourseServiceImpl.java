@@ -150,10 +150,10 @@ public class CourseServiceImpl implements CourseService {
             throw new IllegalArgumentException("Các topic ID không tồn tại: " + missingIds);
         }
 
-
         // Upload ảnh lên AWS S3 nếu có
         if (requestDto.getImageFile() != null && !requestDto.getImageFile().isEmpty()) {
-            course.setImage(s3Service.uploadFileNameTypeFile(List.of(requestDto.getImageFile()), FileNameType.COURSE).getFirst());
+            course.setImage(s3Service.uploadFileNameTypeFile(List.of(requestDto.getImageFile()), FileNameType.COURSE)
+                    .getFirst());
         }
 
         // Cập nhật người tạo course
@@ -181,7 +181,8 @@ public class CourseServiceImpl implements CourseService {
 
         // Cập nhật ảnh nếu có ảnh mới
         if (requestDto.getImageFile() != null && !requestDto.getImageFile().isEmpty()) {
-            course.setImage(s3Service.uploadFileNameTypeFile(List.of(requestDto.getImageFile()), FileNameType.COURSE).getFirst());
+            course.setImage(s3Service.uploadFileNameTypeFile(List.of(requestDto.getImageFile()), FileNameType.COURSE)
+                    .getFirst());
         }
 
         // Cập nhật người chỉnh sửa course
@@ -390,15 +391,16 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Page<EnrolledUserResponseDto> getEnrolledUsersWithProgress(Long courseId, int page, int size, String sortBy, String sortDirection, String usernameSearch) {
+    public Page<EnrolledUserResponseDto> getEnrolledUsersWithProgress(Long courseId, int page, int size, String sortBy,
+            String sortDirection, String usernameSearch) {
         Sort sort = "progress".equalsIgnoreCase(sortBy)
                 ? Sort.unsorted()
                 : Sort.by(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
-                validateSortField(sortBy));
+                        validateSortField(sortBy));
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        //Lấy danh sách CourseUser với phân trang và tìm kiếm
+        // Lấy danh sách CourseUser với phân trang và tìm kiếm
         Page<CourseUser> courseUsersPage;
         if (usernameSearch != null && !usernameSearch.trim().isEmpty()) {
             courseUsersPage = courseUserRepository.findByCourseIdAndUserUsernameContaining(
@@ -407,14 +409,14 @@ public class CourseServiceImpl implements CourseService {
             courseUsersPage = courseUserRepository.findByCourseId(courseId, pageable);
         }
 
-        //Lấy tổng số lesson và progress của tất cả user trong course
+        // Lấy tổng số lesson và progress của tất cả user trong course
         List<Lesson> lessons = lessonRepository.findByChapter_Course_Id(courseId);
         int totalLessons = lessons.size();
         List<UserLessonProgress> progresses = userLessonProgressRepository.findByLessonChapterCourseId(courseId);
         Map<Long, Long> userCompletedLessons = progresses.stream()
                 .collect(Collectors.groupingBy(p -> p.getUser().getId(), Collectors.counting()));
 
-        //Map từ CourseUser sang EnrolledUserResponseDto và tính progress
+        // Map từ CourseUser sang EnrolledUserResponseDto và tính progress
         List<EnrolledUserResponseDto> dtos = courseUsersPage.getContent().stream()
                 .map(courseUser -> {
                     Long userId = courseUser.getUser().getId();
@@ -424,21 +426,32 @@ public class CourseServiceImpl implements CourseService {
                     UserResponseDto userDto = new UserResponseDto(courseUser.getUser());
                     return EnrolledUserResponseDto.builder()
                             .user(userDto)
-                            .enrolledAt(courseUser.getEnrolledAt() != null ? courseUser.getEnrolledAt().getTime() : null)
+                            .enrolledAt(
+                                    courseUser.getEnrolledAt() != null ? courseUser.getEnrolledAt().getTime() : null)
                             .progress(progress)
                             .build();
                 })
                 .collect(Collectors.toList());
 
-        //Sắp xếp trong bộ nhớ nếu sortBy là progress
+        // Sắp xếp trong bộ nhớ nếu sortBy là progress
         if ("progress".equalsIgnoreCase(sortBy)) {
             dtos.sort((a, b) -> sortDirection.equalsIgnoreCase("asc")
                     ? Double.compare(a.getProgress(), b.getProgress())
                     : Double.compare(b.getProgress(), a.getProgress()));
         }
 
-        //Tạo Page từ danh sách đã sắp xếp
+        // Tạo Page từ danh sách đã sắp xếp
         return new PageImpl<>(dtos, pageable, courseUsersPage.getTotalElements());
+    }
+
+    @Override
+    public void sendEmailBasedOnCourseProgress(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("Course not found with ID: " + courseId));
+        Users currentUser = userService.getCurrentUser();
+        String subject = "[KODEHOLIK] You completed " + course.getTitle();
+        String content = "Congratulations! You have successfully completed the course: " + course.getTitle();
+        emailService.sendEmailCompleteCourse(currentUser.getEmail(), subject, currentUser.getUsername(), content);
     }
 
     private String validateSortField(String sortBy) {

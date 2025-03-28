@@ -100,7 +100,7 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
                 .numberOfParticipant(course.getNumberOfParticipant())
                 .createdAt(course.getCreatedAt() != null ? course.getCreatedAt().getTime() : null)
                 .topics(course.getTopics().stream()
-                        .map(Topic::getName) // Giả sử Topic có trường name
+                        .map(Topic::getName)
                         .collect(Collectors.toList()))
                 .progress(progress)
                 .noVote(noVote)

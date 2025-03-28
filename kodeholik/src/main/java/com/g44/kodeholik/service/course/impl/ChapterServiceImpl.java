@@ -42,7 +42,7 @@ public class ChapterServiceImpl implements ChapterService {
 
     private final UserService userService;
 
-    public List<ChapterStatus> getAllowedStatus(){
+    public List<ChapterStatus> getAllowedStatus() {
         Users currentUser = userService.getCurrentUser();
         UserRole userRole = currentUser.getRole();
         List<ChapterStatus> allowedStatuses;
@@ -56,7 +56,7 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public Page<ChapterResponseDto> getAllChapter(Pageable pageable) {
-        Page<Chapter> chapterPage = chapterRepository.findByStatusIn(getAllowedStatus(),pageable);
+        Page<Chapter> chapterPage = chapterRepository.findByStatusIn(getAllowedStatus(), pageable);
         return chapterPage.map(chapterResponseMapper::mapFrom);
     }
 
@@ -103,7 +103,7 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public List<ChapterResponseDto> getChapterByCourseId(Long id) {
-        List<Chapter> chapters = chapterRepository.findByCourseIdAndStatusIn(id,getAllowedStatus());
+        List<Chapter> chapters = chapterRepository.findByCourseIdAndStatusIn(id, getAllowedStatus());
         return chapters.stream()
                 .map(chapterResponseMapper::mapDetailFrom)
                 .collect(Collectors.toList());

@@ -12,11 +12,16 @@ import com.g44.kodeholik.model.entity.course.Lesson;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
     Page<Lesson> findByStatusIn(List<LessonStatus> statuses, Pageable pageable);
+
     Page<Course> findById(Long id, Pageable pageable);
+
     List<Lesson> findByChapterIdAndStatusIn(Long id, List<LessonStatus> statuses);
+
     List<Lesson> findByChapter_Course_Id(Long courseId);
+
     List<Lesson> findByChapter_Course_IdIn(List<Long> courseIds);
 }
