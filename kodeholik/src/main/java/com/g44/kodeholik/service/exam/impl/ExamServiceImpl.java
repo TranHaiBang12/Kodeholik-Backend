@@ -145,8 +145,8 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public ExamResponseDto createExam(AddExamRequestDto addExamRequestDto) {
-        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime()));
-        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime()));
+        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime() + 25200000));
+        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime() + 25200000));
 
         Exam exam = addExamRequestMapper.mapTo(addExamRequestDto);
 
@@ -179,7 +179,7 @@ public class ExamServiceImpl implements ExamService {
 
         exam.setCode(code);
         exam.setLanguageSupport(languages);
-        exam.setCreatedAt(Timestamp.from(Instant.now()));
+        exam.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         exam.setCreatedBy(userService.getCurrentUser());
         exam.setNoParticipant(0);
         exam.setStatus(ExamStatus.NOT_STARTED);
@@ -215,8 +215,8 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public ExamResponseDto editExam(AddExamRequestDto addExamRequestDto, String code) {
-        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime()));
-        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime()));
+        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime() + 25200000));
+        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime() + 25200000));
         Exam savedExam = getExamByCode(code);
         if (savedExam.getStatus() != ExamStatus.NOT_STARTED) {
             throw new BadRequestException("This exam is already started or ended",
@@ -234,7 +234,7 @@ public class ExamServiceImpl implements ExamService {
         exam.setCode(savedExam.getCode());
         exam.setCreatedAt(savedExam.getCreatedAt());
         exam.setCreatedBy(savedExam.getCreatedBy());
-        exam.setUpdatedAt(Timestamp.from(Instant.now()));
+        exam.setUpdatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         exam.setUpdatedBy(userService.getCurrentUser());
         exam.setStatus(ExamStatus.NOT_STARTED);
         exam.setNoParticipant(savedExam.getNoParticipant());

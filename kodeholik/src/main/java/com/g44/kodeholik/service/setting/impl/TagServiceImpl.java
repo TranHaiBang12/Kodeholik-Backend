@@ -70,7 +70,7 @@ public class TagServiceImpl implements TagService {
             throw new BadRequestException("Language already exists", "Language already exists");
         }
         language.setName(addTagRequestDto.getName());
-        language.setCreatedAt(Timestamp.from(Instant.now()));
+        language.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         language.setCreatedBy(userService.getCurrentUser());
         languageRepository.save(language);
     }
@@ -81,7 +81,7 @@ public class TagServiceImpl implements TagService {
             throw new BadRequestException("Topic already exists", "Topic already exists");
         }
         topic.setName(addTagRequestDto.getName());
-        topic.setCreatedAt(Timestamp.from(Instant.now()));
+        topic.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         topic.setCreatedBy(userService.getCurrentUser());
         topicRepository.save(topic);
     }
@@ -93,7 +93,7 @@ public class TagServiceImpl implements TagService {
         }
         skill.setName(addTagRequestDto.getName());
         skill.setLevel(addTagRequestDto.getLevel());
-        skill.setCreatedAt(Timestamp.from(Instant.now()));
+        skill.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         skill.setCreatedBy(userService.getCurrentUser());
         skillRepository.save(skill);
     }
@@ -119,7 +119,7 @@ public class TagServiceImpl implements TagService {
         }
         skill.setName(editTagRequestDto.getName());
         skill.setLevel(editTagRequestDto.getLevel());
-        skill.setUpdatedAt(Timestamp.from(Instant.now()));
+        skill.setUpdatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         skill.setUpdatedBy(userService.getCurrentUser());
         skillRepository.save(skill);
     }
@@ -133,7 +133,7 @@ public class TagServiceImpl implements TagService {
             }
         }
         topic.setName(editTagRequestDto.getName());
-        topic.setUpdatedAt(Timestamp.from(Instant.now()));
+        topic.setUpdatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         topic.setUpdatedBy(userService.getCurrentUser());
         topicRepository.save(topic);
     }
@@ -147,7 +147,7 @@ public class TagServiceImpl implements TagService {
             }
         }
         language.setName(editTagRequestDto.getName());
-        language.setUpdatedAt(Timestamp.from(Instant.now()));
+        language.setUpdatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         language.setUpdatedBy(userService.getCurrentUser());
         languageRepository.save(language);
     }

@@ -582,7 +582,7 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setDescription(problemBasicAddDto.getDescription());
         problem.setAcceptanceRate(0);
         problem.setNoSubmission(0);
-        problem.setCreatedAt(Timestamp.from(Instant.now()));
+        problem.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         problem.setCreatedBy(currentUsers);
         problem.setStatus(problemBasicAddDto.getStatus());
         problem.setLink(link);
@@ -613,7 +613,7 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setDescription(problemBasicAddDto.getDescription());
         problem.setAcceptanceRate(0);
         problem.setNoSubmission(0);
-        problem.setUpdatedAt(Timestamp.from(Instant.now()));
+        problem.setUpdatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         problem.setLink(link);
         problem.setUpdatedBy(currentUsers);
         problem.setStatus(problemBasicAddDto.getStatus());
