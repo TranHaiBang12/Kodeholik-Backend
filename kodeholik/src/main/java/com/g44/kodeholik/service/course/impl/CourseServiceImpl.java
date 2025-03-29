@@ -257,7 +257,9 @@ public class CourseServiceImpl implements CourseService {
 
         List<Long> completedLessons = currentUser != null ? getCompletedLessons() : Collections.emptyList();
 
-        return courses.map(course -> courseResponseMapper.mapFromCourseAndLesson(course, completedLessons));
+        // return courses.map(course ->
+        // courseResponseMapper.mapFromCourseAndLesson(course, completedLessons));
+        return courses.map(course -> courseResponseMapper.mapFrom(course));
     }
 
     @Transactional
