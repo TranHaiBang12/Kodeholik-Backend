@@ -2,7 +2,7 @@ server:
   port: 8080
 spring:
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:production}
+    active: ${SPRING_PROFILES_ACTIVE:local}
   mail:
     host: smtp.gmail.com
     port: 587

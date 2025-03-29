@@ -2,6 +2,7 @@ package com.g44.kodeholik.util.mapper.response.course;
 
 import com.g44.kodeholik.model.dto.response.course.ChapterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.course.Chapter;
 import com.g44.kodeholik.model.entity.course.Lesson;
 import com.g44.kodeholik.model.entity.setting.Topic;
@@ -9,6 +10,8 @@ import com.g44.kodeholik.repository.course.CourseRatingRepository;
 import com.g44.kodeholik.repository.course.LessonRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.util.mapper.request.exam.AddExamRequestMapper;
+import com.g44.kodeholik.util.mapper.response.user.UserResponseMapper;
+
 import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -33,6 +36,8 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
     private final LessonRepository lessonRepository;
 
     private final CourseRatingRepository courseRatingRepository;
+
+    private final UserResponseMapper userResponseMapper;
 
     // @PostConstruct
     // public void configureMapper() {
@@ -85,6 +90,8 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
                 .count();
         double progress = totalLessons > 0 ? (completedCount * 100.0) / totalLessons : 0.0;
 
+        UserResponseDto createdBy = course.getCreatedBy() != null ? userResponseMapper.mapFrom(course.getCreatedBy()) : null;
+        
         int noChapter = course.getChapters() != null ? course.getChapters().size() : 0;
 
         int noLesson = totalLessons;
@@ -103,6 +110,7 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
                         .map(Topic::getName)
                         .collect(Collectors.toList()))
                 .progress(progress)
+                .createdBy(createdBy)
                 .noVote(noVote)
                 .noChapter(noChapter)
                 .noLesson(noLesson)
