@@ -19,4 +19,6 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     List<Chapter> findByCourseIdAndStatusIn(Long courseId, List<ChapterStatus> statuses);
 
     Page<Chapter> findByStatusIn(List<ChapterStatus> statuses, Pageable pageable);
+
+    List<Chapter> findByCourseId(Long courseId);
 }
