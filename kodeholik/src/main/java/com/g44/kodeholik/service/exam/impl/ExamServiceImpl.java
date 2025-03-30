@@ -38,7 +38,6 @@ import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResultExcelDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResultOverviewDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ProblemPoint;
-import com.g44.kodeholik.model.dto.response.exam.examiner.overview.ExamOverviewReportDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamListStudentResponseDto;
