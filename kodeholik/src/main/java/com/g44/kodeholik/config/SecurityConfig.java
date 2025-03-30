@@ -70,12 +70,14 @@ public class SecurityConfig {
                         "/api/v1/problem/list-problem",
                         "/api/v1/course/add",
                         "/api/v1/course/update/**",
+                        "/api/v1/course/overview-report",
                         "/api/v1/chapter/add",
                         "/api/v1/chapter/update/**",
                         "/api/v1/lesson/add",
                         "/api/v1/lesson/update/**",
                         "/api/v1/chapter/list-problem",
-                        "/api/v1/problem/private-problem"
+                        "/api/v1/problem/private-problem",
+                        "/api/v1/problem/overview-report"
         };
 
         private final JwtFilter jwtFilter;

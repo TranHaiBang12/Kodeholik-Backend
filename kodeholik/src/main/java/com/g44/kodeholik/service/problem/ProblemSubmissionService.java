@@ -48,6 +48,8 @@ public interface ProblemSubmissionService {
 
         public Long countByIsAcceptedAndProblem(boolean isAccepted, Problem problem);
 
+        public long countByIsAcceptedAndProblemIn(boolean isAccepted, List<Problem> problems);
+
         public long countByUserAndIsAcceptedAndProblemIn(Users user, boolean isAccepted, List<Problem> problems);
 
         public ProblemSubmissionDto getSubmissionDtoById(Long submissionId);
@@ -92,4 +94,8 @@ public interface ProblemSubmissionService {
         public List<Map<String, String>> getNumberLanguageUserSolved(Users user);
 
         public Map<String, String> getAcceptanceRateAndNoSubmissionByUser(Users user);
+
+        public List<ProblemSubmission> getSubmissionsByTimeBetween(
+                        Timestamp start,
+                        Timestamp end);
 }

@@ -118,7 +118,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
             } catch (Exception e) {
                 status = result;
             }
-            log.info(responseResult.getResults());
+            // log.info(responseResult.getResults());
             problemSubmission.setProblem(problem);
             problemSubmission.setNoTestCasePassed(responseResult.getNoSuccessTestcase());
             problemSubmission.setUser(currentUser);
@@ -211,7 +211,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                 functionSignature,
                 inputType,
                 testCases);
-        log.info(lambdaRequest);
+        // log.info(lambdaRequest);
         // try {
         // String result =
         // CompileService.compileAndRun(problemCompileRequestDto.getCode(), testCases,
@@ -703,6 +703,16 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         result.put("rate", formatted + "%");
         result.put("total", String.valueOf(totalSubmissions));
         return result;
+    }
+
+    @Override
+    public long countByIsAcceptedAndProblemIn(boolean isAccepted, List<Problem> problems) {
+        return problemSubmissionRepository.countByIsAcceptedAndProblemIn(isAccepted, problems);
+    }
+
+    @Override
+    public List<ProblemSubmission> getSubmissionsByTimeBetween(Timestamp start, Timestamp end) {
+        return problemSubmissionRepository.getSubmissionsByTimeBetween(start, end);
     }
 
 }

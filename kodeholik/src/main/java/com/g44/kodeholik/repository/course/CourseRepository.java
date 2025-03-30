@@ -7,26 +7,34 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.g44.kodeholik.model.entity.course.Course;
+import com.g44.kodeholik.model.entity.problem.Problem;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-    Page<Course> findByTitle(String title, Pageable pageable);
+        Page<Course> findByTitle(String title, Pageable pageable);
 
-    Page<Course> findByStatusIn(List<CourseStatus> statuses, Pageable pageable);
+        Page<Course> findByStatusIn(List<CourseStatus> statuses, Pageable pageable);
 
-    Page<Course> findByTitleContainingIgnoreCaseAndStatusIn(String title, List<CourseStatus> statuses,
-            Pageable pageable);
+        Page<Course> findByTitleContainingIgnoreCaseAndStatusIn(String title, List<CourseStatus> statuses,
+                        Pageable pageable);
 
-    Page<Course> findByTopicsInAndStatusIn(List<Topic> topics, List<CourseStatus> statuses, Pageable pageable);
+        Page<Course> findByTopicsInAndStatusIn(List<Topic> topics, List<CourseStatus> statuses, Pageable pageable);
 
-    Page<Course> findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(String title, List<Topic> topics,
-            List<CourseStatus> statuses, Pageable pageable);
+        Page<Course> findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(String title, List<Topic> topics,
+                        List<CourseStatus> statuses, Pageable pageable);
 
-    List<Course> findTop5ByOrderByNumberOfParticipantDescRateDesc();
+        List<Course> findTop5ByOrderByNumberOfParticipantDescRateDesc();
+
+        public List<Course> findByCreatedAtBetweenOrderByNumberOfParticipantDescRateDesc(
+                        Timestamp start, Timestamp end);
+
+        public List<Course> findAllByOrderByNumberOfParticipantDescRateDesc();
 }

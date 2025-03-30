@@ -1,5 +1,6 @@
 package com.g44.kodeholik.repository.problem;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,4 +36,11 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
     public Page<Problem> findByTitleContainsAndDifficultyAndStatusAndIsActive(String title, Difficulty difficulty,
             ProblemStatus status, Boolean isActive, Pageable pageable);
 
+    public List<Problem> findAllByOrderByNoSubmissionDescAcceptanceRateDesc();
+
+    public List<Problem> findByCreatedAtBetweenOrderByNoSubmissionDescAcceptanceRateDesc(
+            Timestamp start, Timestamp end);
+
+    public List<Problem> findByCreatedAtBetweenAndDifficultyOrderByNoSubmissionDescAcceptanceRateDesc(
+            Timestamp start, Timestamp end, Difficulty difficulty);
 }

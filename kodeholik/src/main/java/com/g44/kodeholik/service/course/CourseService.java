@@ -4,6 +4,7 @@ import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 
 import com.g44.kodeholik.model.dto.request.course.CourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
+import com.g44.kodeholik.model.dto.response.course.overview.CourseOverviewReportDto;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public interface CourseService {
@@ -40,4 +43,6 @@ public interface CourseService {
     public void registerEndTime(Long courseId);
 
     public void sendEmailBasedOnStudyStreak();
+
+    public CourseOverviewReportDto getCourseOverviewReport(Timestamp start, Timestamp end);
 }

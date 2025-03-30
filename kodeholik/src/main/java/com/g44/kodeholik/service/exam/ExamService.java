@@ -16,6 +16,7 @@ import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResultOverviewDto;
+import com.g44.kodeholik.model.dto.response.exam.examiner.overview.ExamOverviewReportDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamListStudentResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
@@ -78,4 +79,5 @@ public interface ExamService {
         public List<NotStartedExamListDto> getAllPendingExamNotOverlapTime();
 
         public ExamResultOverviewDto getResultOverviewInformation(String code);
+
 }

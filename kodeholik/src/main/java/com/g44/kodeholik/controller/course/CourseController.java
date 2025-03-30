@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.g44.kodeholik.model.dto.request.course.CourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
+import com.g44.kodeholik.model.dto.response.course.overview.CourseOverviewReportDto;
 import com.g44.kodeholik.service.course.CourseService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @RestController
@@ -116,7 +118,8 @@ public class CourseController {
             @RequestParam(defaultValue = "noUpvote") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection) {
 
-        Page<CommentResponseDto> discussions = courseCommentService.getDiscussionByCourseId(courseId, page, size, sortBy, sortDirection);
+        Page<CommentResponseDto> discussions = courseCommentService.getDiscussionByCourseId(courseId, page, size,
+                sortBy, sortDirection);
         return ResponseEntity.ok(discussions);
     }
 
@@ -150,6 +153,13 @@ public class CourseController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(courseCommentService.getAllCommentReplyByComment(id));
+    }
+
+    @GetMapping("/overview-report")
+    public ResponseEntity<CourseOverviewReportDto> getCourseOverviewReport(
+            @RequestParam(required = false) Timestamp start,
+            @RequestParam(required = false) Timestamp end) {
+        return ResponseEntity.ok(courseService.getCourseOverviewReport(start, end));
     }
 
 }

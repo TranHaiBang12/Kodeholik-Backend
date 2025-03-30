@@ -64,6 +64,8 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterRespons
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemShortResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.TemplateCodeResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.overview.ProblemInfoOverviewDto;
+import com.g44.kodeholik.model.dto.response.problem.overview.ProblemOverviewReportDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
@@ -514,7 +516,6 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public List<NoAchivedInformationResponseDto> getListNoAchievedInformationByCurrentUser() {
         Users user = userService.getCurrentUser();
-        log.info(user);
         long problemSize = problemRepository.findAll().size();
         List<NoAchivedInformationResponseDto> result = new ArrayList<>();
         NoAchivedInformationResponseDto achievedEasy = getNoAchieved(user, Difficulty.EASY);
@@ -1111,6 +1112,7 @@ public class ProblemServiceImpl implements ProblemService {
                 }
             } else if (noDimension == 3) {
                 if (typeData.equals("INT")) {
+
                     Type type = new TypeToken<List<List<List<Integer>>>>() {
                     }.getType();
                     return gson.fromJson(jsonArray, type);
@@ -1399,6 +1401,7 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public byte[] getExcelFile(String link) {
         Problem problem = getProblemByLink(link);
+        log.info(problem);
         List<ProblemTestCase> problemTestCases = problemTestCaseService.getTestCaseByProblemAndAllLanguage(problem);
         return excelService.generateTestCaseFile(problemTestCases, problem);
     }
@@ -1782,4 +1785,115 @@ public class ProblemServiceImpl implements ProblemService {
         return problemSubmissionService.getAcceptanceRateAndNoSubmissionByUser(currentUser);
     }
 
+    private List<NoAchivedInformationResponseDto> getListNoAchievedInformationOverview(List<Problem> problems,
+            Timestamp start,
+            Timestamp end) {
+        long problemSize = problems.size();
+        List<NoAchivedInformationResponseDto> result = new ArrayList<>();
+        NoAchivedInformationResponseDto achievedEasy = getNoAchievedOverview(Difficulty.EASY, start, end);
+        NoAchivedInformationResponseDto achievedMedium = getNoAchievedOverview(Difficulty.MEDIUM, start, end);
+        NoAchivedInformationResponseDto achievedHard = getNoAchievedOverview(Difficulty.HARD, start, end);
+        NoAchivedInformationResponseDto achievedAll = new NoAchivedInformationResponseDto("ALL",
+                achievedEasy.getNoAchived() + achievedMedium.getNoAchived() + achievedHard.getNoAchived(),
+                problemSize);
+        result.add(achievedEasy);
+        result.add(achievedMedium);
+        result.add(achievedHard);
+        result.add(achievedAll);
+        return result;
+    }
+
+    private NoAchivedInformationResponseDto getNoAchievedOverview(Difficulty difficulty, Timestamp start,
+            Timestamp end) {
+        List<Problem> problems;
+        if (start == null && end == null) {
+            problems = problemRepository.findByDifficulty(difficulty);
+        } else {
+            problems = problemRepository
+                    .findByCreatedAtBetweenAndDifficultyOrderByNoSubmissionDescAcceptanceRateDesc(start, end,
+                            difficulty);
+        }
+        long solvedProblems = problemSubmissionService.countByIsAcceptedAndProblemIn(true, problems);
+        return new NoAchivedInformationResponseDto(difficulty.toString(), solvedProblems, problems.size());
+    }
+
+    @Override
+    public ProblemOverviewReportDto getProblemOverviewReport(Timestamp start, Timestamp end) {
+        ProblemOverviewReportDto result = new ProblemOverviewReportDto();
+        List<ProblemInfoOverviewDto> topPopularProblems = new ArrayList<>();
+        List<ProblemInfoOverviewDto> topFlopProblems = new ArrayList<>();
+
+        long totalProblemCount = 0, totalSubmissions = 0;
+        double avgAcceptanceRate = 0;
+
+        if (start == null && end == null) {
+            List<Problem> problems = problemRepository.findAllByOrderByNoSubmissionDescAcceptanceRateDesc();
+            totalProblemCount = problems.size();
+            for (int i = 0; i < totalProblemCount; i++) {
+                totalSubmissions += problems.get(i).getNoSubmission();
+                avgAcceptanceRate += problems.get(i).getAcceptanceRate();
+                if (i < 5) {
+                    topPopularProblems.add(mapProblemToProblemInfo(problems.get(i)));
+                } else if (totalProblemCount >= 10 && i >= totalProblemCount - 5) {
+                    topFlopProblems.add(mapProblemToProblemInfo(problems.get(i)));
+                }
+            }
+            if (totalSubmissions != 0) {
+                avgAcceptanceRate = Math.round((double) avgAcceptanceRate / totalProblemCount * 100) / 100.0;
+
+            }
+
+            result.setNoAchivedInformationList(getListNoAchievedInformationOverview(problems, start, end));
+            result.setTopPopularProblems(topPopularProblems);
+            result.setTopFlopProblems(topFlopProblems);
+            result.setTotalProblemCount(totalProblemCount);
+            result.setAvgAcceptanceRate(avgAcceptanceRate);
+            result.setTotalSubmissions(totalSubmissions);
+        } else {
+            if (start == null || end == null || start.after(end)) {
+                throw new BadRequestException("Please provide both valid start and end time",
+                        "Please provide both valid start and end time");
+            }
+            List<Problem> problems = problemRepository
+                    .findByCreatedAtBetweenOrderByNoSubmissionDescAcceptanceRateDesc(start, end);
+            totalProblemCount = problems.size();
+            List<ProblemSubmission> problemSubmissions = problemSubmissionService.getSubmissionsByTimeBetween(start,
+                    end);
+            totalSubmissions = problemSubmissions.size();
+            long totalSuccessSubmission = 0;
+            for (int i = 0; i < totalSubmissions; i++) {
+                if (problemSubmissions.get(i).isAccepted()) {
+                    totalSuccessSubmission += 1;
+                }
+            }
+            if (totalSubmissions != 0) {
+                avgAcceptanceRate = Math.round((double) totalSuccessSubmission / totalSubmissions * 100) / 100.0;
+            }
+
+            for (int i = 0; i < totalProblemCount; i++) {
+                if (i < 5) {
+                    topPopularProblems.add(mapProblemToProblemInfo(problems.get(i)));
+                } else if (totalProblemCount >= 10 && i >= totalProblemCount - 5) {
+                    topFlopProblems.add(mapProblemToProblemInfo(problems.get(i)));
+                }
+            }
+
+            result.setNoAchivedInformationList(getListNoAchievedInformationOverview(problems, start, end));
+            result.setTopPopularProblems(topPopularProblems);
+            result.setTopFlopProblems(topFlopProblems);
+            result.setTotalProblemCount(totalProblemCount);
+            result.setAvgAcceptanceRate(avgAcceptanceRate);
+            result.setTotalSubmissions(totalSubmissions);
+        }
+        return result;
+    }
+
+    private ProblemInfoOverviewDto mapProblemToProblemInfo(Problem problem) {
+        ProblemInfoOverviewDto problemInfoOverviewDto = new ProblemInfoOverviewDto();
+        problemInfoOverviewDto.setLink(problem.getLink());
+        problemInfoOverviewDto.setTitle(problem.getTitle());
+        problemInfoOverviewDto.setTotalSubmissions(problem.getNoSubmission());
+        problemInfoOverviewDto.setAvgAcceptanceRate(problem.getAcceptanceRate());
+        return problemInfoOverviewDto;
+    }
 }
