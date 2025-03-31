@@ -1,6 +1,7 @@
 package com.g44.kodeholik.model.dto.response.course;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
 
 import com.g44.kodeholik.util.serializer.TimestampSerializer;
@@ -35,4 +36,12 @@ public class CourseResponseDto {
     private List<String> topics;
 
     private Double progress;
+
+    private UserResponseDto createdBy;
+
+    private Integer noVote;
+
+    private Integer noChapter;
+
+    private Integer noLesson;
 }

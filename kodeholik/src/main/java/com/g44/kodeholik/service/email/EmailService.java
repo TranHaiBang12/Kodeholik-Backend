@@ -14,4 +14,5 @@ public interface EmailService {
 
     public void sendEmailRemindLearning(String to, String subject, String username, String content);
 
+    public void sendEmailCompleteCourse(String to, String subject, String username, String content);
 }

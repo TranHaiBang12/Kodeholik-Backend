@@ -14,7 +14,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
@@ -37,4 +39,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
                         Timestamp start, Timestamp end);
 
         public List<Course> findAllByOrderByNumberOfParticipantDescRateDesc();
+
+        Optional<Course> findById(Long courseId);
 }

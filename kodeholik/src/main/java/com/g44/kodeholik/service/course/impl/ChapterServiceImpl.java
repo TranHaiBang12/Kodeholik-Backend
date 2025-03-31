@@ -103,7 +103,8 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public List<ChapterResponseDto> getChapterByCourseId(Long id) {
-        List<Chapter> chapters = chapterRepository.findByCourseIdAndStatusIn(id, getAllowedStatus());
+        List<Chapter> chapters = chapterRepository.findByCourseIdAndStatusIn(id,
+                getAllowedStatus());
         return chapters.stream()
                 .map(chapterResponseMapper::mapDetailFrom)
                 .collect(Collectors.toList());

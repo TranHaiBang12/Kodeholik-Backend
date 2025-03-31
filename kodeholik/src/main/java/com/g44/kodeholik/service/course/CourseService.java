@@ -7,6 +7,7 @@ import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.g44.kodeholik.model.dto.response.course.EnrolledUserResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,9 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 public interface CourseService {
     public CourseDetailResponseDto getCourseById(Long courseId);
 
-    public void addCourse(CourseRequestDto courseRequestDto, MultipartFile imageFile);
+    public void addCourse(CourseRequestDto courseRequestDto);
 
-    public void editCourse(Long courseId, CourseRequestDto courseRequestDto, MultipartFile imageFile);
+    public void editCourse(Long courseId, CourseRequestDto courseRequestDto);
 
     public void deleteCourse(Long courseId);
 
@@ -45,4 +46,9 @@ public interface CourseService {
     public void sendEmailBasedOnStudyStreak();
 
     public CourseOverviewReportDto getCourseOverviewReport(Timestamp start, Timestamp end);
+
+    public Page<EnrolledUserResponseDto> getEnrolledUsersWithProgress(Long courseId, int page, int size, String sortBy,
+            String sortDirection, String usernameSearch);
+
+    public void sendEmailBasedOnCourseProgress(Long courseId);
 }

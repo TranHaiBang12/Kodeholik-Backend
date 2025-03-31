@@ -118,7 +118,7 @@ class CourseServiceImplTest {
         when(topicService.getTopicsByIds(requestDto.getTopicIds())).thenReturn(new HashSet<>());
         when(courseRepository.save(any(Course.class))).thenReturn(course);
 
-        courseService.addCourse(requestDto, imageFile);
+        courseService.addCourse(requestDto);
         verify(courseRepository, times(1)).save(any(Course.class));
     }
 

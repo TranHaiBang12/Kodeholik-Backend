@@ -1,11 +1,13 @@
 package com.g44.kodeholik.controller.course;
 
 import com.g44.kodeholik.model.dto.request.course.CourseRatingRequestDto;
+import com.g44.kodeholik.model.dto.request.course.EnrolledUsersRequestDto;
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.request.discussion.AddCommentRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.course.CourseRatingResponseDto;
+import com.g44.kodeholik.model.dto.response.course.EnrolledUserResponseDto;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.service.course.CourseCommentService;
@@ -52,20 +54,18 @@ public class CourseController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addCourse(
-            @Valid @RequestPart("data") CourseRequestDto requestDto,
-            @ValidImage @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+            @ModelAttribute @Valid CourseRequestDto requestDto) {
 
-        courseService.addCourse(requestDto, imageFile);
+        courseService.addCourse(requestDto);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> editCourse(
             @PathVariable Long id,
-            @Valid @RequestPart("data") CourseRequestDto requestDto,
-            @ValidImage @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+            @ModelAttribute @Valid CourseRequestDto requestDto) {
 
-        courseService.editCourse(id, requestDto, imageFile);
+        courseService.editCourse(id, requestDto);
         return ResponseEntity.ok().build();
     }
 
@@ -162,4 +162,17 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCourseOverviewReport(start, end));
     }
 
+    @PostMapping("/enrolled-users/{courseId}")
+    public ResponseEntity<Page<EnrolledUserResponseDto>> getEnrolledUsers(
+            @PathVariable Long courseId,
+            @RequestBody EnrolledUsersRequestDto request) {
+        Page<EnrolledUserResponseDto> enrolledUsers = courseService.getEnrolledUsersWithProgress(
+                courseId,
+                request.getPage(),
+                request.getSize(),
+                request.getSortBy(),
+                request.getSortDir(),
+                request.getUsername());
+        return ResponseEntity.ok(enrolledUsers);
+    }
 }

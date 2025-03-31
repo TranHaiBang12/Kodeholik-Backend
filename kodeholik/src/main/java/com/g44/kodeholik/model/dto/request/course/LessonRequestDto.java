@@ -5,6 +5,7 @@ import com.g44.kodeholik.model.enums.course.LessonType;
 import com.g44.kodeholik.model.enums.course.LessonVideoType;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,10 +24,11 @@ public class LessonRequestDto {
 
     private Long chapterId;
 
-    @NotBlank(message = "MSG34")
+    @Size(min = 10, max = 5000, message = "MSG34")
     private String title;
 
-    @NotBlank(message = "MSG35")
+
+    @Size(min = 10, max = 5000, message = "MSG29")
     private String description;
 
     private int displayOrder;

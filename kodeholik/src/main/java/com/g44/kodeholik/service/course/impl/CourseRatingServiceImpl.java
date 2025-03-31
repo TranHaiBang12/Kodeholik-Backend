@@ -41,7 +41,7 @@ public class CourseRatingServiceImpl implements CourseRatingService {
 
         // Kiểm tra xem người dùng đã enroll vào course chưa
         boolean alreadyEnrolled = courseUserRepository.existsByCourseAndUser(course, currentUser);
-        if (alreadyEnrolled) {
+        if (!alreadyEnrolled) {
             throw new BadRequestException("You must enroll in the course before rating", "User not enrolled");
         }
 
@@ -61,7 +61,7 @@ public class CourseRatingServiceImpl implements CourseRatingService {
                 .build();
 
         courseRatingRepository.save(courseRating);
-        updateCourseRating(course); // Giả định đây là method cập nhật rating trung bình của course
+        updateCourseRating(course);
         return new CourseRatingResponseDto(courseRating); // Sử dụng constructor của DTO
     }
 

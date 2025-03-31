@@ -14,11 +14,9 @@ import java.util.stream.Stream;
 import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
-import com.g44.kodeholik.model.entity.course.Chapter;
-import com.g44.kodeholik.model.entity.course.CourseUser;
-import com.g44.kodeholik.model.entity.course.CourseUserId;
-import com.g44.kodeholik.model.entity.course.Lesson;
-import com.g44.kodeholik.model.entity.course.TopCourse;
+import com.g44.kodeholik.model.dto.response.course.EnrolledUserResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
+import com.g44.kodeholik.model.entity.course.*;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
@@ -39,10 +37,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.BadRequestException;
@@ -140,7 +135,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void addCourse(CourseRequestDto requestDto, MultipartFile imageFile) {
+    public void addCourse(CourseRequestDto requestDto) {
         Course course = new Course();
         course.setTitle(requestDto.getTitle());
         course.setDescription(requestDto.getDescription());
@@ -150,13 +145,19 @@ public class CourseServiceImpl implements CourseService {
         course.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-        // Lấy danh sách topics
         Set<Topic> topics = topicService.getTopicsByIds(requestDto.getTopicIds());
-        course.setTopics(topics);
+        // Kiểm tra xem tất cả topicIds có tồn tại không
+        if (topics.size() != requestDto.getTopicIds().size()) {
+            Set<Long> foundIds = topics.stream().map(Topic::getId).collect(Collectors.toSet());
+            Set<Long> missingIds = new HashSet<>(requestDto.getTopicIds());
+            missingIds.removeAll(foundIds);
+            throw new IllegalArgumentException("Các topic ID không tồn tại: " + missingIds);
+        }
 
         // Upload ảnh lên AWS S3 nếu có
-        if (imageFile != null && !imageFile.isEmpty()) {
-            course.setImage(s3Service.uploadFileNameTypeFile(List.of(imageFile), FileNameType.COURSE).getFirst());
+        if (requestDto.getImageFile() != null && !requestDto.getImageFile().isEmpty()) {
+            course.setImage(s3Service.uploadFileNameTypeFile(List.of(requestDto.getImageFile()), FileNameType.COURSE)
+                    .getFirst());
         }
 
         // Cập nhật người tạo course
@@ -168,7 +169,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void editCourse(Long courseId, CourseRequestDto requestDto, MultipartFile imageFile) {
+    public void editCourse(Long courseId, CourseRequestDto requestDto) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
@@ -183,8 +184,9 @@ public class CourseServiceImpl implements CourseService {
         course.setTopics(topics);
 
         // Cập nhật ảnh nếu có ảnh mới
-        if (imageFile != null && !imageFile.isEmpty()) {
-            course.setImage(s3Service.uploadFileNameTypeFile(List.of(imageFile), FileNameType.COURSE).getFirst());
+        if (requestDto.getImageFile() != null && !requestDto.getImageFile().isEmpty()) {
+            course.setImage(s3Service.uploadFileNameTypeFile(List.of(requestDto.getImageFile()), FileNameType.COURSE)
+                    .getFirst());
         }
 
         // Cập nhật người chỉnh sửa course
@@ -389,6 +391,83 @@ public class CourseServiceImpl implements CourseService {
         List<CourseUser> courseUsers = courseUserRepository.findAll();
         for (int i = 0; i < courseUsers.size(); i++) {
             sendEmailBasedOnStudyStreakForEachCourseUser(courseUsers.get(i));
+        }
+    }
+
+    @Override
+    public Page<EnrolledUserResponseDto> getEnrolledUsersWithProgress(Long courseId, int page, int size, String sortBy,
+            String sortDirection, String usernameSearch) {
+        Sort sort = "progress".equalsIgnoreCase(sortBy)
+                ? Sort.unsorted()
+                : Sort.by(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                        validateSortField(sortBy));
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Lấy danh sách CourseUser với phân trang và tìm kiếm
+        Page<CourseUser> courseUsersPage;
+        if (usernameSearch != null && !usernameSearch.trim().isEmpty()) {
+            courseUsersPage = courseUserRepository.findByCourseIdAndUserUsernameContaining(
+                    courseId, usernameSearch, pageable);
+        } else {
+            courseUsersPage = courseUserRepository.findByCourseId(courseId, pageable);
+        }
+
+        // Lấy tổng số lesson và progress của tất cả user trong course
+        List<Lesson> lessons = lessonRepository.findByChapter_Course_Id(courseId);
+        int totalLessons = lessons.size();
+        List<UserLessonProgress> progresses = userLessonProgressRepository.findByLessonChapterCourseId(courseId);
+        Map<Long, Long> userCompletedLessons = progresses.stream()
+                .collect(Collectors.groupingBy(p -> p.getUser().getId(), Collectors.counting()));
+
+        // Map từ CourseUser sang EnrolledUserResponseDto và tính progress
+        List<EnrolledUserResponseDto> dtos = courseUsersPage.getContent().stream()
+                .map(courseUser -> {
+                    Long userId = courseUser.getUser().getId();
+                    int completedLessons = userCompletedLessons.getOrDefault(userId, 0L).intValue();
+                    double progress = totalLessons > 0 ? (completedLessons * 100.0) / totalLessons : 0.0;
+
+                    UserResponseDto userDto = new UserResponseDto(courseUser.getUser());
+                    return EnrolledUserResponseDto.builder()
+                            .user(userDto)
+                            .enrolledAt(
+                                    courseUser.getEnrolledAt() != null ? courseUser.getEnrolledAt().getTime() : null)
+                            .progress(progress)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        // Sắp xếp trong bộ nhớ nếu sortBy là progress
+        if ("progress".equalsIgnoreCase(sortBy)) {
+            dtos.sort((a, b) -> sortDirection.equalsIgnoreCase("asc")
+                    ? Double.compare(a.getProgress(), b.getProgress())
+                    : Double.compare(b.getProgress(), a.getProgress()));
+        }
+
+        // Tạo Page từ danh sách đã sắp xếp
+        return new PageImpl<>(dtos, pageable, courseUsersPage.getTotalElements());
+    }
+
+    @Override
+    public void sendEmailBasedOnCourseProgress(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("Course not found with ID: " + courseId));
+        Users currentUser = userService.getCurrentUser();
+        String subject = "[KODEHOLIK] You completed " + course.getTitle();
+        String content = "Congratulations! You have successfully completed the course: " + course.getTitle();
+        emailService.sendEmailCompleteCourse(currentUser.getEmail(), subject, currentUser.getUsername(), content);
+    }
+
+    private String validateSortField(String sortBy) {
+        switch (sortBy.toLowerCase()) {
+            case "enrolledat":
+                return "enrolledAt";
+            case "username":
+                return "user.username";
+            case "progress":
+                return "enrolledAt";
+            default:
+                return "enrolledAt";
         }
     }
 

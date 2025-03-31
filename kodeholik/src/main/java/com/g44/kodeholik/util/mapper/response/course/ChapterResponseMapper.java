@@ -33,8 +33,8 @@ public class ChapterResponseMapper implements Mapper<Chapter, ChapterResponseDto
     public ChapterResponseDto mapFrom(Chapter chapter, List<Long> completedLessons) {
         List<LessonResponseDto> lessonDtos = chapter.getLessons() != null
                 ? chapter.getLessons().stream()
-                .map(lesson -> lessonResponseMapper.mapFrom(lesson, completedLessons))
-                .toList()
+                        .map(lesson -> lessonResponseMapper.mapFrom(lesson, completedLessons))
+                        .toList()
                 : Collections.emptyList();
 
         return ChapterResponseDto.builder()

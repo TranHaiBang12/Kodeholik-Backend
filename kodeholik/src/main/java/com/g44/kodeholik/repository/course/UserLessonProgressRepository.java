@@ -18,4 +18,16 @@ public interface UserLessonProgressRepository extends JpaRepository<UserLessonPr
             "WHERE ulp.user.id = :userId AND ulp.lesson.chapter.course.id = :courseId")
     List<Long> findCompletedLessonIdsByUserAndCourse(@Param("userId") Long userId,
                                                      @Param("courseId") Long courseId);
+
+
+    @Query("SELECT COUNT(ulp) FROM UserLessonProgress ulp " +
+            "WHERE ulp.user.id = :userId " +
+            "AND ulp.lesson.chapter.course.id = :courseId")
+    Integer countByUserIdAndLessonChapterCourseId(
+            @Param("userId") Long userId,
+            @Param("courseId") Long courseId
+    );
+
+    @Query("SELECT ulp FROM UserLessonProgress ulp WHERE ulp.lesson.chapter.course.id = :courseId")
+    List<UserLessonProgress> findByLessonChapterCourseId(@Param("courseId") Long courseId);
 }
