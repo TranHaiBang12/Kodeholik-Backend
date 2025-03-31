@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class ProblemBasicAddDto {
     @NotNull(message = "MSG34")
     @NotBlank(message = "MSG34")
-    @Size(min = 10, max = 200, message = "MSG34")
+    @Size(min = 5, max = 200, message = "MSG34")
     private String title;
 
     @NotNull(message = "MSG02")
@@ -38,6 +38,8 @@ public class ProblemBasicAddDto {
 
     private List<String> skills;
 
-    @NotNull(message = "{MSG02}")
+    @NotNull(message = "MSG02")
     private Boolean isActive;
+
+    private List<String> languageSupport;
 }

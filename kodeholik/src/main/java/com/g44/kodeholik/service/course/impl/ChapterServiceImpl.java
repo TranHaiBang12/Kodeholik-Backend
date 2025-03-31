@@ -2,7 +2,15 @@ package com.g44.kodeholik.service.course.impl;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.g44.kodeholik.model.entity.user.Users;
+import com.g44.kodeholik.model.enums.course.ChapterStatus;
+import com.g44.kodeholik.model.enums.course.LessonStatus;
+import com.g44.kodeholik.model.enums.user.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,9 +42,21 @@ public class ChapterServiceImpl implements ChapterService {
 
     private final UserService userService;
 
+    public List<ChapterStatus> getAllowedStatus() {
+        Users currentUser = userService.getCurrentUser();
+        UserRole userRole = currentUser.getRole();
+        List<ChapterStatus> allowedStatuses;
+        if (userRole == UserRole.STUDENT) {
+            allowedStatuses = Collections.singletonList(ChapterStatus.ACTIVATED);
+        } else {
+            allowedStatuses = Arrays.asList(ChapterStatus.values());
+        }
+        return allowedStatuses;
+    }
+
     @Override
     public Page<ChapterResponseDto> getAllChapter(Pageable pageable) {
-        Page<Chapter> chapterPage = chapterRepository.findAll(pageable);
+        Page<Chapter> chapterPage = chapterRepository.findByStatusIn(getAllowedStatus(), pageable);
         return chapterPage.map(chapterResponseMapper::mapFrom);
     }
 
@@ -79,6 +99,15 @@ public class ChapterServiceImpl implements ChapterService {
         chapterRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
         chapterRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ChapterResponseDto> getChapterByCourseId(Long id) {
+        List<Chapter> chapters = chapterRepository.findByCourseIdAndStatusIn(id,
+                getAllowedStatus());
+        return chapters.stream()
+                .map(chapterResponseMapper::mapDetailFrom)
+                .collect(Collectors.toList());
     }
 
 }

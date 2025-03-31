@@ -3,10 +3,14 @@ package com.g44.kodeholik.model.entity.problem;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
+import java.time.Instant;
+import java.time.ZoneId;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.g44.kodeholik.model.entity.discussion.Comment;
+import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
@@ -22,8 +26,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PostLoad;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,10 +48,12 @@ import lombok.experimental.FieldNameConstants;
 public class Problem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     private String title;
 
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -83,19 +91,28 @@ public class Problem {
 
     @ManyToMany
     @JoinTable(name = "problem_topic", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "topic_id"))
+    @JsonManagedReference
     private Set<Topic> topics = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(name = "problem_comment", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "comment_id"))
-    private Set<Comment> comments = new HashSet<>();
+    // @ManyToMany
+    // @JoinTable(name = "problem_comment", schema = "schema_problem", joinColumns =
+    // @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name =
+    // "comment_id"))
+    // @JsonManagedReference
+    // private Set<Comment> comments = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "problem_skill", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
+    @JsonManagedReference
     private Set<Skill> skills = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "user_favourite", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<Users> usersFavourite = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "language_support", schema = "schema_problem", joinColumns = @JoinColumn(name = "problem_id"), inverseJoinColumns = @JoinColumn(name = "language_id"))
+    private Set<Language> languageSupport = new HashSet<>();
 
     public Problem(String title, String description, Difficulty difficulty, float acceptanceRate, int noSubmission,
             ProblemStatus problemStatus, Timestamp createdAt, Users createdBy) {
@@ -108,4 +125,5 @@ public class Problem {
         this.createdAt = createdAt;
         this.createdBy = createdBy;
     }
+
 }

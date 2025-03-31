@@ -1,10 +1,13 @@
 {
+    "refresh_interval": "30s",
     "analysis": {
       "analyzer": {
         "autocomplete": {
           "type": "custom",
           "tokenizer": "autocomplete_tokenizer",
-          "filter": ["lowercase"]
+          "filter": [
+            "lowercase"
+          ]
         }
       },
       "tokenizer": {
@@ -12,9 +15,12 @@
           "type": "edge_ngram",
           "min_gram": 2,
           "max_gram": 20,
-          "token_chars": ["letter", "digit"]
+          "token_chars": [
+            "letter",
+            "digit"
+          ]
         }
       }
     }
-  }
   
+}

@@ -9,8 +9,8 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.MalformedJwtException;
@@ -51,6 +51,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateAccessToken(String username) {
+
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
                 .claims()
@@ -127,17 +128,27 @@ public class TokenServiceImpl implements TokenService {
         int expiryTime = 0;
         if (tokenType == TokenType.ACCESS) {
             cookieName = "access_token";
-            expiryTime = accessTokenExpiryTime;
+            expiryTime = accessTokenExpiryTime + 25200000; // 7 hours
         } else {
             cookieName = "refresh_token";
-            expiryTime = (int) extractExpiration(token).getTime();
+            expiryTime = refreshTokenExpiryTime + 25200000;
         }
-        Cookie tokenCookie = new Cookie(cookieName, token);
-        tokenCookie.setHttpOnly(true);
-        tokenCookie.setPath("/");
-        tokenCookie.setMaxAge(expiryTime / 1000);
+        // Cookie tokenCookie = new Cookie(cookieName, token);
+        // tokenCookie.setHttpOnly(true);
+        // tokenCookie.setPath("/");
+        // tokenCookie.setMaxAge(expiryTime / 1000);
 
-        response.addCookie(tokenCookie);
+        // response.addCookie(tokenCookie);
+
+        ResponseCookie tokenCookie = ResponseCookie.from(cookieName, token)
+                .httpOnly(true)
+                .secure(true) // Cần thiết khi dùng SameSite=None
+                .sameSite("None")
+                .path("/")
+                .maxAge(expiryTime / 1000)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, tokenCookie.toString());
 
     }
 
@@ -193,11 +204,15 @@ public class TokenServiceImpl implements TokenService {
         } else {
             cookieName = "refresh_token";
         }
-        Cookie cookie = new Cookie(cookieName, "");
-        cookie.setHttpOnly(true);
-        cookie.setPath("/"); // Đảm bảo cùng path với cookie ban đầu
-        cookie.setMaxAge(0); // Đặt thời gian sống về 0 để trình duyệt xóa cookie
-        response.addCookie(cookie);
+        ResponseCookie tokenCookie = ResponseCookie.from(cookieName, "")
+                .httpOnly(true)
+                .secure(true) // Cần thiết khi dùng SameSite=None
+                .sameSite("None")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, tokenCookie.toString());
+
     }
 
 }

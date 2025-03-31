@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 public class ProblemResponseDto {
     private Long id;
 
+    private String link;
+
     private String title;
 
     private String description;

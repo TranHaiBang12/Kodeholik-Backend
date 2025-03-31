@@ -2,21 +2,25 @@ package com.g44.kodeholik.model.dto.response.problem.submission.submit;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
 public class AcceptedSubmissionResponseDto extends SubmissionResponseDto {
     private String executionTime;
-    private float memoryUsage;
+    private double memoryUsage;
     private int noTestcase;
-    private Timestamp createdAt;
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long createdAt;
 
-    public AcceptedSubmissionResponseDto(String executionTime, float memoryUsage, String code, String languageName,
-            int noTestcase, Timestamp createdAt) {
-        super(code, languageName);
+    public AcceptedSubmissionResponseDto(String executionTime, double memoryUsage, String code, String languageName,
+            int noTestcase, Timestamp createdAt, SubmissionStatus status, Long submissionId) {
+        super(submissionId, code, languageName, status);
         this.executionTime = executionTime;
         this.memoryUsage = memoryUsage;
         this.noTestcase = noTestcase;
-        this.createdAt = createdAt;
+        this.createdAt = createdAt.getTime();
     }
 
     public String getExecutionTime() {
@@ -27,11 +31,11 @@ public class AcceptedSubmissionResponseDto extends SubmissionResponseDto {
         this.executionTime = executionTime;
     }
 
-    public float getMemoryUsage() {
+    public double getMemoryUsage() {
         return memoryUsage;
     }
 
-    public void setMemoryUsage(float memoryUsage) {
+    public void setMemoryUsage(double memoryUsage) {
         this.memoryUsage = memoryUsage;
     }
 
@@ -43,12 +47,20 @@ public class AcceptedSubmissionResponseDto extends SubmissionResponseDto {
         this.noTestcase = noTestcase;
     }
 
-    public Timestamp getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getSubmissionId() {
+        return submissionId;
+    }
+
+    public void setSubmissionId(Long submissionId) {
+        this.submissionId = submissionId;
     }
 
     @Override
@@ -69,6 +81,16 @@ public class AcceptedSubmissionResponseDto extends SubmissionResponseDto {
     @Override
     public void setLanguageName(String languageName) {
         this.languageName = languageName;
+    }
+
+    @Override
+    public SubmissionStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(SubmissionStatus status) {
+        this.status = status;
     }
 
 }

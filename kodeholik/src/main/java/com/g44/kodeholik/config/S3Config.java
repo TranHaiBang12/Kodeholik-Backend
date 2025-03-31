@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.lambda.AWSLambda;
+import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
+
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -45,5 +49,13 @@ public class S3Config {
                 .region(Region.AP_SOUTHEAST_1)
                 .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
                 .build();
+    }
+
+    @Bean
+    public AWSLambda getAwsLambda() {
+        return AWSLambdaClientBuilder
+                .standard()
+                .withRegion(Regions.AP_SOUTHEAST_1)
+                .defaultClient();
     }
 }

@@ -13,8 +13,12 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class InputParameterDto {
-    @NotBlank(message = "Please input a name")
+    @NotBlank(message = "MSG02")
     private String inputName;
 
     private InputType inputType;
+
+    private String otherInputType;
+
+    private Integer noDimension;
 }

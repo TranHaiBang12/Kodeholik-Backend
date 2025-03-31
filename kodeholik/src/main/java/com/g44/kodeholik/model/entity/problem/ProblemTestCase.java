@@ -1,11 +1,14 @@
 package com.g44.kodeholik.model.entity.problem;
 
+import com.g44.kodeholik.model.entity.setting.Language;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -30,11 +33,16 @@ public class ProblemTestCase {
     @JoinColumn(name = "problem_id", referencedColumnName = "id")
     private Problem problem;
 
+    @Column(name = "input", columnDefinition = "TEXT")
     private String input;
 
-    @Column(name = "expected_output")
+    @Column(name = "expected_output", columnDefinition = "TEXT")
     private String expectedOutput;
 
     @Column(name = "is_sample")
     private boolean isSample;
+
+    @ManyToOne
+    @JoinColumn(name = "language_id", referencedColumnName = "id")
+    private Language language;
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,9 +43,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private static List<String> skipFilterUrls = Arrays.asList(
             "/login/**",
+            "/api/v1/lambda/**",
+            "/api/v1/auth/logout",
             "/api/v1/auth/login",
+            "/api/v1/auth/login-admin",
             "/api/v1/auth/login/**",
-            "/api/v1/problem/no-achieved-info",
             "/api/v1/auth/reset-password-init",
             "/api/v1/auth/reset-password-check",
             "/api/v1/auth/reset-password-finish",
@@ -52,15 +55,28 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/problem/search/**",
             "/api/v1/problem/suggest/**",
             "/api/v1/problem/description/**",
+            "/api/v1/problem/language-support/**",
             "/api/v1/problem/compile-information/**",
             "/api/v1/course/list/**",
+            "/api/v1/openai/**",
+            "/api/v1/course/top-popular",
             "/api/v1/course/detail/**",
-            "/api/v1/course/search/**");
+            "/api/v1/course/search/**",
+            "/api/v1/tag/all-skill/**",
+            "/api/v1/tag/all-topic/**",
+            "/api/v1/s3/presigned-url",
+            "/api/v1/course/rating/**",
+            "/api/v1/exam/run/**",
+            "/ws",
+            "/ws/**",
+            "/api/v1/lesson/download-file",
+            "/api/v1/tag/all-topic/**");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String accessToken = null;
+
         String username = null;
         // Lấy token từ Cookie
         Cookie[] cookies = request.getCookies();
@@ -105,34 +121,44 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+
+        if (request.getMethod().equals(HttpMethod.OPTIONS.toString())) {
+            return true;
+        }
+
         Cookie[] cookies = request.getCookies();
         if (!request.getRequestURI().equals("/api/v1/auth/login/oauth2/google")) {
-            String accessToken = "";
-            String username = "";
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if (cookie.getName().equals("access_token")) {
-                        accessToken = cookie.getValue();
-                        username = tokenService.extractUsername(accessToken);
-                    }
-                }
-            }
-            if (accessToken != null && !accessToken.equals("")) {
-                if ((username != null && !username.equals("")) &&
-                        SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    if (userRepository.existsByUsernameOrEmail(username).isPresent()
-                            && tokenService.validateToken(accessToken)) {
-                        if (userRepository.isUserNotAllowed(username)) {
-                            throw new ForbiddenException("This account is not allowed to do this action",
-                                    "This account is not allowed to do this action");
+            try {
+                String accessToken = "";
+                String username = "";
+                if (cookies != null) {
+                    for (Cookie cookie : cookies) {
+                        if (cookie.getName().equals("access_token")) {
+                            accessToken = cookie.getValue();
+                            username = tokenService.extractUsername(accessToken);
                         }
-                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
-                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     }
                 }
+                if (accessToken != null && !accessToken.equals("")) {
+                    if ((username != null && !username.equals("")) &&
+                            SecurityContextHolder.getContext().getAuthentication() == null) {
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                        if (userRepository.existsByUsernameOrEmail(username).isPresent()
+                                && tokenService.validateToken(accessToken)) {
+                            if (userRepository.isUserNotAllowed(username)) {
+                                throw new ForbiddenException("This account is not allowed to do this action",
+                                        "This account is not allowed to do this action");
+                            }
+                            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities());
+                            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                return skipFilterUrls.stream().anyMatch(url -> new AntPathRequestMatcher(url).matches(request));
+
             }
         }
         return skipFilterUrls.stream().anyMatch(url -> new AntPathRequestMatcher(url).matches(request));

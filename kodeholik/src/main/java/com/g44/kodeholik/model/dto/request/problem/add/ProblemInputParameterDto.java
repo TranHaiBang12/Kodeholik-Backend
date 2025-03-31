@@ -15,12 +15,16 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ProblemInputParameterDto {
-    private List<TemplateCode> templateCodes;
+    private TemplateCode templateCode;
 
-    @NotBlank(message = "Please input a function signature")
+    @NotBlank(message = "MSG02")
     private String functionSignature;
 
     private InputType returnType;
+
+    private String otherReturnType;
+
+    private Integer noDimension;
 
     private String language;
 

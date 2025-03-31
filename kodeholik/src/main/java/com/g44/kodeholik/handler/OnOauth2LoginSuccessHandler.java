@@ -48,8 +48,6 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
         if (oauthUser == null) {
             throw new UnauthorizedException("Wrong credentials", "Wrong credentials");
         }
-        log.info(request.getRequestURI());
-        log.info(oauthUser);
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         String registrationId = oauthToken.getAuthorizedClientRegistrationId();
         String name = "";
@@ -65,7 +63,6 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
             name = oauthUser.getAttribute("login");
             picture = oauthUser.getAttribute("avatar_url");
         }
-        apiCallbackUrl = "/api/v1/auth/login/oauth2/google";
 
         // OAuth2AuthenticationToken authenticationToken = new
         // OAuth2AuthenticationToken(
@@ -87,6 +84,7 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
             addUserRequestDto.setEmail(email);
             addUserRequestDto.setAvatar(picture);
             addUserRequestDto.setRole(UserRole.STUDENT);
+            apiCallbackUrl = "/api/v1/auth/login/oauth2/google?port=5174";
 
             userService.addUserAfterLoginGoogle(addUserRequestDto);
             username = name;
@@ -97,6 +95,9 @@ public class OnOauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
                         "This account is not allowed to do this action");
             }
             username = optionalUser.get().getUsername();
+            apiCallbackUrl = "/api/v1/auth/login/oauth2/google?port="
+                    + (optionalUser.get().getRole() == UserRole.STUDENT ? 5174 : 5173);
+
         }
         if (userService.isUserNotAllowed(email)) {
             throw new ForbiddenException("This account is not allowed to do this action",

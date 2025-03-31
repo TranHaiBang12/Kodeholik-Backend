@@ -15,12 +15,11 @@ public class ImageValidator implements ConstraintValidator<ValidImage, Multipart
 
     @Override
     public boolean isValid(MultipartFile file, ConstraintValidatorContext context) {
+        if (file == null) {
+            return true;
+        }
         String filename = file.getOriginalFilename();
         String extension = filename.substring(filename.lastIndexOf(".") + 1);
-        log.info(extension);
-        if (file == null || file.isEmpty()) {
-            return false; // Không được null hoặc rỗng
-        }
         return ALLOWED_EXTENSIONS.contains(extension);
     }
 }

@@ -45,6 +45,6 @@ public class YamlMessageSource extends AbstractMessageSource {
                 return temp.getOrDefault(k, "Mã lỗi không tồn tại").toString();
             }
         }
-        return "Mã lỗi không tồn tại";
+        return key;
     }
 }

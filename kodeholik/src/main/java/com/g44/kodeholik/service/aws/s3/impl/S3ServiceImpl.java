@@ -1,6 +1,7 @@
 package com.g44.kodeholik.service.aws.s3.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,12 +67,16 @@ public class S3ServiceImpl implements S3Service {
                     .contentType(multipartFile.getContentType())
                     .build();
 
-            PutObjectResponse response = s3Client.putObject(putObjectRequest, file.toPath());
+            s3Client.putObject(putObjectRequest, file.toPath());
 
             // Xóa file tạm sau khi upload
-            file.delete();
+            try {
+                java.nio.file.Files.delete(file.toPath());
+            } catch (IOException e) {
+                throw new S3Exception(e.getMessage(), "Error deleting temporary file");
+            }
         } catch (Exception e) {
-            throw new S3Exception("Error pushing file", "Error pushing file");
+            throw new S3Exception(e.getMessage(), "Error pushing file");
         }
     }
 

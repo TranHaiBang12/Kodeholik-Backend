@@ -1,6 +1,8 @@
 package com.g44.kodeholik.model.entity.course;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -10,16 +12,7 @@ import com.g44.kodeholik.model.enums.course.CourseStatus;
 import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.model.enums.course.LessonType;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,7 +21,7 @@ import lombok.experimental.FieldNameConstants;
 
 @Entity
 @FieldNameConstants
-@Table(name = "chapter", schema = "schema_course")
+@Table(name = "lesson", schema = "schema_course")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -43,25 +36,34 @@ public class Lesson {
     @JoinColumn(name = "chapter_id", referencedColumnName = "id")
     private Chapter chapter;
 
+    @Column(name = "title", length = 100, nullable = false)
     private String title;
 
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "display_order")
     private int displayOrder;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
+    @Column(name = "type", nullable = false)
     private LessonType type;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private LessonStatus status;
 
-    @Column(name = "created_at")
+    @Column(name = "video_url", length = 200)
+    private String videoUrl;
+
+    @Column(name = "attached_file", length = 250)
+    private String attachedFile;
+
+    @Column(name = "created_at", nullable = false)
     private Timestamp createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "created_by", referencedColumnName = "id")
+    @JoinColumn(name = "created_by", referencedColumnName = "id", nullable = false)
     private Users createdBy;
 
     @Column(name = "updated_at")
@@ -70,4 +72,5 @@ public class Lesson {
     @ManyToOne
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
     private Users updatedBy;
+
 }

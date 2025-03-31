@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.g44.kodeholik.model.dto.request.problem.add.SolutionCodeDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,5 +28,15 @@ public class ProblemSolutionDto {
 
     private List<String> skills;
 
+    private int noUpvote;
+
     private List<SolutionCodeDto> solutionCodes;
+
+    private boolean isCurrentUserCreated;
+
+    private boolean isCurrentUserVoted;
+
+    private UserResponseDto createdBy;
+
+    private UserResponseDto updatedBy;
 }

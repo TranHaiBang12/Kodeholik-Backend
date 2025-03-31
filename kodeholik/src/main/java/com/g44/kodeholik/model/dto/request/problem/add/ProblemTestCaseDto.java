@@ -13,4 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProblemTestCaseDto {
     private List<TestCaseDto> testCases;
+
+    private String language;
 }

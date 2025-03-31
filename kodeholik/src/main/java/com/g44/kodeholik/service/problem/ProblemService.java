@@ -1,20 +1,29 @@
 package com.g44.kodeholik.service.problem;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
+import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
+import com.g44.kodeholik.model.dto.request.problem.FilterProblemRequestAdminDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemInputParameterDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemTestCaseDto;
+import com.g44.kodeholik.model.dto.request.problem.add.ShareSolutionRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.SearchProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.ProblemSortField;
+import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ListProblemAdminDto;
 import com.g44.kodeholik.model.dto.response.problem.NoAchivedInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemBasicResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemCompileResponseDto;
@@ -22,16 +31,29 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemDescriptionResponseDt
 import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.ProblemShortResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.overview.ProblemOverviewReportDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.submission.submit.SuccessSubmissionListResponseDto;
+import com.g44.kodeholik.model.dto.response.user.ProblemProgressResponseDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.model.entity.problem.Problem;
+import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.problem.ProblemTemplate;
+import com.g44.kodeholik.model.entity.setting.Language;
+import com.g44.kodeholik.model.entity.user.Users;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.model.enums.setting.Level;
 
 public interface ProblemService {
+
+        public void syncProblemsToElasticsearch();
+
         public List<ProblemResponseDto> getAllProblems();
 
         public ProblemResponseDto getProblemResponseDtoById(String link);
@@ -57,9 +79,9 @@ public interface ProblemService {
 
         public ProblemTemplate findByProblemAndLanguage(String link, String languageName);
 
-        public List<TestCase> getTestCaseByProblem(String link);
+        public List<List<TestCase>> getTestCaseByProblem(String link, List<Language> languages);
 
-        public List<TestCase> getSampleTestCaseByProblem(String link);
+        public List<List<TestCase>> getSampleTestCaseByProblem(String link, List<Language> languages);
 
         public ProblemCompileResponseDto getProblemCompileInformationById(String link, String languageName);
 
@@ -88,7 +110,11 @@ public interface ProblemService {
 
         public ProblemEditorialResponseDto getProblemEditorialDtoList(String link);
 
-        public ProblemInputParameterResponseDto getProblemInputParameterDtoList(String link);
+        public ProblemEditorialResponseDto getProblemEditorialDtoListTeacher(String link);
+
+        public List<ProblemInputParameterResponseDto> getProblemInputParameterDtoList(String link);
+
+        public List<ProblemInputParameterResponseDto> getProblemInputParameterDtoListTeacher(String link);
 
         public byte[] getExcelFile(String link);
 
@@ -98,16 +124,68 @@ public interface ProblemService {
 
         public Page<SolutionListResponseDto> getProblemListSolution(String link, int page, Integer size, String title,
                         String languageName,
+                        List<String> skillNames,
                         String sortBy, Boolean ascending, Pageable pageable);
 
         public ProblemSolutionDto getProblemSolutionDetail(Long solutionId);
 
-        public void tagFavouriteProblem(Long problemId);
+        public void tagFavouriteProblem(String link);
 
-        public void untagFavouriteProblem(Long problemId);
+        public void untagFavouriteProblem(String link);
 
         public void upvoteSolution(Long solutionId);
 
         public void unupvoteSolution(Long solutionId);
 
+        public List<SubmissionListResponseDto> getSubmissionListByUserAndProblem(String link);
+
+        public ProblemSolutionDto postSolution(ShareSolutionRequestDto shareSolutionRequestDto);
+
+        public ProblemSolutionDto editSolution(Long solutionId, ShareSolutionRequestDto shareSolutionRequestDto);
+
+        public SubmissionResponseDto getSubmissionDetail(Long submissionId);
+
+        public List<SuccessSubmissionListResponseDto> getSuccessSubmissionList(String link, List<Long> excludes);
+
+        public Page<SubmissionListResponseDto> getListSubmission(
+                        String link,
+                        SubmissionStatus status,
+                        Date start,
+                        Date end,
+                        int page,
+                        Integer size,
+                        String sortBy,
+                        Boolean ascending);
+
+        public Map<String, String> getAllProblemHasSubmitted();
+
+        public Page<ProblemResponseDto> findAllProblemUserFavourite(int page, Integer size);
+
+        public Page<ProblemProgressResponseDto> findLastSubmittedByUser(
+                        int page,
+                        SubmissionStatus status, Integer size, String sortBy, Boolean ascending);
+
+        public List<String> getLanguageSupportByProblem(String link);
+
+        public List<ProblemShortResponseDto> getPrivateProblemShortResponseDto();
+
+        public Problem getProblemByExamProblemRequest(ExamProblemRequestDto request);
+
+        public ExamResultOverviewResponseDto submitExam(List<SubmitExamRequestDto> submitExamRequestDto,
+                        Users currentUser);
+
+        public RunProblemResponseDto runExam(String link, ProblemCompileRequestDto problemCompileRequestDto);
+
+        public Page<ListProblemAdminDto> getListProblemForAdmin(
+                        FilterProblemRequestAdminDto filterProblemRequestAdminDto);
+
+        public List<Map<String, String>> getNumberSkillUserSolved(Level level);
+
+        public List<Map<String, String>> getNumberTopicUserSolved();
+
+        public List<Map<String, String>> getNumberLanguageUserSolved();
+
+        public Map<String, String> getAcceptanceRateAndNoSubmissionByUser();
+
+        public ProblemOverviewReportDto getProblemOverviewReport(Timestamp start, Timestamp end);
 }

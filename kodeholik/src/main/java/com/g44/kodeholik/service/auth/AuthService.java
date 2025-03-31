@@ -15,6 +15,8 @@ public interface AuthService {
 
     public void loginNormal(LoginRequestDto loginRequest, HttpServletResponse response);
 
+    public void loginAdmin(LoginRequestDto loginRequest, HttpServletResponse response);
+
     public Users checkUsernameExists(String username);
 
     public void resetPasswordInit(String username);
@@ -28,6 +30,8 @@ public interface AuthService {
     public void loginWithGoogle(OAuth2AuthenticationToken oAuth2User, HttpServletResponse response,
             HttpServletRequest request);
 
-    public void changePassword(ChangePasswordRequestDto ChangePasswordRequestDto);
+    public void changePassword(ChangePasswordRequestDto ChangePasswordRequestDto, HttpServletResponse response);
+
+    public String generateTokenForNotification();
 
 }

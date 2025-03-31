@@ -8,16 +8,21 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.g44.kodeholik.model.dto.request.setting.AddTagRequestDto;
 import com.g44.kodeholik.model.dto.request.setting.EditTagRequestDto;
+import com.g44.kodeholik.model.dto.request.setting.FilterTagRequestDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserAvatarFileDto;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
+import com.g44.kodeholik.model.dto.request.user.EditUserAvatarFileDto;
+import com.g44.kodeholik.model.dto.request.user.FilterUserRequestDto;
+import com.g44.kodeholik.model.dto.response.setting.TagResponseDto;
+import com.g44.kodeholik.model.dto.response.user.ProfileResponseDto;
 import com.g44.kodeholik.model.enums.setting.TagType;
 import com.g44.kodeholik.service.setting.TagService;
 import com.g44.kodeholik.service.user.UserService;
-import com.g44.kodeholik.util.validation.image.ValidImage;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +43,16 @@ public class AdminController {
 
     private final TagService tagService;
 
+    @PostMapping("/list-user")
+    public ResponseEntity<Page<ProfileResponseDto>> getListUsers(
+            @RequestBody @Valid FilterUserRequestDto filterUserRequestDto) {
+        Page<ProfileResponseDto> results = userService.getListOfUsers(filterUserRequestDto);
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(results);
+    }
+
     @PostMapping("/add-user")
     public ResponseEntity<?> addUser(
             @ModelAttribute @Valid AddUserAvatarFileDto addUserAvatarFileDto) {
@@ -44,39 +60,60 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/activate-user/{userId}")
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ProfileResponseDto> getUserDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserFromIdByAdmin(id));
+    }
+
+    @PutMapping("/edit-user/{id}")
+    public ResponseEntity<ProfileResponseDto> editUser(@PathVariable Long id,
+            @ModelAttribute @Valid EditUserAvatarFileDto editUserAvatarFileDto) {
+        return ResponseEntity.ok(userService.editUserByAdmin(id, editUserAvatarFileDto));
+    }
+
+    @PutMapping("/activate-user/{userId}")
     public ResponseEntity<?> activateUser(@PathVariable Long userId) {
         userService.activateUser(userId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/deactivate-user/{userId}")
+    @PutMapping("/deactivate-user/{userId}")
     public ResponseEntity<?> deactivateUser(@PathVariable Long userId) {
         userService.deactivateUser(userId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/ban-user/{userId}")
+    @PutMapping("/ban-user/{userId}")
     public ResponseEntity<?> banUser(@PathVariable Long userId) {
         userService.banUser(userId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/unban-user/{userId}")
+    @PutMapping("/unban-user/{userId}")
     public ResponseEntity<?> unbanUser(@PathVariable Long userId) {
         userService.unbanUser(userId);
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/list-tag")
+    public ResponseEntity<Page<TagResponseDto>> getListTag(
+            @RequestBody @Valid FilterTagRequestDto filterTagRequestDto) {
+        Page<TagResponseDto> result = tagService.getListTag(filterTagRequestDto);
+        if (result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(result);
+    }
+
     @PostMapping("/add-tag")
-    public ResponseEntity<?> addTag(@RequestBody AddTagRequestDto addTagRequestDto) {
+    public ResponseEntity<?> addTag(@RequestBody @Valid AddTagRequestDto addTagRequestDto) {
         tagService.addTag(addTagRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/edit-tag")
-    public ResponseEntity<?> editTag(@RequestBody EditTagRequestDto editTagRequestDto) {
-        tagService.editTag(editTagRequestDto);
+    @PutMapping("/edit-tag/{id}")
+    public ResponseEntity<?> editTag(@PathVariable Long id, @RequestBody @Valid EditTagRequestDto editTagRequestDto) {
+        tagService.editTag(id, editTagRequestDto);
         return ResponseEntity.noContent().build();
     }
 

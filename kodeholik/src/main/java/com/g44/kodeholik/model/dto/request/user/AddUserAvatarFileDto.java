@@ -7,6 +7,7 @@ import com.g44.kodeholik.util.validation.image.ValidImage;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +34,9 @@ public class AddUserAvatarFileDto {
     private String avatar;
 
     @ValidImage
+    @NotNull(message = "MSG02")
     private MultipartFile avatarFile;
 
+    @NotNull(message = "MSG02")
     private UserRole role;
 }

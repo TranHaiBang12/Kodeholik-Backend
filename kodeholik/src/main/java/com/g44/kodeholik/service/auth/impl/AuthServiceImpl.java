@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.config.MessageProperties;
+import com.g44.kodeholik.config.WebsocketSessionManager;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
@@ -65,6 +67,10 @@ public class AuthServiceImpl implements AuthService {
 
     private final MessageProperties messageProperties;
 
+    private final SimpMessagingTemplate messagingTemplate;
+
+    private final WebsocketSessionManager websocketSessionManager;
+
     @Value("${spring.jwt.forgot-token.expiry-time}")
     private int forgotTokenExpiryTime;
 
@@ -83,12 +89,32 @@ public class AuthServiceImpl implements AuthService {
     public void loginNormal(LoginRequestDto loginRequest, HttpServletResponse response) {
         verify(loginRequest);
         String username = loginRequest.getUsername();
+
+        Users user = userRepository.existsByUsernameOrEmail(username)
+                .orElseThrow(() -> new NotFoundException("User not found", "User not found"));
         if (userRepository.isUserNotAllowed(username)) {
             throw new ForbiddenException("This account is not allowed to do this action",
                     "This account is not allowed to do this action");
         }
+
+        String accessToken = tokenService.generateAccessToken(user.getUsername());
+        tokenService.addTokenToCookie(accessToken, response, TokenType.ACCESS);
+        String refreshToken = tokenService.generateRefreshToken(user.getUsername(), new Date());
+        tokenService.addTokenToCookie(refreshToken, response, TokenType.REFRESH);
+    }
+
+    @Override
+    public void loginAdmin(LoginRequestDto loginRequest, HttpServletResponse response) {
+        verify(loginRequest);
+        String username = loginRequest.getUsername();
+
         Users user = userRepository.existsByUsernameOrEmail(username)
                 .orElseThrow(() -> new NotFoundException("User not found", "User not found"));
+        if (userRepository.isUserNotAllowed(username) || user.getRole() == UserRole.STUDENT) {
+            throw new ForbiddenException("This account is not allowed to do this action",
+                    "This account is not allowed to do this action");
+        }
+
         String accessToken = tokenService.generateAccessToken(user.getUsername());
         tokenService.addTokenToCookie(accessToken, response, TokenType.ACCESS);
         String refreshToken = tokenService.generateRefreshToken(user.getUsername(), new Date());
@@ -111,8 +137,8 @@ public class AuthServiceImpl implements AuthService {
                         "This account is not allowed to do this action");
             }
             String token = tokenService.generateForgotPasswordToken(username);
-            redisService.saveToken(username, token, forgotTokenExpiryTime, TokenType.FORGOT);
-            log.info(token);
+            redisService.saveToken(user.getUsername(), token, forgotTokenExpiryTime, TokenType.FORGOT);
+            // log.info(token);
             emailService.sendEmailResetPassword(user.getEmail(), "[KODEHOLIK] Reset Password", user.getUsername(),
                     feLink + token);
         } else {
@@ -139,10 +165,9 @@ public class AuthServiceImpl implements AuthService {
             throw new ForbiddenException("This account is not allowed to do this action",
                     "This account is not allowed to do this action");
         }
-        log.info(username);
-        if (userRepository.existsByUsernameOrEmail(username).isPresent()) {
-            log.info(username + "s");
-            String savedToken = redisService.getToken(username, TokenType.FORGOT);
+        Optional<Users> user = userRepository.existsByUsernameOrEmail(username);
+        if (user.isPresent()) {
+            String savedToken = redisService.getToken(user.get().getUsername(), TokenType.FORGOT);
             if (savedToken != null) {
                 if (tokenService.validateToken(token) &&
                         token.equals(savedToken.trim())) {
@@ -165,7 +190,7 @@ public class AuthServiceImpl implements AuthService {
             } else {
                 throw new BadRequestException(
                         messageProperties.getMessage("MSG06"),
-                        "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character");
+                        messageProperties.getMessage("MSG06"));
             }
             userRepository.save(user);
             redisService.deleteToken(username, TokenType.FORGOT);
@@ -181,8 +206,12 @@ public class AuthServiceImpl implements AuthService {
             redisService.deleteToken(user.getUsername(), TokenType.REFRESH);
             tokenService.deleteCookieFromResponse(response, TokenType.ACCESS);
             tokenService.deleteCookieFromResponse(response, TokenType.REFRESH);
-        } else {
-            throw new UnauthorizedException("User not logged in", "User not logged in");
+            // websocketSessionManager.removeSession("EXAM", user.getUsername());
+            // websocketSessionManager.removeSession("NOTI", user.getUsername());
+            // messagingTemplate.convertAndSend("/topic/exam/disconnect/" +
+            // user.getUsername(), "FORCE_DISCONNECT");
+            // messagingTemplate.convertAndSend("/topic/noti/disconnect/" +
+            // user.getUsername(), "FORCE_DISCONNECT");
         }
     }
 
@@ -232,17 +261,19 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
-    public void changePassword(ChangePasswordRequestDto changePasswordRequestDto) {
+    public void changePassword(ChangePasswordRequestDto changePasswordRequestDto, HttpServletResponse response) {
         if (!changePasswordRequestDto.getNewPassword().equals(changePasswordRequestDto.getConfirmPassword())) {
             throw new BadRequestException("Confirm password must be the same to new password",
                     "Confirm password must be the same to new password");
         }
         Users user = userService.getCurrentUser();
         String newPassword = changePasswordRequestDto.getNewPassword();
+
         if (PasswordUtils.verifyPassword(changePasswordRequestDto.getOldPassword(), user.getPassword())) {
             if (Validation.isValidPassword(newPassword)) {
                 user.setPassword(PasswordUtils.encodePassword(newPassword));
                 userRepository.save(user);
+                logout(response);
             } else {
                 throw new BadRequestException(messageProperties.getMessage("MSG10"),
                         messageProperties.getMessage("MSG10"));
@@ -251,6 +282,12 @@ public class AuthServiceImpl implements AuthService {
         } else {
             throw new BadRequestException("Wrong password", "Wrong password");
         }
+    }
+
+    @Override
+    public String generateTokenForNotification() {
+        Users user = userService.getCurrentUser();
+        return tokenService.generateAccessToken(user.getUsername());
     }
 
 }

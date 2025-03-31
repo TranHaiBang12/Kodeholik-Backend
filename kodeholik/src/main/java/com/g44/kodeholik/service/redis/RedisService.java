@@ -8,4 +8,10 @@ public interface RedisService {
     public String getToken(String username, TokenType tokenType);
 
     public void deleteToken(String username, TokenType tokenType);
+
+    public void saveKeyCheckExamReminder(String username, String code, int minutes);
+
+    public String getKeyCheckExamReminder(String username, String code, int minutes);
+
+    public boolean isUserRemindedForExam(String username, String code, int minutes);
 }

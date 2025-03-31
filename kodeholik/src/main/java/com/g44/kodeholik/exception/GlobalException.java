@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException.Forbidden;
+import org.springframework.web.client.HttpServerErrorException.InternalServerError;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
@@ -42,6 +46,14 @@ public class GlobalException {
         public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
                 return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getDetails()),
                                 HttpStatus.NOT_FOUND);
+        }
+
+        @ExceptionHandler(UsernameNotFoundException.class)
+        @ResponseStatus(HttpStatus.UNAUTHORIZED)
+        @ResponseBody
+        public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+                return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                                HttpStatus.UNAUTHORIZED);
         }
 
         // handle request param bi sai dinh dang
@@ -121,7 +133,21 @@ public class GlobalException {
         @ResponseStatus(HttpStatus.BAD_REQUEST)
         @ResponseBody
         public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
-                return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getMessage()),
+                return new ResponseEntity(new ErrorResponse(ex.getMessage(), ex.getDetails()),
+                                HttpStatus.BAD_REQUEST);
+        }
+
+        // handle Exam not start
+        @ExceptionHandler(ExamNotReadyToStartException.class)
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
+        @ResponseBody
+        public ResponseEntity<ErrorResponse> handleBadRequestException(ExamNotReadyToStartException ex) {
+                Map<String, String> map = new HashMap();
+                map.put("message", ex.getMessage());
+                map.put("details", ex.getDetails());
+                map.put("startTime", ex.getStartTime());
+
+                return new ResponseEntity(map,
                                 HttpStatus.BAD_REQUEST);
         }
 
@@ -160,6 +186,26 @@ public class GlobalException {
                                 HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        // @ExceptionHandler(Exception.class)
+        // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+        // @ResponseBody
+        // public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
+        // log.info(ex.getMessage());
+        // return new ResponseEntity(new ErrorResponse(ex.getMessage(),
+        // ex.getMessage()),
+        // HttpStatus.INTERNAL_SERVER_ERROR);
+        // }
+
+        @ExceptionHandler(BadCredentialsException.class)
+        @ResponseStatus(HttpStatus.UNAUTHORIZED)
+        @ResponseBody
+        public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+                return new ResponseEntity(
+                                new ErrorResponse(messageProperties.getMessage("MSG03"),
+                                                messageProperties.getMessage("MSG03")),
+                                HttpStatus.UNAUTHORIZED);
+        }
+
         @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
         @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
         @ResponseBody
@@ -176,9 +222,9 @@ public class GlobalException {
                         org.springframework.web.bind.MethodArgumentNotValidException ex) {
                 List<Map<String, String>> errorList = ex.getBindingResult().getFieldErrors().stream()
                                 .map(error -> Map.of("field", error.getField(), "error",
-                                                messageProperties.getMessage(error.getDefaultMessage())))
+                                                (error.getDefaultMessage())))
                                 .collect(Collectors.toList());
-
+                log.info(errorList);
                 return Map.of("message", errorList);
         }
 

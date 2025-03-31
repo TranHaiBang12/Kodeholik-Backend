@@ -2,16 +2,22 @@ package com.g44.kodeholik.model.dto.response.problem.submission.submit;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
 public class CompileErrorResposneDto extends SubmissionResponseDto {
     private String message;
-    private Timestamp createdAt;
 
-    public CompileErrorResposneDto(String message, String code, String languageName, Timestamp createdAt) {
-        super(code, languageName);
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long createdAt;
+
+    public CompileErrorResposneDto(String message, String code, String languageName, Timestamp createdAt,
+            SubmissionStatus status, Long submissionId) {
+        super(submissionId, code, languageName, status);
         this.message = message;
-        this.createdAt = createdAt;
+        this.createdAt = createdAt.getTime();
     }
 
     public String getMessage() {
@@ -20,6 +26,14 @@ public class CompileErrorResposneDto extends SubmissionResponseDto {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Long getSubmissionId() {
+        return submissionId;
+    }
+
+    public void setSubmissionId(Long submissionId) {
+        this.submissionId = submissionId;
     }
 
     @Override
@@ -42,12 +56,22 @@ public class CompileErrorResposneDto extends SubmissionResponseDto {
         this.languageName = languageName;
     }
 
-    public Timestamp getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public SubmissionStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(SubmissionStatus status) {
+        this.status = status;
     }
 
 }

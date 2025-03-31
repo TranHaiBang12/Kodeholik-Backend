@@ -2,23 +2,36 @@ package com.g44.kodeholik.model.dto.response.problem.submission.submit;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.lambda.TestResult;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
+import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
 public class FailedSubmissionResponseDto extends SubmissionResponseDto {
     private int noSuccessTestcase;
     private int noTestcase;
     private TestResult inputWrong;
-    private Timestamp createdAt;
+
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long createdAt;
 
     public FailedSubmissionResponseDto(int noSuccessTestcase, int noTestcase, TestResult inputWrong, String code,
-            String languageName, Timestamp createdAt) {
-        super(code, languageName);
+            String languageName, Timestamp createdAt, SubmissionStatus status, Long submissionId) {
+        super(submissionId, code, languageName, status);
         this.noSuccessTestcase = noSuccessTestcase;
         this.noTestcase = noTestcase;
         this.inputWrong = inputWrong;
-        this.createdAt = createdAt;
+        this.createdAt = createdAt.getTime();
+    }
+
+    public Long getSubmissionId() {
+        return submissionId;
+    }
+
+    public void setSubmissionId(Long submissionId) {
+        this.submissionId = submissionId;
     }
 
     public int getNoSuccessTestcase() {
@@ -45,11 +58,11 @@ public class FailedSubmissionResponseDto extends SubmissionResponseDto {
         this.inputWrong = inputWrong;
     }
 
-    public Timestamp getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -71,5 +84,15 @@ public class FailedSubmissionResponseDto extends SubmissionResponseDto {
     @Override
     public void setLanguageName(String languageName) {
         this.languageName = languageName;
+    }
+
+    @Override
+    public SubmissionStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(SubmissionStatus status) {
+        this.status = status;
     }
 }

@@ -34,3 +34,4 @@ build/
 
 application-local.yml
 application-test.yml
+application-production.yml
