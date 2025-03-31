@@ -9,6 +9,7 @@ import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
 import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
+import jakarta.persistence.PostLoad;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -53,4 +54,5 @@ public class ExamResponseDto {
     private Long updatedAt;
 
     private UserResponseDto updatedBy;
+
 }

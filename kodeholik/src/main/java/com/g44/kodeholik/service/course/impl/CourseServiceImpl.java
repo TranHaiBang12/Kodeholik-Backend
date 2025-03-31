@@ -147,8 +147,8 @@ public class CourseServiceImpl implements CourseService {
         course.setStatus(requestDto.getStatus());
         course.setNumberOfParticipant(0);
         course.setRate(0.0);
-        course.setCreatedAt(new Timestamp(System.currentTimeMillis() + 25200000));
-        course.setUpdatedAt(new Timestamp(System.currentTimeMillis() + 25200000));
+        course.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
         // Lấy danh sách topics
         Set<Topic> topics = topicService.getTopicsByIds(requestDto.getTopicIds());
@@ -176,7 +176,7 @@ public class CourseServiceImpl implements CourseService {
         course.setTitle(requestDto.getTitle());
         course.setDescription(requestDto.getDescription());
         course.setStatus(requestDto.getStatus());
-        course.setUpdatedAt(new Timestamp(System.currentTimeMillis() + 25200000));
+        course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
         // Cập nhật danh sách topics
         Set<Topic> topics = topicService.getTopicsByIds(requestDto.getTopicIds());
@@ -315,7 +315,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addTop5PopularCourse() {
-        List<Course> courses = courseRepository.findTop5ByOrderByNumberOfParticipantDescRateDesc();
+        List<Course> courses = courseRepository.findTop6ByOrderByNumberOfParticipantDescRateDesc();
         topCourseRepository.deleteAll();
         int top = 5;
         for (int i = 0; i < courses.size(); i++) {

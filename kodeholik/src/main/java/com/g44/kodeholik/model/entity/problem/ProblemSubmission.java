@@ -1,6 +1,8 @@
 package com.g44.kodeholik.model.entity.problem;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
 
 import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
@@ -17,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PostLoad;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -93,4 +96,5 @@ public class ProblemSubmission {
         this.inputWrong = inputWrong;
         this.status = status;
     }
+
 }

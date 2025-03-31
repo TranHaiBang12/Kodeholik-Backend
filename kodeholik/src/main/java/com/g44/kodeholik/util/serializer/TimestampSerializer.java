@@ -16,7 +16,7 @@ public class TimestampSerializer extends JsonSerializer<Long> {
     public void serialize(Long timestamp, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
             throws IOException {
         if (timestamp != null) {
-            String formattedDate = sdf.format(new Date(timestamp));
+            String formattedDate = sdf.format(new Date(timestamp + 25200000));
             jsonGenerator.writeString(formattedDate);
         } else {
             jsonGenerator.writeNull();

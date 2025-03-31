@@ -1,6 +1,8 @@
 package com.g44.kodeholik.model.entity.course;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -70,4 +72,5 @@ public class Lesson {
     @ManyToOne
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
     private Users updatedBy;
+
 }

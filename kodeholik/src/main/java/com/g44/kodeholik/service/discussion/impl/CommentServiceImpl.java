@@ -192,7 +192,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setComment(addCommentRequestDto.getComment());
         if (addCommentRequestDto.getCommentReply() != null)
             comment.setCommentReply(getCommentById(addCommentRequestDto.getCommentReply()));
-        comment.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
+        comment.setCreatedAt(Timestamp.from(Instant.now()));
         comment.setCreatedBy(userService.getCurrentUser());
         commentRepository.save(comment);
 
@@ -268,7 +268,7 @@ public class CommentServiceImpl implements CommentService {
                     "Comment can only be edited in 7 days");
         }
         comment.setComment(newComment);
-        comment.setUpdatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
+        comment.setUpdatedAt(Timestamp.from(Instant.now()));
         comment.setUpdatedBy(currentUser);
 
         commentRepository.save(comment);

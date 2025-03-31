@@ -224,7 +224,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .noUpvote(noUpvote)
                 .noComment(noComment)
                 .createdBy(user)
-                .createdAt(Timestamp.from(Instant.now().plusMillis(25200000)))
+                .createdAt(Timestamp.from(Instant.now()))
                 .build();
         Set<Skill> skills = tagService.getSkillsByNameList(shareSolutionRequestDto.getSkills());
         log.info(skills);
@@ -282,7 +282,7 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
         problemSolution.setTitle(shareSolutionRequestDto.getTitle());
         problemSolution.setTextSolution(shareSolutionRequestDto.getTextSolution());
         problemSolution.setSkills(skills);
-        problemSolution.setUpdatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
+        problemSolution.setUpdatedAt(Timestamp.from(Instant.now()));
         problemSolution.setUpdatedBy(user);
 
         Set<SolutionCode> solutionCodes = new HashSet();

@@ -73,7 +73,7 @@ public class ChapterServiceImpl implements ChapterService {
         chapter.setCourse(courseRepository
                 .findById(chapterRequestDto.getCourseId())
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found")));
-        chapter.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
+        chapter.setCreatedAt(Timestamp.from(Instant.now()));
         chapter.setCreatedBy(userService.getCurrentUser());
         chapterRepository.save(chapter);
     }
@@ -87,7 +87,7 @@ public class ChapterServiceImpl implements ChapterService {
         chapter.setCourse(courseRepository
                 .findById(chapterRequestDto.getCourseId())
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found")));
-        chapter.setUpdatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
+        chapter.setUpdatedAt(Timestamp.from(Instant.now()));
         chapter.setUpdatedBy(userService.getCurrentUser());
         chapter.setCreatedAt(savedChapter.getCreatedAt());
         chapter.setCreatedBy(savedChapter.getCreatedBy());

@@ -37,14 +37,14 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final CourseService courseService;
 
     @Transactional
-    // @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 5000)
     @Override
     public void endExam() {
         examService.endExam();
     }
 
     @Transactional
-    // @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 5000)
     @Override
     public void remindExam() {
         examService.sendNotiToUserExamAboutToStart();

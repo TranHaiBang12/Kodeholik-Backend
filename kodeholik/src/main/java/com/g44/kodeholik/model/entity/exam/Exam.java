@@ -1,6 +1,8 @@
 package com.g44.kodeholik.model.entity.exam;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +26,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PostLoad;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -79,4 +82,5 @@ public class Exam {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "exam_language_support", schema = "schema_exam", joinColumns = @JoinColumn(name = "exam_id"), inverseJoinColumns = @JoinColumn(name = "language_id"))
     private Set<Language> languageSupport = new HashSet<>();
+
 }
