@@ -18,19 +18,23 @@ import java.util.Optional;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-    Page<Course> findByTitle(String title, Pageable pageable);
+        Page<Course> findByTitle(String title, Pageable pageable);
 
-    Page<Course> findByStatusIn(List<CourseStatus> statuses, Pageable pageable);
+        Page<Course> findByStatusIn(List<CourseStatus> statuses, Pageable pageable);
 
-    Page<Course> findByTitleContainingIgnoreCaseAndStatusIn(String title, List<CourseStatus> statuses,
-            Pageable pageable);
+        Page<Course> findByTitleContainingIgnoreCaseAndStatusIn(String title, List<CourseStatus> statuses,
+                        Pageable pageable);
 
-    Page<Course> findByTopicsInAndStatusIn(List<Topic> topics, List<CourseStatus> statuses, Pageable pageable);
+        Page<Course> findByTopicsInAndStatusIn(List<Topic> topics, List<CourseStatus> statuses, Pageable pageable);
 
-    Page<Course> findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(String title, List<Topic> topics,
-            List<CourseStatus> statuses, Pageable pageable);
+        Page<Course> findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(String title, List<Topic> topics,
+                        List<CourseStatus> statuses, Pageable pageable);
 
-    List<Course> findTop5ByOrderByNumberOfParticipantDescRateDesc();
+        List<Course> findTop5ByOrderByNumberOfParticipantDescRateDesc();
 
-    Optional<Course> findById(Long courseId);
+        Optional<Course> findById(Long courseId);
+
+        boolean existsByTitle(String title);
+
+        boolean existsByTitleAndIdNot(String title, Long id);
 }

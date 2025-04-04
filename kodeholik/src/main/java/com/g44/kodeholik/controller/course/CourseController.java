@@ -40,7 +40,6 @@ public class CourseController {
     private final CourseCommentService courseCommentService;
     private final CourseRatingService courseRatingService;
 
-
     @GetMapping("/top-popular")
     public ResponseEntity<List<CourseResponseDto>> getTop5PopularCourse() {
         return ResponseEntity.status(HttpStatus.SC_OK).body(courseService.getTop5PopularCourse());
@@ -54,7 +53,6 @@ public class CourseController {
     @PostMapping("/add")
     public ResponseEntity<?> addCourse(
             @ModelAttribute @Valid CourseRequestDto requestDto) {
-
         courseService.addCourse(requestDto);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
@@ -117,7 +115,8 @@ public class CourseController {
             @RequestParam(defaultValue = "noUpvote") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection) {
 
-        Page<CommentResponseDto> discussions = courseCommentService.getDiscussionByCourseId(courseId, page, size, sortBy, sortDirection);
+        Page<CommentResponseDto> discussions = courseCommentService.getDiscussionByCourseId(courseId, page, size,
+                sortBy, sortDirection);
         return ResponseEntity.ok(discussions);
     }
 
@@ -165,5 +164,11 @@ public class CourseController {
                 request.getSortDir(),
                 request.getUsername());
         return ResponseEntity.ok(enrolledUsers);
+    }
+
+    @PostMapping("/completed/{courseId}")
+    public ResponseEntity<String> handleCourseCompletion(@PathVariable Long courseId) {
+        courseService.sendEmailBasedOnCourseProgress(courseId);
+        return ResponseEntity.ok("Course completed and email sent successfully");
     }
 }

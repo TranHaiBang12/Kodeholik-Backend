@@ -69,6 +69,10 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public void addChapter(ChapterRequestDto chapterRequestDto) {
+        if (chapterRepository.existsByTitle(chapterRequestDto.getTitle())) {
+            throw new IllegalArgumentException("Chapter title already exists: " + chapterRequestDto.getTitle());
+        }
+
         Chapter chapter = chapterRequestMapper.mapTo(chapterRequestDto);
         chapter.setCourse(courseRepository
                 .findById(chapterRequestDto.getCourseId())
@@ -76,12 +80,18 @@ public class ChapterServiceImpl implements ChapterService {
         chapter.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
         chapter.setCreatedBy(userService.getCurrentUser());
         chapterRepository.save(chapter);
+
     }
 
     @Override
     public void editChapter(Long id, ChapterRequestDto chapterRequestDto) {
         Chapter savedChapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
+
+        if (chapterRepository.existsByTitleAndIdNot(chapterRequestDto.getTitle(), id)) {
+            throw new IllegalArgumentException("Chapter title already exists: " + chapterRequestDto.getTitle());
+        }
+
         Chapter chapter = chapterRequestMapper.mapTo(chapterRequestDto);
         chapter.setId(id);
         chapter.setCourse(courseRepository

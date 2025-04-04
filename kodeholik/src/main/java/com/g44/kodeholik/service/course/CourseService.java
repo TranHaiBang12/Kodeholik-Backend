@@ -45,4 +45,5 @@ public interface CourseService {
     public Page<EnrolledUserResponseDto> getEnrolledUsersWithProgress(Long courseId, int page, int size, String sortBy, String sortDirection, String usernameSearch);
 
     public void sendEmailBasedOnCourseProgress(Long courseId);
+
 }
