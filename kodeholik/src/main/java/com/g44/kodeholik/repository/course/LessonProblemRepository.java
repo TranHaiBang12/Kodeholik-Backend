@@ -12,4 +12,3 @@ public interface LessonProblemRepository extends JpaRepository<LessonProblem, Le
     List<LessonProblem> findByLesson_Id(Long lessonId);
     void deleteByLesson_Id(Long lessonId);
 }
-

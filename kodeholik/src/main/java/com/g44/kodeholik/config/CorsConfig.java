@@ -27,7 +27,7 @@ public class CorsConfig {
                 // configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174")); //
                 // Domain của client
                 configuration.setAllowedOrigins(Arrays.asList("https://kodeholik.site",
-                                "https://kodeholik-admin.site"));
+                                "https://kodeholik-admin.site","http://localhost:81","http://localhost:5173"));
                 // configuration.setAllowedOrigins(Arrays.asList(frontendUrl,
                 // adminFrontendUrl));
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

@@ -116,6 +116,14 @@ public class CourseServiceImpl implements CourseService {
             return courseDetailResponseMapper.mapFromCourseAndLesson(course, Collections.emptyList(),
                     Collections.emptyList());
         }
+        // Sắp xếp chapters/lessons trong course theo displayOrder
+        chapters.sort(Comparator.comparingInt(Chapter::getDisplayOrder));
+        chapters.forEach(chapter -> {
+            List<Lesson> lessons = chapter.getLessons();
+            if (lessons != null && !lessons.isEmpty()) {
+                lessons.sort(Comparator.comparingInt(Lesson::getDisplayOrder));
+            }
+        });
 
         List<Long> lessonIds = chapters.stream()
                 .flatMap(chapter -> {

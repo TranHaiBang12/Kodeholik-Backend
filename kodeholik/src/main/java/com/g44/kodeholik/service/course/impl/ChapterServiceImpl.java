@@ -84,7 +84,6 @@ public class ChapterServiceImpl implements ChapterService {
         chapter.setCreatedAt(Timestamp.from(Instant.now()));
         chapter.setCreatedBy(userService.getCurrentUser());
         chapterRepository.save(chapter);
-
     }
 
     @Override
