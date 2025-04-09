@@ -24,4 +24,5 @@ public interface CourseUserRepository extends JpaRepository<CourseUser, CourseUs
             @Param("username") String username,
             Pageable pageable
     );
+    Page<CourseUser> findByUserId(Long userId, Pageable pageable);
 }

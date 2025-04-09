@@ -268,6 +268,29 @@ public class CourseServiceImpl implements CourseService {
         return courses.map(course -> courseResponseMapper.mapFromCourseAndLesson(course, completedLessons));
     }
 
+    @Override
+    public Page<CourseResponseDto> getEnrolledCourseByUserId(int page, int size, String sortBy, String sortDir) {
+        Sort sort = "progress".equalsIgnoreCase(sortBy)
+                ? Sort.unsorted()
+                : Sort.by(sortDir.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                validateSortField(sortBy));
+        Users currentUser = userService.getCurrentUser();
+        Long userId = currentUser.getId();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<CourseUser> courseUserPage = courseUserRepository.findByUserId(userId, pageable);
+
+        List<CourseResponseDto> dtos = courseUserPage.getContent().stream()
+                .map(courseUser -> courseResponseMapper.mapToCourseResponseDto(courseUser.getCourse(), userId))
+                .collect(Collectors.toList());
+
+        if ("progress".equalsIgnoreCase(sortBy)) {
+            dtos.sort((a, b) -> sortDir.equalsIgnoreCase("asc")
+                    ? Double.compare(a.getProgress(), b.getProgress())
+                    : Double.compare(b.getProgress(), a.getProgress()));
+        }
+        return new PageImpl<>(dtos, pageable, courseUserPage.getTotalElements());
+    }
+
     @Transactional
     @Override
     public void enrollUserInCourse(Long courseId) {
@@ -424,7 +447,6 @@ public class CourseServiceImpl implements CourseService {
         Map<Long, Long> userCompletedLessons = progresses.stream()
                 .collect(Collectors.groupingBy(p -> p.getUser().getId(), Collectors.counting()));
 
-        // Map từ CourseUser sang EnrolledUserResponseDto và tính progress
         List<EnrolledUserResponseDto> dtos = courseUsersPage.getContent().stream()
                 .map(courseUser -> {
                     Long userId = courseUser.getUser().getId();
@@ -441,14 +463,12 @@ public class CourseServiceImpl implements CourseService {
                 })
                 .collect(Collectors.toList());
 
-        // Sắp xếp trong bộ nhớ nếu sortBy là progress
         if ("progress".equalsIgnoreCase(sortBy)) {
             dtos.sort((a, b) -> sortDirection.equalsIgnoreCase("asc")
                     ? Double.compare(a.getProgress(), b.getProgress())
                     : Double.compare(b.getProgress(), a.getProgress()));
         }
 
-        // Tạo Page từ danh sách đã sắp xếp
         return new PageImpl<>(dtos, pageable, courseUsersPage.getTotalElements());
     }
 

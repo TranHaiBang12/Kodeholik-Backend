@@ -171,4 +171,15 @@ public class CourseController {
         courseService.sendEmailBasedOnCourseProgress(courseId);
         return ResponseEntity.ok("Course completed and email sent successfully");
     }
+
+    @GetMapping("/my-course")
+    public ResponseEntity<Page<CourseResponseDto>> getEnrolledCoursesByUserId(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "enrolledAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        Page<CourseResponseDto> enrolledCourses = courseService.getEnrolledCourseByUserId(page, size, sortBy, sortDir);
+        return ResponseEntity.ok(enrolledCourses);
+    }
+
 }
