@@ -12,7 +12,9 @@ import com.g44.kodeholik.model.enums.course.ChapterStatus;
 import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.model.enums.user.UserRole;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.NotFoundException;
@@ -56,7 +58,9 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public Page<ChapterResponseDto> getAllChapter(Pageable pageable) {
-        Page<Chapter> chapterPage = chapterRepository.findByStatusIn(getAllowedStatus(), pageable);
+        Sort sort = Sort.by(Sort.Direction.ASC, "displayOrder");
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        Page<Chapter> chapterPage = chapterRepository.findByStatusIn(getAllowedStatus(), sortedPageable);
         return chapterPage.map(chapterResponseMapper::mapFrom);
     }
 
@@ -113,8 +117,8 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public List<ChapterResponseDto> getChapterByCourseId(Long id) {
-        List<Chapter> chapters = chapterRepository.findByCourseIdAndStatusIn(id,
-                getAllowedStatus());
+        Sort sort = Sort.by(Sort.Direction.ASC, "displayOrder");
+        List<Chapter> chapters = chapterRepository.findByCourseIdAndStatusIn(id, getAllowedStatus(), sort);
         return chapters.stream()
                 .map(chapterResponseMapper::mapDetailFrom)
                 .collect(Collectors.toList());
