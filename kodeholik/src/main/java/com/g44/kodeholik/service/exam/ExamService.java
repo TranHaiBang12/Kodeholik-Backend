@@ -78,4 +78,5 @@ public interface ExamService {
         public List<NotStartedExamListDto> getAllPendingExamNotOverlapTime();
 
         public ExamResultOverviewDto getResultOverviewInformation(String code);
+
 }

@@ -1,6 +1,7 @@
 package com.g44.kodeholik.service.problem;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemShortResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.overview.ProblemOverviewReportDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.ProblemSolutionDto;
 import com.g44.kodeholik.model.dto.response.problem.solution.SolutionListResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
@@ -184,4 +186,6 @@ public interface ProblemService {
         public List<Map<String, String>> getNumberLanguageUserSolved();
 
         public Map<String, String> getAcceptanceRateAndNoSubmissionByUser();
+
+        public ProblemOverviewReportDto getProblemOverviewReport(Timestamp start, Timestamp end);
 }

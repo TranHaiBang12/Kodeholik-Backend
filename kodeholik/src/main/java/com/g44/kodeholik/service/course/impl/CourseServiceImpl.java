@@ -40,10 +40,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.course.CourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
+import com.g44.kodeholik.model.dto.response.course.overview.CourseInfoOverviewDto;
+import com.g44.kodeholik.model.dto.response.course.overview.CourseOverviewReportDto;
+import com.g44.kodeholik.model.entity.course.Course;
 import com.g44.kodeholik.repository.course.CourseRepository;
 import com.g44.kodeholik.service.course.CourseService;
 import com.g44.kodeholik.service.email.EmailService;
@@ -142,8 +146,8 @@ public class CourseServiceImpl implements CourseService {
         course.setStatus(requestDto.getStatus());
         course.setNumberOfParticipant(0);
         course.setRate(0.0);
-        course.setCreatedAt(new Timestamp(System.currentTimeMillis() + 25200000));
-        course.setUpdatedAt(new Timestamp(System.currentTimeMillis() + 25200000));
+        course.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
         Set<Topic> topics = topicService.getTopicsByIds(requestDto.getTopicIds());
         // Kiểm tra xem tất cả topicIds có tồn tại không
@@ -182,7 +186,7 @@ public class CourseServiceImpl implements CourseService {
         course.setTitle(requestDto.getTitle());
         course.setDescription(requestDto.getDescription());
         course.setStatus(requestDto.getStatus());
-        course.setUpdatedAt(new Timestamp(System.currentTimeMillis() + 25200000));
+        course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
         // Cập nhật danh sách topics
         Set<Topic> topics = topicService.getTopicsByIds(requestDto.getTopicIds());
@@ -344,7 +348,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addTop5PopularCourse() {
-        List<Course> courses = courseRepository.findTop5ByOrderByNumberOfParticipantDescRateDesc();
+        List<Course> courses = courseRepository.findTop6ByOrderByNumberOfParticipantDescRateDesc();
         topCourseRepository.deleteAll();
         int top = 5;
         for (int i = 0; i < courses.size(); i++) {
@@ -709,6 +713,71 @@ public class CourseServiceImpl implements CourseService {
 
         // Chuyển LocalDateTime -> Timestamp
         return Timestamp.valueOf(localDateTime);
+    }
+
+    @Override
+    public CourseOverviewReportDto getCourseOverviewReport(Timestamp start, Timestamp end) {
+        CourseOverviewReportDto result = new CourseOverviewReportDto();
+        List<CourseInfoOverviewDto> topPopularCourses = new ArrayList<>();
+        List<CourseInfoOverviewDto> topFlopCourses = new ArrayList<>();
+
+        long totalEnrollments = 0;
+        double avgRating = 0;
+        if (start == null && end == null) {
+            List<Course> courses = courseRepository.findAllByOrderByNumberOfParticipantDescRateDesc();
+            for (int i = 0; i < courses.size(); i++) {
+                totalEnrollments += courses.get(i).getNumberOfParticipant();
+                avgRating += courses.get(i).getRate();
+                if (i < 5) {
+                    topPopularCourses.add(mapFromCourse(courses.get(i)));
+                } else if (totalEnrollments >= 10 && i >= courses.size() - 5) {
+                    topFlopCourses.add(mapFromCourse(courses.get(i)));
+                }
+            }
+
+            result.setTotalCourseCount(courses.size());
+            result.setTotalEnrollments(totalEnrollments);
+            if (totalEnrollments != 0) {
+                result.setAvgRating(Math.round((double) avgRating / result.getTotalCourseCount() * 100) / 100.0);
+            }
+            result.setTopPopularCourses(topPopularCourses);
+            result.setTopFlopCourses(topFlopCourses);
+
+        } else {
+            if (start == null || end == null || start.after(end)) {
+                throw new BadRequestException("Please provide both valid start and end time",
+                        "Please provide both valid start and end time");
+            }
+            List<Course> courses = courseRepository.findByCreatedAtBetweenOrderByNumberOfParticipantDescRateDesc(start,
+                    end);
+            for (int i = 0; i < courses.size(); i++) {
+                totalEnrollments += courses.get(i).getNumberOfParticipant();
+                avgRating += courses.get(i).getRate();
+                if (i < 5) {
+                    topPopularCourses.add(mapFromCourse(courses.get(i)));
+                } else if (totalEnrollments >= 10 && i >= courses.size() - 5) {
+                    topFlopCourses.add(mapFromCourse(courses.get(i)));
+                }
+            }
+
+            result.setTotalCourseCount(courses.size());
+            result.setTotalEnrollments(totalEnrollments);
+            if (totalEnrollments != 0) {
+                result.setAvgRating(Math.round((double) avgRating / result.getTotalCourseCount() * 100) / 100.0);
+            }
+            result.setTopPopularCourses(topPopularCourses);
+            result.setTopFlopCourses(topFlopCourses);
+        }
+        return result;
+    }
+
+    private CourseInfoOverviewDto mapFromCourse(Course course) {
+        CourseInfoOverviewDto courseInfo = new CourseInfoOverviewDto();
+        courseInfo.setId(course.getId());
+        courseInfo.setTitle(course.getTitle());
+        courseInfo.setTotalEnrollments(course.getNumberOfParticipant());
+        courseInfo.setAvgRating(course.getRate());
+        return courseInfo;
     }
 
 }

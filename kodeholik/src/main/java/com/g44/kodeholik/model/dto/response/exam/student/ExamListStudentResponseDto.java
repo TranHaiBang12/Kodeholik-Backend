@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
 import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
+import jakarta.persistence.PostLoad;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,4 +28,5 @@ public class ExamListStudentResponseDto {
     private String result;
 
     private ExamStatus status;
+
 }

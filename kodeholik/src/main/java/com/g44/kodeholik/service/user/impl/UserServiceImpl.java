@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
         Users user = addUserRequestMapper.mapTo(addUserRequestDto);
         checkUsernameExisted(addUserRequestDto.getUsername());
         checkEmailExisted(addUserRequestDto.getEmail());
-        user.setCreatedDate(new java.sql.Date(Date.from(Instant.now()).getTime() + 25200000));
+        user.setCreatedDate(new java.sql.Date(Date.from(Instant.now()).getTime()));
         user.setPassword(PasswordUtils.encodePassword(password));
         user.setStatus(userStatus);
         return userRepository.save(user);

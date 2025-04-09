@@ -1,6 +1,8 @@
 package com.g44.kodeholik.model.entity.course;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,4 +69,5 @@ public class Course {
     @JoinTable(name = "course_topic", schema = "schema_course", joinColumns = @JoinColumn(name = "course_id"), inverseJoinColumns = @JoinColumn(name = "topic_id"))
     @JsonManagedReference
     private Set<Topic> topics = new HashSet<>();
+
 }

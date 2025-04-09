@@ -21,6 +21,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
@@ -165,7 +166,7 @@ public class ExcelServiceImpl implements ExcelService {
                 for (int i = 0; i < problemTestCases.size(); i++) {
                     if (problemTestCases.get(i).getLanguage().getName().equals(language.getName())) {
                         List<InputVariable> inputVariables = objectMapper.readValue(problemTestCases.get(i).getInput(),
-                                new com.fasterxml.jackson.core.type.TypeReference<List<InputVariable>>() {
+                                new TypeReference<List<InputVariable>>() {
                                 });
                         if (!isGetInputName) {
                             for (int k = 0; k < inputVariables.size(); k++) {
@@ -197,7 +198,19 @@ public class ExcelServiceImpl implements ExcelService {
                         int k = 0;
                         while (k < inputVariablesList.get(m).size()) {
                             Object value = inputVariablesList.get(m).get(k).getValue();
-                            row.createCell(k).setCellValue(value.toString());
+                            String formattedValue = "";
+                            if (inputVariablesList.get(m).get(k).getType().equals("STRING")) {
+                                formattedValue = value.toString().replace("\"\\\"", "\"").replace("\\\"\"", "\"");
+                            } else {
+                                if (value.toString().startsWith("\"")) {
+                                    formattedValue = value.toString().substring(1, value.toString().length() - 1)
+                                            .replace("\\\"", "\"");
+                                } else {
+                                    formattedValue = value.toString().replace("\\\"", "\"");
+                                }
+                            }
+                            row.createCell(k)
+                                    .setCellValue(formattedValue);
                             k++;
                         }
                         m++;

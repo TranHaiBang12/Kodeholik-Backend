@@ -88,7 +88,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         }
-        log.info("access: " + accessToken + " " + request.getRequestURI());
         if (accessToken != null && !accessToken.equals("")) {
             if ((username != null && !username.equals("")) &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -124,7 +123,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 
         if (request.getMethod().equals(HttpMethod.OPTIONS.toString())) {
-            log.info("OPTIONS");
             return true;
         }
 
@@ -141,7 +139,6 @@ public class JwtFilter extends OncePerRequestFilter {
                         }
                     }
                 }
-                log.info("access: " + accessToken);
                 if (accessToken != null && !accessToken.equals("")) {
                     if ((username != null && !username.equals("")) &&
                             SecurityContextHolder.getContext().getAuthentication() == null) {

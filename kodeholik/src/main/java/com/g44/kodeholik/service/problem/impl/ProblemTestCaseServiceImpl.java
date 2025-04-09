@@ -197,6 +197,8 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
 
     @Override
     public List<ProblemTestCase> getTestCaseByProblemAndAllLanguage(Problem problem) {
+        log.info(problemTestCaseRepository
+                .findByProblem(problem));
         return problemTestCaseRepository
                 .findByProblem(problem);
     }

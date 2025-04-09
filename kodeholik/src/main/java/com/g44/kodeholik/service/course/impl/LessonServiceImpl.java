@@ -119,7 +119,7 @@ public class LessonServiceImpl implements LessonService {
         Chapter chapter = chapterRepository.findById(lessonRequestDto.getChapterId())
                 .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
         lesson.setChapter(chapter);
-        lesson.setCreatedAt(Timestamp.from(Instant.now().plusMillis(25200000)));
+        lesson.setCreatedAt(Timestamp.from(Instant.now()));
         lesson.setCreatedBy(userService.getCurrentUser());
 
         try {

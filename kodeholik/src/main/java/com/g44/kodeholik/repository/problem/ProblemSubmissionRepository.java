@@ -25,6 +25,11 @@ public interface ProblemSubmissionRepository extends JpaRepository<ProblemSubmis
                         boolean isAccepted,
                         List<Problem> problems);
 
+        @Query("SELECT COUNT(DISTINCT p.problem) FROM ProblemSubmission p WHERE p.isAccepted = :isAccepted AND p.problem IN :problems")
+        public long countByIsAcceptedAndProblemIn(
+                        boolean isAccepted,
+                        List<Problem> problems);
+
         public List<ProblemSubmission> findByUserAndProblemAndIsAccepted(
                         Users user,
                         Problem problem,
@@ -102,5 +107,8 @@ public interface ProblemSubmissionRepository extends JpaRepository<ProblemSubmis
 
         @Query("SELECT COUNT(*) FROM ProblemSubmission ps WHERE ps.user = :user")
         public int getTotalSubmission(Users user);
+
+        @Query("SELECT p FROM ProblemSubmission p WHERE p.createdAt >= :start AND p.createdAt <= :end")
+        public List<ProblemSubmission> getSubmissionsByTimeBetween(Timestamp start, Timestamp end);
 
 }

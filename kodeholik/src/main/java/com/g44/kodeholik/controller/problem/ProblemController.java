@@ -1,5 +1,6 @@
 package com.g44.kodeholik.controller.problem;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ import com.g44.kodeholik.model.dto.response.problem.ProblemEditorialResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemInputParameterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemShortResponseDto;
+import com.g44.kodeholik.model.dto.response.problem.overview.ProblemOverviewReportDto;
 import com.g44.kodeholik.model.elasticsearch.ProblemElasticsearch;
 import com.g44.kodeholik.service.problem.ProblemService;
 
@@ -229,6 +231,14 @@ public class ProblemController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(pageProblem);
+    }
+
+    @GetMapping("/overview-report")
+    public ResponseEntity<ProblemOverviewReportDto> getProblemOverviewReport(
+            @RequestParam(required = false) Timestamp start,
+            @RequestParam(required = false) Timestamp end) {
+        ProblemOverviewReportDto problemOverviewReportDto = problemService.getProblemOverviewReport(start, end);
+        return ResponseEntity.ok(problemOverviewReportDto);
     }
 
 }

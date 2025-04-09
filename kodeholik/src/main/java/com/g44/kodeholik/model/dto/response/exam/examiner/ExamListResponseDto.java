@@ -5,6 +5,7 @@ import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
 import com.g44.kodeholik.util.serializer.TimestampSerializer;
 
+import jakarta.persistence.PostLoad;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,4 +34,5 @@ public class ExamListResponseDto {
 
     @JsonSerialize(using = TimestampSerializer.class)
     private Long createdAt;
+
 }
