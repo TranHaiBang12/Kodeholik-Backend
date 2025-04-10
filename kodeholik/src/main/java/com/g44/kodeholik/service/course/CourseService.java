@@ -29,6 +29,8 @@ public interface CourseService {
     Page<CourseResponseDto> searchCourses(SearchCourseRequestDto request, Integer page, Integer size,
             CourseSortField sortBy, Boolean ascending);
 
+    Page<CourseResponseDto> getEnrolledCourseByUserId( int page, int size, String sortBy, String sortDir);
+
     public void enrollUserInCourse(Long courseId);
 
     public void unenrollUserFromCourse(Long courseId);
@@ -51,4 +53,5 @@ public interface CourseService {
             String sortDirection, String usernameSearch);
 
     public void sendEmailBasedOnCourseProgress(Long courseId);
+
 }

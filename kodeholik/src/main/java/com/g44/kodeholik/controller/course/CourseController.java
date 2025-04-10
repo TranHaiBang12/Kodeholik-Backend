@@ -55,7 +55,6 @@ public class CourseController {
     @PostMapping("/add")
     public ResponseEntity<?> addCourse(
             @ModelAttribute @Valid CourseRequestDto requestDto) {
-
         courseService.addCourse(requestDto);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
@@ -175,4 +174,21 @@ public class CourseController {
                 request.getUsername());
         return ResponseEntity.ok(enrolledUsers);
     }
+
+    @PostMapping("/completed/{courseId}")
+    public ResponseEntity<String> handleCourseCompletion(@PathVariable Long courseId) {
+        courseService.sendEmailBasedOnCourseProgress(courseId);
+        return ResponseEntity.ok("Course completed and email sent successfully");
+    }
+
+    @GetMapping("/my-course")
+    public ResponseEntity<Page<CourseResponseDto>> getEnrolledCoursesByUserId(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "enrolledAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        Page<CourseResponseDto> enrolledCourses = courseService.getEnrolledCourseByUserId(page, size, sortBy, sortDir);
+        return ResponseEntity.ok(enrolledCourses);
+    }
+
 }

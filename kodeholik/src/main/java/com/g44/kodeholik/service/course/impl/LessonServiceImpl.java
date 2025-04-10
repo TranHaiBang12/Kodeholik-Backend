@@ -114,8 +114,24 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public void addLesson(LessonRequestDto lessonRequestDto) {
-        Lesson lesson = lessonRequestMapper.mapTo(lessonRequestDto);
+        String normalizedTitle = lessonRequestDto.getTitle().trim().replaceAll("\\s+", " ");
+        if (normalizedTitle.length() < 10) {
+            throw new IllegalArgumentException("Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (lessonRepository.existsByTitle(normalizedTitle)) {
+            throw new IllegalArgumentException("Lesson title already exists: " + normalizedTitle);
+        }
 
+        String normalizedDescription = lessonRequestDto.getDescription().trim().replaceAll("\\s+", " ");
+        if (normalizedDescription.isEmpty()) {
+            throw new IllegalArgumentException("Lesson description cannot be empty or contain only whitespace");
+        }
+        if (normalizedDescription.length() < 10) {
+            throw new IllegalArgumentException("Lesson description must be at least 10 characters long (excluding extra spaces): " + normalizedDescription);
+        }
+        Lesson lesson = lessonRequestMapper.mapTo(lessonRequestDto);
+        lesson.setTitle(normalizedTitle);
+        lesson.setDescription(normalizedDescription);
         Chapter chapter = chapterRepository.findById(lessonRequestDto.getChapterId())
                 .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
         lesson.setChapter(chapter);
@@ -188,9 +204,24 @@ public class LessonServiceImpl implements LessonService {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
 
+        String normalizedTitle = lessonRequestDto.getTitle().trim().replaceAll("\\s+", " ");
+        if (normalizedTitle.length() < 10) {
+            throw new IllegalArgumentException("Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (lessonRepository.existsByTitleAndIdNot(normalizedTitle, lessonId)) {
+            throw new IllegalArgumentException("Lesson title already exists: " + normalizedTitle);
+        }
+        String normalizedDescription = lessonRequestDto.getDescription().trim().replaceAll("\\s+", " ");
+        if (normalizedDescription.isEmpty()) {
+            throw new IllegalArgumentException("Lesson description cannot be empty or contain only whitespace");
+        }
+        if (normalizedDescription.length() < 10) {
+            throw new IllegalArgumentException("Lesson description must be at least 10 characters long (excluding extra spaces): " + normalizedDescription);
+        }
         // Update lesson properties using mapper
         lessonRequestMapper.updateFromDto(lessonRequestDto, lesson);
-
+        lesson.setTitle(normalizedTitle);
+        lesson.setDescription(normalizedDescription);
         // Update chapter if changed
         if (lessonRequestDto.getChapterId() != null &&
                 !lessonRequestDto.getChapterId().equals(lesson.getChapter().getId())) {

@@ -12,7 +12,9 @@ import com.g44.kodeholik.model.enums.course.ChapterStatus;
 import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.model.enums.user.UserRole;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.exception.NotFoundException;
@@ -56,7 +58,9 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public Page<ChapterResponseDto> getAllChapter(Pageable pageable) {
-        Page<Chapter> chapterPage = chapterRepository.findByStatusIn(getAllowedStatus(), pageable);
+        Sort sort = Sort.by(Sort.Direction.ASC, "displayOrder");
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        Page<Chapter> chapterPage = chapterRepository.findByStatusIn(getAllowedStatus(), sortedPageable);
         return chapterPage.map(chapterResponseMapper::mapFrom);
     }
 
@@ -69,7 +73,25 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public void addChapter(ChapterRequestDto chapterRequestDto) {
+        String normalizedTitle = chapterRequestDto.getTitle().trim().replaceAll("\\s+", " ");
+
+        if (normalizedTitle.length() < 10) {
+            throw new IllegalArgumentException("Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (chapterRepository.existsByTitle(normalizedTitle)) {
+            throw new IllegalArgumentException("Chapter title already exists: " + normalizedTitle);
+        }
+        String normalizedDescription = chapterRequestDto.getDescription().trim().replaceAll("\\s+", " ");
+        if (normalizedDescription.isEmpty()) {
+            throw new IllegalArgumentException("Chapter description cannot be empty or contain only whitespace");
+        }
+        if (normalizedDescription.length() < 10) {
+            throw new IllegalArgumentException("Chapter description must be at least 10 characters long (excluding extra spaces): " + normalizedDescription);
+        }
+
         Chapter chapter = chapterRequestMapper.mapTo(chapterRequestDto);
+        chapter.setTitle(normalizedTitle);
+        chapter.setDescription(normalizedDescription);
         chapter.setCourse(courseRepository
                 .findById(chapterRequestDto.getCourseId())
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found")));
@@ -82,8 +104,26 @@ public class ChapterServiceImpl implements ChapterService {
     public void editChapter(Long id, ChapterRequestDto chapterRequestDto) {
         Chapter savedChapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
+
+        String normalizedTitle = chapterRequestDto.getTitle().trim().replaceAll("\\s+", " ");
+        if (normalizedTitle.length() < 10) {
+            throw new IllegalArgumentException("Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (chapterRepository.existsByTitle(normalizedTitle)) {
+            throw new IllegalArgumentException("Chapter title already exists: " + normalizedTitle);
+        }
+        String normalizedDescription = chapterRequestDto.getDescription().trim().replaceAll("\\s+", " ");
+        if (normalizedDescription.isEmpty()) {
+            throw new IllegalArgumentException("Chapter description cannot be empty or contain only whitespace");
+        }
+        if (normalizedDescription.length() < 10) {
+            throw new IllegalArgumentException("Chapter description must be at least 10 characters long (excluding extra spaces): " + normalizedDescription);
+        }
+
         Chapter chapter = chapterRequestMapper.mapTo(chapterRequestDto);
         chapter.setId(id);
+        chapter.setTitle(normalizedTitle);
+        chapter.setDescription(normalizedDescription);
         chapter.setCourse(courseRepository
                 .findById(chapterRequestDto.getCourseId())
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found")));
@@ -103,8 +143,8 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public List<ChapterResponseDto> getChapterByCourseId(Long id) {
-        List<Chapter> chapters = chapterRepository.findByCourseIdAndStatusIn(id,
-                getAllowedStatus());
+        Sort sort = Sort.by(Sort.Direction.ASC, "displayOrder");
+        List<Chapter> chapters = chapterRepository.findByCourseIdAndStatusIn(id, getAllowedStatus(), sort);
         return chapters.stream()
                 .map(chapterResponseMapper::mapDetailFrom)
                 .collect(Collectors.toList());

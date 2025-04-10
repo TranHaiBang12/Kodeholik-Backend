@@ -52,6 +52,9 @@ public class CourseUser {
     @Column(name = "last_studied_end", nullable = false)
     private Timestamp lastStudiedEndAt;
 
+    @Column(name = "finished")
+    private boolean finished = false;
+
     public CourseUser(Course course, Users user) {
         this.course = course;
         this.user = user;

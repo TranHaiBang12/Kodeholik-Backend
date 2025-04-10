@@ -116,6 +116,14 @@ public class CourseServiceImpl implements CourseService {
             return courseDetailResponseMapper.mapFromCourseAndLesson(course, Collections.emptyList(),
                     Collections.emptyList());
         }
+        // Sắp xếp chapters/lessons trong course theo displayOrder
+        chapters.sort(Comparator.comparingInt(Chapter::getDisplayOrder));
+        chapters.forEach(chapter -> {
+            List<Lesson> lessons = chapter.getLessons();
+            if (lessons != null && !lessons.isEmpty()) {
+                lessons.sort(Comparator.comparingInt(Lesson::getDisplayOrder));
+            }
+        });
 
         List<Long> lessonIds = chapters.stream()
                 .flatMap(chapter -> {
@@ -136,9 +144,21 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addCourse(CourseRequestDto requestDto) {
+        String normalizedTitle = requestDto.getTitle().trim().replaceAll("\\s+", " ");
+        String normalizedDescription = requestDto.getDescription().trim().replaceAll("\\s+", " ");
+        if (normalizedTitle.length() < 10) {
+            throw new IllegalArgumentException("Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (normalizedDescription.length() < 10) {
+            throw new IllegalArgumentException("Course description must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (courseRepository.existsByTitle(normalizedTitle)) {
+            throw new IllegalArgumentException("Course title already exists: " + normalizedTitle);
+        }
+
         Course course = new Course();
-        course.setTitle(requestDto.getTitle());
-        course.setDescription(requestDto.getDescription());
+        course.setTitle(normalizedTitle);
+        course.setDescription(normalizedDescription);
         course.setStatus(requestDto.getStatus());
         course.setNumberOfParticipant(0);
         course.setRate(0.0);
@@ -153,14 +173,13 @@ public class CourseServiceImpl implements CourseService {
             missingIds.removeAll(foundIds);
             throw new IllegalArgumentException("Các topic ID không tồn tại: " + missingIds);
         }
+        course.setTopics(topics);
 
-        // Upload ảnh lên AWS S3 nếu có
         if (requestDto.getImageFile() != null && !requestDto.getImageFile().isEmpty()) {
             course.setImage(s3Service.uploadFileNameTypeFile(List.of(requestDto.getImageFile()), FileNameType.COURSE)
                     .getFirst());
         }
 
-        // Cập nhật người tạo course
         Users currentUser = userService.getCurrentUser();
         course.setCreatedBy(currentUser);
         course.setUpdatedBy(currentUser);
@@ -170,12 +189,27 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void editCourse(Long courseId, CourseRequestDto requestDto) {
+        String normalizedTitle = requestDto.getTitle().trim().replaceAll("\\s+", " ");
+        String normalizedDescription = requestDto.getDescription().trim().replaceAll("\\s+", " ");
+        if (normalizedTitle.length() < 10) {
+            throw new IllegalArgumentException("Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (normalizedDescription.length() < 10) {
+            throw new IllegalArgumentException("Course description must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
-        // Cập nhật các thông tin course
-        course.setTitle(requestDto.getTitle());
-        course.setDescription(requestDto.getDescription());
+        // Kiểm tra xem title mới có trùng với Course khác không (ngoại trừ Course hiện
+        // tại)
+        if (courseRepository.existsByTitle(normalizedTitle)) {
+            throw new IllegalArgumentException("Course title already exists: " + normalizedTitle);
+        }
+
+        // Nếu title không trùng, tiếp tục cập nhật Course
+        course.setTitle(normalizedTitle);
+        course.setDescription(normalizedDescription);
         course.setStatus(requestDto.getStatus());
         course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
@@ -189,7 +223,6 @@ public class CourseServiceImpl implements CourseService {
                     .getFirst());
         }
 
-        // Cập nhật người chỉnh sửa course
         Users currentUser = userService.getCurrentUser();
         course.setUpdatedBy(currentUser);
 
@@ -262,6 +295,33 @@ public class CourseServiceImpl implements CourseService {
         List<Long> completedLessons = currentUser != null ? getCompletedLessons() : Collections.emptyList();
 
         return courses.map(course -> courseResponseMapper.mapFromCourseAndLesson(course, completedLessons));
+    }
+
+    @Override
+    public Page<CourseResponseDto> getEnrolledCourseByUserId(int page, int size, String sortBy, String sortDir) {
+        Users currentUser = userService.getCurrentUser();
+        Long userId = currentUser.getId();
+
+        Sort sort = "progress".equalsIgnoreCase(sortBy)
+                ? Sort.unsorted()
+                : Sort.by(sortDir.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                validateSortField(sortBy));
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<CourseUser> courseUserPage = courseUserRepository.findByUserId(userId, pageable);
+
+        List<CourseResponseDto> dtos = courseUserPage.getContent().stream()
+                .map(courseUser -> courseResponseMapper.mapToCourseResponseDto(courseUser, userId))
+                .collect(Collectors.toList());
+
+        if ("progress".equalsIgnoreCase(sortBy)) {
+            dtos.sort((a, b) -> sortDir.equalsIgnoreCase("asc")
+                    ? Double.compare(a.getProgress(), b.getProgress())
+                    : Double.compare(b.getProgress(), a.getProgress()));
+        }
+
+        return new PageImpl<>(dtos, pageable, courseUserPage.getTotalElements());
     }
 
     @Transactional
@@ -420,7 +480,6 @@ public class CourseServiceImpl implements CourseService {
         Map<Long, Long> userCompletedLessons = progresses.stream()
                 .collect(Collectors.groupingBy(p -> p.getUser().getId(), Collectors.counting()));
 
-        // Map từ CourseUser sang EnrolledUserResponseDto và tính progress
         List<EnrolledUserResponseDto> dtos = courseUsersPage.getContent().stream()
                 .map(courseUser -> {
                     Long userId = courseUser.getUser().getId();
@@ -437,14 +496,12 @@ public class CourseServiceImpl implements CourseService {
                 })
                 .collect(Collectors.toList());
 
-        // Sắp xếp trong bộ nhớ nếu sortBy là progress
         if ("progress".equalsIgnoreCase(sortBy)) {
             dtos.sort((a, b) -> sortDirection.equalsIgnoreCase("asc")
                     ? Double.compare(a.getProgress(), b.getProgress())
                     : Double.compare(b.getProgress(), a.getProgress()));
         }
 
-        // Tạo Page từ danh sách đã sắp xếp
         return new PageImpl<>(dtos, pageable, courseUsersPage.getTotalElements());
     }
 
@@ -453,9 +510,44 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found with ID: " + courseId));
         Users currentUser = userService.getCurrentUser();
-        String subject = "[KODEHOLIK] You completed " + course.getTitle();
-        String content = "Congratulations! You have successfully completed the course: " + course.getTitle();
-        emailService.sendEmailCompleteCourse(currentUser.getEmail(), subject, currentUser.getUsername(), content);
+
+        CourseUser courseUser = courseUserRepository.findByCourseAndUser(course,currentUser)
+                .orElseThrow(() -> new IllegalArgumentException("User not enrolled in course: " + courseId));
+
+        if (!courseUser.isFinished()) {
+            try {
+                log.info("Sending course completion email to {} for course {}", currentUser.getEmail(), course.getTitle());
+                emailService.sendEmailCompleteCourse(
+                        currentUser.getEmail(),
+                        "[KODEHOLIK] You completed " + course.getTitle(),
+                        currentUser.getUsername(),
+                        course.getTitle()
+                );
+                markCourseAsFinished(courseId, currentUser); // Gọi service cập nhật finished
+                log.info("Email sent and marked as finished for user {} and course {}", currentUser.getId(), courseId);
+            } catch (Exception e) {
+                log.error("Failed to send email to {}: {}", currentUser.getEmail(), e.getMessage());
+                throw new RuntimeException("Email sending failed", e);
+            }
+        } else {
+            log.info("Email already sent for user {} and course {}", currentUser.getId(), courseId);
+        }
+    }
+    //Cập nhật finished course
+    public void markCourseAsFinished(Long courseId, Users user) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("Course not found with ID: " + courseId));
+
+        CourseUser courseUser = courseUserRepository.findByCourseAndUser(course,user)
+                .orElseThrow(() -> new IllegalArgumentException("User not enrolled in course: " + courseId));
+
+        if (!courseUser.isFinished()) {
+            courseUser.setFinished(true);
+            courseUserRepository.save(courseUser);
+            log.info("Marked course {} as finished for user {}", courseId, user.getId());
+        } else {
+            log.info("Course {} already marked as finished for user {}", courseId, user.getId());
+        }
     }
 
     private String validateSortField(String sortBy) {

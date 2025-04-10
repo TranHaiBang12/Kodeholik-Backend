@@ -33,6 +33,9 @@ public class CourseResponseDto {
     @JsonSerialize(using = TimestampSerializer.class)
     private Long createdAt;
 
+    @JsonSerialize(using = TimestampSerializer.class)
+    private Long enrolledAt;
+
     private List<String> topics;
 
     private Double progress;
