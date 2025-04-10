@@ -73,11 +73,25 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public void addChapter(ChapterRequestDto chapterRequestDto) {
-        if (chapterRepository.existsByTitle(chapterRequestDto.getTitle())) {
-            throw new IllegalArgumentException("Chapter title already exists: " + chapterRequestDto.getTitle());
+        String normalizedTitle = chapterRequestDto.getTitle().trim().replaceAll("\\s+", " ");
+
+        if (normalizedTitle.length() < 10) {
+            throw new IllegalArgumentException("Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (chapterRepository.existsByTitle(normalizedTitle)) {
+            throw new IllegalArgumentException("Chapter title already exists: " + normalizedTitle);
+        }
+        String normalizedDescription = chapterRequestDto.getDescription().trim().replaceAll("\\s+", " ");
+        if (normalizedDescription.isEmpty()) {
+            throw new IllegalArgumentException("Chapter description cannot be empty or contain only whitespace");
+        }
+        if (normalizedDescription.length() < 10) {
+            throw new IllegalArgumentException("Chapter description must be at least 10 characters long (excluding extra spaces): " + normalizedDescription);
         }
 
         Chapter chapter = chapterRequestMapper.mapTo(chapterRequestDto);
+        chapter.setTitle(normalizedTitle);
+        chapter.setDescription(normalizedDescription);
         chapter.setCourse(courseRepository
                 .findById(chapterRequestDto.getCourseId())
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found")));
@@ -91,12 +105,25 @@ public class ChapterServiceImpl implements ChapterService {
         Chapter savedChapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
 
-        if (chapterRepository.existsByTitleAndIdNot(chapterRequestDto.getTitle(), id)) {
-            throw new IllegalArgumentException("Chapter title already exists: " + chapterRequestDto.getTitle());
+        String normalizedTitle = chapterRequestDto.getTitle().trim().replaceAll("\\s+", " ");
+        if (normalizedTitle.length() < 10) {
+            throw new IllegalArgumentException("Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (chapterRepository.existsByTitle(normalizedTitle)) {
+            throw new IllegalArgumentException("Chapter title already exists: " + normalizedTitle);
+        }
+        String normalizedDescription = chapterRequestDto.getDescription().trim().replaceAll("\\s+", " ");
+        if (normalizedDescription.isEmpty()) {
+            throw new IllegalArgumentException("Chapter description cannot be empty or contain only whitespace");
+        }
+        if (normalizedDescription.length() < 10) {
+            throw new IllegalArgumentException("Chapter description must be at least 10 characters long (excluding extra spaces): " + normalizedDescription);
         }
 
         Chapter chapter = chapterRequestMapper.mapTo(chapterRequestDto);
         chapter.setId(id);
+        chapter.setTitle(normalizedTitle);
+        chapter.setDescription(normalizedDescription);
         chapter.setCourse(courseRepository
                 .findById(chapterRequestDto.getCourseId())
                 .orElseThrow(() -> new NotFoundException("Course not found", "Course not found")));

@@ -144,13 +144,21 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addCourse(CourseRequestDto requestDto) {
-        if (courseRepository.existsByTitle(requestDto.getTitle())) {
-            throw new IllegalArgumentException("Course title already exists: " + requestDto.getTitle());
+        String normalizedTitle = requestDto.getTitle().trim().replaceAll("\\s+", " ");
+        String normalizedDescription = requestDto.getDescription().trim().replaceAll("\\s+", " ");
+        if (normalizedTitle.length() < 10) {
+            throw new IllegalArgumentException("Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (normalizedDescription.length() < 10) {
+            throw new IllegalArgumentException("Course description must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (courseRepository.existsByTitle(normalizedTitle)) {
+            throw new IllegalArgumentException("Course title already exists: " + normalizedTitle);
         }
 
         Course course = new Course();
-        course.setTitle(requestDto.getTitle());
-        course.setDescription(requestDto.getDescription());
+        course.setTitle(normalizedTitle);
+        course.setDescription(normalizedDescription);
         course.setStatus(requestDto.getStatus());
         course.setNumberOfParticipant(0);
         course.setRate(0.0);
@@ -181,18 +189,27 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void editCourse(Long courseId, CourseRequestDto requestDto) {
+        String normalizedTitle = requestDto.getTitle().trim().replaceAll("\\s+", " ");
+        String normalizedDescription = requestDto.getDescription().trim().replaceAll("\\s+", " ");
+        if (normalizedTitle.length() < 10) {
+            throw new IllegalArgumentException("Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+        if (normalizedDescription.length() < 10) {
+            throw new IllegalArgumentException("Course description must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+        }
+
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
         // Kiểm tra xem title mới có trùng với Course khác không (ngoại trừ Course hiện
         // tại)
-        if (courseRepository.existsByTitleAndIdNot(requestDto.getTitle(), courseId)) {
-            throw new IllegalArgumentException("Course title already exists: " + requestDto.getTitle());
+        if (courseRepository.existsByTitle(normalizedTitle)) {
+            throw new IllegalArgumentException("Course title already exists: " + normalizedTitle);
         }
 
         // Nếu title không trùng, tiếp tục cập nhật Course
-        course.setTitle(requestDto.getTitle());
-        course.setDescription(requestDto.getDescription());
+        course.setTitle(normalizedTitle);
+        course.setDescription(normalizedDescription);
         course.setStatus(requestDto.getStatus());
         course.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
