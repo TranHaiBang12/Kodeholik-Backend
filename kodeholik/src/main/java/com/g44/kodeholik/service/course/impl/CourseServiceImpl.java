@@ -299,17 +299,20 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<CourseResponseDto> getEnrolledCourseByUserId(int page, int size, String sortBy, String sortDir) {
+        Users currentUser = userService.getCurrentUser();
+        Long userId = currentUser.getId();
+
         Sort sort = "progress".equalsIgnoreCase(sortBy)
                 ? Sort.unsorted()
                 : Sort.by(sortDir.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
                 validateSortField(sortBy));
-        Users currentUser = userService.getCurrentUser();
-        Long userId = currentUser.getId();
+
         Pageable pageable = PageRequest.of(page, size, sort);
+
         Page<CourseUser> courseUserPage = courseUserRepository.findByUserId(userId, pageable);
 
         List<CourseResponseDto> dtos = courseUserPage.getContent().stream()
-                .map(courseUser -> courseResponseMapper.mapToCourseResponseDto(courseUser.getCourse(), userId))
+                .map(courseUser -> courseResponseMapper.mapToCourseResponseDto(courseUser, userId))
                 .collect(Collectors.toList());
 
         if ("progress".equalsIgnoreCase(sortBy)) {
@@ -317,6 +320,7 @@ public class CourseServiceImpl implements CourseService {
                     ? Double.compare(a.getProgress(), b.getProgress())
                     : Double.compare(b.getProgress(), a.getProgress()));
         }
+
         return new PageImpl<>(dtos, pageable, courseUserPage.getTotalElements());
     }
 

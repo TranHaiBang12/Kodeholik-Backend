@@ -4,6 +4,7 @@ import com.g44.kodeholik.model.dto.response.course.ChapterResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.ProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.course.Chapter;
+import com.g44.kodeholik.model.entity.course.CourseUser;
 import com.g44.kodeholik.model.entity.course.Lesson;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.repository.course.CourseRatingRepository;
@@ -120,24 +121,34 @@ public class CourseResponseMapper implements Mapper<Course, CourseResponseDto> {
                 .build();
     }
 
-    public CourseResponseDto mapToCourseResponseDto(Course course, Long userId) {
+    public CourseResponseDto mapToCourseResponseDto(CourseUser courseUser, Long userId) {
+        Course course = courseUser.getCourse();
         List<Lesson> lessons = lessonRepository.findByChapter_Course_Id(course.getId());
         int totalLessons = lessons.size();
 
         int completedLessons = userLessonProgressRepository.countByUserIdAndLessonChapterCourseId(userId, course.getId());
         double progress = totalLessons > 0 ? (completedLessons * 100.0) / totalLessons : 0.0;
 
+        String image = course.getImage();
+        if (image != null && image.startsWith("kodeholik")) {
+            image = s3Service.getPresignedUrl(image);
+        }
+
+        UserResponseDto createdBy = course.getCreatedBy() != null ? userResponseMapper.mapFrom(course.getCreatedBy()) : null;
+
         return CourseResponseDto.builder()
                 .id(course.getId())
                 .title(course.getTitle())
-                .image(course.getImage())
-                .status(course.getStatus())
+                .image(image)
+//                .status(course.getStatus())
                 .rate(course.getRate())
                 .numberOfParticipant(course.getNumberOfParticipant())
-                .createdAt(course.getCreatedAt() != null ? course.getCreatedAt().getTime() : null)
+//                .createdAt(course.getCreatedAt() != null ? course.getCreatedAt().getTime() : null)
+                .enrolledAt(courseUser.getEnrolledAt() != null ? courseUser.getEnrolledAt().getTime() : null)
                 .topics(course.getTopics().stream().map(Topic::getName).collect(Collectors.toList()))
                 .progress(progress)
-                .noVote(courseRatingRepository.countByCourseId(course.getId())) // Giả sử bạn có repository này
+                .createdBy(createdBy)
+                .noVote(courseRatingRepository.countByCourseId(course.getId()))
                 .noChapter(course.getChapters() != null ? course.getChapters().size() : 0)
                 .noLesson(totalLessons)
                 .build();
