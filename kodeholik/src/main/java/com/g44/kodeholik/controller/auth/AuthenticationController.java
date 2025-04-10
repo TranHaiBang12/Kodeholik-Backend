@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.amazonaws.Response;
 import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.LoginRequestDto;
 import com.g44.kodeholik.service.auth.AuthService;
@@ -81,6 +82,24 @@ public class AuthenticationController {
         } else {
             response.sendRedirect(empGoogleUrl);
         }
+    }
+
+    @PostMapping("/login-google")
+    public ResponseEntity<?> loginGoogle(
+            @RequestParam String token,
+            HttpServletResponse response,
+            HttpServletRequest request) throws IOException {
+        authService.loginWithGoogle(token, response, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/login-github")
+    public ResponseEntity<?> loginGithub(
+            @RequestParam String code,
+            HttpServletResponse response,
+            HttpServletRequest request) throws IOException {
+        authService.loginWithGithub(code, response, request);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/rotate-token")

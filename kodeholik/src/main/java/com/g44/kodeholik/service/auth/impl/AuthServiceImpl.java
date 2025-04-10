@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +24,7 @@ import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.exception.UnauthorizedException;
+import com.g44.kodeholik.model.dto.request.github.GithubUser;
 import com.g44.kodeholik.model.dto.request.user.AddUserRequestDto;
 import com.g44.kodeholik.model.dto.request.user.ChangePasswordRequestDto;
 import com.g44.kodeholik.model.dto.request.user.LoginRequestDto;
@@ -33,6 +35,7 @@ import com.g44.kodeholik.model.enums.user.UserStatus;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.auth.AuthService;
 import com.g44.kodeholik.service.email.EmailService;
+import com.g44.kodeholik.service.github.GithubService;
 import com.g44.kodeholik.service.redis.RedisService;
 import com.g44.kodeholik.service.token.TokenService;
 import com.g44.kodeholik.service.user.UserService;
@@ -67,9 +70,9 @@ public class AuthServiceImpl implements AuthService {
 
     private final MessageProperties messageProperties;
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final GoogleTokenVerifierService googleTokenVerifierService;
 
-    private final WebsocketSessionManager websocketSessionManager;
+    private final GithubService githubService;
 
     @Value("${spring.jwt.forgot-token.expiry-time}")
     private int forgotTokenExpiryTime;
@@ -216,23 +219,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void loginWithGoogle(OAuth2AuthenticationToken oAuth2User, HttpServletResponse response,
-            HttpServletRequest request) {
-        if (oAuth2User == null) {
-            throw new UnauthorizedException("Wrong credentials", "Wrong credentials");
+    public void loginWithGoogle(String token, HttpServletResponse response, HttpServletRequest request) {
+        var payload = googleTokenVerifierService.verifyToken(token);
+        if (payload == null) {
+            throw new UnauthorizedException("Invalid oauth2 token", "Invalid oauth2 token");
         }
 
-        String email = oAuth2User.getPrincipal().getAttribute("email");
+        // Lấy thông tin user
+        String email = payload.getEmail();
+        String name = (String) payload.get("name");
+        String picture = (String) payload.get("picture");
+
         // if (!EmailUtils.isFptEduEmail(email)) {
         // throw new ForbiddenException("This account is not allowed to do this action",
         // "This account is not allowed to do this action");
         // }
+
         String username = "";
-        Optional<Users> optionalUser = userRepository.existsByUsernameOrEmail(email);
+        Optional<Users> optionalUser = userService.isUserExistedbyUsernameOrEmail(email);
         if (!optionalUser.isPresent()) {
-            // get data
-            String name = oAuth2User.getPrincipal().getAttribute("name");
-            String picture = oAuth2User.getPrincipal().getAttribute("picture");
             AddUserRequestDto addUserRequestDto = new AddUserRequestDto();
             addUserRequestDto.setUsername(name);
             addUserRequestDto.setFullname(name);
@@ -244,21 +249,22 @@ public class AuthServiceImpl implements AuthService {
             username = name;
 
         } else {
-            if (userRepository.isUserNotAllowed(email)) {
+            if (userService.isUserNotAllowed(email)) {
                 throw new ForbiddenException("This account is not allowed to do this action",
                         "This account is not allowed to do this action");
             }
             username = optionalUser.get().getUsername();
-        }
-        // set security principal
-        setPrincipal(username, request);
 
-        // generate token
+        }
+        if (userService.isUserNotAllowed(email)) {
+            throw new ForbiddenException("This account is not allowed to do this action",
+                    "This account is not allowed to do this action");
+        }
+        setPrincipal(username, request);
         String accessToken = tokenService.generateAccessToken(username);
         tokenService.addTokenToCookie(accessToken, response, TokenType.ACCESS);
         String refreshToken = tokenService.generateRefreshToken(username, new Date());
         tokenService.addTokenToCookie(refreshToken, response, TokenType.REFRESH);
-
     }
 
     public void changePassword(ChangePasswordRequestDto changePasswordRequestDto, HttpServletResponse response) {
@@ -288,6 +294,51 @@ public class AuthServiceImpl implements AuthService {
     public String generateTokenForNotification() {
         Users user = userService.getCurrentUser();
         return tokenService.generateAccessToken(user.getUsername());
+    }
+
+    @Override
+    public void loginWithGithub(String code, HttpServletResponse response, HttpServletRequest request) {
+        String token = githubService.getGitHubAccessToken(code);
+
+        if (token != null) {
+            GithubUser user = githubService.getGitHubUserInfo(token);
+
+            // if (!EmailUtils.isFptEduEmail(email)) {
+            // throw new ForbiddenException("This account is not allowed to do this action",
+            // "This account is not allowed to do this action");
+            // }
+
+            String username = "";
+            Optional<Users> optionalUser = userService.isUserExistedbyUsernameOrEmail(user.getEmail());
+            if (!optionalUser.isPresent()) {
+                AddUserRequestDto addUserRequestDto = new AddUserRequestDto();
+                addUserRequestDto.setUsername(user.getName());
+                addUserRequestDto.setFullname(user.getName());
+                addUserRequestDto.setEmail(user.getEmail());
+                addUserRequestDto.setAvatar(user.getAvatarUrl());
+                addUserRequestDto.setRole(UserRole.STUDENT);
+
+                userService.addUserAfterLoginGoogle(addUserRequestDto);
+                username = user.getName();
+
+            } else {
+                if (userService.isUserNotAllowed(user.getEmail())) {
+                    throw new ForbiddenException("This account is not allowed to do this action",
+                            "This account is not allowed to do this action");
+                }
+                username = optionalUser.get().getUsername();
+
+            }
+            if (userService.isUserNotAllowed(user.getEmail())) {
+                throw new ForbiddenException("This account is not allowed to do this action",
+                        "This account is not allowed to do this action");
+            }
+            setPrincipal(username, request);
+            String accessToken = tokenService.generateAccessToken(username);
+            tokenService.addTokenToCookie(accessToken, response, TokenType.ACCESS);
+            String refreshToken = tokenService.generateRefreshToken(username, new Date());
+            tokenService.addTokenToCookie(refreshToken, response, TokenType.REFRESH);
+        }
     }
 
 }

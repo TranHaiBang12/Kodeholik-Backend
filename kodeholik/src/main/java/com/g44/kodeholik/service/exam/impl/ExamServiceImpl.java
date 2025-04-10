@@ -311,7 +311,6 @@ public class ExamServiceImpl implements ExamService {
                 : Timestamp.valueOf("1970-01-01 00:00:00");
         Timestamp endTimestamp = filterExamRequestDto.getEnd() != null ? filterExamRequestDto.getEnd()
                 : Timestamp.valueOf("2100-01-01 00:00:00");
-        log.info(filterExamRequestDto);
         Page<Exam> examList = examRepository
                 .searchExam(
                         filterExamRequestDto.getTitle(),
