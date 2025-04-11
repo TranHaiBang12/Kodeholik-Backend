@@ -18,10 +18,14 @@ import java.util.List;
 @Repository
 public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     List<Chapter> findByCourseIdAndStatusIn(Long courseId, List<ChapterStatus> statuses);
+
     List<Chapter> findByCourseIdAndStatusIn(Long courseId, List<ChapterStatus> statuses, Sort sort);
+
     Page<Chapter> findByStatusIn(List<ChapterStatus> statuses, Pageable pageable);
 
     List<Chapter> findByCourseId(Long courseId);
+
+    List<Chapter> findByCourseIdOrderByDisplayOrderAsc(Long courseId);
 
     boolean existsByTitle(String title);
 

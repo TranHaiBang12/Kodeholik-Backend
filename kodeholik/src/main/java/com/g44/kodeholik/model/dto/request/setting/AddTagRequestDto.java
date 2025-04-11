@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 public class AddTagRequestDto {
     @NotNull(message = "MSG02")
     @NotBlank(message = "MSG02")
+    @Size(min = 1, max = 50, message = "MSG02")
     private String name;
 
     @NotNull(message = "MSG02")

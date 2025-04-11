@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.g44.kodeholik.model.dto.request.course.ChapterRequestDto;
 import com.g44.kodeholik.model.dto.response.course.ChapterResponseDto;
+import com.g44.kodeholik.model.dto.response.course.ListResponseDto;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface ChapterService {
     public void deleteChapter(Long id);
 
     public List<ChapterResponseDto> getChapterByCourseId(Long id);
+
+    public List<ListResponseDto> getListChapterResponseDtoByCourseId(Long courseId);
 }

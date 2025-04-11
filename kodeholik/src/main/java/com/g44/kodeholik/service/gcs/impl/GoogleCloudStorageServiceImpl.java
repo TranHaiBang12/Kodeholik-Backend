@@ -15,7 +15,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -27,25 +29,26 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
 
     private static final String VIDEO_PREFIX = "videos/";
 
-    @Async
+    private final Executor emailTaskExecutor;
+
     @Override
     public CompletableFuture<String> uploadVideo(byte[] fileBytes, String originalFileName, String contentType) {
-        if (storage.get(bucketName) == null) {
-            throw new IllegalStateException("Bucket " + bucketName + " does not exist.");
-        }
+        return CompletableFuture.supplyAsync(() -> {
+            if (storage.get(bucketName) == null) {
+                throw new IllegalStateException("Bucket " + bucketName + " does not exist.");
+            }
 
-        String safeFileName = System.currentTimeMillis() + "_" + originalFileName;
-        String filePath = VIDEO_PREFIX + safeFileName;
+            String safeFileName = System.currentTimeMillis() + "_" + originalFileName;
+            String filePath = VIDEO_PREFIX + safeFileName;
 
-        BlobId blobId = BlobId.of(bucketName, filePath);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                .setContentType(contentType)
-                .build();
+            BlobId blobId = BlobId.of(bucketName, filePath);
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                    .setContentType(contentType)
+                    .build();
 
-        // Upload từ byte[] thay vì InputStream để tránh mất file tạm
-        storage.create(blobInfo, fileBytes);
-
-        return CompletableFuture.completedFuture(filePath);
+            storage.create(blobInfo, fileBytes); // blocking, nhưng giờ chạy trên thread pool
+            return filePath;
+        }, emailTaskExecutor); // <-- taskExecutor là Bean của Executor bạn cấu hình
     }
 
     @Override

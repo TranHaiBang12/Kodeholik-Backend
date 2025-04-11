@@ -15,6 +15,7 @@ import com.g44.kodeholik.model.dto.request.course.search.CourseSortField;
 import com.g44.kodeholik.model.dto.request.course.search.SearchCourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.course.EnrolledUserResponseDto;
+import com.g44.kodeholik.model.dto.response.course.ListResponseDto;
 import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.course.*;
 import com.g44.kodeholik.model.entity.setting.Topic;
@@ -147,13 +148,20 @@ public class CourseServiceImpl implements CourseService {
         String normalizedTitle = requestDto.getTitle().trim().replaceAll("\\s+", " ");
         String normalizedDescription = requestDto.getDescription().trim().replaceAll("\\s+", " ");
         if (normalizedTitle.length() < 10) {
-            throw new IllegalArgumentException("Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+            throw new BadRequestException(
+                    "Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
+                    "Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
         if (normalizedDescription.length() < 10) {
-            throw new IllegalArgumentException("Course description must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+            throw new BadRequestException(
+                    "Course description must be at least 10 characters long (excluding extra spaces): "
+                            + normalizedTitle,
+                    "Course description must be at least 10 characters long (excluding extra spaces): "
+                            + normalizedTitle);
         }
         if (courseRepository.existsByTitle(normalizedTitle)) {
-            throw new IllegalArgumentException("Course title already exists: " + normalizedTitle);
+            throw new BadRequestException("Course title already exists: " + normalizedTitle,
+                    "Course title already exists: " + normalizedTitle);
         }
 
         Course course = new Course();
@@ -171,7 +179,8 @@ public class CourseServiceImpl implements CourseService {
             Set<Long> foundIds = topics.stream().map(Topic::getId).collect(Collectors.toSet());
             Set<Long> missingIds = new HashSet<>(requestDto.getTopicIds());
             missingIds.removeAll(foundIds);
-            throw new IllegalArgumentException("Các topic ID không tồn tại: " + missingIds);
+            throw new BadRequestException("Các topic ID không tồn tại: " + missingIds,
+                    "Các topic ID không tồn tại: " + missingIds);
         }
         course.setTopics(topics);
 
@@ -192,10 +201,16 @@ public class CourseServiceImpl implements CourseService {
         String normalizedTitle = requestDto.getTitle().trim().replaceAll("\\s+", " ");
         String normalizedDescription = requestDto.getDescription().trim().replaceAll("\\s+", " ");
         if (normalizedTitle.length() < 10) {
-            throw new IllegalArgumentException("Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+            throw new BadRequestException(
+                    "Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
+                    "Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
         if (normalizedDescription.length() < 10) {
-            throw new IllegalArgumentException("Course description must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+            throw new BadRequestException(
+                    "Course description must be at least 10 characters long (excluding extra spaces): "
+                            + normalizedTitle,
+                    "Course description must be at least 10 characters long (excluding extra spaces): "
+                            + normalizedTitle);
         }
 
         Course course = courseRepository.findById(courseId)
@@ -204,7 +219,8 @@ public class CourseServiceImpl implements CourseService {
         // Kiểm tra xem title mới có trùng với Course khác không (ngoại trừ Course hiện
         // tại)
         if (courseRepository.existsByTitle(normalizedTitle)) {
-            throw new IllegalArgumentException("Course title already exists: " + normalizedTitle);
+            throw new BadRequestException("Course title already exists: " + normalizedTitle,
+                    "Course title already exists: " + normalizedTitle);
         }
 
         // Nếu title không trùng, tiếp tục cập nhật Course
@@ -305,7 +321,7 @@ public class CourseServiceImpl implements CourseService {
         Sort sort = "progress".equalsIgnoreCase(sortBy)
                 ? Sort.unsorted()
                 : Sort.by(sortDir.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
-                validateSortField(sortBy));
+                        validateSortField(sortBy));
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
@@ -508,21 +524,23 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public void sendEmailBasedOnCourseProgress(Long courseId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new IllegalArgumentException("Course not found with ID: " + courseId));
+                .orElseThrow(() -> new BadRequestException("Course not found with ID: " + courseId,
+                        "Course not found with ID: " + courseId));
         Users currentUser = userService.getCurrentUser();
 
-        CourseUser courseUser = courseUserRepository.findByCourseAndUser(course,currentUser)
-                .orElseThrow(() -> new IllegalArgumentException("User not enrolled in course: " + courseId));
+        CourseUser courseUser = courseUserRepository.findByCourseAndUser(course, currentUser)
+                .orElseThrow(() -> new BadRequestException("User not enrolled in course: " + courseId,
+                        "User not enrolled in course: " + courseId));
 
         if (!courseUser.isFinished()) {
             try {
-                log.info("Sending course completion email to {} for course {}", currentUser.getEmail(), course.getTitle());
+                log.info("Sending course completion email to {} for course {}", currentUser.getEmail(),
+                        course.getTitle());
                 emailService.sendEmailCompleteCourse(
                         currentUser.getEmail(),
                         "[KODEHOLIK] You completed " + course.getTitle(),
                         currentUser.getUsername(),
-                        course.getTitle()
-                );
+                        course.getTitle());
                 markCourseAsFinished(courseId, currentUser); // Gọi service cập nhật finished
                 log.info("Email sent and marked as finished for user {} and course {}", currentUser.getId(), courseId);
             } catch (Exception e) {
@@ -533,13 +551,16 @@ public class CourseServiceImpl implements CourseService {
             log.info("Email already sent for user {} and course {}", currentUser.getId(), courseId);
         }
     }
-    //Cập nhật finished course
+
+    // Cập nhật finished course
     public void markCourseAsFinished(Long courseId, Users user) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new IllegalArgumentException("Course not found with ID: " + courseId));
+                .orElseThrow(() -> new BadRequestException("Course not found with ID: " + courseId,
+                        "Course not found with ID: " + courseId));
 
-        CourseUser courseUser = courseUserRepository.findByCourseAndUser(course,user)
-                .orElseThrow(() -> new IllegalArgumentException("User not enrolled in course: " + courseId));
+        CourseUser courseUser = courseUserRepository.findByCourseAndUser(course, user)
+                .orElseThrow(() -> new BadRequestException("User not enrolled in course: " + courseId,
+                        "User not enrolled in course: " + courseId));
 
         if (!courseUser.isFinished()) {
             courseUser.setFinished(true);
@@ -807,6 +828,19 @@ public class CourseServiceImpl implements CourseService {
         courseInfo.setTotalEnrollments(course.getNumberOfParticipant());
         courseInfo.setAvgRating(course.getRate());
         return courseInfo;
+    }
+
+    @Override
+    public List<ListResponseDto> getListCourseResponseDto() {
+        List<ListResponseDto> result = new ArrayList();
+        List<Course> courses = courseRepository.findAll();
+        for (int i = 0; i < courses.size(); i++) {
+            ListResponseDto listResponseDto = new ListResponseDto();
+            listResponseDto.setId(courses.get(i).getId());
+            listResponseDto.setTitle(courses.get(i).getTitle());
+            result.add(listResponseDto);
+        }
+        return result;
     }
 
 }

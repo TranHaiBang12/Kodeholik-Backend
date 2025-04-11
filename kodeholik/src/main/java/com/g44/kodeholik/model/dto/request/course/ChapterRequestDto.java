@@ -16,9 +16,11 @@ import lombok.NoArgsConstructor;
 public class ChapterRequestDto {
     private Long courseId;
 
+    @NotBlank(message = "MSG02")
     @Size(min = 10, max = 200, message = "MSG34")
     private String title;
 
+    @NotBlank(message = "MSG02")
     @Size(min = 10, max = 5000, message = "MSG29")
     private String description;
 

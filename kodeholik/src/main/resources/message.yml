@@ -58,3 +58,4 @@ messages:
   MSG57: "Unable to grading for students. Please try again later"
   MSG58: "Please login again"
   MSG59: "Only accept file with .jpg, .png or .jpeg extension"
+  MSG60: "The file size exceeds the allowed limit"

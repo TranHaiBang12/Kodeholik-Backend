@@ -2,6 +2,7 @@ package com.g44.kodeholik.service.course.impl;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -17,10 +18,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.course.ChapterRequestDto;
 import com.g44.kodeholik.model.dto.response.course.ChapterResponseDto;
+import com.g44.kodeholik.model.dto.response.course.ListResponseDto;
 import com.g44.kodeholik.model.entity.course.Chapter;
+import com.g44.kodeholik.model.entity.course.Course;
 import com.g44.kodeholik.repository.course.ChapterRepository;
 import com.g44.kodeholik.repository.course.CourseRepository;
 import com.g44.kodeholik.service.course.ChapterService;
@@ -76,17 +80,25 @@ public class ChapterServiceImpl implements ChapterService {
         String normalizedTitle = chapterRequestDto.getTitle().trim().replaceAll("\\s+", " ");
 
         if (normalizedTitle.length() < 10) {
-            throw new IllegalArgumentException("Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+            throw new BadRequestException(
+                    "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
+                    "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
         if (chapterRepository.existsByTitle(normalizedTitle)) {
-            throw new IllegalArgumentException("Chapter title already exists: " + normalizedTitle);
+            throw new BadRequestException("Chapter title already exists: " + normalizedTitle,
+                    "Chapter title already exists: " + normalizedTitle);
         }
         String normalizedDescription = chapterRequestDto.getDescription().trim().replaceAll("\\s+", " ");
         if (normalizedDescription.isEmpty()) {
-            throw new IllegalArgumentException("Chapter description cannot be empty or contain only whitespace");
+            throw new BadRequestException("Chapter description cannot be empty or contain only whitespace",
+                    "Chapter description cannot be empty or contain only whitespace");
         }
         if (normalizedDescription.length() < 10) {
-            throw new IllegalArgumentException("Chapter description must be at least 10 characters long (excluding extra spaces): " + normalizedDescription);
+            throw new BadRequestException(
+                    "Chapter description must be at least 10 characters long (excluding extra spaces): "
+                            + normalizedDescription,
+                    "Chapter description must be at least 10 characters long (excluding extra spaces): "
+                            + normalizedDescription);
         }
 
         Chapter chapter = chapterRequestMapper.mapTo(chapterRequestDto);
@@ -107,17 +119,25 @@ public class ChapterServiceImpl implements ChapterService {
 
         String normalizedTitle = chapterRequestDto.getTitle().trim().replaceAll("\\s+", " ");
         if (normalizedTitle.length() < 10) {
-            throw new IllegalArgumentException("Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
+            throw new BadRequestException(
+                    "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
+                    "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
         if (chapterRepository.existsByTitle(normalizedTitle)) {
-            throw new IllegalArgumentException("Chapter title already exists: " + normalizedTitle);
+            throw new BadRequestException("Chapter title already exists: " + normalizedTitle,
+                    "Chapter title already exists: " + normalizedTitle);
         }
         String normalizedDescription = chapterRequestDto.getDescription().trim().replaceAll("\\s+", " ");
         if (normalizedDescription.isEmpty()) {
-            throw new IllegalArgumentException("Chapter description cannot be empty or contain only whitespace");
+            throw new BadRequestException("Chapter description cannot be empty or contain only whitespace",
+                    "Chapter description cannot be empty or contain only whitespace");
         }
         if (normalizedDescription.length() < 10) {
-            throw new IllegalArgumentException("Chapter description must be at least 10 characters long (excluding extra spaces): " + normalizedDescription);
+            throw new BadRequestException(
+                    "Chapter description must be at least 10 characters long (excluding extra spaces): "
+                            + normalizedDescription,
+                    "Chapter description must be at least 10 characters long (excluding extra spaces): "
+                            + normalizedDescription);
         }
 
         Chapter chapter = chapterRequestMapper.mapTo(chapterRequestDto);
@@ -148,6 +168,19 @@ public class ChapterServiceImpl implements ChapterService {
         return chapters.stream()
                 .map(chapterResponseMapper::mapDetailFrom)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ListResponseDto> getListChapterResponseDtoByCourseId(Long courseId) {
+        List<ListResponseDto> result = new ArrayList();
+        List<Chapter> chapters = chapterRepository.findByCourseIdOrderByDisplayOrderAsc(courseId);
+        for (int i = 0; i < chapters.size(); i++) {
+            ListResponseDto listResponseDto = new ListResponseDto();
+            listResponseDto.setId(chapters.get(i).getId());
+            listResponseDto.setTitle(chapters.get(i).getTitle());
+            result.add(listResponseDto);
+        }
+        return result;
     }
 
 }

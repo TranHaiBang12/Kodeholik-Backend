@@ -73,13 +73,15 @@ public class S3ServiceImpl implements S3Service {
             try {
                 java.nio.file.Files.delete(file.toPath());
             } catch (IOException e) {
-                throw new S3Exception(e.getMessage(), "Error deleting temporary file");
+                throw new S3Exception(e.getMessage(),
+                        "Error deleting temporary file");
             }
         } catch (Exception e) {
             throw new S3Exception(e.getMessage(), "Error pushing file");
         }
     }
 
+    @Override
     public boolean doesObjectExist(String key) {
         try {
             HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()

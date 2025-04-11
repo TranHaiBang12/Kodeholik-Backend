@@ -19,9 +19,11 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class CourseRequestDto {
+    @NotBlank(message = "MSG02")
     @Size(min = 10, max = 200, message = "MSG34")
     private String title;
 
+    @NotBlank(message = "MSG02")
     @Size(min = 10, max = 5000, message = "MSG29")
     private String description;
 
@@ -33,4 +35,3 @@ public class CourseRequestDto {
     @ValidImage
     private MultipartFile imageFile;
 }
-

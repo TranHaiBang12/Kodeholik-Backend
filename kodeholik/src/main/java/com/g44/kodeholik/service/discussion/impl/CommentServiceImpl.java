@@ -256,7 +256,7 @@ public class CommentServiceImpl implements CommentService {
         } else {
             updatedAt = comment.getCreatedAt();
         }
-        if (newComment == null || newComment.equals("")) {
+        if (newComment == null || newComment.isEmpty()) {
             throw new BadRequestException(messageProperties.getMessage("MSG17"), messageProperties.getMessage("MSG17"));
         }
         if (currentUser.getId().intValue() != comment.getCreatedBy().getId().intValue()) {

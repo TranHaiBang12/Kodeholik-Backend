@@ -186,15 +186,14 @@ public class GlobalException {
                                 HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        // @ExceptionHandler(Exception.class)
-        // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-        // @ResponseBody
-        // public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
-        // log.info(ex.getMessage());
-        // return new ResponseEntity(new ErrorResponse(ex.getMessage(),
-        // ex.getMessage()),
-        // HttpStatus.INTERNAL_SERVER_ERROR);
-        // }
+        @ExceptionHandler(Exception.class)
+        @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+        @ResponseBody
+        public ResponseEntity<ErrorResponse> handleServerException(Exception ex) {
+                return new ResponseEntity(new ErrorResponse(ex.getMessage(),
+                                ex.getMessage()),
+                                HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         @ExceptionHandler(BadCredentialsException.class)
         @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -222,9 +221,8 @@ public class GlobalException {
                         org.springframework.web.bind.MethodArgumentNotValidException ex) {
                 List<Map<String, String>> errorList = ex.getBindingResult().getFieldErrors().stream()
                                 .map(error -> Map.of("field", error.getField(), "error",
-                                                (error.getDefaultMessage())))
+                                                (messageProperties.getMessage(error.getDefaultMessage()))))
                                 .collect(Collectors.toList());
-                log.info(errorList);
                 return Map.of("message", errorList);
         }
 
