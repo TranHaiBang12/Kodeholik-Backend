@@ -5,6 +5,7 @@ import com.g44.kodeholik.model.enums.setting.TagType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 public class EditTagRequestDto {
     @NotNull(message = "MSG02")
     @NotBlank(message = "MSG02")
+    @Size(min = 1, max = 50, message = "MSG02")
     private String name;
 
     @NotNull(message = "MSG02")

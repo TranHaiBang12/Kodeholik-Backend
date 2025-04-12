@@ -33,6 +33,7 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @Log4j2
 @RestController
 @RequiredArgsConstructor
@@ -62,19 +63,14 @@ public class LessonController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Map<String, String>> addLesson(@ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
-        lessonService.addLesson(lessonRequestDto);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Lesson created successfully");
-
-        return ResponseEntity.status(HttpStatus.SC_CREATED).body(response);
+    public ResponseEntity<?> addLesson(@ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
+        return ResponseEntity.status(HttpStatus.SC_CREATED).body(lessonService.addLesson(lessonRequestDto));
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateLesson(@PathVariable Long id,
             @ModelAttribute @Valid LessonRequestDto lessonRequestDto) {
-        lessonService.editLesson(id, lessonRequestDto);
-        return ResponseEntity.status(HttpStatus.SC_OK).build();
+        return ResponseEntity.status(HttpStatus.SC_OK).body(lessonService.editLesson(id, lessonRequestDto));
     }
 
     @DeleteMapping("/delete/{id}")

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.g44.kodeholik.model.dto.request.course.LessonRequestDto;
 import com.g44.kodeholik.model.entity.course.Lesson;
+import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.util.mapper.Mapper;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,9 @@ public class LessonRequestMapper implements Mapper<Lesson, LessonRequestDto> {
     }
 
     public void updateFromDto(LessonRequestDto dto, Lesson lesson) {
+        if (lesson.getStatus() == LessonStatus.IN_PROGRESS) {
+            dto.setStatus(LessonStatus.IN_PROGRESS);
+        }
         modelMapper.map(dto, lesson);
     }
 

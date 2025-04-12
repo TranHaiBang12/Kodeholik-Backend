@@ -1,6 +1,8 @@
 package com.g44.kodeholik.controller.course;
 
 import com.g44.kodeholik.model.dto.response.course.LessonResponseDto;
+import com.g44.kodeholik.model.dto.response.course.ListResponseDto;
+
 import jakarta.validation.Valid;
 import org.apache.http.HttpStatus;
 import org.springframework.data.domain.Page;
@@ -37,6 +39,12 @@ public class ChapterController {
         return ResponseEntity.status(HttpStatus.SC_OK).body(chapterService.getAllChapter(pageable));
     }
 
+    @GetMapping("/list-by-course/{courseId}")
+    public ResponseEntity<List<ListResponseDto>> getAllCourseResponseDto(@PathVariable Long courseId) {
+        return ResponseEntity.status(HttpStatus.SC_OK)
+                .body(chapterService.getListChapterResponseDtoByCourseId(courseId));
+    }
+
     @GetMapping("/detail/{id}")
     public ResponseEntity<ChapterResponseDto> getChapterDetail(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.SC_OK).body(chapterService.getChapterById(id));
@@ -49,7 +57,8 @@ public class ChapterController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateChapter(@PathVariable Long id, @RequestBody @Valid ChapterRequestDto chapterRequestDto) {
+    public ResponseEntity<?> updateChapter(@PathVariable Long id,
+            @RequestBody @Valid ChapterRequestDto chapterRequestDto) {
         chapterService.editChapter(id, chapterRequestDto);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }

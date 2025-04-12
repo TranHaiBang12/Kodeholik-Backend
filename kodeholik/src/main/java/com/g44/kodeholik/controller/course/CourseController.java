@@ -8,6 +8,7 @@ import com.g44.kodeholik.model.dto.request.discussion.AddCommentRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.course.CourseRatingResponseDto;
 import com.g44.kodeholik.model.dto.response.course.EnrolledUserResponseDto;
+import com.g44.kodeholik.model.dto.response.course.ListResponseDto;
 import com.g44.kodeholik.model.dto.response.discussion.CommentResponseDto;
 import com.g44.kodeholik.model.entity.discussion.Comment;
 import com.g44.kodeholik.service.course.CourseCommentService;
@@ -45,6 +46,11 @@ public class CourseController {
     @GetMapping("/top-popular")
     public ResponseEntity<List<CourseResponseDto>> getTop5PopularCourse() {
         return ResponseEntity.status(HttpStatus.SC_OK).body(courseService.getTop5PopularCourse());
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<ListResponseDto>> getAllCourseResponseDto() {
+        return ResponseEntity.status(HttpStatus.SC_OK).body(courseService.getListCourseResponseDto());
     }
 
     @GetMapping("/detail/{id}")

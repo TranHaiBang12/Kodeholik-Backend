@@ -73,13 +73,13 @@ public class ExamController {
 
     @MessageMapping("/exam/submit/{code}")
     @SendTo("/topic/exam/{code}")
-    public ResponseEntity<Double> getExamResult(
+    public ResponseEntity<Double> submitExam(
             @DestinationVariable String code,
-            @Payload List<SubmitExamRequestDto> examProblemDetailResponseDtos,
+            @Payload List<SubmitExamRequestDto> submitExamRequestDtos,
             StompHeaderAccessor accessor) {
         String username = (String) accessor.getSessionAttributes().get("username");
 
-        double grade = examService.submitExam(examProblemDetailResponseDtos,
+        double grade = examService.submitExam(submitExamRequestDtos,
                 code,
                 username);
         return ResponseEntity.ok(grade);

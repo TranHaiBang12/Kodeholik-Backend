@@ -22,6 +22,7 @@ public class EditProfileRequestDto {
     private MultipartFile avatar;
 
     @NotNull(message = "MSG02")
+    @NotBlank(message = "MSG02")
     private String username;
 
     @NotNull(message = "MSG02")

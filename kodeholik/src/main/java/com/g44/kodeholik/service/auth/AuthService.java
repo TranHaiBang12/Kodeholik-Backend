@@ -27,8 +27,9 @@ public interface AuthService {
 
     public void logout(HttpServletResponse response);
 
-    public void loginWithGoogle(OAuth2AuthenticationToken oAuth2User, HttpServletResponse response,
-            HttpServletRequest request);
+    public void loginWithGoogle(String token, HttpServletResponse response, HttpServletRequest request);
+
+    public void loginWithGithub(String code, HttpServletResponse response, HttpServletRequest request);
 
     public void changePassword(ChangePasswordRequestDto ChangePasswordRequestDto, HttpServletResponse response);
 

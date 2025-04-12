@@ -14,9 +14,9 @@ public interface LessonService {
 
     public LessonResponseDto getLessonById(Long id);
 
-    public void addLesson(LessonRequestDto lessonRequestDto);
+    public String addLesson(LessonRequestDto lessonRequestDto);
 
-    public void editLesson(Long lessonId, LessonRequestDto lessonRequestDto);
+    public String editLesson(Long lessonId, LessonRequestDto lessonRequestDto);
 
     public void deleteLessonById(Long id);
 

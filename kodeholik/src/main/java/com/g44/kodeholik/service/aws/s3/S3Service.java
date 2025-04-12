@@ -11,6 +11,8 @@ public interface S3Service {
 
     public String getPresignedUrl(String key);
 
+    public boolean doesObjectExist(String key);
+
     public List<String> uploadFileNameTypeFile(List<MultipartFile> multipartFiles, FileNameType fileNameType);
 
     public void deleteFileFromS3(String key);

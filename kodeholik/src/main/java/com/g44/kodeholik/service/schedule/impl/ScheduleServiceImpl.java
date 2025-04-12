@@ -48,7 +48,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public void remindExam() {
         examService.sendNotiToUserExamAboutToStart();
-        ;
     }
 
     @Transactional

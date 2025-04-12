@@ -3,6 +3,7 @@ package com.g44.kodeholik.model.dto.request.course;
 import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.model.enums.course.LessonType;
 import com.g44.kodeholik.model.enums.course.LessonVideoType;
+import com.g44.kodeholik.util.validation.file.MaxFileSize;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -24,10 +25,12 @@ public class LessonRequestDto {
 
     private Long chapterId;
 
+    @NotBlank(message = "MSG02")
     @Size(min = 10, max = 200, message = "MSG34")
     private String title;
 
     @Size(min = 10, max = 5000, message = "MSG29")
+    @NotBlank(message = "MSG02")
     private String description;
 
     private int displayOrder;
@@ -36,8 +39,10 @@ public class LessonRequestDto {
 
     private LessonStatus status;
 
+    @MaxFileSize(value = 100L * 1024 * 1024, message = "MSG60")
     private MultipartFile attachedFile;
 
+    @MaxFileSize(value = 500L * 1024 * 1024, message = "MSG60")
     private MultipartFile videoFile;
 
     private String youtubeUrl;
