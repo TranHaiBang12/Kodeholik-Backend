@@ -118,7 +118,7 @@ public class LessonServiceImpl implements LessonService {
     @Override
     public String addLesson(LessonRequestDto lessonRequestDto) {
         Users currentUser = userService.getCurrentUser();
-        String normalizedTitle = lessonRequestDto.getTitle().trim().replaceAll("\\s+", " ");
+        String normalizedTitle = lessonRequestDto.getTitle().trim().replaceAll("[ ]+", " ");
         if (normalizedTitle.length() < 10) {
             throw new BadRequestException(
                     "Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
@@ -130,7 +130,7 @@ public class LessonServiceImpl implements LessonService {
         }
         String message = "Add lesson successfully!";
 
-        String normalizedDescription = lessonRequestDto.getDescription().trim().replaceAll("\\s+", " ");
+        String normalizedDescription = lessonRequestDto.getDescription().trim().replaceAll("[ ]+", " ");
         if (normalizedDescription.isEmpty()) {
             throw new BadRequestException("Lesson description cannot be empty or contain only whitespace",
                     "Lesson description cannot be empty or contain only whitespace");
@@ -223,7 +223,7 @@ public class LessonServiceImpl implements LessonService {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
         String message = "Edit lesson successfully!";
-        String normalizedTitle = lessonRequestDto.getTitle().trim().replaceAll("\\s+", " ");
+        String normalizedTitle = lessonRequestDto.getTitle().trim().replaceAll("[ ]+", " ");
         if (normalizedTitle.length() < 10) {
             throw new BadRequestException(
                     "Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
@@ -233,7 +233,7 @@ public class LessonServiceImpl implements LessonService {
             throw new BadRequestException("Lesson title already exists: " + normalizedTitle,
                     "Lesson title already exists: " + normalizedTitle);
         }
-        String normalizedDescription = lessonRequestDto.getDescription().trim().replaceAll("\\s+", " ");
+        String normalizedDescription = lessonRequestDto.getDescription().trim().replaceAll("[ ]+", " ");
         if (normalizedDescription.isEmpty()) {
             throw new BadRequestException("Lesson description cannot be empty or contain only whitespace",
                     "Lesson description cannot be empty or contain only whitespace");

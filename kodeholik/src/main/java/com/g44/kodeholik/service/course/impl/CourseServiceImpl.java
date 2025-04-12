@@ -145,8 +145,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addCourse(CourseRequestDto requestDto) {
-        String normalizedTitle = requestDto.getTitle().trim().replaceAll("\\s+", " ");
-        String normalizedDescription = requestDto.getDescription().trim().replaceAll("\\s+", " ");
+        String normalizedTitle = requestDto.getTitle().trim().replaceAll("[ ]+", " ");
+        String normalizedDescription = requestDto.getDescription().trim().replaceAll("[ ]+", " ");
         if (normalizedTitle.length() < 10) {
             throw new BadRequestException(
                     "Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
@@ -198,8 +198,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void editCourse(Long courseId, CourseRequestDto requestDto) {
-        String normalizedTitle = requestDto.getTitle().trim().replaceAll("\\s+", " ");
-        String normalizedDescription = requestDto.getDescription().trim().replaceAll("\\s+", " ");
+        String normalizedTitle = requestDto.getTitle().trim().replaceAll("[ ]+", " ");
+        String normalizedDescription = requestDto.getDescription().trim().replaceAll("[ ]+", " ");
         if (normalizedTitle.length() < 10) {
             throw new BadRequestException(
                     "Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
@@ -306,54 +306,6 @@ public class CourseServiceImpl implements CourseService {
         } else {
             courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsInAndStatusIn(title, topics,
                     allowedStatuses, pageable);
-        }
-
-        List<Long> completedLessons = currentUser != null ? getCompletedLessons() : Collections.emptyList();
-
-        return courses.map(course -> courseResponseMapper.mapFromCourseAndLesson(course, completedLessons));
-    }
-
-    @Override
-    public Page<CourseResponseDto> searchCourseContainChapter(SearchCourseRequestDto request, Integer page, Integer size, CourseSortField sortBy, Boolean ascending) {
-        String title = request.getTitle() != null ? request.getTitle().trim() : "";
-        List<String> topicNames = request.getTopics();
-
-        List<Topic> topics = new ArrayList<>();
-        if (topicNames != null && !topicNames.isEmpty()) {
-            Set<Topic> topicSet = topicRepository.findByNameIn(topicNames);
-            topics = new ArrayList<>(topicSet);
-        }
-
-        Sort.Direction direction = (ascending != null && ascending) ? Sort.Direction.ASC : Sort.Direction.DESC;
-        String sortField;
-        switch (sortBy) {
-            case createdAt:
-                sortField = "createdAt";
-                break;
-            case numberOfParticipant:
-                sortField = "numberOfParticipant";
-                break;
-            default:
-                sortField = "title";
-        }
-        Sort sort = Sort.by(direction, sortField);
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        Users currentUser = null;
-        try {
-            currentUser = userService.getCurrentUser();
-        } catch (Exception e) {
-        }
-
-        Page<Course> courses;
-        if (title.isEmpty() && topics.isEmpty()) {
-            courses = courseRepository.findByChaptersNotEmpty(pageable);
-        } else if (!title.isEmpty() && topics.isEmpty()) {
-            courses = courseRepository.findByTitleContainingIgnoreCaseAndChaptersNotEmpty(title, pageable);
-        } else if (title.isEmpty()) {
-            courses = courseRepository.findByTopicsInAndChaptersNotEmpty(topics, pageable);
-        } else {
-            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsInAndChaptersNotEmpty(title, topics, pageable);
         }
 
         List<Long> completedLessons = currentUser != null ? getCompletedLessons() : Collections.emptyList();
@@ -880,14 +832,16 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<ListResponseDto> getListCourseResponseDto() {
-        List<ListResponseDto> result = new ArrayList();
-        List<Course> courses = courseRepository.findAll();
-        for (int i = 0; i < courses.size(); i++) {
-            ListResponseDto listResponseDto = new ListResponseDto();
-            listResponseDto.setId(courses.get(i).getId());
-            listResponseDto.setTitle(courses.get(i).getTitle());
-            result.add(listResponseDto);
-        }
+        List<Course> courses = courseRepository.findByChaptersNotEmpty();
+        List<ListResponseDto> result = courses.stream()
+                .map(course -> {
+                    ListResponseDto dto = new ListResponseDto();
+                    dto.setId(course.getId());
+                    dto.setTitle(course.getTitle());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
         return result;
     }
 
