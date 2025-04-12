@@ -262,7 +262,7 @@ public class LessonServiceImpl implements LessonService {
         try {
             // Handle attached file update
             if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
-                if (lesson.getAttachedFile() != null && s3Service.doesObjectExist(lesson.getAttachedFile())) {
+                if (lesson.getAttachedFile() != null && s3Service.isObjectExist(lesson.getAttachedFile())) {
                     s3Service.deleteFileFromS3(lesson.getAttachedFile());
                 }
                 String s3Key = "lessons/" + UUID.randomUUID() + "-"
