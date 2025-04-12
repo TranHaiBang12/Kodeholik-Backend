@@ -29,6 +29,9 @@ public interface CourseService {
     Page<CourseResponseDto> searchCourses(SearchCourseRequestDto request, Integer page, Integer size,
             CourseSortField sortBy, Boolean ascending);
 
+    Page<CourseResponseDto> searchCourseContainChapter(SearchCourseRequestDto request, Integer page, Integer size,
+            CourseSortField sortBy, Boolean ascending);
+
     Page<CourseResponseDto> getEnrolledCourseByUserId( int page, int size, String sortBy, String sortDir);
 
     public void enrollUserInCourse(Long courseId);

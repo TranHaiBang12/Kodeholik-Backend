@@ -47,4 +47,20 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         public List<Course> findAllByOrderByNumberOfParticipantDescRateDesc();
 
         Optional<Course> findById(Long courseId);
+
+        @Query("SELECT c FROM Course c WHERE SIZE(c.chapters) > 0")
+        Page<Course> findByChaptersNotEmpty(Pageable pageable);
+
+        @Query("SELECT c FROM Course c WHERE LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%')) AND SIZE(c.chapters) > 0")
+        Page<Course> findByTitleContainingIgnoreCaseAndChaptersNotEmpty(
+                @Param("title") String title, Pageable pageable);
+
+        @Query("SELECT c FROM Course c WHERE :topics IN ELEMENTS(c.topics) AND SIZE(c.chapters) > 0")
+        Page<Course> findByTopicsInAndChaptersNotEmpty(
+                @Param("topics") List<Topic> topics, Pageable pageable);
+
+        @Query("SELECT c FROM Course c WHERE LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%')) " +
+                "AND :topics IN ELEMENTS(c.topics) AND SIZE(c.chapters) > 0")
+        Page<Course> findByTitleContainingIgnoreCaseAndTopicsInAndChaptersNotEmpty(
+                @Param("title") String title, @Param("topics") List<Topic> topics, Pageable pageable);
 }

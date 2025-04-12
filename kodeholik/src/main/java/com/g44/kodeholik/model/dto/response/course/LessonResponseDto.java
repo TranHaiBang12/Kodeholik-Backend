@@ -18,6 +18,7 @@ import java.util.List;
 public class LessonResponseDto {
     private Long id;
     private Long chapterId;
+    private Long courseId;
     private String title;
     private String description;
     private int displayOrder;

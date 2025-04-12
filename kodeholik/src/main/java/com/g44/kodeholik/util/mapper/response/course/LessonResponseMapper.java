@@ -28,7 +28,8 @@ public class LessonResponseMapper implements Mapper<Lesson, LessonResponseDto> {
     @PostConstruct
     public void configureMapper() {
         modelMapper.createTypeMap(Lesson.class, LessonResponseDto.class)
-                .addMappings(mapper -> mapper.map(src -> src.getChapter().getId(), LessonResponseDto::setChapterId));
+                .addMappings(mapper -> mapper.map(src -> src.getChapter().getId(), LessonResponseDto::setChapterId))
+                .addMappings(mapper -> mapper.map(src -> src.getChapter().getCourse().getId(), LessonResponseDto::setCourseId));
     }
 
     @Override

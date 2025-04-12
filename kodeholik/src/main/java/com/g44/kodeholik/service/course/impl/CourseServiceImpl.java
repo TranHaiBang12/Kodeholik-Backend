@@ -298,6 +298,54 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public Page<CourseResponseDto> searchCourseContainChapter(SearchCourseRequestDto request, Integer page, Integer size, CourseSortField sortBy, Boolean ascending) {
+        String title = request.getTitle() != null ? request.getTitle().trim() : "";
+        List<String> topicNames = request.getTopics();
+
+        List<Topic> topics = new ArrayList<>();
+        if (topicNames != null && !topicNames.isEmpty()) {
+            Set<Topic> topicSet = topicRepository.findByNameIn(topicNames);
+            topics = new ArrayList<>(topicSet);
+        }
+
+        Sort.Direction direction = (ascending != null && ascending) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        String sortField;
+        switch (sortBy) {
+            case createdAt:
+                sortField = "createdAt";
+                break;
+            case numberOfParticipant:
+                sortField = "numberOfParticipant";
+                break;
+            default:
+                sortField = "title";
+        }
+        Sort sort = Sort.by(direction, sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Users currentUser = null;
+        try {
+            currentUser = userService.getCurrentUser();
+        } catch (Exception e) {
+        }
+
+        Page<Course> courses;
+        if (title.isEmpty() && topics.isEmpty()) {
+            courses = courseRepository.findByChaptersNotEmpty(pageable);
+        } else if (!title.isEmpty() && topics.isEmpty()) {
+            courses = courseRepository.findByTitleContainingIgnoreCaseAndChaptersNotEmpty(title, pageable);
+        } else if (title.isEmpty()) {
+            courses = courseRepository.findByTopicsInAndChaptersNotEmpty(topics, pageable);
+        } else {
+            courses = courseRepository.findByTitleContainingIgnoreCaseAndTopicsInAndChaptersNotEmpty(title, topics, pageable);
+        }
+
+        List<Long> completedLessons = currentUser != null ? getCompletedLessons() : Collections.emptyList();
+
+        return courses.map(course -> courseResponseMapper.mapFromCourseAndLesson(course, completedLessons));
+    }
+
+    @Override
     public Page<CourseResponseDto> getEnrolledCourseByUserId(int page, int size, String sortBy, String sortDir) {
         Users currentUser = userService.getCurrentUser();
         Long userId = currentUser.getId();

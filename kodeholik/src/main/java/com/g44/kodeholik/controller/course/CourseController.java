@@ -85,6 +85,17 @@ public class CourseController {
         return ResponseEntity.ok(courses);
     }
 
+    @PostMapping("/course-chapter")
+    public ResponseEntity<Page<CourseResponseDto>> getCourseContainChapter(
+            @RequestBody SearchCourseRequestDto request,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "title") CourseSortField sortBy,
+            @RequestParam(defaultValue = "true") Boolean ascending) {
+        Page<CourseResponseDto> courses = courseService.searchCourseContainChapter(request, page, size, sortBy, ascending);
+        return ResponseEntity.ok(courses);
+    }
+
     @PostMapping("/enroll/{courseId}")
     public ResponseEntity<String> enrollUserInCourse(@PathVariable Long courseId) {
         courseService.enrollUserInCourse(courseId);
