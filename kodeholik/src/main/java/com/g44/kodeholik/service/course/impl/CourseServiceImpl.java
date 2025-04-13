@@ -216,9 +216,8 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
-        // Kiểm tra xem title mới có trùng với Course khác không (ngoại trừ Course hiện
-        // tại)
-        if (courseRepository.existsByTitle(normalizedTitle)) {
+        // Kiểm tra xem title mới có trùng với Course khác không (ngoại trừ Course hiện tại)
+        if (courseRepository.existsByTitleAndIdNot(normalizedTitle, courseId)) {
             throw new BadRequestException("Course title already exists: " + normalizedTitle,
                     "Course title already exists: " + normalizedTitle);
         }

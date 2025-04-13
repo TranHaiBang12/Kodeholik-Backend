@@ -123,7 +123,7 @@ public class ChapterServiceImpl implements ChapterService {
                     "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
                     "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
-        if (chapterRepository.existsByTitle(normalizedTitle)) {
+        if (chapterRepository.existsByTitleAndIdNot(normalizedTitle, id)) {
             throw new BadRequestException("Chapter title already exists: " + normalizedTitle,
                     "Chapter title already exists: " + normalizedTitle);
         }
