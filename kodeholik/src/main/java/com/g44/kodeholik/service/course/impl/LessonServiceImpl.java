@@ -252,6 +252,7 @@ public class LessonServiceImpl implements LessonService {
         lesson.setDescription(normalizedDescription);
         lesson.setUpdatedAt(Timestamp.from(Instant.now()));
         lesson.setUpdatedBy(currentUser);
+        lesson.setStatus(lessonRequestDto.getStatus());
         // Update chapter if changed
         if (lessonRequestDto.getChapterId() != null &&
                 !lessonRequestDto.getChapterId().equals(lesson.getChapter().getId())) {
@@ -270,7 +271,10 @@ public class LessonServiceImpl implements LessonService {
                         + lessonRequestDto.getAttachedFile().getOriginalFilename();
                 s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
                 lesson.setAttachedFile(s3Key);
-                lesson.setStatus(LessonStatus.ACTIVATED);
+                if(lessonRequestDto.getStatus()==LessonStatus.ACTIVATED){
+                    lesson.setStatus(LessonStatus.ACTIVATED);
+                }
+
             }
 
             // Handle video update
@@ -278,7 +282,9 @@ public class LessonServiceImpl implements LessonService {
                 if (lessonRequestDto.getVideoType() == LessonVideoType.YOUTUBE) {
                     String videoId = YoutubeUrlParser.extractVideoId(lessonRequestDto.getYoutubeUrl());
                     lesson.setVideoUrl(videoId);
-                    lesson.setStatus(LessonStatus.ACTIVATED);
+                    if(lessonRequestDto.getStatus()==LessonStatus.ACTIVATED){
+                        lesson.setStatus(LessonStatus.ACTIVATED);
+                    }
 
                 } else if (lessonRequestDto.getVideoType() == LessonVideoType.VIDEO_FILE &&
                         lessonRequestDto.getVideoFile() != null &&
@@ -288,7 +294,9 @@ public class LessonServiceImpl implements LessonService {
                     String contentType = lessonRequestDto.getVideoFile().getContentType();
 
                     lesson.setVideoUrl("uploading...");
-                    lesson.setStatus(LessonStatus.IN_PROGRESS);
+                    if(lessonRequestDto.getStatus()==LessonStatus.ACTIVATED){
+                        lesson.setStatus(LessonStatus.IN_PROGRESS);
+                    }
                     lessonRepository.save(lesson);
                     message = "Edit lesson successfully! We will notify you when the video has been successfully uploaded";
 
@@ -296,7 +304,9 @@ public class LessonServiceImpl implements LessonService {
                             .thenAccept(gcsPath -> {
 
                                 lesson.setVideoUrl(gcsPath);
-                                lesson.setStatus(LessonStatus.ACTIVATED);
+                                if(lessonRequestDto.getStatus()==LessonStatus.ACTIVATED){
+                                    lesson.setStatus(LessonStatus.ACTIVATED);
+                                }
                                 lessonRepository.save(lesson);
                                 notificationService.saveNotification(currentUser,
                                         "Video in lesson " + lesson.getTitle() + " uploaded successfully", "",
