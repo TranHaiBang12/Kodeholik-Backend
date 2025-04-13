@@ -119,9 +119,11 @@ public class CourseServiceImpl implements CourseService {
             return courseDetailResponseMapper.mapFromCourseAndLesson(course, Collections.emptyList(),
                     Collections.emptyList());
         }
+
         List<Chapter> filteredChapters = chapters.stream()
                 .filter(chapter -> chapter.getStatus() == ChapterStatus.ACTIVATED)
-                .sorted(Comparator.comparingInt(Chapter::getDisplayOrder))
+                .sorted(Comparator.comparingInt(Chapter::getDisplayOrder)
+                        .thenComparing(Chapter::getCreatedAt))
                 .collect(Collectors.toList());
 
         filteredChapters.forEach(chapter -> {
@@ -129,11 +131,14 @@ public class CourseServiceImpl implements CourseService {
             if (lessons != null && !lessons.isEmpty()) {
                 List<Lesson> filteredLessons = lessons.stream()
                         .filter(lesson -> lesson.getStatus() == LessonStatus.ACTIVATED)
-                        .sorted(Comparator.comparingInt(Lesson::getDisplayOrder))
+                        .sorted(Comparator.comparingInt(Lesson::getDisplayOrder)
+                                .thenComparing(Lesson::getCreatedAt))
                         .collect(Collectors.toList());
                 chapter.setLessons(filteredLessons);
             }
         });
+
+        course.setChapters(filteredChapters);
 
         List<Long> lessonIds = filteredChapters.stream()
                 .flatMap(chapter -> {
@@ -149,6 +154,7 @@ public class CourseServiceImpl implements CourseService {
                 .collect(Collectors.toList());
 
         return courseDetailResponseMapper.mapFromCourseAndLesson(course, lessonIds, completedLessons);
+
     }
 
     @Override
