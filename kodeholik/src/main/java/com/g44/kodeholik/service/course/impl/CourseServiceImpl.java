@@ -20,7 +20,9 @@ import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.course.*;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
+import com.g44.kodeholik.model.enums.course.ChapterStatus;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
+import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.model.enums.s3.FileNameType;
 import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.repository.course.CourseUserRepository;
@@ -117,16 +119,23 @@ public class CourseServiceImpl implements CourseService {
             return courseDetailResponseMapper.mapFromCourseAndLesson(course, Collections.emptyList(),
                     Collections.emptyList());
         }
-        // Sắp xếp chapters/lessons trong course theo displayOrder
-        chapters.sort(Comparator.comparingInt(Chapter::getDisplayOrder));
-        chapters.forEach(chapter -> {
+        List<Chapter> filteredChapters = chapters.stream()
+                .filter(chapter -> chapter.getStatus() == ChapterStatus.ACTIVATED)
+                .sorted(Comparator.comparingInt(Chapter::getDisplayOrder))
+                .collect(Collectors.toList());
+
+        filteredChapters.forEach(chapter -> {
             List<Lesson> lessons = chapter.getLessons();
             if (lessons != null && !lessons.isEmpty()) {
-                lessons.sort(Comparator.comparingInt(Lesson::getDisplayOrder));
+                List<Lesson> filteredLessons = lessons.stream()
+                        .filter(lesson -> lesson.getStatus() == LessonStatus.ACTIVATED)
+                        .sorted(Comparator.comparingInt(Lesson::getDisplayOrder))
+                        .collect(Collectors.toList());
+                chapter.setLessons(filteredLessons);
             }
         });
 
-        List<Long> lessonIds = chapters.stream()
+        List<Long> lessonIds = filteredChapters.stream()
                 .flatMap(chapter -> {
                     List<Lesson> lessons = chapter.getLessons();
                     return lessons != null ? lessons.stream() : Stream.empty();
@@ -134,10 +143,9 @@ public class CourseServiceImpl implements CourseService {
                 .map(Lesson::getId)
                 .collect(Collectors.toList());
 
-        // Sử dụng getCompletedLessons() để lấy danh sách lesson đã hoàn thành
         List<Long> completedLessons = getCompletedLessons()
                 .stream()
-                .filter(lessonId -> lessonIds.contains(lessonId)) // Chỉ lấy lesson thuộc course này
+                .filter(lessonId -> lessonIds.contains(lessonId))
                 .collect(Collectors.toList());
 
         return courseDetailResponseMapper.mapFromCourseAndLesson(course, lessonIds, completedLessons);
