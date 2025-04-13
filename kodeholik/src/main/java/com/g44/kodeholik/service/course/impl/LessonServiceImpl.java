@@ -108,8 +108,9 @@ public class LessonServiceImpl implements LessonService {
                         lp.getProblem().getDifficulty(),
                         lp.getProblem().getLink()))
                 .collect(Collectors.toList());
+        List<Long> completedLessons = getCompletedLessons();
 
-        LessonResponseDto lessonResponse = lessonResponseMapper.mapFrom(lesson);
+        LessonResponseDto lessonResponse = lessonResponseMapper.mapFrom(lesson,completedLessons);
         lessonResponse.setProblems(lessonProblemDtos);
 
         return lessonResponse;
@@ -383,6 +384,7 @@ public class LessonServiceImpl implements LessonService {
                 .map(progress -> progress.getLesson().getId())
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public List<LessonResponseDto> getLessonByChapterId(Long id) {
