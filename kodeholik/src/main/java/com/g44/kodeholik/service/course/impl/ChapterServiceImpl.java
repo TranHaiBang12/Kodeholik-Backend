@@ -84,7 +84,7 @@ public class ChapterServiceImpl implements ChapterService {
                     "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
                     "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
-        if (chapterRepository.existsByTitleAndCourseId(normalizedTitle, chapterRequestDto.getCourseId())) {
+        if (chapterRepository.findByTitleIgnoreCaseAndCourseId(normalizedTitle, chapterRequestDto.getCourseId()).isPresent()) {
             throw new BadRequestException("Chapter title already exists: " + normalizedTitle,
                     "Chapter title already exists: " + normalizedTitle);
         }
@@ -123,7 +123,7 @@ public class ChapterServiceImpl implements ChapterService {
                     "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
                     "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
-        if (chapterRepository.existsByTitleAndIdNotAndCourseId(normalizedTitle, id, chapterRequestDto.getCourseId())) {
+        if (chapterRepository.findByTitleIgnoreCaseAndIdNotAndCourseId(normalizedTitle, id, chapterRequestDto.getCourseId()).isPresent()) {
             throw new BadRequestException("Chapter title already exists: " + normalizedTitle,
                     "Chapter title already exists: " + normalizedTitle);
         }

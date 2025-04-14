@@ -125,7 +125,7 @@ public class LessonServiceImpl implements LessonService {
                     "Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
                     "Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
-        if (lessonRepository.existsByTitleAndChapterId(normalizedTitle,lessonRequestDto.getChapterId())) {
+        if (lessonRepository.findByTitleIgnoreCaseAndChapterId(normalizedTitle,lessonRequestDto.getChapterId()).isPresent()) {
             throw new BadRequestException("Lesson title already exists: " + normalizedTitle,
                     "Lesson title already exists: " + normalizedTitle);
         }
@@ -230,7 +230,7 @@ public class LessonServiceImpl implements LessonService {
                     "Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
                     "Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
-        if (lessonRepository.existsByTitleAndIdNotAndChapterId(normalizedTitle, lessonId, lessonRequestDto.getChapterId())) {
+        if (lessonRepository.findByTitleIgnoreCaseAndIdNotAndChapterId(normalizedTitle, lessonId, lessonRequestDto.getChapterId()).isPresent()) {
             throw new BadRequestException("Lesson title already exists: " + normalizedTitle,
                     "Lesson title already exists: " + normalizedTitle);
         }

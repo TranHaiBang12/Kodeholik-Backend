@@ -173,7 +173,7 @@ public class CourseServiceImpl implements CourseService {
                     "Course description must be at least 10 characters long (excluding extra spaces): "
                             + normalizedTitle);
         }
-        if (courseRepository.existsByTitle(normalizedTitle)) {
+        if (courseRepository.findByTitleIgnoreCase(normalizedTitle).isPresent()) {
             throw new BadRequestException("Course title already exists: " + normalizedTitle,
                     "Course title already exists: " + normalizedTitle);
         }
@@ -231,7 +231,7 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
         // Kiểm tra xem title mới có trùng với Course khác không (ngoại trừ Course hiện tại)
-        if (courseRepository.existsByTitleAndIdNot(normalizedTitle, courseId)) {
+        if (courseRepository.findByTitleIgnoreCaseAndIdNot(normalizedTitle, courseId).isPresent()) {
             throw new BadRequestException("Course title already exists: " + normalizedTitle,
                     "Course title already exists: " + normalizedTitle);
         }
