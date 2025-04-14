@@ -17,7 +17,7 @@ public interface LanguageRepository extends JpaRepository<Language, Long> {
 
     public Page<Language> findByNameContains(String name, Pageable pageable);
 
-    boolean existsByName(String tagName);
+    public Optional<Language> findByNameIgnoreCase(String tagName);
 
-    boolean existsByNameAndIdNot(String tagName, Long id);
+    public Optional<Language> findByNameIgnoreCaseAndIdNot(String tagName, Long id);
 }

@@ -66,7 +66,7 @@ public class TagServiceImpl implements TagService {
 
     private void addLanguage(AddTagRequestDto addTagRequestDto) {
         Language language = new Language();
-        if (languageRepository.existsByName(normalizeString(addTagRequestDto.getName()))) {
+        if (languageRepository.findByNameIgnoreCase(normalizeString(addTagRequestDto.getName())).isPresent()) {
             throw new BadRequestException("Language already exists", "Language already exists");
         }
         language.setName(addTagRequestDto.getName());
@@ -77,7 +77,7 @@ public class TagServiceImpl implements TagService {
 
     private void addTopic(AddTagRequestDto addTagRequestDto) {
         Topic topic = new Topic();
-        if (topicRepository.existsByName(addTagRequestDto.getName())) {
+        if (topicRepository.findByNameIgnoreCase(addTagRequestDto.getName()).isPresent()) {
             throw new BadRequestException("Topic already exists", "Topic already exists");
         }
         topic.setName(addTagRequestDto.getName());
@@ -88,7 +88,7 @@ public class TagServiceImpl implements TagService {
 
     private void addSkill(AddTagRequestDto addTagRequestDto) {
         Skill skill = new Skill();
-        if (skillRepository.existsByName(addTagRequestDto.getName())) {
+        if (skillRepository.findByNameIgnoreCase(addTagRequestDto.getName()).isPresent()) {
             throw new BadRequestException("Skill already exists", "Skill already exists");
         }
         skill.setName(addTagRequestDto.getName());
@@ -113,7 +113,7 @@ public class TagServiceImpl implements TagService {
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Skill not found", "Skill not found"));
         if (!skill.getName().equals(editTagRequestDto.getName())) {
-            if (skillRepository.existsByNameAndIdNot(normalizeString(editTagRequestDto.getName()), id)) {
+            if (skillRepository.findByNameIgnoreCaseAndIdNot(normalizeString(editTagRequestDto.getName()), id).isPresent()) {
                 throw new BadRequestException("Skill already exists", "Skill already exists");
             }
         }
@@ -128,7 +128,7 @@ public class TagServiceImpl implements TagService {
         Topic topic = topicRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Topic not found", "Topic not found"));
         if (!topic.getName().equals(editTagRequestDto.getName())) {
-            if (topicRepository.existsByNameAndIdNot(normalizeString(editTagRequestDto.getName()),id)) {
+            if (topicRepository.findByNameIgnoreCaseAndIdNot(normalizeString(editTagRequestDto.getName()),id).isPresent()) {
                 throw new BadRequestException("Topic already exists", "Topic already exists");
             }
         }
@@ -142,7 +142,7 @@ public class TagServiceImpl implements TagService {
         Language language = languageRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Language not found", "Language not found"));
         if (!language.getName().equals(editTagRequestDto.getName())) {
-            if (languageRepository.existsByNameAndIdNot(normalizeString(editTagRequestDto.getName()),id)) {
+            if (languageRepository.findByNameIgnoreCaseAndIdNot(normalizeString(editTagRequestDto.getName()),id).isPresent()) {
                 throw new BadRequestException("Language already exists", "Language already exists");
             }
         }

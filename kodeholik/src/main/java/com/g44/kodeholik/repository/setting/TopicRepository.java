@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.g44.kodeholik.model.entity.setting.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,7 +20,7 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
 
     Page<Topic> findByNameContains(String name, Pageable pageable);
 
-    boolean existsByName(String tagName);
+    public Optional<Topic> findByNameIgnoreCase(String tagName);
 
-    boolean existsByNameAndIdNot(String tagName, Long id);
+    public Optional<Topic> findByNameIgnoreCaseAndIdNot(String tagName, Long id);
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.g44.kodeholik.model.entity.setting.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +18,7 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
 
     Optional<Skill> findByName(String name);
 
-    boolean existsByName(String tagName);
+    public Optional<Skill> findByNameIgnoreCase(String tagName);
 
-    boolean existsByNameAndIdNot(String tagName, Long id);
+    public Optional<Skill> findByNameIgnoreCaseAndIdNot(String tagName, Long id);
 }
