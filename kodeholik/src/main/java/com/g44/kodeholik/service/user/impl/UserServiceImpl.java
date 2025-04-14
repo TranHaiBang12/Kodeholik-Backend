@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
 
         emailService.sendEmailAddUser(user.getEmail(), "[KODEHOLIK] Account Created", user.getUsername(),
                 password);
-        notificationService.saveNotification(getCurrentUser(), "Welcome to Kodeholik",
+        notificationService.saveNotification(user, "Welcome to Kodeholik",
                 null, NotificationType.SYSTEM);
 
         return user;
