@@ -14,7 +14,7 @@ import com.g44.kodeholik.model.entity.setting.Skill;
 public interface SkillRepository extends JpaRepository<Skill, Long> {
     Set<Skill> findByNameIn(List<String> names);
 
-    Page<Skill> findByNameContains(String name, Pageable pageable);
+    Page<Skill> findByNameIgnoreCaseContains(String name, Pageable pageable);
 
     Optional<Skill> findByName(String name);
 

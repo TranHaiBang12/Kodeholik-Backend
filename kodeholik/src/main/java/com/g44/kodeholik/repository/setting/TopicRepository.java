@@ -18,7 +18,7 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
 
     Set<Topic> findByIdIn(Set<Long> ids);
 
-    Page<Topic> findByNameContains(String name, Pageable pageable);
+    Page<Topic> findByNameIgnoreCaseContains(String name, Pageable pageable);
 
     public Optional<Topic> findByNameIgnoreCase(String tagName);
 

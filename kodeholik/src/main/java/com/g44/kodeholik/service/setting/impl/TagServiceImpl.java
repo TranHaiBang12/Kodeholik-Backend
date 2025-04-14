@@ -224,13 +224,13 @@ public class TagServiceImpl implements TagService {
 
         Page<TagResponseDto> result;
         if (filterTagRequestDto.getType() == TagType.LANGUAGE) {
-            Page<Language> languages = languageRepository.findByNameContains(filterTagRequestDto.getName(), pageable);
+            Page<Language> languages = languageRepository.findByNameIgnoreCaseContains(filterTagRequestDto.getName(), pageable);
             result = languages.map(tagResponseMapperLanguage::mapFrom);
         } else if (filterTagRequestDto.getType() == TagType.TOPIC) {
-            Page<Topic> topics = topicRepository.findByNameContains(filterTagRequestDto.getName(), pageable);
+            Page<Topic> topics = topicRepository.findByNameIgnoreCaseContains(filterTagRequestDto.getName(), pageable);
             result = topics.map(tagResponseMapperTopic::mapFrom);
         } else {
-            Page<Skill> skills = skillRepository.findByNameContains(filterTagRequestDto.getName(), pageable);
+            Page<Skill> skills = skillRepository.findByNameIgnoreCaseContains(filterTagRequestDto.getName(), pageable);
             result = skills.map(tagResponseMapperSkill::mapFrom);
         }
 
