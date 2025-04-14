@@ -16,4 +16,8 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
     Page<Skill> findByNameContains(String name, Pageable pageable);
 
     Optional<Skill> findByName(String name);
+
+    boolean existsByName(String tagName);
+
+    boolean existsByNameAndIdNot(String tagName, Long id);
 }

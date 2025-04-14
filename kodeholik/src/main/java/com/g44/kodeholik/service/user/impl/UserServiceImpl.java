@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public void checkUsernameExisted(String username) {
-        if (userRepository.findByUsername(username).isPresent()) {
+        if (userRepository.findByUsername(username.trim().replaceAll("[ ]+", " ")).isPresent()) {
             throw new BadRequestException("Username already exists", "Username already exists");
         }
     }

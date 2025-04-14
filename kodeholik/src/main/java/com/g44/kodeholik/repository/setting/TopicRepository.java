@@ -18,4 +18,8 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     Set<Topic> findByIdIn(Set<Long> ids);
 
     Page<Topic> findByNameContains(String name, Pageable pageable);
+
+    boolean existsByName(String tagName);
+
+    boolean existsByNameAndIdNot(String tagName, Long id);
 }
