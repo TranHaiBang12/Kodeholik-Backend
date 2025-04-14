@@ -131,7 +131,7 @@ public class LessonServiceImpl implements LessonService {
         }
         String message = "Add lesson successfully!";
 
-        String normalizedDescription = lessonRequestDto.getDescription().trim().replaceAll("[ ]+", " ");
+        String normalizedDescription = lessonRequestDto.getDescription().trim();
         if (normalizedDescription.isEmpty()) {
             throw new BadRequestException("Lesson description cannot be empty or contain only whitespace",
                     "Lesson description cannot be empty or contain only whitespace");
@@ -234,7 +234,7 @@ public class LessonServiceImpl implements LessonService {
             throw new BadRequestException("Lesson title already exists: " + normalizedTitle,
                     "Lesson title already exists: " + normalizedTitle);
         }
-        String normalizedDescription = lessonRequestDto.getDescription().trim().replaceAll("[ ]+", " ");
+        String normalizedDescription = lessonRequestDto.getDescription().trim();
         if (normalizedDescription.isEmpty()) {
             throw new BadRequestException("Lesson description cannot be empty or contain only whitespace",
                     "Lesson description cannot be empty or contain only whitespace");
