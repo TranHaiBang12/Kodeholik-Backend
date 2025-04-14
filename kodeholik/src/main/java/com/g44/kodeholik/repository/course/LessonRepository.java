@@ -25,7 +25,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
     List<Lesson> findByChapter_Course_IdIn(List<Long> courseIds);
 
-    boolean existsByTitle(String title);
+    boolean existsByTitleAndChapterId(String title, Long chapterId);
 
-    boolean existsByTitleAndIdNot(String title, Long id);
+    boolean existsByTitleAndIdNotAndChapterId(String title, Long id, Long chapterId);
 }

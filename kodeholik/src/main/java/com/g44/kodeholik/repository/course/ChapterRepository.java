@@ -27,7 +27,7 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 
     List<Chapter> findByCourseIdOrderByDisplayOrderAsc(Long courseId);
 
-    boolean existsByTitle(String title);
+    boolean existsByTitleAndCourseId(String title, Long courseId);
 
-    boolean existsByTitleAndIdNot(String title, Long id);
+    boolean existsByTitleAndIdNotAndCourseId(String title, Long id, Long courseId);
 }
