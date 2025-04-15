@@ -676,8 +676,12 @@ public class ProblemServiceImpl implements ProblemService {
                 throw new BadRequestException("Your problem doesn't support this language",
                         "Your problem doesn't support this language");
             }
-            templateLanguage.put(problemInputParameterDto.get(j).getLanguage(),
-                    problemInputParameterDto.get(j).getTemplateCode().getCode());
+            templateLanguage.put(
+                    problemInputParameterDto.get(j).getLanguage(),
+                    problemInputParameterDto.get(j).getTemplateCode() != null
+                            ? problemInputParameterDto.get(j).getTemplateCode().getCode()
+                            : ""
+            );
             List<InputParameterDto> inputParameters = problemInputParameterDto.get(j).getParameters();
 
             addProblemTemplate(problemInputParameterDto.get(j), problemInputParameterDto.get(j).getTemplateCode(),
