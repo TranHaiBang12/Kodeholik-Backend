@@ -422,7 +422,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<CourseResponseDto> getTop5PopularCourse() {
-        List<TopCourse> topCourses = topCourseRepository.findByOrderByDisplayOrderDesc();
+        List<TopCourse> topCourses = topCourseRepository.findByCourseStatusOrderByDisplayOrderDesc(CourseStatus.ACTIVATED);
         List<CourseResponseDto> result = new ArrayList();
         for (int i = 0; i < topCourses.size(); i++) {
             result.add(courseResponseMapper.mapFrom(topCourses.get(i).getCourse()));
