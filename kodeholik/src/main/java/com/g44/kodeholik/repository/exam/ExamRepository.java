@@ -20,13 +20,13 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
 
         boolean existsByTitleIgnoreCase(String title);
 
-        @Query("SELECT e FROM Exam e WHERE (cast(:title as text) IS NULL OR (e.title LIKE '%' || cast(:title as text) || '%')) AND (COALESCE(:status, e.status) = e.status) AND (e.startTime >= :start AND e.endTime <= :end)")
+        @Query("SELECT e FROM Exam e WHERE (cast(:title as text) IS NULL OR (LOWER(e.title) LIKE '%' || cast(:title as text) || '%')) AND (COALESCE(:status, e.status) = e.status) AND (e.startTime >= :start AND e.endTime <= :end)")
         public Page<Exam> searchExam(
-                String title,
-                ExamStatus status,
-                Timestamp start,
-                Timestamp end,
-                Pageable pageable);
+                        String title,
+                        ExamStatus status,
+                        Timestamp start,
+                        Timestamp end,
+                        Pageable pageable);
 
         @Query("SELECT e.code FROM Exam e WHERE e.noParticipant > 0 AND e.startTime >= :now AND e.startTime <= :maxTime")
         List<String> getCodeFromExamReadyToStarted(@Param("now") Timestamp now, @Param("maxTime") Timestamp maxTime);
