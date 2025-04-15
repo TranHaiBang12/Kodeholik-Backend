@@ -25,10 +25,11 @@ public class ExamListResponseMapper implements Mapper<Exam, ExamListResponseDto>
 
     @Override
     public ExamListResponseDto mapFrom(Exam a) {
+        ExamListResponseDto examDto = mapper.map(a, ExamListResponseDto.class);
         if (a.getCreatedBy() != null) {
-            userResponseMapper.mapFrom(a.getCreatedBy());
+            UserResponseDto userDto = userResponseMapper.mapFrom(a.getCreatedBy());
+            examDto.setCreatedBy(userDto);
         }
-        return mapper.map(a, ExamListResponseDto.class);
+        return examDto;
     }
-
 }
