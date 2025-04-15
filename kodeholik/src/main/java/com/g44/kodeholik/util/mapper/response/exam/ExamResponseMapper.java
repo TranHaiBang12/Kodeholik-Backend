@@ -29,10 +29,10 @@ public class ExamResponseMapper implements Mapper<Exam, ExamResponseDto> {
 
     @Override
     public ExamResponseDto mapFrom(Exam a) {
+        ExamResponseDto examResponseDto = mapper.map(a, ExamResponseDto.class);
         if (a.getCreatedBy() != null) {
             userResponseMapper.mapFrom(a.getCreatedBy());
         }
-        ExamResponseDto examResponseDto = mapper.map(a, ExamResponseDto.class);
         updateAvatar(examResponseDto.getCreatedBy());
         updateAvatar(examResponseDto.getUpdatedBy());
         return examResponseDto;
