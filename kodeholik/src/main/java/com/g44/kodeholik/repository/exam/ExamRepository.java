@@ -16,7 +16,7 @@ import com.g44.kodeholik.model.enums.exam.ExamStatus;
 public interface ExamRepository extends JpaRepository<Exam, Long> {
         public Optional<Exam> findByCode(String code);
 
-        @Query("SELECT e FROM Exam e WHERE (cast(:title as text) IS NULL OR (e.title LIKE '%' || cast(:title as text) || '%')) AND (COALESCE(:status, e.status) = e.status) AND (e.startTime >= :start AND e.endTime <= :end)")
+        @Query("SELECT e FROM Exam e WHERE (cast(:title as text) IS NULL OR (LOWER(e.title) LIKE '%' || cast(:title as text) || '%')) AND (COALESCE(:status, e.status) = e.status) AND (e.startTime >= :start AND e.endTime <= :end)")
         public Page<Exam> searchExam(
                 String title,
                 ExamStatus status,
