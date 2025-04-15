@@ -33,6 +33,9 @@ public class ExamResponseMapper implements Mapper<Exam, ExamResponseDto> {
         if (a.getCreatedBy() != null) {
             userResponseMapper.mapFrom(a.getCreatedBy());
         }
+        if (a.getUpdatedBy() != null) {
+            userResponseMapper.mapFrom(a.getUpdatedBy());
+        }
         updateAvatar(examResponseDto.getCreatedBy());
         updateAvatar(examResponseDto.getUpdatedBy());
         return examResponseDto;
