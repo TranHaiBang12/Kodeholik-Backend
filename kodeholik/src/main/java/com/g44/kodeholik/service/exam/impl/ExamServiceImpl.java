@@ -145,37 +145,25 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public ExamResponseDto createExam(AddExamRequestDto addExamRequestDto) {
-        addExamRequestDto.setStartTime(new Timestamp(addExamRequestDto.getStartTime().getTime()));
-        addExamRequestDto.setEndTime(new Timestamp(addExamRequestDto.getEndTime().getTime()));
-
-        Exam exam = addExamRequestMapper.mapTo(addExamRequestDto);
-
         if (addExamRequestDto.getStartTime().before(Timestamp.from(Instant.now()))) {
-            throw new BadRequestException("Start date cannot be in the past", "Start date cannot be in the past");
+            throw new BadRequestException("Start date cannot be in the past", "ERR_START_PAST");
         }
         if (addExamRequestDto.getStartTime().after(addExamRequestDto.getEndTime())) {
-            throw new BadRequestException("Start date cannot be after end date", "Start date cannot be after end date");
+            throw new BadRequestException("Start date cannot be after end date", "ERR_START_AFTER_END");
+        }
+
+        Exam exam = addExamRequestMapper.mapTo(addExamRequestDto);
+        if (examRepository.existsByTitleIgnoreCase(addExamRequestDto.getTitle())) {
+            throw new BadRequestException("An exam with title '" + addExamRequestDto.getTitle() + "' already exists", "ERR_DUPLICATE_TITLE");
         }
 
         Set<Language> languages = languageService.getLanguagesByNameList(addExamRequestDto.getLanguageSupports());
         List<ExamProblemRequestDto> problemExams = addExamRequestDto.getProblemRequests();
 
-        String code = UUIDGenerator.generateUUID();
-        List<Exam> exams = examRepository.findAll();
-
-        boolean isDuplicateCode = false;
-        while (true) {
+        String code;
+        do {
             code = UUIDGenerator.generateUUID();
-            for (int i = 0; i < exams.size(); i++) {
-                if (exams.get(i).getCode().equals(code)) {
-                    isDuplicateCode = true;
-                    break;
-                }
-            }
-            if (!isDuplicateCode) {
-                break;
-            }
-        }
+        } while (examRepository.existsByCode(code));
 
         exam.setCode(code);
         exam.setLanguageSupport(languages);
@@ -184,18 +172,23 @@ public class ExamServiceImpl implements ExamService {
         exam.setNoParticipant(0);
         exam.setStatus(ExamStatus.NOT_STARTED);
 
-        exam = examRepository.save(exam);
-
-        List<ExamProblem> examProblems = new ArrayList();
+        List<ExamProblem> examProblems = new ArrayList<>();
         for (ExamProblemRequestDto problemExam : problemExams) {
             Problem problem = problemService.getProblemByExamProblemRequest(problemExam);
             if (!checkLanguageSupportEquals(languages, problem.getLanguageSupport())) {
-                throw new BadRequestException("Language support of your exam does not match with your problem",
-                        "Language support of your exam does not match with your problem");
+                throw new BadRequestException("Language support of exam does not match problem: " + problem.getId(),
+                        "ERR_LANGUAGE_MISMATCH");
             }
-            ExamProblemId examProblemId = new ExamProblemId(exam.getId(), problem.getId());
-            ExamProblem examProblem = new ExamProblem(examProblemId, exam, problem, problemExam.getProblemPoint());
+            ExamProblem examProblem = new ExamProblem();
+            examProblem.setExam(exam);
+            examProblem.setProblem(problem);
+            examProblem.setPoint(problemExam.getProblemPoint());
             examProblems.add(examProblem);
+        }
+
+        exam = examRepository.save(exam);
+        for (ExamProblem examProblem : examProblems) {
+            examProblem.setId(new ExamProblemId(exam.getId(), examProblem.getProblem().getId()));
         }
         examProblemRepository.saveAll(examProblems);
 
@@ -203,6 +196,8 @@ public class ExamServiceImpl implements ExamService {
         eventPublisher.publishEvent(new ExamStartEvent(this, code, exam.getStartTime().toInstant()));
         return examResponseDto;
     }
+
+
 
     private boolean checkLanguageSupportEquals(Set<Language> examSupport, Set<Language> problemSupport) {
         return problemSupport.containsAll(examSupport);
