@@ -708,7 +708,8 @@ public class ExamServiceImpl implements ExamService {
                 : Timestamp.valueOf("2100-01-01 00:00:00");
 
         Users user = userService.getCurrentUser();
-        Page<ExamParticipant> exams = examParticipantRepository.findByStatus(status, user, title, startTimestamp,
+        String tileLowerCase = title != null ? title.toLowerCase() : null;
+        Page<ExamParticipant> exams = examParticipantRepository.findByStatus(status, user, tileLowerCase, startTimestamp,
                 endTimestamp, pageable);
 
         Users currentUser = userService.getCurrentUser();
