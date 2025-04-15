@@ -406,7 +406,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addTop5PopularCourse() {
-        List<Course> courses = courseRepository.findTop6ByOrderByNumberOfParticipantDescRateDesc();
+        List<Course> courses = courseRepository.findTop6ByStatusOrderByNumberOfParticipantDescRateDesc(CourseStatus.ACTIVATED);
         topCourseRepository.deleteAll();
         int top = 5;
         for (int i = 0; i < courses.size(); i++) {

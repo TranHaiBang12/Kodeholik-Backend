@@ -39,7 +39,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
         Optional<Course> findByTitleIgnoreCaseAndIdNot(String title, Long id);
 
-        List<Course> findTop6ByOrderByNumberOfParticipantDescRateDesc();
+        List<Course> findTop6ByStatusOrderByNumberOfParticipantDescRateDesc(CourseStatus status);
 
         public List<Course> findByCreatedAtBetweenOrderByNumberOfParticipantDescRateDesc(
                         Timestamp start, Timestamp end);
