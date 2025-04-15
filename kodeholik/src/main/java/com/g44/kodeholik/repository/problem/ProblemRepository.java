@@ -32,7 +32,11 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
 
     public Page<Problem> findByUsersFavouriteContains(Users user, Pageable pageable);
 
-    @Query("SELECT p FROM Problem p WHERE (cast(:title as text) IS NULL OR (LOWER(p.title) LIKE '%' || cast(:title as text) || '%')) AND (COALESCE(:difficulty, p.difficulty) = p.difficulty) AND (COALESCE(:status, p.status) = p.status) AND (:isActive IS NULL OR p.isActive = :isActive)")
+    @Query("SELECT p FROM Problem p " +
+            "WHERE (CAST(:title AS text) IS NULL OR LOWER(p.title) LIKE '%' || LOWER(CAST(:title AS text)) || '%') " +
+            "AND (COALESCE(:difficulty, p.difficulty) = p.difficulty) " +
+            "AND (COALESCE(:status, p.status) = p.status) " +
+            "AND (:isActive IS NULL OR p.isActive = :isActive)")
     public Page<Problem> findByTitleContainsAndDifficultyAndStatusAndIsActive(String title, Difficulty difficulty,
             ProblemStatus status, Boolean isActive, Pageable pageable);
 
