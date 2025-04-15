@@ -949,7 +949,6 @@ public class ProblemServiceImpl implements ProblemService {
             for (int m = 0; m < problemTestCaseDtos.size(); m++) {
                 if (problemTestCaseDtos.get(m).getLanguage().equals(problemInputParameterDto.getLanguage())) {
                     problemTestCaseDto = problemTestCaseDtos.get(m);
-
                     break;
                 }
             }
