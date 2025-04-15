@@ -145,6 +145,12 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public ExamResponseDto createExam(AddExamRequestDto addExamRequestDto) {
+        if (addExamRequestDto.getLanguageSupports() == null || addExamRequestDto.getLanguageSupports().isEmpty()) {
+            throw new BadRequestException("At least one language must be supported", "ERR_NO_LANGUAGES");
+        }
+        if (addExamRequestDto.getProblemRequests() == null || addExamRequestDto.getProblemRequests().isEmpty()) {
+            throw new BadRequestException("At least one problem is required", "ERR_NO_PROBLEMS");
+        }
         if (addExamRequestDto.getStartTime().before(Timestamp.from(Instant.now()))) {
             throw new BadRequestException("Start date cannot be in the past", "ERR_START_PAST");
         }
