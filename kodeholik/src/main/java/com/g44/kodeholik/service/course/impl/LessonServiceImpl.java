@@ -274,6 +274,8 @@ public class LessonServiceImpl implements LessonService {
                 if(lessonRequestDto.getStatus()==LessonStatus.ACTIVATED){
                     lesson.setStatus(LessonStatus.ACTIVATED);
                 }
+            }else{
+                lesson.setAttachedFile(null);
             }
 
             // Handle video update
