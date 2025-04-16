@@ -4,6 +4,8 @@ import com.g44.kodeholik.model.dto.response.course.CourseRatingResponseDto;
 import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.course.CourseRating;
 import com.g44.kodeholik.util.mapper.Mapper;
+import com.g44.kodeholik.util.mapper.response.user.UserResponseMapper;
+
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Component;
 public class CourseRatingResponseMapper implements Mapper<CourseRating, CourseRatingResponseDto> {
 
     private final ModelMapper modelMapper;
+
+    private final UserResponseMapper userResponseMapper;
 
     @PostConstruct
     public void configureMapper() {
@@ -34,10 +38,12 @@ public class CourseRatingResponseMapper implements Mapper<CourseRating, CourseRa
         if (courseRating == null) {
             return null;
         }
+
+        UserResponseDto createdBy = courseRating.getUser() != null ? userResponseMapper.mapFrom(courseRating.getUser()) : null;
         return CourseRatingResponseDto.builder()
                 .id(courseRating.getId())
                 .courseId(courseRating.getCourse().getId())
-                .user(new UserResponseDto(courseRating.getUser()))
+                .user(createdBy)
                 .rating(courseRating.getRating())
                 .comment(courseRating.getComment())
                 .createdAt(courseRating.getCreatedAt() != null ? courseRating.getCreatedAt().getTime() : null)
