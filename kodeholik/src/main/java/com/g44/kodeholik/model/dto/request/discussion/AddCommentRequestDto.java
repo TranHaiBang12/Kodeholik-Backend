@@ -12,7 +12,7 @@ import lombok.*;
 @Data
 public class AddCommentRequestDto {
 
-    @NotNull(message = "Comment cannot be null")
+    @Size(min = 10, max = 5000, message = "MSG17")
     private String comment;
 
     private Long commentReply;
