@@ -122,7 +122,7 @@ public class ExcelServiceImpl implements ExcelService {
                 } else {
                     input = inputCell.toString();
                 }
-                log.info(input);
+                // log.info(input);
                 inputMap.put(inputNames.get(i), input);
             }
             Cell cell = row.getCell(expectedOutputIndex);
@@ -148,7 +148,7 @@ public class ExcelServiceImpl implements ExcelService {
 
         problemTestCaseDto.setTestCases(testCases);
         problemTestCaseDtoList.add(problemTestCaseDto);
-        log.info(problemTestCaseDtoList);
+        // log.info(problemTestCaseDtoList);
         return problemTestCaseDtoList;
     }
 
