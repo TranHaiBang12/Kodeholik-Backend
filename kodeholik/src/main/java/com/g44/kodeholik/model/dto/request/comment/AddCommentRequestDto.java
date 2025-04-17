@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class AddCommentRequestDto {
-    @Size(min = 10, max = 5000, message = "MSG17")
+    @Size(min = 0, max = 5000, message = "MSG17")
     private String comment;
 
     @NotNull(message = "MSG02")
