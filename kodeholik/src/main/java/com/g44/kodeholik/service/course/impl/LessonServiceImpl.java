@@ -110,7 +110,7 @@ public class LessonServiceImpl implements LessonService {
                 .collect(Collectors.toList());
         List<Long> completedLessons = getCompletedLessons();
 
-        LessonResponseDto lessonResponse = lessonResponseMapper.mapFrom(lesson,completedLessons);
+        LessonResponseDto lessonResponse = lessonResponseMapper.mapFrom(lesson, completedLessons);
         lessonResponse.setProblems(lessonProblemDtos);
 
         return lessonResponse;
@@ -118,6 +118,9 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public String addLesson(LessonRequestDto lessonRequestDto) {
+        log.info("Adding lesson: " + lessonRequestDto);
+        long start = System.currentTimeMillis();
+        log.info(">>> Time to map & validate 1: {}ms", System.currentTimeMillis() - start);
         Users currentUser = userService.getCurrentUser();
         String normalizedTitle = lessonRequestDto.getTitle().trim().replaceAll("[ ]+", " ");
         if (normalizedTitle.length() < 10) {
@@ -125,10 +128,15 @@ public class LessonServiceImpl implements LessonService {
                     "Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
                     "Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
-        if (lessonRepository.findByTitleIgnoreCaseAndChapterId(normalizedTitle,lessonRequestDto.getChapterId()).isPresent()) {
-            throw new BadRequestException("Lesson title already exists: " + normalizedTitle,
+        if (lessonRepository.findByTitleIgnoreCaseAndChapterId(normalizedTitle,
+                lessonRequestDto.getChapterId())
+                .isPresent()) {
+            throw new BadRequestException("Lesson title already exists: " +
+                    normalizedTitle,
                     "Lesson title already exists: " + normalizedTitle);
         }
+        log.info(">>> Time to map & validate 2: {}ms", System.currentTimeMillis() - start);
+
         String message = "Add lesson successfully!";
 
         String normalizedDescription = lessonRequestDto.getDescription().trim();
@@ -143,6 +151,8 @@ public class LessonServiceImpl implements LessonService {
                     "Lesson description must be at least 10 characters long (excluding extra spaces): "
                             + normalizedDescription);
         }
+        log.info(">>> Time to map & validate 3: {}ms", System.currentTimeMillis() - start);
+
         Lesson lesson = lessonRequestMapper.mapTo(lessonRequestDto);
         lesson.setTitle(normalizedTitle);
         lesson.setDescription(normalizedDescription);
@@ -151,16 +161,21 @@ public class LessonServiceImpl implements LessonService {
         lesson.setChapter(chapter);
         lesson.setCreatedAt(Timestamp.from(Instant.now()));
         lesson.setCreatedBy(currentUser);
+        log.info(">>> Time to map & validate 4: {}ms", System.currentTimeMillis() - start);
 
         try {
             // Upload file đính kèm lên S3 (nếu có)
+            log.info(lessonRequestDto.getAttachedFile() != null);
+            log.info(!lessonRequestDto.getAttachedFile().isEmpty());
             if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
                 String s3Key = "lessons/" + UUID.randomUUID() + "-"
                         + lessonRequestDto.getAttachedFile().getOriginalFilename();
+                log.info("Uploaded file to S3: " + s3Key);
                 s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
                 lesson.setAttachedFile(s3Key);
                 lesson.setStatus(LessonStatus.ACTIVATED);
             }
+            log.info(">>> Time to map & validate 5: {}ms", System.currentTimeMillis() - start);
 
             if (lessonRequestDto.getVideoType() == LessonVideoType.YOUTUBE) {
                 // Nếu là YouTube, lấy videoId từ URL và kích hoạt luôn
@@ -170,17 +185,13 @@ public class LessonServiceImpl implements LessonService {
                     && lessonRequestDto.getVideoFile() != null
                     && !lessonRequestDto.getVideoFile().isEmpty()) {
                 // Đọc file thành byte[]
-                byte[] fileBytes = lessonRequestDto.getVideoFile().getBytes();
-                String originalFileName = lessonRequestDto.getVideoFile().getOriginalFilename();
-                String contentType = lessonRequestDto.getVideoFile().getContentType();
 
                 lesson.setVideoUrl("uploading...");
                 lesson.setStatus(LessonStatus.IN_PROGRESS);
-                lessonRepository.save(lesson);
                 message = "Add lesson successfully! We will notify you when the video has been successfully uploaded";
 
                 // Upload video lên GCS **ASYNC**
-                gcsService.uploadVideo(fileBytes, originalFileName, contentType)
+                gcsService.uploadVideo(lessonRequestDto.getVideoFile())
                         .thenAccept(gcsPath -> {
                             lesson.setVideoUrl(gcsPath);
                             lesson.setStatus(LessonStatus.ACTIVATED);
@@ -194,21 +205,21 @@ public class LessonServiceImpl implements LessonService {
                             return null;
                         });
             }
+            log.info(">>> Time to map & validate 6: {}ms", System.currentTimeMillis() - start);
 
             lessonRepository.save(lesson);
 
             if (lessonRequestDto.getProblemIds() != null && !lessonRequestDto.getProblemIds().isEmpty()) {
-                List<LessonProblem> lessonProblems = lessonRequestDto.getProblemIds().stream()
-                        .map(problemLink -> problemRepository.findByLink(problemLink)
-                                .map(problem -> new LessonProblem(lesson, problem))
-                                .orElse(null)) // Nếu không tìm thấy thì bỏ qua
-                        .filter(Objects::nonNull) // Lọc bỏ null
+                List<Problem> problems = problemRepository.findAllByLinkIn(lessonRequestDto.getProblemIds());
+                List<LessonProblem> lessonProblems = problems.stream()
+                        .map(problem -> new LessonProblem(lesson, problem))
                         .collect(Collectors.toList());
 
                 if (!lessonProblems.isEmpty()) {
                     lessonProblemRepository.saveAll(lessonProblems);
                 }
             }
+            log.info(">>> Time to map & validate 7: {}ms", System.currentTimeMillis() - start);
 
         } catch (Exception e) {
             log.error("Error occurred while adding lesson", e);
@@ -230,7 +241,9 @@ public class LessonServiceImpl implements LessonService {
                     "Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
                     "Lesson title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
-        if (lessonRepository.findByTitleIgnoreCaseAndIdNotAndChapterId(normalizedTitle, lessonId, lessonRequestDto.getChapterId()).isPresent()) {
+        if (lessonRepository
+                .findByTitleIgnoreCaseAndIdNotAndChapterId(normalizedTitle, lessonId, lessonRequestDto.getChapterId())
+                .isPresent()) {
             throw new BadRequestException("Lesson title already exists: " + normalizedTitle,
                     "Lesson title already exists: " + normalizedTitle);
         }
@@ -271,10 +284,10 @@ public class LessonServiceImpl implements LessonService {
                         + lessonRequestDto.getAttachedFile().getOriginalFilename();
                 s3Service.uploadFileToS3(lessonRequestDto.getAttachedFile(), s3Key);
                 lesson.setAttachedFile(s3Key);
-                if(lessonRequestDto.getStatus()==LessonStatus.ACTIVATED){
+                if (lessonRequestDto.getStatus() == LessonStatus.ACTIVATED) {
                     lesson.setStatus(LessonStatus.ACTIVATED);
                 }
-            }else{
+            } else {
                 lesson.setAttachedFile(null);
             }
 
@@ -283,29 +296,26 @@ public class LessonServiceImpl implements LessonService {
                 if (lessonRequestDto.getVideoType() == LessonVideoType.YOUTUBE) {
                     String videoId = YoutubeUrlParser.extractVideoId(lessonRequestDto.getYoutubeUrl());
                     lesson.setVideoUrl(videoId);
-                    if(lessonRequestDto.getStatus()==LessonStatus.ACTIVATED){
+                    if (lessonRequestDto.getStatus() == LessonStatus.ACTIVATED) {
                         lesson.setStatus(LessonStatus.ACTIVATED);
                     }
 
                 } else if (lessonRequestDto.getVideoType() == LessonVideoType.VIDEO_FILE &&
                         lessonRequestDto.getVideoFile() != null &&
                         !lessonRequestDto.getVideoFile().isEmpty()) {
-                    byte[] fileBytes = lessonRequestDto.getVideoFile().getBytes();
-                    String originalFileName = lessonRequestDto.getVideoFile().getOriginalFilename();
-                    String contentType = lessonRequestDto.getVideoFile().getContentType();
 
                     lesson.setVideoUrl("uploading...");
-                    if(lessonRequestDto.getStatus()==LessonStatus.ACTIVATED){
+                    if (lessonRequestDto.getStatus() == LessonStatus.ACTIVATED) {
                         lesson.setStatus(LessonStatus.IN_PROGRESS);
                     }
                     lessonRepository.save(lesson);
                     message = "Edit lesson successfully! We will notify you when the video has been successfully uploaded";
 
-                    gcsService.uploadVideo(fileBytes, originalFileName, contentType)
+                    gcsService.uploadVideo(lessonRequestDto.getVideoFile())
                             .thenAccept(gcsPath -> {
 
                                 lesson.setVideoUrl(gcsPath);
-                                if(lessonRequestDto.getStatus()==LessonStatus.ACTIVATED){
+                                if (lessonRequestDto.getStatus() == LessonStatus.ACTIVATED) {
                                     lesson.setStatus(LessonStatus.ACTIVATED);
                                 }
                                 lessonRepository.save(lesson);
@@ -395,7 +405,6 @@ public class LessonServiceImpl implements LessonService {
                 .map(progress -> progress.getLesson().getId())
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public List<LessonResponseDto> getLessonByChapterId(Long id) {

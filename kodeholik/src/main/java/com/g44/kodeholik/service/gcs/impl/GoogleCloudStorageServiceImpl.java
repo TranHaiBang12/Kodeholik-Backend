@@ -32,23 +32,33 @@ public class GoogleCloudStorageServiceImpl implements GoogleCloudStorageService 
     private final Executor emailTaskExecutor;
 
     @Override
-    public CompletableFuture<String> uploadVideo(byte[] fileBytes, String originalFileName, String contentType) {
+    public CompletableFuture<String> uploadVideo(MultipartFile videoFile) {
         return CompletableFuture.supplyAsync(() -> {
-            if (storage.get(bucketName) == null) {
-                throw new IllegalStateException("Bucket " + bucketName + " does not exist.");
+            try {
+                byte[] fileBytes = videoFile.getBytes(); // gọi ở đây, trong executor thread
+                String originalFileName = videoFile.getOriginalFilename();
+                String contentType = videoFile.getContentType();
+
+                if (storage.get(bucketName) == null) {
+                    throw new IllegalStateException("Bucket " + bucketName + " does not exist.");
+                }
+
+                String safeFileName = System.currentTimeMillis() + "_" + originalFileName;
+                String filePath = VIDEO_PREFIX + safeFileName;
+
+                BlobId blobId = BlobId.of(bucketName, filePath);
+                BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                        .setContentType(contentType)
+                        .build();
+
+                storage.create(blobInfo, fileBytes);
+                return filePath;
+
+            } catch (IOException e) {
+                log.error("Error uploading video: {}", e.getMessage(), e);
+                throw new RuntimeException("Failed to upload video", e);
             }
-
-            String safeFileName = System.currentTimeMillis() + "_" + originalFileName;
-            String filePath = VIDEO_PREFIX + safeFileName;
-
-            BlobId blobId = BlobId.of(bucketName, filePath);
-            BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                    .setContentType(contentType)
-                    .build();
-
-            storage.create(blobInfo, fileBytes); // blocking, nhưng giờ chạy trên thread pool
-            return filePath;
-        }, emailTaskExecutor); // <-- taskExecutor là Bean của Executor bạn cấu hình
+        }, emailTaskExecutor);
     }
 
     @Override

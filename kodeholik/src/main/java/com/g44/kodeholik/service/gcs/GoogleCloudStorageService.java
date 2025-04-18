@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 public interface GoogleCloudStorageService {
-    public CompletableFuture<String> uploadVideo(byte[] fileBytes, String originalFileName, String contentType);
+    public CompletableFuture<String> uploadVideo(MultipartFile videoFile);
 
     public String generateUploadSignedUrl(String fileName, String contentType);
 

@@ -19,6 +19,8 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
 
         public Optional<Problem> findByLink(String link);
 
+        public List<Problem> findAllByLinkIn(List<String> links);
+
         public List<Problem> findByDifficulty(Difficulty difficulty);
 
         public List<Problem> findByStatusAndIsActive(ProblemStatus status, boolean isActive);

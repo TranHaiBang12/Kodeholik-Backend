@@ -540,6 +540,10 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public void addProblem(ProblemBasicAddDto problemBasicAddDto, ProblemEditorialDto problemEditorialDto,
             List<ProblemInputParameterDto> problemInputParameterDto, MultipartFile excelFile) {
+        log.info(problemBasicAddDto);
+        log.info(problemEditorialDto);
+        log.info(problemInputParameterDto);
+
         if (checkTitleExisted(problemBasicAddDto.getTitle())) {
             throw new BadRequestException("Title has already existed", "Title has already existed");
         }
@@ -566,7 +570,7 @@ public class ProblemServiceImpl implements ProblemService {
         addProblemEditorial(problemEditorialDto, problem,
                 problemBasicAddDto.getLanguageSupport());
         addProblemTestCase(problemTestCaseDtos, problem, problemInputParameterDto);
-        // syncProblemsToElasticsearch();
+        syncProblemsToElasticsearch();
     }
 
     private Problem addProblemBasic(ProblemBasicAddDto problemBasicAddDto, Set<Language> languages) {
@@ -680,8 +684,7 @@ public class ProblemServiceImpl implements ProblemService {
                     problemInputParameterDto.get(j).getLanguage(),
                     problemInputParameterDto.get(j).getTemplateCode() != null
                             ? problemInputParameterDto.get(j).getTemplateCode().getCode()
-                            : ""
-            );
+                            : "");
             List<InputParameterDto> inputParameters = problemInputParameterDto.get(j).getParameters();
 
             addProblemTemplate(problemInputParameterDto.get(j), problemInputParameterDto.get(j).getTemplateCode(),
@@ -789,6 +792,7 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     private ProblemInputParameterDto generateTemplate(ProblemInputParameterDto problemInputParameterDto) {
+        log.info(problemInputParameterDto);
         TemplateCode templateCode = problemInputParameterDto.getTemplateCode();
         StringBuilder templateBuilder;
         String template = "";
@@ -1166,7 +1170,6 @@ public class ProblemServiceImpl implements ProblemService {
         }
         switch (type) {
             case ARR_INT:
-                // log.info("HIHI: " + parseMultiDimArray(rawValue, "INT"));
                 return parseMultiDimArray(rawValue, "INT");
             case ARR_DOUBLE:
                 return parseMultiDimArray(rawValue, "DOUBLE");
@@ -1231,6 +1234,7 @@ public class ProblemServiceImpl implements ProblemService {
         addProblemInputParameter(problemInputParameterDto, problem, problemBasicAddDto.getLanguageSupport());
         addProblemEditorial(problemEditorialDto, problem, problemBasicAddDto.getLanguageSupport());
         addProblemTestCase(problemTestCaseDtos, problem, problemInputParameterDto);
+        syncProblemsToElasticsearch();
     }
 
     private boolean checkTitleExistedForUpdate(String newTitle, String oldTitle) {
@@ -1261,6 +1265,7 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setUpdatedAt(Timestamp.from(Instant.now()));
         problem.setUpdatedBy(currentUser);
         problemRepository.save(problem);
+        syncProblemsToElasticsearch();
     }
 
     @Override
@@ -1275,6 +1280,7 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setUpdatedAt(Timestamp.from(Instant.now()));
         problem.setUpdatedBy(currentUser);
         problemRepository.save(problem);
+        syncProblemsToElasticsearch();
     }
 
     @Override

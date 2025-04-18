@@ -35,4 +35,7 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
 
         List<Exam> findByStatus(ExamStatus status);
 
+        boolean existsByTitleIgnoreCase(String title);
+
+        boolean existsByCode(String code);
 }
