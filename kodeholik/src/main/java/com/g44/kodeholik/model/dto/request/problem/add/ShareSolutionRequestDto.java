@@ -26,10 +26,12 @@ public class ShareSolutionRequestDto {
     private Problem problem;
 
     @NotNull(message = "MSG34")
+    @NotBlank(message = "MSG34")
     @Size(min = 10, max = 200, message = "MSG34")
     private String title;
 
     @NotNull(message = "MSG29")
+    @NotBlank(message = "MSG34")
     @Size(min = 10, max = 5000, message = "MSG29")
     private String textSolution;
 

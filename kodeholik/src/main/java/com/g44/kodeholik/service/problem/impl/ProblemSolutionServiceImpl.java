@@ -104,6 +104,8 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
             Language language,
             String sortBy, Boolean ascending, Pageable pageable, Users currentUser) {
         int sizeN = 5;
+        if (title != null)
+            title = title.trim();
         if (size != null) {
             sizeN = size;
         }
@@ -227,8 +229,6 @@ public class ProblemSolutionServiceImpl implements ProblemSolutionService {
                 .createdAt(Timestamp.from(Instant.now()))
                 .build();
         Set<Skill> skills = tagService.getSkillsByNameList(shareSolutionRequestDto.getSkills());
-        log.info(skills);
-        log.info(shareSolutionRequestDto.getSkills());
 
         problemSolution.setSkills(skills);
         Set<SolutionCode> solutionCodes = new HashSet();

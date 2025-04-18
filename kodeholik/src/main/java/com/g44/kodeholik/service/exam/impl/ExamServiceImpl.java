@@ -290,6 +290,10 @@ public class ExamServiceImpl implements ExamService {
             throw new BadRequestException("Start and end date must be provided together",
                     "Start and end date must be provided together");
         }
+
+        if (filterExamRequestDto.getTitle() != null)
+            filterExamRequestDto.setTitle(filterExamRequestDto.getTitle().trim());
+
         if ((filterExamRequestDto.getStart() != null && filterExamRequestDto.getEnd() != null)
                 && filterExamRequestDto.getStart().after(filterExamRequestDto.getEnd())) {
             throw new BadRequestException("Start date cannot be after end date", "Start date cannot be after end date");
