@@ -82,6 +82,20 @@ public class S3ServiceImpl implements S3Service {
     }
 
     @Override
+    public boolean isObjectExist(String key) {
+        try {
+            HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+            s3Client.headObject(headObjectRequest);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
     public boolean doesObjectExist(String key) {
         try {
             HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
@@ -89,12 +103,11 @@ public class S3ServiceImpl implements S3Service {
                     .key(key)
                     .build();
             s3Client.headObject(headObjectRequest);
-            return true; // File tồn tại
+            return true;
         } catch (NoSuchKeyException e) {
             throw new NotFoundException("Key not found", "Key not found");
         } catch (Exception e) {
             throw new NotFoundException("Key not found", "Key not found");
-
         }
     }
 

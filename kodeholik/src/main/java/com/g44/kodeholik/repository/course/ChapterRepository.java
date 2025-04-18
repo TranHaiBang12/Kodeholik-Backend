@@ -14,6 +14,7 @@ import com.g44.kodeholik.model.entity.course.Chapter;
 import com.g44.kodeholik.model.entity.course.Course;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ChapterRepository extends JpaRepository<Chapter, Long> {
@@ -27,7 +28,7 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 
     List<Chapter> findByCourseIdOrderByDisplayOrderAsc(Long courseId);
 
-    boolean existsByTitle(String title);
+    Optional<Chapter> findByTitleIgnoreCaseAndCourseId(String title, Long courseId);
 
-    boolean existsByTitleAndIdNot(String title, Long id);
+    Optional<Chapter> findByTitleIgnoreCaseAndIdNotAndCourseId(String title, Long id, Long courseId);
 }

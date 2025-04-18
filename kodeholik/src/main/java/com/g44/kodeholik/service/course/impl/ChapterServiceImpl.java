@@ -77,18 +77,18 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public void addChapter(ChapterRequestDto chapterRequestDto) {
-        String normalizedTitle = chapterRequestDto.getTitle().trim().replaceAll("\\s+", " ");
+        String normalizedTitle = chapterRequestDto.getTitle().trim().replaceAll("[ ]+", " ");
 
         if (normalizedTitle.length() < 10) {
             throw new BadRequestException(
                     "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
                     "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
-        if (chapterRepository.existsByTitle(normalizedTitle)) {
+        if (chapterRepository.findByTitleIgnoreCaseAndCourseId(normalizedTitle, chapterRequestDto.getCourseId()).isPresent()) {
             throw new BadRequestException("Chapter title already exists: " + normalizedTitle,
                     "Chapter title already exists: " + normalizedTitle);
         }
-        String normalizedDescription = chapterRequestDto.getDescription().trim().replaceAll("\\s+", " ");
+        String normalizedDescription = chapterRequestDto.getDescription().trim().replaceAll("[ ]+", " ");
         if (normalizedDescription.isEmpty()) {
             throw new BadRequestException("Chapter description cannot be empty or contain only whitespace",
                     "Chapter description cannot be empty or contain only whitespace");
@@ -117,17 +117,17 @@ public class ChapterServiceImpl implements ChapterService {
         Chapter savedChapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
 
-        String normalizedTitle = chapterRequestDto.getTitle().trim().replaceAll("\\s+", " ");
+        String normalizedTitle = chapterRequestDto.getTitle().trim().replaceAll("[ ]+", " ");
         if (normalizedTitle.length() < 10) {
             throw new BadRequestException(
                     "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
                     "Chapter title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle);
         }
-        if (chapterRepository.existsByTitle(normalizedTitle)) {
+        if (chapterRepository.findByTitleIgnoreCaseAndIdNotAndCourseId(normalizedTitle, id, chapterRequestDto.getCourseId()).isPresent()) {
             throw new BadRequestException("Chapter title already exists: " + normalizedTitle,
                     "Chapter title already exists: " + normalizedTitle);
         }
-        String normalizedDescription = chapterRequestDto.getDescription().trim().replaceAll("\\s+", " ");
+        String normalizedDescription = chapterRequestDto.getDescription().trim().replaceAll("[ ]+", " ");
         if (normalizedDescription.isEmpty()) {
             throw new BadRequestException("Chapter description cannot be empty or contain only whitespace",
                     "Chapter description cannot be empty or contain only whitespace");

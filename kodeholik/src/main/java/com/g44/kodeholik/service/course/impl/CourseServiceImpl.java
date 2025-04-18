@@ -20,7 +20,9 @@ import com.g44.kodeholik.model.dto.response.user.UserResponseDto;
 import com.g44.kodeholik.model.entity.course.*;
 import com.g44.kodeholik.model.entity.setting.Topic;
 import com.g44.kodeholik.model.entity.user.Users;
+import com.g44.kodeholik.model.enums.course.ChapterStatus;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
+import com.g44.kodeholik.model.enums.course.LessonStatus;
 import com.g44.kodeholik.model.enums.s3.FileNameType;
 import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.repository.course.CourseUserRepository;
@@ -117,16 +119,28 @@ public class CourseServiceImpl implements CourseService {
             return courseDetailResponseMapper.mapFromCourseAndLesson(course, Collections.emptyList(),
                     Collections.emptyList());
         }
-        // Sắp xếp chapters/lessons trong course theo displayOrder
-        chapters.sort(Comparator.comparingInt(Chapter::getDisplayOrder));
-        chapters.forEach(chapter -> {
+
+        List<Chapter> filteredChapters = chapters.stream()
+                .filter(chapter -> chapter.getStatus() == ChapterStatus.ACTIVATED)
+                .sorted(Comparator.comparingInt(Chapter::getDisplayOrder)
+                        .thenComparing(Chapter::getCreatedAt))
+                .collect(Collectors.toList());
+
+        filteredChapters.forEach(chapter -> {
             List<Lesson> lessons = chapter.getLessons();
             if (lessons != null && !lessons.isEmpty()) {
-                lessons.sort(Comparator.comparingInt(Lesson::getDisplayOrder));
+                List<Lesson> filteredLessons = lessons.stream()
+                        .filter(lesson -> lesson.getStatus() == LessonStatus.ACTIVATED)
+                        .sorted(Comparator.comparingInt(Lesson::getDisplayOrder)
+                                .thenComparing(Lesson::getCreatedAt))
+                        .collect(Collectors.toList());
+                chapter.setLessons(filteredLessons);
             }
         });
 
-        List<Long> lessonIds = chapters.stream()
+        course.setChapters(filteredChapters);
+
+        List<Long> lessonIds = filteredChapters.stream()
                 .flatMap(chapter -> {
                     List<Lesson> lessons = chapter.getLessons();
                     return lessons != null ? lessons.stream() : Stream.empty();
@@ -134,19 +148,19 @@ public class CourseServiceImpl implements CourseService {
                 .map(Lesson::getId)
                 .collect(Collectors.toList());
 
-        // Sử dụng getCompletedLessons() để lấy danh sách lesson đã hoàn thành
         List<Long> completedLessons = getCompletedLessons()
                 .stream()
-                .filter(lessonId -> lessonIds.contains(lessonId)) // Chỉ lấy lesson thuộc course này
+                .filter(lessonId -> lessonIds.contains(lessonId))
                 .collect(Collectors.toList());
 
         return courseDetailResponseMapper.mapFromCourseAndLesson(course, lessonIds, completedLessons);
+
     }
 
     @Override
     public void addCourse(CourseRequestDto requestDto) {
-        String normalizedTitle = requestDto.getTitle().trim().replaceAll("\\s+", " ");
-        String normalizedDescription = requestDto.getDescription().trim().replaceAll("\\s+", " ");
+        String normalizedTitle = requestDto.getTitle().trim().replaceAll("[ ]+", " ");
+        String normalizedDescription = requestDto.getDescription().trim().replaceAll("[ ]+", " ");
         if (normalizedTitle.length() < 10) {
             throw new BadRequestException(
                     "Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
@@ -159,7 +173,7 @@ public class CourseServiceImpl implements CourseService {
                     "Course description must be at least 10 characters long (excluding extra spaces): "
                             + normalizedTitle);
         }
-        if (courseRepository.existsByTitle(normalizedTitle)) {
+        if (courseRepository.findByTitleIgnoreCase(normalizedTitle).isPresent()) {
             throw new BadRequestException("Course title already exists: " + normalizedTitle,
                     "Course title already exists: " + normalizedTitle);
         }
@@ -198,8 +212,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void editCourse(Long courseId, CourseRequestDto requestDto) {
-        String normalizedTitle = requestDto.getTitle().trim().replaceAll("\\s+", " ");
-        String normalizedDescription = requestDto.getDescription().trim().replaceAll("\\s+", " ");
+        String normalizedTitle = requestDto.getTitle().trim().replaceAll("[ ]+", " ");
+        String normalizedDescription = requestDto.getDescription().trim().replaceAll("[ ]+", " ");
         if (normalizedTitle.length() < 10) {
             throw new BadRequestException(
                     "Course title must be at least 10 characters long (excluding extra spaces): " + normalizedTitle,
@@ -216,9 +230,8 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
-        // Kiểm tra xem title mới có trùng với Course khác không (ngoại trừ Course hiện
-        // tại)
-        if (courseRepository.existsByTitle(normalizedTitle)) {
+        // Kiểm tra xem title mới có trùng với Course khác không (ngoại trừ Course hiện tại)
+        if (courseRepository.findByTitleIgnoreCaseAndIdNot(normalizedTitle, courseId).isPresent()) {
             throw new BadRequestException("Course title already exists: " + normalizedTitle,
                     "Course title already exists: " + normalizedTitle);
         }
@@ -393,7 +406,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addTop5PopularCourse() {
-        List<Course> courses = courseRepository.findTop6ByOrderByNumberOfParticipantDescRateDesc();
+        List<Course> courses = courseRepository.findTop6ByStatusOrderByNumberOfParticipantDescRateDesc(CourseStatus.ACTIVATED);
         topCourseRepository.deleteAll();
         int top = 5;
         for (int i = 0; i < courses.size(); i++) {
@@ -409,7 +422,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<CourseResponseDto> getTop5PopularCourse() {
-        List<TopCourse> topCourses = topCourseRepository.findByOrderByDisplayOrderDesc();
+        List<TopCourse> topCourses = topCourseRepository.findByCourseStatusOrderByDisplayOrderDesc(CourseStatus.ACTIVATED);
         List<CourseResponseDto> result = new ArrayList();
         for (int i = 0; i < topCourses.size(); i++) {
             result.add(courseResponseMapper.mapFrom(topCourses.get(i).getCourse()));
@@ -832,14 +845,16 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<ListResponseDto> getListCourseResponseDto() {
-        List<ListResponseDto> result = new ArrayList();
-        List<Course> courses = courseRepository.findAll();
-        for (int i = 0; i < courses.size(); i++) {
-            ListResponseDto listResponseDto = new ListResponseDto();
-            listResponseDto.setId(courses.get(i).getId());
-            listResponseDto.setTitle(courses.get(i).getTitle());
-            result.add(listResponseDto);
-        }
+        List<Course> courses = courseRepository.findByChaptersNotEmpty();
+        List<ListResponseDto> result = courses.stream()
+                .map(course -> {
+                    ListResponseDto dto = new ListResponseDto();
+                    dto.setId(course.getId());
+                    dto.setTitle(course.getTitle());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
         return result;
     }
 

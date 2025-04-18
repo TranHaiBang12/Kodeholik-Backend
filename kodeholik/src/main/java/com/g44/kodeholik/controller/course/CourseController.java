@@ -110,7 +110,7 @@ public class CourseController {
     }
 
     @PostMapping("/comment")
-    public ResponseEntity<Void> createComment(@RequestBody AddCommentRequestDto requestDto) {
+    public ResponseEntity<Void> createComment(@Valid @RequestBody AddCommentRequestDto requestDto) {
         courseCommentService.createComment(requestDto);
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }

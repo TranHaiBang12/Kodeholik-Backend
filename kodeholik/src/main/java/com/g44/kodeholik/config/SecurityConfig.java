@@ -55,6 +55,7 @@ public class SecurityConfig {
                         "/api/v1/openai/**",
                         "/api/v1/course/detail/**",
                         "/api/v1/course/search/**",
+                        "/api/v1/course/course-chapter/**",
                         "/api/v1/course/rating/**",
                         "/api/v1/tag/all-skill/**",
                         "/api/v1/tag/all-topic/**",

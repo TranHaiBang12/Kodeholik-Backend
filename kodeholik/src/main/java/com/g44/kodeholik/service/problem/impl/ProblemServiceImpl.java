@@ -676,8 +676,12 @@ public class ProblemServiceImpl implements ProblemService {
                 throw new BadRequestException("Your problem doesn't support this language",
                         "Your problem doesn't support this language");
             }
-            templateLanguage.put(problemInputParameterDto.get(j).getLanguage(),
-                    problemInputParameterDto.get(j).getTemplateCode().getCode());
+            templateLanguage.put(
+                    problemInputParameterDto.get(j).getLanguage(),
+                    problemInputParameterDto.get(j).getTemplateCode() != null
+                            ? problemInputParameterDto.get(j).getTemplateCode().getCode()
+                            : ""
+            );
             List<InputParameterDto> inputParameters = problemInputParameterDto.get(j).getParameters();
 
             addProblemTemplate(problemInputParameterDto.get(j), problemInputParameterDto.get(j).getTemplateCode(),
@@ -697,7 +701,7 @@ public class ProblemServiceImpl implements ProblemService {
                 String parameterJson = gson.toJson(inputMap);
                 problemInputParameter.setParameters(parameterJson);
                 problemInputParameters.add(problemInputParameter);
-                log.info(parameterJson);
+                // log.info(parameterJson);
             }
         }
         problemInputParameterService.addListInputParameters(problemInputParameters);
@@ -949,7 +953,6 @@ public class ProblemServiceImpl implements ProblemService {
             for (int m = 0; m < problemTestCaseDtos.size(); m++) {
                 if (problemTestCaseDtos.get(m).getLanguage().equals(problemInputParameterDto.getLanguage())) {
                     problemTestCaseDto = problemTestCaseDtos.get(m);
-
                     break;
                 }
             }
@@ -988,12 +991,14 @@ public class ProblemServiceImpl implements ProblemService {
 
             List<SolutionCodeDto> solutionCodes = problemEditorialDto.getEditorialDtos().getSolutionCodes();
             SolutionCodeDto solutionCodeDto = new SolutionCodeDto();
+            log.info(solutionCodes.size());
+            log.info(solutionCodes);
             for (int j = 0; j < solutionCodes.size(); j++) {
                 if (solutionCodes.get(j).getSolutionLanguage().equals(problemInputParameterDto.getLanguage())) {
                     solutionCodeDto = solutionCodes.get(j);
                 }
             }
-            log.info(testCases);
+            log.info(solutionCodeDto.toString());
             LambdaRequest lambdaRequest = new LambdaRequest();
             lambdaRequest.setCode(solutionCodeDto.getSolutionCode());
             lambdaRequest.setLanguage(solutionCodeDto.getSolutionLanguage());
@@ -1010,7 +1015,7 @@ public class ProblemServiceImpl implements ProblemService {
                         problemInputParameterDto.getNoDimension()));
             }
             lambdaRequest.setTestCases(testCases);
-            log.info(lambdaRequest);
+            // log.info(lambdaRequest);
 
             String result = lambdaService.invokeLambdaFunction(lambdaRequest);
             String status = "";
@@ -1018,15 +1023,15 @@ public class ProblemServiceImpl implements ProblemService {
             submissionResponseDto = null;
             try {
                 responseResult = gson.fromJson(result, ResponseResult.class);
-                log.info(result);
-                log.info(responseResult);
+                // log.info(result);
+                // log.info(responseResult);
                 if (responseResult.isAccepted()) {
                     status = "ACCEPTED";
                 } else {
                     status = "FAILED";
                 }
             } catch (Exception e) {
-                log.info(e.getMessage());
+                // log.info(e.getMessage());
                 status = result;
             }
             switch (status) {
@@ -1161,7 +1166,7 @@ public class ProblemServiceImpl implements ProblemService {
         }
         switch (type) {
             case ARR_INT:
-                log.info("HIHI: " + parseMultiDimArray(rawValue, "INT"));
+                // log.info("HIHI: " + parseMultiDimArray(rawValue, "INT"));
                 return parseMultiDimArray(rawValue, "INT");
             case ARR_DOUBLE:
                 return parseMultiDimArray(rawValue, "DOUBLE");
@@ -1401,7 +1406,7 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public byte[] getExcelFile(String link) {
         Problem problem = getProblemByLink(link);
-        log.info(problem);
+        // log.info(problem);
         List<ProblemTestCase> problemTestCases = problemTestCaseService.getTestCaseByProblemAndAllLanguage(problem);
         return excelService.generateTestCaseFile(problemTestCases, problem);
     }
@@ -1617,7 +1622,6 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public List<ProblemShortResponseDto> getPrivateProblemShortResponseDto() {
-        log.info("test");
         List<ProblemShortResponseDto> result = new ArrayList();
         List<Problem> problems = problemRepository.findByStatusAndIsActive(ProblemStatus.PRIVATE, true);
         for (int i = 0; i < problems.size(); i++) {
@@ -1692,11 +1696,11 @@ public class ProblemServiceImpl implements ProblemService {
             sort = Sort.by("createdAt").descending();
         }
         Pageable pageable = PageRequest.of(page, size == null ? 5 : size.intValue(), sort);
-        log.info(filterProblemRequestAdminDto);
+        // log.info(filterProblemRequestAdminDto);
         Page<Problem> problems = problemRepository.findByTitleContainsAndDifficultyAndStatusAndIsActive(
-                filterProblemRequestAdminDto.getTitle(), filterProblemRequestAdminDto.getDifficulty(),
+                filterProblemRequestAdminDto.getTitle().toLowerCase(), filterProblemRequestAdminDto.getDifficulty(),
                 filterProblemRequestAdminDto.getStatus(), filterProblemRequestAdminDto.getIsActive(), pageable);
-        log.info(problems);
+        // log.info(problems);
         return problems.map(listProblemAdminResponseMapper::mapFrom);
     }
 
@@ -1738,7 +1742,7 @@ public class ProblemServiceImpl implements ProblemService {
 
             for (int i = 0; i < problemInputParameters.size(); i++) {
                 InputParameterDto inputParameterDto = new InputParameterDto();
-                log.info(problemInputParameters.get(i).getParameters());
+                // log.info(problemInputParameters.get(i).getParameters());
                 InputVariable inputVariables = new InputVariable();
                 try {
                     inputVariables = objectMapper.readValue(problemInputParameters.get(i).getParameters(),

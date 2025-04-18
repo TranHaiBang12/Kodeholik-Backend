@@ -1,5 +1,6 @@
 package com.g44.kodeholik.util.mapper.response.exam;
 
+import com.g44.kodeholik.util.mapper.response.user.UserResponseMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,8 @@ public class ExamResponseMapper implements Mapper<Exam, ExamResponseDto> {
 
     private final S3Service s3Service;
 
+    private final UserResponseMapper userResponseMapper;
+
     @Override
     public Exam mapTo(ExamResponseDto b) {
         return mapper.map(b, Exam.class);
@@ -27,6 +30,12 @@ public class ExamResponseMapper implements Mapper<Exam, ExamResponseDto> {
     @Override
     public ExamResponseDto mapFrom(Exam a) {
         ExamResponseDto examResponseDto = mapper.map(a, ExamResponseDto.class);
+        if (a.getCreatedBy() != null) {
+            userResponseMapper.mapFrom(a.getCreatedBy());
+        }
+        if (a.getUpdatedBy() != null) {
+            userResponseMapper.mapFrom(a.getUpdatedBy());
+        }
         updateAvatar(examResponseDto.getCreatedBy());
         updateAvatar(examResponseDto.getUpdatedBy());
         return examResponseDto;

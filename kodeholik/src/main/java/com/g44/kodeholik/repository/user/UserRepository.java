@@ -24,18 +24,19 @@ public interface UserRepository extends JpaRepository<Users, Long> {
         @Query("SELECT COUNT(u) > 0 FROM Users u WHERE (u.username = :username OR u.email = :username) AND (u.status = 'BANNED' OR u.status = 'NOT_ACTIVATED')")
         public boolean isUserNotAllowed(@Param("username") String username);
 
-        @Query("SELECT u FROM Users u WHERE (cast(:search as text) IS NULL OR ((u.username LIKE '%' || cast(:search as text) || '%') OR (u.fullname LIKE '%' || cast(:search as text) || '%'))) "
-                        +
-                        "AND (COALESCE(:role, u.role) = u.role) " +
-                        "AND (COALESCE(:status, u.status) = u.status) " +
-                        "AND (u.createdDate >= :start AND u.createdDate <= :end)")
-        public Page<Users> getListUserByAdmin(
-                        String search,
-                        UserRole role,
-                        UserStatus status,
-                        Date start,
-                        Date end,
-                        Pageable pageable);
+        @Query("SELECT u FROM Users u WHERE (cast(:search as text) IS NULL OR " +
+                "((LOWER(u.username) LIKE '%' || LOWER(cast(:search as text)) || '%') OR " +
+                "(LOWER(u.fullname) LIKE '%' || LOWER(cast(:search as text)) || '%'))) " +
+                "AND (COALESCE(:role, u.role) = u.role) " +
+                "AND (COALESCE(:status, u.status) = u.status) " +
+                "AND (u.createdDate >= :start AND u.createdDate <= :end)")
+        Page<Users> getListUserByAdmin(
+                @Param("search") String search,
+                @Param("role") UserRole role,
+                @Param("status") UserStatus status,
+                @Param("start") Date start,
+                @Param("end") Date end,
+                Pageable pageable);
 
         /*
          * private String text;

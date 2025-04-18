@@ -1,6 +1,7 @@
 package com.g44.kodeholik.repository.course;
 
 import com.g44.kodeholik.model.dto.response.course.LessonResponseDto;
+import com.g44.kodeholik.model.entity.course.Chapter;
 import com.g44.kodeholik.model.enums.course.CourseStatus;
 import com.g44.kodeholik.model.enums.course.LessonStatus;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import com.g44.kodeholik.model.entity.course.Lesson;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
@@ -25,7 +27,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
     List<Lesson> findByChapter_Course_IdIn(List<Long> courseIds);
 
-    boolean existsByTitle(String title);
+    Optional<Lesson> findByTitleIgnoreCaseAndChapterId(String title, Long chapterId);
 
-    boolean existsByTitleAndIdNot(String title, Long id);
+    Optional<Lesson> findByTitleIgnoreCaseAndIdNotAndChapterId(String title, Long id, Long chapterId);
 }

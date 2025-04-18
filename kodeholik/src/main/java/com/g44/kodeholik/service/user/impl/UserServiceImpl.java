@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public void checkUsernameExisted(String username) {
-        if (userRepository.findByUsername(username).isPresent()) {
+        if (userRepository.findByUsername(username.trim().replaceAll("[ ]+", " ")).isPresent()) {
             throw new BadRequestException("Username already exists", "Username already exists");
         }
     }
@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
 
         emailService.sendEmailAddUser(user.getEmail(), "[KODEHOLIK] Account Created", user.getUsername(),
                 password);
-        notificationService.saveNotification(getCurrentUser(), "Welcome to Kodeholik",
+        notificationService.saveNotification(user, "Welcome to Kodeholik",
                 null, NotificationType.SYSTEM);
 
         return user;

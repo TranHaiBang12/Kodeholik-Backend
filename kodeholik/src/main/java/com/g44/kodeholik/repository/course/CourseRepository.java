@@ -21,7 +21,7 @@ import java.util.Optional;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-        Page<Course> findByTitle(String title, Pageable pageable);
+        Optional<Course> findByTitleIgnoreCase(String title);
 
         Page<Course> findByStatusIn(List<CourseStatus> statuses, Pageable pageable);
 
@@ -35,11 +35,11 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
         List<Course> findTop5ByOrderByNumberOfParticipantDescRateDesc();
 
-        boolean existsByTitle(String title);
+        Optional<Course> existsByTitleIgnoreCase(String title);
 
-        boolean existsByTitleAndIdNot(String title, Long id);
+        Optional<Course> findByTitleIgnoreCaseAndIdNot(String title, Long id);
 
-        List<Course> findTop6ByOrderByNumberOfParticipantDescRateDesc();
+        List<Course> findTop6ByStatusOrderByNumberOfParticipantDescRateDesc(CourseStatus status);
 
         public List<Course> findByCreatedAtBetweenOrderByNumberOfParticipantDescRateDesc(
                         Timestamp start, Timestamp end);
@@ -47,4 +47,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         public List<Course> findAllByOrderByNumberOfParticipantDescRateDesc();
 
         Optional<Course> findById(Long courseId);
+
+        @Query("SELECT c FROM Course c WHERE SIZE(c.chapters) > 0")
+        List<Course> findByChaptersNotEmpty();
+
 }

@@ -15,7 +15,7 @@ messages:
   MSG14: "Invalid email format"
   MSG15: "Profile edited successfully"
   MSG16: "No result found"
-  MSG17: "Comment must be 0-5000 character long"
+  MSG17: "Comment must be 1-5000 character long"
   MSG18: "Comment must follow Community principal"
   MSG19: "The system cannot save the comment, please try again later."
   MSG20: "Comment successfully"
