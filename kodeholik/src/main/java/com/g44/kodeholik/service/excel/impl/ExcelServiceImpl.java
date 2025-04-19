@@ -148,7 +148,7 @@ public class ExcelServiceImpl implements ExcelService {
 
         problemTestCaseDto.setTestCases(testCases);
         problemTestCaseDtoList.add(problemTestCaseDto);
-        // log.info(problemTestCaseDtoList);
+        log.info(problemTestCaseDtoList);
         return problemTestCaseDtoList;
     }
 
@@ -165,7 +165,8 @@ public class ExcelServiceImpl implements ExcelService {
                 boolean isGetInputName = false;
                 for (int i = 0; i < problemTestCases.size(); i++) {
                     if (problemTestCases.get(i).getLanguage().getName().equals(language.getName())) {
-                        List<InputVariable> inputVariables = objectMapper.readValue(problemTestCases.get(i).getInput(),
+                        List<InputVariable> inputVariables = objectMapper.readValue(
+                                problemTestCases.get(i).getInput() + "",
                                 new TypeReference<List<InputVariable>>() {
                                 });
                         if (!isGetInputName) {
@@ -214,7 +215,7 @@ public class ExcelServiceImpl implements ExcelService {
                             k++;
                         }
                         m++;
-                        row.createCell(k++).setCellValue(data.getExpectedOutput());
+                        row.createCell(k++).setCellValue(data.getExpectedOutput() + "");
                         row.createCell(k++).setCellValue(data.isSample());
                     }
                 }

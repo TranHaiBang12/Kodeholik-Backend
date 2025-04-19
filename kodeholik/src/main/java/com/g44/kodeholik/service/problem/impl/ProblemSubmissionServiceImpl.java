@@ -110,6 +110,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
             SubmissionResponseDto submissionResponseDto = null;
             try {
                 responseResult = objectMapper.readValue(result, ResponseResult.class);
+                convertFormatInputAndOutput(inputType, responseResult.getResults());
                 if (responseResult.isAccepted()) {
                     status = "ACCEPTED";
                 } else {
@@ -188,7 +189,6 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     private String getReturn(ProblemTemplate problemTemplate, String language) {
         String[] words = problemTemplate.getTemplateCode().trim().split(" ");
         for (int i = 0; i < words.length; i++) {
-            log.info(words[i]);
             if (words[i].contains(problemTemplate.getFunctionSignature())) {
                 return words[i - 1];
             }
@@ -229,6 +229,7 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         RunProblemResponseDto runProblemResponseDto = new RunProblemResponseDto();
         try {
             responseResult = objectMapper.readValue(result, ResponseResult.class);
+            convertFormatInputAndOutput(inputType, responseResult.getResults());
             if (responseResult.isAccepted()) {
                 status = "ACCEPTED";
             } else {
@@ -256,6 +257,27 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                 break;
         }
         return runProblemResponseDto;
+    }
+
+    public void convertFormatInputAndOutput(String returnType, List<TestResult> testResults) {
+        for (int i = 0; i < testResults.size(); i++) {
+            TestResult testResult = testResults.get(i);
+            log.info(testResult.toString());
+            if (!returnType.equals("String")) {
+                String expectedOutput = testResult.getExpectedOutput().toString();
+                if (expectedOutput.startsWith("\"")) {
+                    expectedOutput = expectedOutput.substring(1, expectedOutput.length() - 1);
+                    testResult.setExpectedOutput(expectedOutput);
+                }
+
+                String actualOutput = testResult.getActualOutput().toString();
+                log.info(expectedOutput + " " + actualOutput);
+                if (actualOutput.startsWith("\"")) {
+                    actualOutput = actualOutput.substring(1, actualOutput.length() - 1);
+                    testResult.setActualOutput(actualOutput);
+                }
+            }
+        }
     }
 
     @Override

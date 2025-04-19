@@ -540,9 +540,9 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public void addProblem(ProblemBasicAddDto problemBasicAddDto, ProblemEditorialDto problemEditorialDto,
             List<ProblemInputParameterDto> problemInputParameterDto, MultipartFile excelFile) {
-        log.info(problemBasicAddDto);
-        log.info(problemEditorialDto);
-        log.info(problemInputParameterDto);
+        // log.info(problemBasicAddDto);
+        // log.info(problemEditorialDto);
+        // log.info(problemInputParameterDto);
 
         if (checkTitleExisted(problemBasicAddDto.getTitle())) {
             throw new BadRequestException("Title has already existed", "Title has already existed");
@@ -551,8 +551,10 @@ public class ProblemServiceImpl implements ProblemService {
         Set<Language> languages = languageService.getLanguagesByNameList(problemBasicAddDto.getLanguageSupport());
         List<ProblemTestCaseDto> problemTestCaseDtos = new ArrayList();
         for (Language language : languages) {
-            List<String> inputNames = getInputName(problemInputParameterDto, language.getName());
-            problemTestCaseDtos.addAll(excelService.readTestCaseExcel(excelFile, inputNames,
+            List<String> inputNames = getInputName(problemInputParameterDto,
+                    language.getName());
+            problemTestCaseDtos.addAll(excelService.readTestCaseExcel(excelFile,
+                    inputNames,
                     language.getName()));
         }
         if (problemTestCaseDtos.isEmpty()) {
@@ -571,6 +573,7 @@ public class ProblemServiceImpl implements ProblemService {
                 problemBasicAddDto.getLanguageSupport());
         addProblemTestCase(problemTestCaseDtos, problem, problemInputParameterDto);
         syncProblemsToElasticsearch();
+
     }
 
     private Problem addProblemBasic(ProblemBasicAddDto problemBasicAddDto, Set<Language> languages) {
@@ -781,6 +784,7 @@ public class ProblemServiceImpl implements ProblemService {
                 // } else {
                 // problemTestCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
                 // }
+
                 problemTestCase.setExpectedOutput(testCaseDtos.get(i).getExpectedOutput());
 
                 problemTestCase.setProblem(problem);
@@ -797,7 +801,8 @@ public class ProblemServiceImpl implements ProblemService {
         StringBuilder templateBuilder;
         String template = "";
         templateBuilder = new StringBuilder();
-        templateBuilder.append(templateCode.getCode());
+        if (templateCode.getCode() != null && !templateCode.getCode().isEmpty())
+            templateBuilder.append(templateCode.getCode());
         templateBuilder.append("//Function \n ");
         if (templateCode.getLanguage().equals("Java")) {
             templateBuilder.append("public static ");
@@ -1077,8 +1082,13 @@ public class ProblemServiceImpl implements ProblemService {
     private String generateInputJson(List<ProblemInputParameterDto> problemInputParameterDto,
             ProblemTestCaseDto problemTestCaseDto,
             int index) {
-        return gson.toJson(inputs.get(index));
-
+        try {
+            // log.info(inputs.get(index));
+            log.info(objectMapper.writeValueAsString(inputs.get(index)));
+            return objectMapper.writeValueAsString(inputs.get(index));
+        } catch (JsonProcessingException ex) {
+            return "";
+        }
     }
 
     public Object parseMultiDimArray(String rawValue, String type) {

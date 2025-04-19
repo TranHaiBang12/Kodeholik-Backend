@@ -38,6 +38,7 @@ public class Subscriber implements MessageListener {
                 log.info(map.get("notification") + " " + map.get("username"));
                 messagingTemplate.convertAndSend("/notification/" + map.get("username"), map.get("notification"));
             } else {
+                log.info(objectMapper.writeValueAsString(map));
                 messagingTemplate.convertAndSend("/topic/exam/" + map.get("code"),
                         objectMapper.writeValueAsString(map));
             }

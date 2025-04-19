@@ -288,7 +288,9 @@ public class LessonServiceImpl implements LessonService {
                     lesson.setStatus(LessonStatus.ACTIVATED);
                 }
             } else {
-                lesson.setAttachedFile(null);
+                if (lessonRequestDto.getIsAttachedFileKeeped() != null
+                        && !lessonRequestDto.getIsAttachedFileKeeped().booleanValue())
+                    lesson.setAttachedFile(null);
             }
 
             // Handle video update

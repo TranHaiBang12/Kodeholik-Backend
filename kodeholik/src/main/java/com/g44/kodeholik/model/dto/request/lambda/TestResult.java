@@ -26,6 +26,8 @@ public class TestResult {
 
     private String status;
 
+    @JsonRawValue
+    @JsonDeserialize(using = RawJsonDeserializer.class)
     private Object actualOutput;
 
 }

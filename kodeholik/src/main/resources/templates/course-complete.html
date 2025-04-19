@@ -135,7 +135,7 @@
         <tr>
           <td class="header" style="background-color: #121221; padding: 25px 20px; text-align: center;">
             <div style="display: flex !important; margin: auto">
-              <img style="width: 50px; height: 50px" src="https://i.ibb.co/1GDGJC0x/kodeholik-logo.png" />
+              <img style="width: 50px; height: 50px" src="https://i.ibb.co/B2n6byQN/kodeholik-logo.png" />
               <h1 class="logo" style="color: #98ff99; font-size: 28px; font-weight: bold; letter-spacing: 1px; margin-top: 5px;">
                 Kodeholik
               </h1>
@@ -147,26 +147,40 @@
         <tr>
           <td class="content" style="padding: 30px 40px; line-height: 1.6; color: #b9c5e5 !important;">
             <div class="greeting" style="margin-bottom: 15px; color: #b9c5e5 !important;">
-              Hello, <span style="font-weight: bold;" th:text="${username}">User</span>
+              Hi <span style="font-weight: bold;" th:text="${username}">User</span>,
             </div>
-
-            <div class="message" style="margin-bottom: 25px; font-size: 16px; color: #b9c5e5 !important;">
-              <strong>Congratulations!</strong> You have successfully completed your course with Kodeholik. We’re proud of your achievement and hope you continue to learn and grow with us!
+          
+            <div class="message" style="margin-bottom: 20px; font-size: 16px; color: #b9c5e5 !important;">
+              🎉 <strong>Big congratulations!</strong><br>
+              You've officially completed your course at <span class="highlight">Kodeholik</span>! That’s a huge step forward and we couldn’t be prouder of you.
             </div>
-
-            <div class="course-container" style="background-color: #121221; border-radius: 6px; padding: 20px; margin: 20px 0 30px; text-align: center; border: 1px solid #333344;">
-              <div class="course-label" style="font-size: 14px; color: #b9c5e5; margin-bottom: 10px;">
-                Completed Course
+          
+            <div class="course-container">
+              <div class="course-label">Completed Course</div>
+              <div class="course-name" th:text="${content}">Course Name</div>
+              
+              <div style="margin-top: 20px; font-size: 14px; color: #b9c5e5;">
+                <div>🗓️ Started on: <span style="color: #98ff99;" th:text="${startDate}">01 Jan 2025</span></div>
+                <div>🏁 Finished on: <span style="color: #98ff99;" th:text="${endDate}">10 Jan 2025</span></div>
+                <div>📚 Days of learning: <span style="color: #98ff99;" th:text="${totalDays}">10 days</span></div>
               </div>
-              <div class="course-name" style="font-size: 24px; font-weight: bold; color: #98ff99;" th:text="${content}">
-                Course Name
-              </div>
             </div>
-
-            <a href="https://kodeholik.com/courses" class="cta-button" style="display: block; background-color: #98ff99; color: #121221; text-decoration: none; text-align: center; padding: 12px 25px; border-radius: 4px; font-weight: bold; margin: 25px 0;">
-              Explore More Courses
+          
+            <div style="margin: 25px 0 10px; font-size: 16px; color: #b9c5e5;">
+              🔥 What's next?
+            </div>
+            <ul style="padding-left: 20px; color: #b9c5e5; font-size: 15px;">
+              <li>Keep your momentum going – explore our <a href="https://kodeholik.com/courses" style="color: #98ff99; text-decoration: underline;">next-level courses</a>.</li>
+              <li>Join our <a href="#" style="color: #98ff99; text-decoration: underline;">community on Discord</a> and connect with fellow learners.</li>
+              <li>Share your achievement on social media – inspire someone today!</li>
+            </ul>
+          
+            <a href="https://kodeholik.com/courses" class="cta-button">
+              🚀 Discover New Courses
             </a>
           </td>
+          
+          
         </tr>
 
         <!-- Footer -->

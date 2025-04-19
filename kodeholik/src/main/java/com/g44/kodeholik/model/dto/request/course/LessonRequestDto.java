@@ -51,6 +51,8 @@ public class LessonRequestDto {
 
     private List<String> problemIds = new ArrayList<>();
 
+    private Boolean isAttachedFileKeeped;
+
     public void setProblemIds(String problemIdsStr) {
         if (problemIdsStr != null && !problemIdsStr.isEmpty()) {
             this.problemIds = Arrays.asList(problemIdsStr.split(","));

@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -143,6 +144,14 @@ public class ExamServiceImpl implements ExamService {
 
     private final ExcelService excelService;
 
+    private Timestamp setSecondToZero(Timestamp timestamp) {
+
+        LocalDateTime ldt = timestamp.toLocalDateTime().withSecond(0).withNano(0);
+
+        Timestamp truncated = Timestamp.valueOf(ldt);
+        return truncated;
+    }
+
     @Override
     public ExamResponseDto createExam(AddExamRequestDto addExamRequestDto) {
         if (addExamRequestDto.getLanguageSupports() == null || addExamRequestDto.getLanguageSupports().isEmpty()) {
@@ -158,9 +167,13 @@ public class ExamServiceImpl implements ExamService {
             throw new BadRequestException("Start date cannot be after end date", "ERR_START_AFTER_END");
         }
 
+        addExamRequestDto.setStartTime(setSecondToZero(addExamRequestDto.getStartTime()));
+        addExamRequestDto.setEndTime(setSecondToZero(addExamRequestDto.getEndTime()));
+
         Exam exam = addExamRequestMapper.mapTo(addExamRequestDto);
         if (examRepository.existsByTitleIgnoreCase(addExamRequestDto.getTitle())) {
-            throw new BadRequestException("An exam with title '" + addExamRequestDto.getTitle() + "' already exists", "ERR_DUPLICATE_TITLE");
+            throw new BadRequestException("An exam with title '" + addExamRequestDto.getTitle() + "' already exists",
+                    "ERR_DUPLICATE_TITLE");
         }
 
         Set<Language> languages = languageService.getLanguagesByNameList(addExamRequestDto.getLanguageSupports());
@@ -203,8 +216,6 @@ public class ExamServiceImpl implements ExamService {
         return examResponseDto;
     }
 
-
-
     private boolean checkLanguageSupportEquals(Set<Language> examSupport, Set<Language> problemSupport) {
         return problemSupport.containsAll(examSupport);
     }
@@ -229,6 +240,9 @@ public class ExamServiceImpl implements ExamService {
         if (addExamRequestDto.getStartTime().after(addExamRequestDto.getEndTime())) {
             throw new BadRequestException("Start date cannot be after end date", "Start date cannot be after end date");
         }
+
+        addExamRequestDto.setStartTime(setSecondToZero(addExamRequestDto.getStartTime()));
+        addExamRequestDto.setEndTime(setSecondToZero(addExamRequestDto.getEndTime()));
 
         Exam exam = addExamRequestMapper.mapTo(addExamRequestDto);
         exam.setId(savedExam.getId());
@@ -719,7 +733,8 @@ public class ExamServiceImpl implements ExamService {
 
         Users user = userService.getCurrentUser();
         String tileLowerCase = title != null ? title.toLowerCase() : null;
-        Page<ExamParticipant> exams = examParticipantRepository.findByStatus(status, user, tileLowerCase, startTimestamp,
+        Page<ExamParticipant> exams = examParticipantRepository.findByStatus(status, user, tileLowerCase,
+                startTimestamp,
                 endTimestamp, pageable);
 
         Users currentUser = userService.getCurrentUser();

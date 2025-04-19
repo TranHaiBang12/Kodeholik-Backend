@@ -71,7 +71,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 List<InputVariable> inputs = new ArrayList<>();
                 try {
                     inputs = objectMapper.readValue(
-                            problemTestCase.get(i).getInput(),
+                            problemTestCase.get(i).getInput() + "",
                             new TypeReference<List<InputVariable>>() {
                             });
                 } catch (Exception e) {
@@ -96,7 +96,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 Object output = null;
                 try {
                     inputs = objectMapper.readValue(
-                            problemTestCase.get(i).getInput(),
+                            problemTestCase.get(i).getInput() + "",
                             new TypeReference<List<InputVariable>>() {
                             });
                 } catch (Exception e) {
@@ -119,7 +119,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             Object output = null;
             try {
                 inputs = objectMapper.readValue(
-                        problemTestCase.get(i).getInput(),
+                        problemTestCase.get(i).getInput() + "",
                         new TypeReference<List<InputVariable>>() {
                         });
                 output = problemTestCase.get(i).getExpectedOutput();
@@ -163,7 +163,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             Object output = null;
             try {
                 inputs = objectMapper.readValue(
-                        problemTestCase.get(i).getInput(),
+                        problemTestCase.get(i).getInput() + "",
                         new TypeReference<List<InputVariable>>() {
                         });
             } catch (Exception e) {
@@ -184,7 +184,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             Object output = null;
             try {
                 inputs = objectMapper.readValue(
-                        problemTestCase.get(i).getInput(),
+                        problemTestCase.get(i).getInput() + "",
                         new TypeReference<List<InputVariable>>() {
                         });
             } catch (Exception e) {
@@ -198,7 +198,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
     @Override
     public List<ProblemTestCase> getTestCaseByProblemAndAllLanguage(Problem problem) {
         // log.info(problemTestCaseRepository
-        //         .findByProblem(problem));
+        // .findByProblem(problem));
         return problemTestCaseRepository
                 .findByProblem(problem);
     }
