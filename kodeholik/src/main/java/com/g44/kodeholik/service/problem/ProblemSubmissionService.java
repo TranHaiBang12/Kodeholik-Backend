@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
-import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.compileRequest.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ProblemResultOverviewResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.ProblemSubmissionDto;

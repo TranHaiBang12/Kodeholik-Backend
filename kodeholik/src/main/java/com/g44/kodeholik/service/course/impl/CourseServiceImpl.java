@@ -2,6 +2,7 @@ package com.g44.kodeholik.service.course.impl;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -50,7 +51,6 @@ import com.g44.kodeholik.model.dto.request.course.CourseRequestDto;
 import com.g44.kodeholik.model.dto.response.course.CourseResponseDto;
 import com.g44.kodeholik.model.dto.response.course.overview.CourseInfoOverviewDto;
 import com.g44.kodeholik.model.dto.response.course.overview.CourseOverviewReportDto;
-import com.g44.kodeholik.model.entity.course.Course;
 import com.g44.kodeholik.repository.course.CourseRepository;
 import com.g44.kodeholik.service.course.CourseService;
 import com.g44.kodeholik.service.email.EmailService;
@@ -93,6 +93,8 @@ public class CourseServiceImpl implements CourseService {
     private final S3Service s3Service;
 
     private final LessonRepository lessonRepository;
+
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy, HH:mm");
 
     public List<Long> getCompletedLessons() {
         Users currentUser = userService.getCurrentUser();
@@ -230,7 +232,8 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
-        // Kiểm tra xem title mới có trùng với Course khác không (ngoại trừ Course hiện tại)
+        // Kiểm tra xem title mới có trùng với Course khác không (ngoại trừ Course hiện
+        // tại)
         if (courseRepository.findByTitleIgnoreCaseAndIdNot(normalizedTitle, courseId).isPresent()) {
             throw new BadRequestException("Course title already exists: " + normalizedTitle,
                     "Course title already exists: " + normalizedTitle);
@@ -406,7 +409,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addTop5PopularCourse() {
-        List<Course> courses = courseRepository.findTop6ByStatusOrderByNumberOfParticipantDescRateDesc(CourseStatus.ACTIVATED);
+        List<Course> courses = courseRepository
+                .findTop6ByStatusOrderByNumberOfParticipantDescRateDesc(CourseStatus.ACTIVATED);
         topCourseRepository.deleteAll();
         int top = 5;
         for (int i = 0; i < courses.size(); i++) {
@@ -422,7 +426,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<CourseResponseDto> getTop5PopularCourse() {
-        List<TopCourse> topCourses = topCourseRepository.findByCourseStatusOrderByDisplayOrderDesc(CourseStatus.ACTIVATED);
+        List<TopCourse> topCourses = topCourseRepository
+                .findByCourseStatusOrderByDisplayOrderDesc(CourseStatus.ACTIVATED);
         List<CourseResponseDto> result = new ArrayList();
         for (int i = 0; i < topCourses.size(); i++) {
             result.add(courseResponseMapper.mapFrom(topCourses.get(i).getCourse()));
@@ -553,9 +558,11 @@ public class CourseServiceImpl implements CourseService {
                         currentUser.getEmail(),
                         "[KODEHOLIK] You completed " + course.getTitle(),
                         currentUser.getUsername(),
-                        course.getTitle());
+                        course.getTitle(),
+                        sdf.format(courseUser.getEnrolledAt()),
+                        sdf.format(Timestamp.from(Instant.now())),
+                        (int) Duration.between(courseUser.getEnrolledAt().toInstant(), Instant.now()).toDays());
                 markCourseAsFinished(courseId, currentUser); // Gọi service cập nhật finished
-                log.info("Email sent and marked as finished for user {} and course {}", currentUser.getId(), courseId);
             } catch (Exception e) {
                 log.error("Failed to send email to {}: {}", currentUser.getEmail(), e.getMessage());
                 throw new RuntimeException("Email sending failed", e);

@@ -1,5 +1,7 @@
 package com.g44.kodeholik.service.email;
 
+import java.util.Map;
+
 public interface EmailService {
     public void sendEmailResetPassword(String to, String subject, String username, String link);
 
@@ -14,5 +16,9 @@ public interface EmailService {
 
     public void sendEmailRemindLearning(String to, String subject, String username, String content);
 
-    public void sendEmailCompleteCourse(String to, String subject, String username, String content);
+    public void sendEmailCompleteCourse(String to, String subject, String username, String courseName, String startDate,
+            String endDate, int totalDays);
+
+    public void sendEmailNotifyExamResult(String to, String subject, String username, String title, String startDate,
+            double totalGrade, Map<String, Double> questionResults);
 }

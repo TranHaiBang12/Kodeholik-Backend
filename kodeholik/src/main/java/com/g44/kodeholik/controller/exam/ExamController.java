@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.g44.kodeholik.config.WebsocketSessionManager;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
-import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.compileRequest.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResultOverviewDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamCompileInformationResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;

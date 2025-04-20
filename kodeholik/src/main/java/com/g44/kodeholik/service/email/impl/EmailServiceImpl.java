@@ -1,5 +1,9 @@
 package com.g44.kodeholik.service.email.impl;
 
+import java.io.File;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -28,6 +32,9 @@ public class EmailServiceImpl implements EmailService {
 
     private final OpenAIService openAIService;
 
+    @Value("${spring.application.fe-url}")
+    private String feLink;
+
     @Async("emailTaskExecutor")
     private void sendEmail(String to, String subject, Context context, String template) {
         String htmlContent = templateEngine.process(template, context);
@@ -38,8 +45,13 @@ public class EmailServiceImpl implements EmailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
+
+            ClassPathResource imageResource = new ClassPathResource("templates/images/logo/kodeholik_logo.png");
+            helper.addInline("kodeholik-logo", imageResource);
+
             javaMailSender.send(message);
         } catch (Exception e) {
+            log.info(e.getMessage());
             throw new EmailSendingException("Error sending email", "Error sending email");
         }
     }
@@ -83,6 +95,7 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("date", date);
         context.setVariable("code", code);
         context.setVariable("duration", duration + " minutes");
+        context.setVariable("link", feLink + "/exam");
         sendEmail(to, subject, context, "exam-noti-30");
     }
 
@@ -93,6 +106,7 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("username", username);
         context.setVariable("date", date);
         context.setVariable("code", code);
+        context.setVariable("link", feLink + "/exam");
         sendEmail(to, subject, context, "exam-noti-5");
     }
 
@@ -108,11 +122,30 @@ public class EmailServiceImpl implements EmailService {
 
     @Async("emailTaskExecutor")
     @Override
-    public void sendEmailCompleteCourse(String to, String subject, String username, String content) {
+    public void sendEmailCompleteCourse(String to, String subject, String username, String courseName, String startDate,
+            String endDate, int totalDays) {
         Context context = new Context();
         context.setVariable("username", username);
-        context.setVariable("content", content);
+        context.setVariable("courseName", courseName);
+        context.setVariable("startDate", startDate);
+        context.setVariable("endDate", endDate);
+        context.setVariable("totalDays", totalDays);
+        context.setVariable("link", feLink + "/courses");
         sendEmail(to, subject, context, "course-complete");
+    }
+
+    @Async("emailTaskExecutor")
+    @Override
+    public void sendEmailNotifyExamResult(String to, String subject, String username, String title, String startDate,
+            double totalGrade, Map<String, Double> questionResults) {
+        Context context = new Context();
+        context.setVariable("username", username);
+        context.setVariable("title", title);
+        context.setVariable("startDate", startDate);
+        context.setVariable("totalGrade", totalGrade);
+        context.setVariable("questionResults", questionResults);
+        context.setVariable("link", feLink + "/exam");
+        sendEmail(to, subject, context, "exam-result-noti");
     }
 
 }

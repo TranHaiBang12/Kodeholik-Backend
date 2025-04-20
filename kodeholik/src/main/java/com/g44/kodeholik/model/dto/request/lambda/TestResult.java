@@ -30,4 +30,6 @@ public class TestResult {
     @JsonDeserialize(using = RawJsonDeserializer.class)
     private Object actualOutput;
 
+    private boolean isRunInput;
+
 }

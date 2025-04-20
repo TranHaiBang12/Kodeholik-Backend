@@ -32,7 +32,7 @@ import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
-import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.compileRequest.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamProblemResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
@@ -654,6 +654,32 @@ public class ExamServiceImpl implements ExamService {
         for (Exam exam : exams) {
             exam.setStatus(ExamStatus.END);
             examRepository.save(exam);
+            List<ExamParticipant> examParticipants = examParticipantRepository.findByExam(exam);
+            List<ExamProblem> examProblems = examProblemRepository.findByExam(exam);
+            Map<String, Double> gradeDetails = new HashMap<>();
+            for (ExamParticipant examParticipant : examParticipants) {
+                try {
+                    double totalGrade = examParticipant.getGrade();
+                    for (ExamProblem examProblem : examProblems) {
+                        Problem problem = examProblem.getProblem();
+                        Optional<ExamSubmission> examSubmissionOptional = examSubmissionRepository
+                                .findByExamParticipantAndProblem(examParticipant, problem);
+                        double grade = examSubmissionOptional.map(ExamSubmission::getPoint).orElse(0.0);
+                        gradeDetails.put(problem.getTitle(), grade);
+                    }
+                    emailService.sendEmailNotifyExamResult(
+                            examParticipant.getParticipant().getEmail(),
+                            "[KODEHOLIK] Exam Result",
+                            examParticipant.getParticipant().getUsername(),
+                            exam.getTitle(),
+                            sdf.format(exam.getStartTime()),
+                            totalGrade,
+                            gradeDetails);
+                } catch (Exception e) {
+                    log.error("Failed to send result email to user {}: {}",
+                            examParticipant.getParticipant().getUsername(), e.getMessage());
+                }
+            }
         }
     }
 

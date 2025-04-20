@@ -3,7 +3,7 @@ package com.g44.kodeholik.controller.problem;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.compileRequest.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.search.FilterProgress;
 import com.g44.kodeholik.model.dto.request.problem.search.FilterSubmission;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;

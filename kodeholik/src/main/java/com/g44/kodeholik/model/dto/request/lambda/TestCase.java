@@ -2,6 +2,7 @@ package com.g44.kodeholik.model.dto.request.lambda;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 
 import lombok.AllArgsConstructor;
@@ -17,4 +18,10 @@ public class TestCase {
     private List<InputVariable> input;
     @JsonRawValue
     private Object expectedOutput;
+    @JsonProperty("isRunInput")
+    private boolean isRunInput;
+
+    public boolean isRunInput() {
+        return isRunInput;
+    }
 }

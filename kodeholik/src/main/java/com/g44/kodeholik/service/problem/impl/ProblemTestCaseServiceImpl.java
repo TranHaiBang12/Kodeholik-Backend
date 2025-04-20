@@ -77,7 +77,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 } catch (Exception e) {
                     log.info(e.getMessage());
                 }
-                testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+                testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput(), false));
             }
             listTestCase.add(testCases);
         }
@@ -102,7 +102,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
                 } catch (Exception e) {
                     log.info(e.getMessage());
                 }
-                testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+                testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput(), false));
             }
             listTestCase.add(testCases);
         }
@@ -127,7 +127,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             } catch (Exception e) {
                 log.info(e.getMessage());
             }
-            testCases.add(new TestCase(inputs, output));
+            testCases.add(new TestCase(inputs, output, false));
         }
         return testCases;
     }
@@ -169,7 +169,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             } catch (Exception e) {
                 log.info(e.getMessage());
             }
-            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput(), false));
         }
         return testCases;
     }
@@ -190,7 +190,7 @@ public class ProblemTestCaseServiceImpl implements ProblemTestCaseService {
             } catch (Exception e) {
                 log.info(e.getMessage());
             }
-            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput()));
+            testCases.add(new TestCase(inputs, problemTestCase.get(i).getExpectedOutput(), false));
         }
         return testCases;
     }

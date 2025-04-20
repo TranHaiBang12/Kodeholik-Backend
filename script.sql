@@ -271,26 +271,13 @@ ALTER TYPE schema_user.notification_type OWNER TO postgres;
 -- Name: transaction_status; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
-CREATE TYPE schema_user.transaction_status AS ENUM (
-    'success',
-    'failed'
-);
 
-
-ALTER TYPE schema_user.transaction_status OWNER TO postgres;
 
 --
 -- TOC entry 968 (class 1247 OID 17224)
 -- Name: transaction_type; Type: TYPE; Schema: schema_user; Owner: postgres
 --
 
-CREATE TYPE schema_user.transaction_type AS ENUM (
-    'topup',
-    'withdraw'
-);
-
-
-ALTER TYPE schema_user.transaction_type OWNER TO postgres;
 
 --
 -- TOC entry 1007 (class 1247 OID 17494)
@@ -1201,35 +1188,6 @@ ALTER TABLE schema_user.notification ALTER COLUMN id ADD GENERATED ALWAYS AS IDE
 -- TOC entry 252 (class 1259 OID 17244)
 -- Name: transaction; Type: TABLE; Schema: schema_user; Owner: postgres; Tablespace: kodeholik_user_data
 --
-
-CREATE TABLE schema_user.transaction (
-    id integer NOT NULL,
-    user_id integer,
-    amount double precision NOT NULL,
-    transaction_type schema_user.transaction_type NOT NULL,
-    status schema_user.transaction_status NOT NULL,
-    description text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone,
-    reference_id character varying(100)
-);
-
-
-ALTER TABLE schema_user.transaction OWNER TO postgres;
-
---
--- TOC entry 251 (class 1259 OID 17243)
--- Name: transaction_id_seq; Type: SEQUENCE; Schema: schema_user; Owner: postgres
---
-
-ALTER TABLE schema_user.transaction ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME schema_user.transaction_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
 
 
 --
@@ -13114,8 +13072,7 @@ ALTER TABLE ONLY schema_user.notification
 -- Name: transaction transaction_pkey; Type: CONSTRAINT; Schema: schema_user; Owner: postgres
 --
 
-ALTER TABLE ONLY schema_user.transaction
-    ADD CONSTRAINT transaction_pkey PRIMARY KEY (id);
+
 
 
 --
@@ -13876,9 +13833,6 @@ ALTER TABLE ONLY schema_user.notification
 -- TOC entry 5043 (class 2606 OID 17251)
 -- Name: transaction transaction_user_id_fkey; Type: FK CONSTRAINT; Schema: schema_user; Owner: postgres
 --
-
-ALTER TABLE ONLY schema_user.transaction
-    ADD CONSTRAINT transaction_user_id_fkey FOREIGN KEY (user_id) REFERENCES schema_user.users(id);
 
 
 -- Completed on 2025-03-30 19:05:20

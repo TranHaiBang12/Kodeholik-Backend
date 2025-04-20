@@ -1,4 +1,4 @@
-package com.g44.kodeholik.model.dto.request.problem;
+package com.g44.kodeholik.model.dto.request.problem.compileRequest;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ import lombok.NoArgsConstructor;
 public class ProblemCompileRequestDto {
     private String code;
     private String languageName;
-    private List<TestCase> testCases;
+    private List<List<InputTestCase>> inputs;
 }

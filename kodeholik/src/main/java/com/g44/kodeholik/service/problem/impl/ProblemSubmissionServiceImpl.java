@@ -22,11 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
+import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
 import com.g44.kodeholik.model.dto.request.lambda.ResponseResult;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 import com.g44.kodeholik.model.dto.request.lambda.TestResult;
-import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.compileRequest.InputTestCase;
+import com.g44.kodeholik.model.dto.request.problem.compileRequest.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ProblemResultOverviewResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.TestCaseResult;
 import com.g44.kodeholik.model.dto.response.problem.submission.ProblemSubmissionDto;
@@ -202,6 +204,32 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         if (problemCompileRequestDto.getCode().isEmpty()) {
             throw new BadRequestException("Code is required", "Code is required");
         }
+        List<List<InputTestCase>> inputs = problemCompileRequestDto.getInputs();
+        if (inputs != null && !inputs.isEmpty()) {
+            for (int i = 0; i < inputs.size(); i++) {
+                TestCase testCase = new TestCase();
+                List<InputTestCase> inputTestCase = inputs.get(i);
+                List<InputVariable> newInputVariableList = new ArrayList<>();
+                List<InputVariable> inputVariable = testCases.get(0).getInput();
+                if (inputTestCase.size() != inputVariable.size()) {
+                    throw new BadRequestException("Input test case is not valid", "Input test case is not valid");
+                }
+                for (int j = 0; j < inputVariable.size(); j++) {
+                    if (inputVariable.get(j).getName().equals(inputTestCase.get(j).getName())) {
+                        InputVariable newInputVariable = new InputVariable();
+                        newInputVariable.setName(inputTestCase.get(j).getName());
+                        newInputVariable.setValue(inputTestCase.get(j).getValue());
+                        newInputVariable.setNoDimension(inputVariable.get(j).getNoDimension());
+                        newInputVariable.setType(inputVariable.get(j).getType());
+                        newInputVariable.setSample(inputVariable.get(j).isSample());
+                        newInputVariableList.add(newInputVariable);
+                    }
+                }
+                testCase.setInput(newInputVariableList);
+                testCase.setRunInput(true);
+                testCases.add(testCase);
+            }
+        }
         String languageName = problemCompileRequestDto.getLanguageName();
         String functionSignature = problemTemplate.getFunctionSignature();
         String inputType = getReturn(problemTemplate, languageName);
@@ -238,7 +266,8 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
         } catch (Exception e) {
             status = result;
         }
-        log.info(responseResult.getResults());
+        log.info("HEHE");
+        log.info(responseResult);
 
         runProblemResponseDto.setResults(responseResult.getResults());
         switch (status) {

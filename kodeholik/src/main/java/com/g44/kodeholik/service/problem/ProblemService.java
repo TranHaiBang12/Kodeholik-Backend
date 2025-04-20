@@ -13,7 +13,7 @@ import com.g44.kodeholik.model.dto.request.exam.ExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
 import com.g44.kodeholik.model.dto.request.problem.FilterProblemRequestAdminDto;
-import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.compileRequest.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemBasicAddDto;
 import com.g44.kodeholik.model.dto.request.problem.add.ProblemEditorialDto;

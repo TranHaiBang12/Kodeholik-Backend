@@ -12,7 +12,7 @@ import com.g44.kodeholik.model.dto.request.exam.EditExamBasicRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.EditExamProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.FilterExamRequestDto;
 import com.g44.kodeholik.model.dto.request.exam.SubmitExamRequestDto;
-import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.compileRequest.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamListResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.examiner.ExamResultOverviewDto;
