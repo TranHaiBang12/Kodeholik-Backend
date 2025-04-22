@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
+import com.g44.kodeholik.exception.WrongInputDataTypeRunTestCaseException;
 import com.g44.kodeholik.model.dto.request.lambda.InputVariable;
 import com.g44.kodeholik.model.dto.request.lambda.LambdaRequest;
 import com.g44.kodeholik.model.dto.request.lambda.ResponseResult;
@@ -215,41 +216,36 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                 List<InputTestCase> inputTestCase = inputs.get(i);
                 List<InputVariable> newInputVariableList = new ArrayList<>();
                 List<InputVariable> inputVariable = testCases.get(0).getInput();
+                log.info(inputTestCase.size() + " " + inputVariable.size());
                 if (inputTestCase.size() != inputVariable.size()) {
-                    throw new BadRequestException("Input test case is not valid", "Input test case is not valid");
+                    throw new BadRequestException(
+                            "Input test case is not valid",
+                            "Input test case is not valid");
                 }
                 for (int j = 0; j < inputVariable.size(); j++) {
                     if (inputVariable.get(j).getName().equals(inputTestCase.get(j).getName())) {
                         InputVariable newInputVariable = new InputVariable();
-                        log.info(inputTestCase.get(j).getValue() + " " + inputTestCase.get(j).getValue().getClass());
-                        log.info(inputVariable.get(j).getValue() + " " + inputVariable.get(j).getValue().getClass());
-                        if (inputVariable.get(j).getType().equals("STRING")) {
-                            inputTestCase.get(j).setValue("\"" + inputTestCase.get(j).getValue() + "\"");
-                        }
                         try {
-                            if (inputVariable.get(j).getType().equals("STRING")) {
-                                if (!StructureComparator.haveSameStructure(
-                                        objectMapper.readValue(inputTestCase.get(j).getValue().toString(),
-                                                Object.class),
-                                        objectMapper.readValue(inputVariable.get(j).getValue().toString(),
-                                                Object.class))) {
-                                    throw new BadRequestException("Invalid data type in input test case.",
-                                            "Invalid data type in input test case.");
-                                }
-                            } else {
-                                if (!StructureComparator.haveSameStructure(
-                                        objectMapper.readValue(inputTestCase.get(j).getValue().toString(),
-                                                Object.class),
-                                        objectMapper.readValue(inputVariable.get(j).getValue().toString(),
-                                                Object.class))) {
-                                    throw new BadRequestException("Invalid data type in input test case.",
-                                            "Invalid data type in input test case.");
-                                }
+
+                            inputTestCase.get(j)
+                                    .setValue(objectMapper.writeValueAsString(inputTestCase.get(j).getValue()));
+                            log.info(inputTestCase.get(j).getValue() + " " + inputVariable.get(j).getValue());
+                            if (!StructureComparator.haveSameStructure(
+                                    objectMapper.readValue(inputTestCase.get(j).getValue().toString(),
+                                            Object.class),
+                                    objectMapper.readValue(inputVariable.get(j).getValue().toString(),
+                                            Object.class))) {
+                                throw new WrongInputDataTypeRunTestCaseException(
+                                        "Invalid data type in input test case.",
+                                        "Invalid data type in input test case.", "Case " + testCases.size() + (i + 1),
+                                        inputTestCase.get(j).getValue());
                             }
                         } catch (Exception e) {
                             log.info(e.getMessage());
-                            throw new BadRequestException("Invalid data type in input test case.",
-                                    "Invalid data type in input test case.");
+                            throw new WrongInputDataTypeRunTestCaseException(
+                                    "Invalid data type in input test case.",
+                                    "Invalid data type in input test case.", "Case " + (i + 1),
+                                    inputTestCase.get(j).getValue().toString());
                         }
 
                         newInputVariable.setName(inputTestCase.get(j).getName());

@@ -137,6 +137,22 @@ public class GlobalException {
                                 HttpStatus.BAD_REQUEST);
         }
 
+        // handle loi~ input test case sai dinh dang
+        @ExceptionHandler(WrongInputDataTypeRunTestCaseException.class)
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
+        @ResponseBody
+        public ResponseEntity<Map<String, Object>> handleWrongInputDataTypeRunTestCaseException(
+                        WrongInputDataTypeRunTestCaseException ex) {
+                log.info(ex.getTestCaseValue());
+                Map<String, Object> errorList = new HashMap<>();
+                errorList.put("message", ex.getMessage());
+                errorList.put("details", ex.getDetails());
+                errorList.put("testCaseName", ex.getTestCaseName());
+                errorList.put("testCaseValue", ex.getTestCaseValue());
+                return new ResponseEntity(errorList,
+                                HttpStatus.BAD_REQUEST);
+        }
+
         // handle Exam not start
         @ExceptionHandler(ExamNotReadyToStartException.class)
         @ResponseStatus(HttpStatus.BAD_REQUEST)

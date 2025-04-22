@@ -21,6 +21,8 @@ public class TestCase {
     @JsonProperty("isRunInput")
     private boolean isRunInput;
 
+    // private boolean wrongInputType;
+
     public boolean isRunInput() {
         return isRunInput;
     }

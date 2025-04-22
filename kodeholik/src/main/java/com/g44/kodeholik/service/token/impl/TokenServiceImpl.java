@@ -140,10 +140,17 @@ public class TokenServiceImpl implements TokenService {
 
         // response.addCookie(tokenCookie);
 
+        // ResponseCookie tokenCookie = ResponseCookie.from(cookieName, token)
+        // .httpOnly(true)
+        // .secure(true) // Cần thiết khi dùng SameSite=None
+        // .sameSite("None")
+        // .path("/")
+        // .maxAge(expiryTime / 1000)
+        // .build();
         ResponseCookie tokenCookie = ResponseCookie.from(cookieName, token)
                 .httpOnly(true)
-                .secure(true) // Cần thiết khi dùng SameSite=None
-                .sameSite("None")
+                .secure(false) // Cần thiết khi dùng SameSite=None
+                .sameSite("Lax")
                 .path("/")
                 .maxAge(expiryTime / 1000)
                 .build();
