@@ -23,6 +23,7 @@ import com.g44.kodeholik.model.dto.response.exam.student.ExamResultOverviewRespo
 import com.g44.kodeholik.model.dto.response.exam.student.NotStartedExamListDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;
 import com.g44.kodeholik.model.entity.exam.Exam;
+import com.g44.kodeholik.model.enums.exam.ExamSocketResponseType;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
 
 public interface ExamService {
@@ -48,7 +49,8 @@ public interface ExamService {
 
         public ExamDetailResponseDto getProblemDetailInExam(String code);
 
-        public double submitExam(List<SubmitExamRequestDto> submitExamRequestDto, String code,
+        public Map<String, String> submitExam(List<SubmitExamRequestDto> submitExamRequestDto,
+                        String code,
                         String username);
 
         public Object generateTokenForExam(String code);

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.g44.kodeholik.model.dto.response.exam.student.ExamDetailResponseDto;
 import com.g44.kodeholik.model.dto.response.exam.student.ExamProblemDetailResponseDto;
+import com.g44.kodeholik.model.enums.exam.ExamSocketResponseType;
 import com.g44.kodeholik.service.exam.ExamService;
 import com.g44.kodeholik.service.publisher.Publisher;
 import com.g44.kodeholik.service.scheduler.ExamSchedulerService;
@@ -59,6 +60,7 @@ public class ExamSchedulerServiceImpl implements ExamSchedulerService {
     public void sendExamToUsers(String code) {
         ExamDetailResponseDto examProblemDetailResponseDtos = examService.startExam(code);
         Map<String, Object> map = new HashMap<String, Object>();
+        map.put("type", ExamSocketResponseType.TOPIC);
         map.put("code", code);
         map.put("details", examProblemDetailResponseDtos);
         publisher.startExam(map);

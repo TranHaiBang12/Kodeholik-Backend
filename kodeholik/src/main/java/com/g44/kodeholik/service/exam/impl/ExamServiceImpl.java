@@ -58,6 +58,7 @@ import com.g44.kodeholik.model.entity.problem.Problem;
 import com.g44.kodeholik.model.entity.problem.ProblemSubmission;
 import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
+import com.g44.kodeholik.model.enums.exam.ExamSocketResponseType;
 import com.g44.kodeholik.model.enums.exam.ExamStatus;
 import com.g44.kodeholik.model.enums.user.NotificationType;
 import com.g44.kodeholik.model.enums.user.UserRole;
@@ -459,12 +460,12 @@ public class ExamServiceImpl implements ExamService {
         }
         examDetailResponseDto.setDuration(getMinuteDifference(exam.getStartTime(), exam.getEndTime()) * 60);
         examDetailResponseDto.setProblems(result);
-        log.info(examDetailResponseDto);
+        examDetailResponseDto.setEndTime(exam.getEndTime());
         return examDetailResponseDto;
     }
 
     @Override
-    public double submitExam(List<SubmitExamRequestDto> submitExamRequestDto, String code,
+    public Map<String, String> submitExam(List<SubmitExamRequestDto> submitExamRequestDto, String code,
             String username) {
         Exam exam = getExamByCode(code);
         Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -475,21 +476,21 @@ public class ExamServiceImpl implements ExamService {
             mapError.put("username", username);
             mapError.put("error", "Exam has not started yet");
             publisher.sendError(mapError);
-            return 0;
+            return null;
         }
 
         else if (exam.getEndTime().getTime() <= after5Minutes.getTime()) {
             mapError.put("username", username);
             mapError.put("error", "Exam has already ended");
             publisher.sendError(mapError);
-            return 0;
+            return null;
         }
 
         else if (exam.getStatus() != ExamStatus.IN_PROGRESS) {
             mapError.put("username", username);
             mapError.put("error", "The exam has not started or already ended.");
             publisher.sendError(mapError);
-            return 0;
+            return null;
         }
 
         Users currentUser = userService.getUserByUsernameOrEmail(username);
@@ -499,7 +500,7 @@ public class ExamServiceImpl implements ExamService {
             mapError.put("username", username);
             mapError.put("error", "Exam not found");
             publisher.sendError(mapError);
-            return 0;
+            return null;
         } else {
             examParticipant = examParticipantRepository.findByExamAndParticipant(exam, currentUser).get();
         }
@@ -520,7 +521,7 @@ public class ExamServiceImpl implements ExamService {
             mapError.put("username", username);
             mapError.put("error", "You are not enrolled in this exam");
             publisher.sendError(mapError);
-            return 0;
+            return null;
         }
 
         for (int i = 0; i < submitExamRequestDto.size(); i++) {
@@ -530,7 +531,7 @@ public class ExamServiceImpl implements ExamService {
                 mapError.put("username", username);
                 mapError.put("error", "Exam not found");
                 publisher.sendError(mapError);
-                return 0;
+                return null;
             } else {
                 examProblem = examProblemRepository.findByExamAndProblem(exam, problem).get();
             }
@@ -538,7 +539,7 @@ public class ExamServiceImpl implements ExamService {
                 mapError.put("username", username);
                 mapError.put("error", "You can only submit exam once");
                 publisher.sendError(mapError);
-                return 0;
+                return null;
             }
             if (examProblem != null) {
                 submitExamRequestDto.get(i).setPoint(examProblem.getPoint());
@@ -566,11 +567,13 @@ public class ExamServiceImpl implements ExamService {
             }
             examParticipant.setGrade(examResultResponseDto.getGrade());
             examParticipantRepository.save(examParticipant);
-
-            return examResultResponseDto.getGrade();
+            Map<String, String> response = new HashMap<>();
+            response.put("type", ExamSocketResponseType.RESULT.toString());
+            response.put("grade", String.valueOf(examResultResponseDto.getGrade()));
+            return response;
 
         }
-        return 0;
+        return null;
     }
 
     @Override

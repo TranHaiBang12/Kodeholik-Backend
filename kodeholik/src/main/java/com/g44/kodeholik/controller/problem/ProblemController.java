@@ -160,7 +160,7 @@ public class ProblemController {
     }
 
     @GetMapping("/compile-information/{link}")
-    public ResponseEntity<ProblemCompileResponseDto> getProblemCompileInformationById(
+    public ResponseEntity<ProblemCompileResponseDto> getProblemCompileInformationByLink(
             @PathVariable String link,
             @RequestParam String languageName) {
         return ResponseEntity.ok(problemService.getProblemCompileInformationById(link, languageName));
@@ -173,12 +173,12 @@ public class ProblemController {
     }
 
     @GetMapping("/description/{link}")
-    public ResponseEntity<ProblemDescriptionResponseDto> getProblemDescriptionById(@PathVariable String link) {
+    public ResponseEntity<ProblemDescriptionResponseDto> getProblemDescriptionByLink(@PathVariable String link) {
         return ResponseEntity.ok(problemService.getProblemDescriptionById(link));
     }
 
     @GetMapping("/{link}")
-    public ResponseEntity<ProblemResponseDto> getProblemResponseDtoById(@PathVariable String link) {
+    public ResponseEntity<ProblemResponseDto> getProblemResponseDtoByLink(@PathVariable String link) {
         return ResponseEntity.ok(problemService.getProblemResponseDtoById(link));
     }
 

@@ -113,7 +113,7 @@ public class ExaminerController {
     }
 
     @GetMapping("/result-excel/{code}")
-    public ResponseEntity<byte[]> downloadProblemTestcase(@PathVariable String code) {
+    public ResponseEntity<byte[]> downloadExamResult(@PathVariable String code) {
         byte[] excelFile = examService.generateExamResultFile(code);
 
         HttpHeaders headers = new HttpHeaders();

@@ -2,6 +2,7 @@ package com.g44.kodeholik.model.dto.request.lambda;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.g44.kodeholik.util.serializer.RawJsonDeserializer;
@@ -29,7 +30,7 @@ public class TestResult {
     @JsonRawValue
     @JsonDeserialize(using = RawJsonDeserializer.class)
     private Object actualOutput;
-
+    @JsonProperty("isRunInput")
     private boolean isRunInput;
 
 }

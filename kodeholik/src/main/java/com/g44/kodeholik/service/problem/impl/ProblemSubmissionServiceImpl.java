@@ -7,8 +7,10 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
@@ -59,6 +62,7 @@ import com.g44.kodeholik.service.setting.LanguageService;
 import com.g44.kodeholik.service.user.UserService;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemSubmissionMapper;
 import com.g44.kodeholik.util.mapper.response.problem.SubmissionListResponseMapper;
+import com.g44.kodeholik.util.structurecomparator.StructureComparator;
 import com.google.gson.Gson;
 
 import lombok.RequiredArgsConstructor;
@@ -217,6 +221,37 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                 for (int j = 0; j < inputVariable.size(); j++) {
                     if (inputVariable.get(j).getName().equals(inputTestCase.get(j).getName())) {
                         InputVariable newInputVariable = new InputVariable();
+                        log.info(inputTestCase.get(j).getValue() + " " + inputTestCase.get(j).getValue().getClass());
+                        log.info(inputVariable.get(j).getValue() + " " + inputVariable.get(j).getValue().getClass());
+                        if (inputVariable.get(j).getType().equals("STRING")) {
+                            inputTestCase.get(j).setValue("\"" + inputTestCase.get(j).getValue() + "\"");
+                        }
+                        try {
+                            if (inputVariable.get(j).getType().equals("STRING")) {
+                                if (!StructureComparator.haveSameStructure(
+                                        objectMapper.readValue(inputTestCase.get(j).getValue().toString(),
+                                                Object.class),
+                                        objectMapper.readValue(inputVariable.get(j).getValue().toString(),
+                                                Object.class))) {
+                                    throw new BadRequestException("Invalid data type in input test case.",
+                                            "Invalid data type in input test case.");
+                                }
+                            } else {
+                                if (!StructureComparator.haveSameStructure(
+                                        objectMapper.readValue(inputTestCase.get(j).getValue().toString(),
+                                                Object.class),
+                                        objectMapper.readValue(inputVariable.get(j).getValue().toString(),
+                                                Object.class))) {
+                                    throw new BadRequestException("Invalid data type in input test case.",
+                                            "Invalid data type in input test case.");
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.info(e.getMessage());
+                            throw new BadRequestException("Invalid data type in input test case.",
+                                    "Invalid data type in input test case.");
+                        }
+
                         newInputVariable.setName(inputTestCase.get(j).getName());
                         newInputVariable.setValue(inputTestCase.get(j).getValue());
                         newInputVariable.setNoDimension(inputVariable.get(j).getNoDimension());
@@ -764,6 +799,32 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
     @Override
     public List<ProblemSubmission> getSubmissionsByTimeBetween(Timestamp start, Timestamp end) {
         return problemSubmissionRepository.getSubmissionsByTimeBetween(start, end);
+    }
+
+    public boolean haveSameStructure(JsonNode node1, JsonNode node2) {
+        if (node1.isObject() && node2.isObject()) {
+            Set<String> fieldNames1 = new HashSet<>();
+            node1.fieldNames().forEachRemaining(fieldNames1::add);
+
+            Set<String> fieldNames2 = new HashSet<>();
+            node2.fieldNames().forEachRemaining(fieldNames2::add);
+
+            if (!fieldNames1.equals(fieldNames2))
+                return false;
+
+            for (String field : fieldNames1) {
+                if (!haveSameStructure(node1.get(field), node2.get(field)))
+                    return false;
+            }
+
+            return true;
+        } else if (node1.isArray() && node2.isArray()) {
+            if (node1.size() == 0 || node2.size() == 0)
+                return true; // assume same
+            return haveSameStructure(node1.get(0), node2.get(0));
+        } else {
+            return node1.getNodeType() == node2.getNodeType();
+        }
     }
 
 }

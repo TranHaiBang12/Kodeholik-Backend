@@ -27,7 +27,7 @@ public class S3Controller {
     private final S3Service s3Service;
 
     @PostMapping("/upload")
-    public ResponseEntity<List<String>> createProblem(@RequestPart("file") MultipartFile[] multipartFiles) {
+    public ResponseEntity<List<String>> upload(@RequestPart("file") MultipartFile[] multipartFiles) {
         return new ResponseEntity<>(
                 s3Service.uploadFileNameTypeFile(Arrays.asList(multipartFiles), FileNameType.PROBLEM),
                 HttpStatus.OK);
