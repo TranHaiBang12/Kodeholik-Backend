@@ -77,7 +77,6 @@ public class CourseRatingServiceImpl implements CourseRatingService {
         courseRepository.save(course);
     }
 
-
     @Override
     public List<CourseRatingResponseDto> getCourseRating(Long courseId) {
         Course course = courseRepository.findById(courseId)
@@ -89,10 +88,4 @@ public class CourseRatingServiceImpl implements CourseRatingService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Optional<CourseRatingResponseDto> getUserCourseRating(Long courseId) {
-        Users currentUser = userService.getCurrentUser();
-        return courseRatingRepository.findByCourseIdAndUserId(courseId, currentUser.getId())
-                .map(courseRatingResponseMapper::mapFrom);
-    }
 }

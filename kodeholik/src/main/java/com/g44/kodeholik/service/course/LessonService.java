@@ -17,7 +17,7 @@ public interface LessonService {
     public String addLesson(LessonRequestDto lessonRequestDto);
 
     public String editLesson(Long lessonId, LessonRequestDto lessonRequestDto);
-    
+
     public void markLessonAsCompleted(Long lessonId);
 
     public List<Long> getCompletedLessons();

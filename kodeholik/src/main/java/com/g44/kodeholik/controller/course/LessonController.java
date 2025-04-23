@@ -73,12 +73,6 @@ public class LessonController {
         return ResponseEntity.status(HttpStatus.SC_OK).body(lessonService.editLesson(id, lessonRequestDto));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteLesson(@PathVariable Long id) {
-        lessonService.deleteLessonById(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/download-file")
     public ResponseEntity<byte[]> downloadFile(@RequestParam String key) {
         return lessonService.downloadFile(key);

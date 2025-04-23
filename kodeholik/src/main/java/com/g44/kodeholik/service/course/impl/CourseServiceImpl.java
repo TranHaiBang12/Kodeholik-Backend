@@ -261,12 +261,6 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.save(course);
     }
 
-    @Override
-    public void deleteCourse(Long courseId) {
-        courseRepository.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course not found", "Course not found"));
-        courseRepository.deleteById(courseId);
-    }
 
     @Override
     public Page<CourseResponseDto> searchCourses(
