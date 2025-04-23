@@ -63,12 +63,6 @@ public class ChapterController {
         return ResponseEntity.status(HttpStatus.SC_CREATED).build();
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteChapter(@PathVariable Long id) {
-        chapterService.deleteChapter(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/by-course/{courseId}")
     public ResponseEntity<List<ChapterResponseDto>> getChapterByCourse(@PathVariable Long courseId) {
         List<ChapterResponseDto> chapters = chapterService.getChapterByCourseId(courseId);

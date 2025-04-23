@@ -155,13 +155,6 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
-    public void deleteChapter(Long id) {
-        chapterRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Chapter not found", "Chapter not found"));
-        chapterRepository.deleteById(id);
-    }
-
-    @Override
     public List<ChapterResponseDto> getChapterByCourseId(Long id) {
         Sort sort = Sort.by(Sort.Direction.ASC, "displayOrder");
         List<Chapter> chapters = chapterRepository.findByCourseIdAndStatusIn(id, getAllowedStatus(), sort);

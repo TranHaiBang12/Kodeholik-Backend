@@ -358,29 +358,6 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public void deleteLessonById(Long id) {
-        Lesson lesson = lessonRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
-
-        try {
-            // Xóa file trên S3 nếu có
-            if (lesson.getAttachedFile() != null) {
-                s3Service.deleteFileFromS3(lesson.getAttachedFile());
-            }
-
-            // Xóa video trên GCS nếu có
-            if (lesson.getVideoUrl() != null) {
-                gcsService.deleteFile(lesson.getVideoUrl());
-            }
-
-            lessonRepository.deleteById(id);
-        } catch (Exception e) {
-            log.error("Error occurred while deleting lesson", e);
-            throw new RuntimeException("Failed to delete lesson: " + e.getMessage());
-        }
-    }
-
-    @Override
     public void markLessonAsCompleted(Long lessonId) {
         Users currentUser = userService.getCurrentUser();
 

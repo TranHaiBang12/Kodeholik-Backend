@@ -149,20 +149,4 @@ class ChapterServiceImplTest {
 
         assertThrows(NotFoundException.class, () -> chapterService.editChapter(1L, chapterRequestDto));
     }
-
-    @Test
-    void deleteChapterShouldDeleteSuccessfully() {
-        when(chapterRepository.findById(1L)).thenReturn(Optional.of(chapter));
-
-        chapterService.deleteChapter(1L);
-
-        verify(chapterRepository, times(1)).deleteById(1L);
-    }
-
-    @Test
-    void deleteChapterNotFoundShouldThrowException() {
-        when(chapterRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> chapterService.deleteChapter(1L));
-    }
 }

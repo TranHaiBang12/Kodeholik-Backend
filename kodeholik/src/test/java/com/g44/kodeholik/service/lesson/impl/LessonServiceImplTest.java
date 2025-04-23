@@ -122,17 +122,4 @@ class LessonServiceImplTest {
 //
 //        verify(lessonRepository, times(1)).save(any(Lesson.class));
 //    }
-
-    @Test
-    void testDeleteLessonByIdSuccess() {
-        when(lessonRepository.findById(1L)).thenReturn(Optional.of(lesson));
-        lessonService.deleteLessonById(1L);
-        verify(lessonRepository, times(1)).deleteById(1L);
-    }
-
-    @Test
-    void testDeleteLessonByIdNotFound() {
-        when(lessonRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> lessonService.deleteLessonById(1L));
-    }
 }

@@ -123,21 +123,6 @@ class CourseServiceImplTest {
     }
 
     @Test
-    void testDeleteCourseSuccess() {
-        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
-
-        courseService.deleteCourse(1L);
-        verify(courseRepository, times(1)).deleteById(1L);
-    }
-
-    @Test
-    void testDeleteCourseNotFound() {
-        when(courseRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> courseService.deleteCourse(1L));
-    }
-
-    @Test
     void testEnrollUserInCourseSuccess() {
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         when(userService.getCurrentUser()).thenReturn(user);

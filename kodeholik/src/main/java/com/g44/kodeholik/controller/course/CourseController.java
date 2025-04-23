@@ -74,12 +74,6 @@ public class CourseController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
-        courseService.deleteCourse(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @PostMapping("/search")
     public ResponseEntity<Page<CourseResponseDto>> searchCourses(
             @RequestBody SearchCourseRequestDto request,

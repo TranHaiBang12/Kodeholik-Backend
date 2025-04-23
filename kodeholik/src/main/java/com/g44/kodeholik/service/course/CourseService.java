@@ -26,8 +26,6 @@ public interface CourseService {
 
         public void editCourse(Long courseId, CourseRequestDto courseRequestDto);
 
-        public void deleteCourse(Long courseId);
-
         Page<CourseResponseDto> searchCourses(SearchCourseRequestDto request, Integer page, Integer size,
                         CourseSortField sortBy, Boolean ascending);
 

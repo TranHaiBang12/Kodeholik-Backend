@@ -10,6 +10,4 @@ public interface CourseRatingService {
     public CourseRatingResponseDto rateCourse(CourseRatingRequestDto requestDto);
 
     public List<CourseRatingResponseDto> getCourseRating(Long courseId);
-
-    Optional<CourseRatingResponseDto> getUserCourseRating(Long courseId);
 }

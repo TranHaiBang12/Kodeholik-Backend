@@ -18,8 +18,6 @@ public interface ChapterService {
 
     public void editChapter(Long id, ChapterRequestDto chapterRequestDto);
 
-    public void deleteChapter(Long id);
-
     public List<ChapterResponseDto> getChapterByCourseId(Long id);
 
     public List<ListResponseDto> getListChapterResponseDtoByCourseId(Long courseId);
