@@ -3,6 +3,7 @@ package com.g44.kodeholik.controller.problem;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -173,8 +174,8 @@ public class ProblemController {
     }
 
     @GetMapping("/description/{link}")
-    public ResponseEntity<ProblemDescriptionResponseDto> getProblemDescriptionByLink(@PathVariable String link) {
-        return ResponseEntity.ok(problemService.getProblemDescriptionById(link));
+    public ResponseEntity<ProblemDescriptionResponseDto> getProblemDescriptionByLink(@PathVariable String link) throws InterruptedException, ExecutionException {
+        return ResponseEntity.ok(problemService.getProblemDescriptionById(link).get());
     }
 
     @GetMapping("/{link}")

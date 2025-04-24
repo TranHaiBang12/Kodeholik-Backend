@@ -577,9 +577,9 @@ class ExamServiceImplTest {
                 when(problemService.submitExam(anyList(), any(Users.class)))
                                 .thenReturn(new ExamResultOverviewResponseDto());
 
-                double grade = examService.submitExam(Collections.emptyList(), "code", "username");
+                Map<String, String> grade = examService.submitExam(Collections.emptyList(), "code", "username");
 
-                assertEquals(0, grade);
+                assertNotNull(grade);
                 verify(examSubmissionRepository, times(0)).save(any(ExamSubmission.class));
         }
 

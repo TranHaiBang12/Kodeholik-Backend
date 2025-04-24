@@ -10,6 +10,7 @@ public class MapperConfig {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
+        
         mapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.STRICT)
                 .setPropertyCondition(context -> context.getSource() != null);

@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,7 +61,7 @@ public interface ProblemService {
 
         public Problem getProblemById(Long id);
 
-        public ProblemDescriptionResponseDto getProblemDescriptionById(String link);
+        public CompletableFuture<ProblemDescriptionResponseDto> getProblemDescriptionById(String link);
 
         public ProblemResponseDto createProblem(ProblemRequestDto problemRequest);
 

@@ -38,7 +38,7 @@ import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.exception.TestCaseNotPassedException;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
-import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.compileRequest.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.ProblemRequestDto;
 import com.g44.kodeholik.model.dto.request.problem.add.EditorialDto;
 import com.g44.kodeholik.model.dto.request.problem.add.InputParameterDto;

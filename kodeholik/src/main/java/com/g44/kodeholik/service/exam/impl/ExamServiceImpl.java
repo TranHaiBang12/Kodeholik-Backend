@@ -470,6 +470,8 @@ public class ExamServiceImpl implements ExamService {
         Exam exam = getExamByCode(code);
         Timestamp now = new Timestamp(System.currentTimeMillis());
         Timestamp after5Minutes = new Timestamp(now.getTime() + 60 * 1000 * 5);
+        Timestamp after5MinutesSubmitExam = new Timestamp(exam.getEndTime().getTime() + 60 * 1000 * 5);
+
         Map<String, Object> mapError = new HashMap<String, Object>();
 
         if (exam.getStartTime().getTime() > now.getTime()) {
@@ -479,7 +481,7 @@ public class ExamServiceImpl implements ExamService {
             return null;
         }
 
-        else if (exam.getEndTime().getTime() <= after5Minutes.getTime()) {
+        else if (now.getTime() > after5MinutesSubmitExam.getTime()) {
             mapError.put("username", username);
             mapError.put("error", "Exam has already ended");
             publisher.sendError(mapError);

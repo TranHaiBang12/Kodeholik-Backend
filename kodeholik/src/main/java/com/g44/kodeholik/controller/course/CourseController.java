@@ -27,6 +27,7 @@ import com.g44.kodeholik.service.course.CourseService;
 import lombok.RequiredArgsConstructor;
 
 import org.apache.http.HttpStatus;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,7 @@ public class CourseController {
     private final CourseCommentService courseCommentService;
     private final CourseRatingService courseRatingService;
 
+    @Cacheable(value = "top-course")
     @GetMapping("/top-popular")
     public ResponseEntity<List<CourseResponseDto>> getTop5PopularCourse() {
         return ResponseEntity.status(HttpStatus.SC_OK).body(courseService.getTop5PopularCourse());

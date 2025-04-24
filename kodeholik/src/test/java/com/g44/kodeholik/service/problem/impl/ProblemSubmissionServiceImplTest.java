@@ -29,7 +29,7 @@ import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
 import com.g44.kodeholik.model.dto.request.lambda.TestCase;
-import com.g44.kodeholik.model.dto.request.problem.ProblemCompileRequestDto;
+import com.g44.kodeholik.model.dto.request.problem.compileRequest.ProblemCompileRequestDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.ProblemSubmissionDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.SubmissionResponseDto;
 import com.g44.kodeholik.model.dto.response.problem.submission.run.RunProblemResponseDto;

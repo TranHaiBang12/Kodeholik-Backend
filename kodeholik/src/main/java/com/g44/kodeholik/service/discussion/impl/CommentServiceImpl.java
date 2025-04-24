@@ -259,6 +259,9 @@ public class CommentServiceImpl implements CommentService {
         if (newComment == null || newComment.isEmpty()) {
             throw new BadRequestException(messageProperties.getMessage("MSG17"), messageProperties.getMessage("MSG17"));
         }
+        if(newComment.length() > 5000) {
+            throw new BadRequestException(messageProperties.getMessage("MSG17"), messageProperties.getMessage("MSG17"));
+        }
         if (currentUser.getId().intValue() != comment.getCreatedBy().getId().intValue()) {
             throw new UnauthorizedException("You are not the owner of this comment",
                     "You are not the owner of this comment");

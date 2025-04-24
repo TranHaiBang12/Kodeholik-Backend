@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -264,38 +265,31 @@ public class ProblemServiceImpl implements ProblemService {
         problemRepository.delete(problem);
     }
 
+    @Async
     @Override
-    public ProblemDescriptionResponseDto getProblemDescriptionById(String link) {
-        ProblemDescriptionResponseDto problemDescriptionResponseDto = new ProblemDescriptionResponseDto();
+    public CompletableFuture<ProblemDescriptionResponseDto> getProblemDescriptionById(String link) {
+        ProblemDescriptionResponseDto dto = new ProblemDescriptionResponseDto();
         Problem problem = getPublicProblemById(link);
-        List<String> topics = new ArrayList<>();
-        for (Topic topic : problem.getTopics()) {
-            topics.add(topic.getName());
-        }
 
-        List<String> skills = new ArrayList<>();
-        for (Skill skill : problem.getSkills()) {
-            skills.add(skill.getName());
-        }
-        problemDescriptionResponseDto = problemDescriptionMapper.mapFrom(problem);
-        problemDescriptionResponseDto.setNoComment(commentRepository.countByProblemsContains(problem));
-        problemDescriptionResponseDto.setTopicList(topics);
-        problemDescriptionResponseDto
-                .setNoAccepted(problemSubmissionService.countByIsAcceptedAndProblem(true, problem));
-        problemDescriptionResponseDto.setSkillList(skills);
-        if (problemSubmissionService.checkIsCurrentUserSolvedProblem(problem)) {
-            problemDescriptionResponseDto.setSolved(true);
-        } else {
-            problemDescriptionResponseDto.setSolved(false);
-        }
+        List<String> topics = problem.getTopics().stream()
+                .map(Topic::getName)
+                .collect(Collectors.toList());
+
+        List<String> skills = problem.getSkills().stream()
+                .map(Skill::getName)
+                .collect(Collectors.toList());
+
+        dto = problemDescriptionMapper.mapFrom(problem);
+        dto.setNoComment(commentRepository.countByProblemsContains(problem));
+        dto.setTopicList(topics);
+        dto.setSkillList(skills);
+        dto.setNoAccepted(problemSubmissionService.countByIsAcceptedAndProblem(true, problem));
+        dto.setSolved(problemSubmissionService.checkIsCurrentUserSolvedProblem(problem));
 
         Users currentUser = userService.getCurrentUser();
-        if (problem.getUsersFavourite().contains(currentUser)) {
-            problemDescriptionResponseDto.setFavourite(true);
-        } else {
-            problemDescriptionResponseDto.setFavourite(false);
-        }
-        return problemDescriptionResponseDto;
+        dto.setFavourite(problem.getUsersFavourite().contains(currentUser));
+
+        return CompletableFuture.completedFuture(dto);
     }
 
     @Override
