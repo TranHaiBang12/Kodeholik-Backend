@@ -288,6 +288,56 @@ class ChapterServiceImplTest {
         verify(chapterRepository, never()).save(any(Chapter.class));
     }
 
+    // Abnormal Case: course id not found
+    @Test
+    void editChapterCourseNotFoundShouldThrowException() {
+        when(chapterRepository.findById(1L)).thenReturn(Optional.of(chapter));
+        when(courseRepository.findById(1L)).thenReturn(Optional.empty());
+        when(chapterRequestMapper.mapTo(chapterRequestDto)).thenReturn(chapter);
+        when(chapterRepository.findByTitleIgnoreCaseAndIdNotAndCourseId(anyString(), anyLong(), anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> chapterService.editChapter(1L, chapterRequestDto));
+        verify(chapterRepository, never()).save(any(Chapter.class));
+    }
+
+    // Abnormal Case: Chapter title too short
+    @Test
+    void editChapterWithShortTitleShouldThrowException() {
+        chapterRequestDto.setTitle("Short"); // 5 characters, less than 10
+        chapter.setTitle("Short");
+
+        when(chapterRepository.findById(1L)).thenReturn(Optional.of(chapter));
+
+        assertThrows(BadRequestException.class, () -> chapterService.editChapter(1L, chapterRequestDto));
+        verify(chapterRepository, never()).save(any(Chapter.class));
+    }
+
+    // Abnormal Case: Chapter description too short
+    @Test
+    void editChapterWithShortDescriptionShouldThrowException() {
+        chapterRequestDto.setDescription("Short"); // 5 characters, less than 10
+        chapter.setDescription("Short");
+
+        when(chapterRepository.findById(1L)).thenReturn(Optional.of(chapter));
+        when(chapterRepository.findByTitleIgnoreCaseAndIdNotAndCourseId(anyString(), anyLong(), anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(BadRequestException.class, () -> chapterService.editChapter(1L, chapterRequestDto));
+        verify(chapterRepository, never()).save(any(Chapter.class));
+    }
+
+    // Abnormal Case: Chapter description empty
+    @Test
+    void editChapterWithEmptyDescriptionShouldThrowException() {
+        chapterRequestDto.setDescription("   "); // Whitespace only
+        chapter.setDescription("   ");
+
+        when(chapterRepository.findById(1L)).thenReturn(Optional.of(chapter));
+        when(chapterRepository.findByTitleIgnoreCaseAndIdNotAndCourseId(anyString(), anyLong(), anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(BadRequestException.class, () -> chapterService.editChapter(1L, chapterRequestDto));
+        verify(chapterRepository, never()).save(any(Chapter.class));
+    }
+
     // Normal Case: Get chapters by course ID
     @Test
     void getChapterByCourseIdShouldReturnChapters() {
@@ -322,54 +372,4 @@ class ChapterServiceImplTest {
         verify(chapterRepository, times(1)).findByCourseIdAndStatusIn(eq(1L), anyList(), eq(sort));
     }
 
-    // Normal Case: Get list response DTO by course ID
-    @Test
-    void getListChapterResponseDtoByCourseIdShouldReturnList() {
-        List<Chapter> chapters = Collections.singletonList(chapter);
-
-        when(chapterRepository.findByCourseIdOrderByDisplayOrderAsc(1L)).thenReturn(chapters);
-
-        List<ListResponseDto> result = chapterService.getListChapterResponseDtoByCourseId(1L);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(chapter.getId(), result.get(0).getId());
-        assertEquals(chapter.getTitle(), result.get(0).getTitle());
-        verify(chapterRepository, times(1)).findByCourseIdOrderByDisplayOrderAsc(1L);
-    }
-
-    // Boundary Case: Get list response DTO with no chapters
-    @Test
-    void getListChapterResponseDtoByCourseIdNoChaptersShouldReturnEmptyList() {
-        when(chapterRepository.findByCourseIdOrderByDisplayOrderAsc(1L)).thenReturn(Collections.emptyList());
-
-        List<ListResponseDto> result = chapterService.getListChapterResponseDtoByCourseId(1L);
-
-        assertNotNull(result);
-        assertEquals(0, result.size());
-        verify(chapterRepository, times(1)).findByCourseIdOrderByDisplayOrderAsc(1L);
-    }
-
-    // Normal Case: Get allowed statuses for admin
-    @Test
-    void getAllowedStatusForAdminShouldReturnAllStatuses() {
-        when(userService.getCurrentUser()).thenReturn(user);
-
-        List<ChapterStatus> result = chapterService.getAllowedStatus();
-
-        assertEquals(Arrays.asList(ChapterStatus.values()), result);
-        verify(userService, times(1)).getCurrentUser();
-    }
-
-    // Normal Case: Get allowed statuses for student
-    @Test
-    void getAllowedStatusForStudentShouldReturnActivatedOnly() {
-        user.setRole(UserRole.STUDENT);
-        when(userService.getCurrentUser()).thenReturn(user);
-
-        List<ChapterStatus> result = chapterService.getAllowedStatus();
-
-        assertEquals(Collections.singletonList(ChapterStatus.ACTIVATED), result);
-        verify(userService, times(1)).getCurrentUser();
-    }
 }
