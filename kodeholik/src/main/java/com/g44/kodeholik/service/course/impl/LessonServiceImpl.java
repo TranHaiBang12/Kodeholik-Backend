@@ -166,7 +166,7 @@ public class LessonServiceImpl implements LessonService {
         try {
             // Upload file đính kèm lên S3 (nếu có)
             log.info(lessonRequestDto.getAttachedFile() != null);
-            log.info(!lessonRequestDto.getAttachedFile().isEmpty());
+//            log.info(!lessonRequestDto.getAttachedFile().isEmpty());
             if (lessonRequestDto.getAttachedFile() != null && !lessonRequestDto.getAttachedFile().isEmpty()) {
                 String s3Key = "lessons/" + UUID.randomUUID() + "-"
                         + lessonRequestDto.getAttachedFile().getOriginalFilename();
