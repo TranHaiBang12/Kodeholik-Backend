@@ -179,6 +179,9 @@ public class CourseServiceImpl implements CourseService {
             throw new BadRequestException("Course title already exists: " + normalizedTitle,
                     "Course title already exists: " + normalizedTitle);
         }
+        if (requestDto.getTopicIds() == null || requestDto.getTopicIds().isEmpty()) {
+            throw new BadRequestException("Topic IDs cannot be empty", "Topic IDs cannot be empty");
+        }
 
         Course course = new Course();
         course.setTitle(normalizedTitle);
@@ -227,6 +230,9 @@ public class CourseServiceImpl implements CourseService {
                             + normalizedTitle,
                     "Course description must be at least 10 characters long (excluding extra spaces): "
                             + normalizedTitle);
+        }
+        if (requestDto.getTopicIds() == null || requestDto.getTopicIds().isEmpty()) {
+            throw new BadRequestException("Topic IDs cannot be empty", "Topic IDs cannot be empty");
         }
 
         Course course = courseRepository.findById(courseId)
