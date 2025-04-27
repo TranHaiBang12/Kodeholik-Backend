@@ -234,7 +234,7 @@ public class AuthServiceImpl implements AuthService {
         // throw new ForbiddenException("This account is not allowed to do this action",
         // "This account is not allowed to do this action");
         // }
-
+        log.info(email);
         String username = "";
         Optional<Users> optionalUser = userService.isUserExistedbyUsernameOrEmail(email);
         if (!optionalUser.isPresent()) {
@@ -249,6 +249,7 @@ public class AuthServiceImpl implements AuthService {
             username = name;
 
         } else {
+            log.info(email);
             if (userService.isUserNotAllowed(email)) {
                 throw new ForbiddenException("This account is not allowed to do this action",
                         "This account is not allowed to do this action");
