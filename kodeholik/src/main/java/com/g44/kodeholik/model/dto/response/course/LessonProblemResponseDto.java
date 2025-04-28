@@ -12,5 +12,6 @@ public class LessonProblemResponseDto {
     private String title;
     private Difficulty difficulty;
     private String problemLink;
+    private boolean completed;
 }
 

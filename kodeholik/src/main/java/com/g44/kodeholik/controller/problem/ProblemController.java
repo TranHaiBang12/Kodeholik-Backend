@@ -175,7 +175,7 @@ public class ProblemController {
 
     @GetMapping("/description/{link}")
     public ResponseEntity<ProblemDescriptionResponseDto> getProblemDescriptionByLink(@PathVariable String link) throws InterruptedException, ExecutionException {
-        return ResponseEntity.ok(problemService.getProblemDescriptionById(link).get());
+        return ResponseEntity.ok(problemService.getProblemDescriptionById(link));
     }
 
     @GetMapping("/{link}")

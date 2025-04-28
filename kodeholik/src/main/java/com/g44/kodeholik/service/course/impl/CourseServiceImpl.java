@@ -101,7 +101,7 @@ public class CourseServiceImpl implements CourseService {
         if (currentUser == null) {
             return Collections.emptyList();
         }
-        return userLessonProgressRepository.findByUserId(currentUser.getId())
+        return userLessonProgressRepository.findByUserIdAndIsLessonCompletedAndIsLabCompleted(currentUser.getId(), true, true)
                 .stream()
                 .map(progress -> progress.getLesson().getId())
                 .collect(Collectors.toList());
@@ -466,8 +466,6 @@ public class CourseServiceImpl implements CourseService {
 
         Timestamp now = Timestamp.from(Instant.now());
         courseUser.setLastStudiedEndAt(now);
-        log.info(courseUser);
-        log.info(courseUser.getLastStudiedEndAt());
         courseUser.setStudyTime(isSameDay(courseUser.getLastStudiedStartAt(),
                 courseUser.getLastStudiedEndAt())
                         ? courseUser.getStudyTime()
@@ -556,7 +554,7 @@ public class CourseServiceImpl implements CourseService {
                         course.getTitle());
                 emailService.sendEmailCompleteCourse(
                         currentUser.getEmail(),
-                        "[KODEHOLIK] You completed " + course.getTitle(),
+                        "[KODEHOLIK] You've completed " + course.getTitle(),
                         currentUser.getUsername(),
                         course.getTitle(),
                         sdf.format(courseUser.getEnrolledAt()),

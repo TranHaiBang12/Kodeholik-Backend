@@ -265,9 +265,8 @@ public class ProblemServiceImpl implements ProblemService {
         problemRepository.delete(problem);
     }
 
-    @Async
     @Override
-    public CompletableFuture<ProblemDescriptionResponseDto> getProblemDescriptionById(String link) {
+    public ProblemDescriptionResponseDto getProblemDescriptionById(String link) {
         ProblemDescriptionResponseDto dto = new ProblemDescriptionResponseDto();
         Problem problem = getPublicProblemById(link);
 
@@ -289,7 +288,7 @@ public class ProblemServiceImpl implements ProblemService {
         Users currentUser = userService.getCurrentUser();
         dto.setFavourite(problem.getUsersFavourite().contains(currentUser));
 
-        return CompletableFuture.completedFuture(dto);
+        return dto;
     }
 
     @Override
@@ -422,7 +421,6 @@ public class ProblemServiceImpl implements ProblemService {
         } catch (IOException e) {
             throw new RuntimeException("Error querying Elasticsearch", e);
         }
-
     }
 
     @Override
@@ -613,8 +611,6 @@ public class ProblemServiceImpl implements ProblemService {
         problem.setTitle(problemBasicAddDto.getTitle());
         problem.setDifficulty(problemBasicAddDto.getDifficulty());
         problem.setDescription(problemBasicAddDto.getDescription());
-        problem.setAcceptanceRate(0);
-        problem.setNoSubmission(0);
         problem.setUpdatedAt(Timestamp.from(Instant.now()));
         problem.setLink(link);
         problem.setUpdatedBy(currentUsers);

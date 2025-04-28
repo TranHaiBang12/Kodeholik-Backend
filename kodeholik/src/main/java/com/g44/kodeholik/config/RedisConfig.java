@@ -29,6 +29,7 @@ public class RedisConfig {
         return new ChannelTopic("examChannel");
     }
 
+    
     @Bean
     public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connectionFactory,
             Subscriber subscriber) {

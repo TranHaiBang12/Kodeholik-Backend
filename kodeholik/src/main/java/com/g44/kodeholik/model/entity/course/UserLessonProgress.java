@@ -1,5 +1,7 @@
 package com.g44.kodeholik.model.entity.course;
 
+import org.checkerframework.checker.units.qual.C;
+
 import com.g44.kodeholik.model.entity.user.Users;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,4 +29,10 @@ public class UserLessonProgress {
     @MapsId("lessonId")
     @JoinColumn(name = "lesson_id")
     private Lesson lesson;
+
+    @Column(name = "is_lesson_completed")
+    private Boolean isLessonCompleted;
+
+    @Column(name = "is_lab_completed")
+    private Boolean isLabCompleted;
 }

@@ -1,6 +1,7 @@
 package com.g44.kodeholik.model.dto.response.exam.student;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 import lombok.AllArgsConstructor;

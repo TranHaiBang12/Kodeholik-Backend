@@ -22,6 +22,7 @@ import com.g44.kodeholik.repository.course.UserLessonProgressRepository;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.service.aws.s3.S3Service;
 import com.g44.kodeholik.service.gcs.GoogleCloudStorageService;
+import com.g44.kodeholik.service.problem.ProblemSubmissionService;
 import com.g44.kodeholik.util.string.YoutubeUrlParser;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
@@ -69,6 +70,7 @@ public class LessonServiceImpl implements LessonService {
     private final ProblemRepository problemRepository;
     private final LessonProblemRepository lessonProblemRepository;
     private final NotificationService notificationService;
+    private final ProblemSubmissionService problemSubmissionService;
 
     public List<LessonStatus> getAllowedStatus() {
         Users currentUser = userService.getCurrentUser();
@@ -93,7 +95,11 @@ public class LessonServiceImpl implements LessonService {
     public LessonResponseDto getLessonById(Long id) {
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Lesson not found", "Lesson not found"));
-
+        Optional<UserLessonProgress> userLessonProgressOptional = userLessonProgressRepository
+                .findByUserIdAndLessonId(userService.getCurrentUser().getId(), id);
+        if (userLessonProgressOptional.isPresent()) {
+            checkLabCompleted(id, userLessonProgressOptional.get());
+        }
         String videoUrl = lesson.getVideoUrl();
         if (videoUrl != null && videoUrl.startsWith("videos/")) {
             videoUrl = gcsService.generateSignedUrl(videoUrl);
@@ -106,7 +112,8 @@ public class LessonServiceImpl implements LessonService {
                 .map(lp -> new LessonProblemResponseDto(
                         lp.getProblem().getTitle(),
                         lp.getProblem().getDifficulty(),
-                        lp.getProblem().getLink()))
+                        lp.getProblem().getLink(),
+                        problemSubmissionService.checkIsCurrentUserSolvedProblem(lp.getProblem())))
                 .collect(Collectors.toList());
         List<Long> completedLessons = getCompletedLessons();
 
@@ -367,8 +374,35 @@ public class LessonServiceImpl implements LessonService {
         progress.setId(new UserLessonProgressId(currentUser.getId(), lessonId));
         progress.setUser(currentUser);
         progress.setLesson(lesson);
+        progress.setIsLessonCompleted(true);
 
-        userLessonProgressRepository.save(progress);
+        checkLabCompleted(lessonId, progress);
+    }
+
+    private void checkLabCompleted(Long lessonId, UserLessonProgress progress) {
+        List<LessonProblem> lessonProblems = lessonProblemRepository.findByLesson_Id(lessonId);
+        if (progress.getIsLabCompleted() == null || !progress.getIsLabCompleted().booleanValue()) {
+            if (lessonProblems.isEmpty()) {
+                progress.setIsLabCompleted(true);
+            } else {
+                boolean allProblemsSolved = true;
+                for (LessonProblem lessonProblem : lessonProblems) {
+                    Problem problem = lessonProblem.getProblem();
+                    if (problem != null) {
+                        if (!problemSubmissionService.checkIsCurrentUserSolvedProblem(problem)) {
+                            allProblemsSolved = false;
+                            break;
+                        }
+                    }
+                }
+                if (allProblemsSolved) {
+                    progress.setIsLabCompleted(true);
+                } else {
+                    progress.setIsLabCompleted(false);
+                }
+            }
+            userLessonProgressRepository.save(progress);
+        }
     }
 
     @Override
@@ -377,7 +411,8 @@ public class LessonServiceImpl implements LessonService {
         if (currentUser == null) {
             return Collections.emptyList();
         }
-        return userLessonProgressRepository.findByUserId(currentUser.getId())
+        return userLessonProgressRepository
+                .findByUserIdAndIsLessonCompletedAndIsLabCompleted(currentUser.getId(), true, true)
                 .stream()
                 .map(progress -> progress.getLesson().getId())
                 .collect(Collectors.toList());

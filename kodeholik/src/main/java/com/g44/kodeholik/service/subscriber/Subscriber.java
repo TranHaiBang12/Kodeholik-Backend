@@ -3,7 +3,9 @@ package com.g44.kodeholik.service.subscriber;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -22,15 +24,18 @@ public class Subscriber implements MessageListener {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final ObjectMapper objectMapper;
+    @Qualifier("utcObjectMapper")
+    private final ObjectMapper utcObjectMapper;
 
     @Override
     public void onMessage(Message message, byte[] arg1) {
 
         try {
             String messageBody = new String(message.getBody());
-            Map<String, Object> map = objectMapper.readValue(messageBody, new TypeReference<Map<String, Object>>() {
+            Map<String, Object> map = utcObjectMapper.readValue(messageBody, new TypeReference<Map<String, Object>>() {
             });
+            log.info(map);
+
             if (map.get("error") != null) {
                 log.info(map.get("error") + " " + map.get("username"));
                 messagingTemplate.convertAndSend("/error/" + map.get("username"), map.get("error"));
@@ -38,9 +43,8 @@ public class Subscriber implements MessageListener {
                 log.info(map.get("notification") + " " + map.get("username"));
                 messagingTemplate.convertAndSend("/notification/" + map.get("username"), map.get("notification"));
             } else {
-                log.info(objectMapper.writeValueAsString(map));
                 messagingTemplate.convertAndSend("/topic/exam/" + map.get("code"),
-                        objectMapper.writeValueAsString(map));
+                        utcObjectMapper.writeValueAsString(map));
             }
         } catch (IOException e) {
             log.error("❌ Lỗi khi parse message từ Redis", e);

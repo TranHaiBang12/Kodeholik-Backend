@@ -8,10 +8,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserLessonProgressRepository extends JpaRepository<UserLessonProgress, UserLessonProgressId> {
     List<UserLessonProgress> findByUserId(Long userId);
+    Optional<UserLessonProgress> findByUserIdAndLessonId(Long userId, Long lessonId);
+    List<UserLessonProgress> findByUserIdAndIsLessonCompletedAndIsLabCompleted(Long userId, boolean isVideoCompleted, boolean isLabCompleted);
     boolean existsByUserIdAndLessonId(Long userId, Long lessonId);
 
     @Query("SELECT ulp.lesson.id FROM UserLessonProgress ulp " +

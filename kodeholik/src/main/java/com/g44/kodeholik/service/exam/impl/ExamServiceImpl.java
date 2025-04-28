@@ -460,7 +460,8 @@ public class ExamServiceImpl implements ExamService {
         }
         examDetailResponseDto.setDuration(getMinuteDifference(exam.getStartTime(), exam.getEndTime()) * 60);
         examDetailResponseDto.setProblems(result);
-        examDetailResponseDto.setEndTime(exam.getEndTime());
+        examDetailResponseDto.setEndTime(new Timestamp(exam.getEndTime().getTime() + 25200000));
+        log.info(examDetailResponseDto.getEndTime());
         return examDetailResponseDto;
     }
 

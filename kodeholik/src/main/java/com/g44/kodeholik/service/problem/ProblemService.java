@@ -61,7 +61,7 @@ public interface ProblemService {
 
         public Problem getProblemById(Long id);
 
-        public CompletableFuture<ProblemDescriptionResponseDto> getProblemDescriptionById(String link);
+        public ProblemDescriptionResponseDto getProblemDescriptionById(String link);
 
         public ProblemResponseDto createProblem(ProblemRequestDto problemRequest);
 
