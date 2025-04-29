@@ -20,6 +20,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.BadRequestException;
@@ -466,9 +468,9 @@ public class ProblemSubmissionServiceImpl implements ProblemSubmissionService {
                     break;
             }
             return submissionResponseDto;
-        } catch (Exception e) {
-            throw new BadRequestException("Json invalid", "Json invalid");
-        }
+        } catch (JsonProcessingException e) {
+            throw new BadRequestException("Json invalid", e.getMessage());
+        } 
     }
 
     @Override

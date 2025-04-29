@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,8 +16,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.handler.JwtAuthenticationFailureHandler;
+import com.g44.kodeholik.model.dto.exception.ErrorResponse;
 import com.g44.kodeholik.repository.user.UserRepository;
 import com.g44.kodeholik.service.token.TokenService;
 
@@ -98,8 +101,15 @@ public class JwtFilter extends OncePerRequestFilter {
                 if (userRepository.existsByUsernameOrEmail(username).isPresent()
                         && tokenService.validateToken(accessToken)) {
                     if (userRepository.isUserNotAllowed(username)) {
-                        throw new ForbiddenException("This account is not allowed to do this action",
-                                "This account is not allowed to do this action");
+                        log.info("BANNED 1");
+
+                        response.setStatus(HttpStatus.FORBIDDEN.value());
+                        response.setContentType("application/json");
+                        response.getWriter().write(
+                                new ObjectMapper().writeValueAsString(
+                                        new ErrorResponse("This account is not allowed to do this action",
+                                                "This account is not allowed to do this action")));
+                        return;
                     }
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
@@ -149,8 +159,11 @@ public class JwtFilter extends OncePerRequestFilter {
                         if (userRepository.existsByUsernameOrEmail(username).isPresent()
                                 && tokenService.validateToken(accessToken)) {
                             if (userRepository.isUserNotAllowed(username)) {
-                                throw new ForbiddenException("This account is not allowed to do this action",
-                                        "This account is not allowed to do this action");
+                                log.info("BANNED");
+                                
+                                return skipFilterUrls.stream()
+                                        .anyMatch(url -> new AntPathRequestMatcher(url).matches(request));
+
                             }
                             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                                     userDetails, null, userDetails.getAuthorities());

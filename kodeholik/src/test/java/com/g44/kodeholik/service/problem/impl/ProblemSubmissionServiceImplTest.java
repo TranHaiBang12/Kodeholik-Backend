@@ -46,6 +46,7 @@ import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.model.enums.problem.Difficulty;
 import com.g44.kodeholik.model.enums.problem.SubmissionStatus;
+import com.g44.kodeholik.model.enums.user.UserRole;
 import com.g44.kodeholik.repository.problem.ProblemRepository;
 import com.g44.kodeholik.repository.problem.ProblemSubmissionRepository;
 import com.g44.kodeholik.service.aws.lambda.LambdaService;
@@ -505,9 +506,11 @@ public class ProblemSubmissionServiceImplTest {
         public void testGetSubmissionDetailNotOwnerOfSubmission() {
                 Users user = new Users();
                 user.setId(1L);
+                user.setRole(UserRole.ADMIN);
 
                 Users currentUser = new Users();
                 user.setId(2L);
+                user.setRole(UserRole.ADMIN);
 
                 Language language = new Language();
                 language.setName("Java");
