@@ -80,8 +80,7 @@ public class LessonController {
 
     @PostMapping("/complete/{lessonId}")
     public ResponseEntity<?> markLessonAsCompleted(@PathVariable Long lessonId) {
-        lessonService.markLessonAsCompleted(lessonId);
-        return ResponseEntity.ok().body("Lesson marked as completed");
+        return ResponseEntity.ok().body(lessonService.markLessonAsCompleted(lessonId));
     }
 
     @GetMapping("/completed-lessons")

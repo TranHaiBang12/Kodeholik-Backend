@@ -8,6 +8,7 @@ import com.g44.kodeholik.model.dto.response.course.LessonResponseDto;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface LessonService {
     public Page<LessonResponseDto> getAllLesson(Pageable pageable);
@@ -18,7 +19,7 @@ public interface LessonService {
 
     public String editLesson(Long lessonId, LessonRequestDto lessonRequestDto);
 
-    public void markLessonAsCompleted(Long lessonId);
+    public Map<String, Boolean> markLessonAsCompleted(Long lessonId);
 
     public List<Long> getCompletedLessons();
 

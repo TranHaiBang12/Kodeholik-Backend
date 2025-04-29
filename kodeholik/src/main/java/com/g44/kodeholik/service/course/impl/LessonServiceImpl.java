@@ -119,7 +119,7 @@ public class LessonServiceImpl implements LessonService {
                         lp.getProblem().getDifficulty(),
                         lp.getProblem().getLink(),
                         isLabCompleted));
-                if(!isLabCompleted) {
+                if (!isLabCompleted) {
                     isAllLabCompleted = false;
                 }
             }
@@ -373,7 +373,7 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public void markLessonAsCompleted(Long lessonId) {
+    public Map<String, Boolean> markLessonAsCompleted(Long lessonId) {
         Users currentUser = userService.getCurrentUser();
 
         Lesson lesson = lessonRepository.findById(lessonId)
@@ -385,11 +385,13 @@ public class LessonServiceImpl implements LessonService {
         progress.setUser(currentUser);
         progress.setLesson(lesson);
         progress.setIsLessonCompleted(true);
-
-        checkLabCompleted(lessonId, progress);
+        log.info("Marking lesson as completed: " + lessonId);
+        Map<String, Boolean> map = new HashMap();
+        map.put("labCompleted", checkLabCompleted(lessonId, progress));
+        return map;
     }
 
-    private void checkLabCompleted(Long lessonId, UserLessonProgress progress) {
+    private boolean checkLabCompleted(Long lessonId, UserLessonProgress progress) {
         List<LessonProblem> lessonProblems = lessonProblemRepository.findByLesson_Id(lessonId);
         if (progress.getIsLabCompleted() == null || !progress.getIsLabCompleted().booleanValue()) {
             if (lessonProblems.isEmpty()) {
@@ -413,6 +415,7 @@ public class LessonServiceImpl implements LessonService {
             }
             userLessonProgressRepository.save(progress);
         }
+        return progress.getIsLabCompleted();
     }
 
     @Override
