@@ -1007,7 +1007,7 @@ public class ProblemServiceImpl implements ProblemService {
             }
             log.info(problemInputParameterDto);
             LambdaRequest lambdaRequest = new LambdaRequest();
-            lambdaRequest.setCode(templateCode + "\n" + solutionCodeDto.getSolutionCode());
+            lambdaRequest.setCode((templateCode != null ? templateCode + "\n" : "") + solutionCodeDto.getSolutionCode());
             lambdaRequest.setLanguage(solutionCodeDto.getSolutionLanguage());
             lambdaRequest.setFunctionSignature(problemInputParameterDto.getFunctionSignature());
             if (solutionCodeDto.getSolutionLanguage().equals("C")) {

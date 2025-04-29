@@ -28,5 +28,6 @@ public class LessonResponseDto {
     private String videoUrl;
     private LessonVideoType videoType;
     private boolean isCompleted;
+    private boolean labCompleted;
     private List<LessonProblemResponseDto> problems;
 }

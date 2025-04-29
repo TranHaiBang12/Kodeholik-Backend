@@ -107,19 +107,29 @@ public class LessonServiceImpl implements LessonService {
         }
 
         List<LessonProblem> lessonProblems = lessonProblemRepository.findByLesson_Id(id);
+        boolean isAllLabCompleted = true;
+        List<LessonProblemResponseDto> lessonProblemDtos = new ArrayList();
 
-        List<LessonProblemResponseDto> lessonProblemDtos = lessonProblems.stream()
-                .map(lp -> new LessonProblemResponseDto(
+        for (int i = 0; i < lessonProblems.size(); i++) {
+            LessonProblem lp = lessonProblems.get(i);
+            if (lp != null) {
+                boolean isLabCompleted = problemSubmissionService.checkIsCurrentUserSolvedProblem(lp.getProblem());
+                lessonProblemDtos.add(new LessonProblemResponseDto(
                         lp.getProblem().getTitle(),
                         lp.getProblem().getDifficulty(),
                         lp.getProblem().getLink(),
-                        problemSubmissionService.checkIsCurrentUserSolvedProblem(lp.getProblem())))
-                .collect(Collectors.toList());
+                        isLabCompleted));
+                if(!isLabCompleted) {
+                    isAllLabCompleted = false;
+                }
+            }
+        }
+
         List<Long> completedLessons = getCompletedLessons();
 
         LessonResponseDto lessonResponse = lessonResponseMapper.mapFrom(lesson, completedLessons);
         lessonResponse.setProblems(lessonProblemDtos);
-
+        lessonResponse.setLabCompleted(isAllLabCompleted);
         return lessonResponse;
     }
 
