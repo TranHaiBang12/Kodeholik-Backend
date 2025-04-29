@@ -33,6 +33,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g44.kodeholik.exception.BadRequestException;
 import com.g44.kodeholik.exception.ForbiddenException;
 import com.g44.kodeholik.exception.NotFoundException;
@@ -91,6 +92,7 @@ import com.g44.kodeholik.util.mapper.response.problem.ProblemBasicResponseMapper
 import com.g44.kodeholik.util.mapper.response.problem.ProblemDescriptionMapper;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemResponseMapper;
 import com.g44.kodeholik.util.mapper.response.problem.SolutionCodeMapper;
+import com.g44.kodeholik.util.mapper.response.user.UserResponseMapper;
 import com.google.gson.Gson;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -114,6 +116,9 @@ class ProblemServiceImplTest {
 
         @Mock
         private ProblemResponseMapper problemResponseMapper;
+
+        @Mock
+        private UserResponseMapper userResponseMapper;
 
         @Mock
         private ProblemDescriptionMapper problemDescriptionMapper;
@@ -177,6 +182,9 @@ class ProblemServiceImplTest {
 
         @Spy
         private SolutionCodeRepository solutionCodeRepository;
+
+        @Mock
+        private ObjectMapper objectMapper;
 
         private Gson gson = new Gson();
 

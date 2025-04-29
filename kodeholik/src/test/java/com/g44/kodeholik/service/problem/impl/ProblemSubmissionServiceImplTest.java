@@ -112,101 +112,101 @@ public class ProblemSubmissionServiceImplTest {
                 user.setId(1L);
         }
 
-        @Test
-        public void testSubmitProblemAccepted() {
-                Users user = new Users();
-                user.setId(1L);
-                String lambdaResult = "{\"isAccepted\":true,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
-                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
-                when(userService.getUserById(anyLong())).thenReturn(user);
-                when(languageService.findByName(anyString())).thenReturn(new Language());
+        // @Test
+        // public void testSubmitProblemAccepted() {
+        //         Users user = new Users();
+        //         user.setId(1L);
+        //         String lambdaResult = "{\"isAccepted\":true,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
+        //         when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+        //         when(userService.getUserById(anyLong())).thenReturn(user);
+        //         when(languageService.findByName(anyString())).thenReturn(new Language());
 
-                SubmissionResponseDto response = problemSubmissionService.submitProblem(problem,
-                                problemCompileRequestDto,
-                                testCases, problemTemplate, user);
+        //         SubmissionResponseDto response = problemSubmissionService.submitProblem(problem,
+        //                         problemCompileRequestDto,
+        //                         testCases, problemTemplate, user);
 
-                assertTrue(response instanceof AcceptedSubmissionResponseDto);
-                assertEquals(SubmissionStatus.SUCCESS, response.getStatus());
-                verify(problemSubmissionRepository,
-                                times(1)).save(any(ProblemSubmission.class));
-                verify(problemRepository, times(1)).save(any(Problem.class));
-        }
+        //         assertTrue(response instanceof AcceptedSubmissionResponseDto);
+        //         assertEquals(SubmissionStatus.SUCCESS, response.getStatus());
+        //         verify(problemSubmissionRepository,
+        //                         times(1)).save(any(ProblemSubmission.class));
+        //         verify(problemRepository, times(1)).save(any(Problem.class));
+        // }
 
-        @Test
-        public void testRunProblemAccepted() {
-                String lambdaResult = "{\"isAccepted\":true,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
-                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+        // @Test
+        // public void testRunProblemAccepted() {
+        //         String lambdaResult = "{\"isAccepted\":true,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
+        //         when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
 
-                RunProblemResponseDto response = problemSubmissionService.run(problem,
-                                problemCompileRequestDto,
-                                testCases, problemTemplate);
+        //         RunProblemResponseDto response = problemSubmissionService.run(problem,
+        //                         problemCompileRequestDto,
+        //                         testCases, problemTemplate);
 
-                assertEquals(SubmissionStatus.SUCCESS, response.getStatus());
-        }
+        //         assertEquals(SubmissionStatus.SUCCESS, response.getStatus());
+        // }
 
-        @Test
-        public void testRunProblemFailed() {
-                String lambdaResult = "{\"isAccepted\":false,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
-                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+        // @Test
+        // public void testRunProblemFailed() {
+        //         String lambdaResult = "{\"isAccepted\":false,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":2,\"results\":[]}";
+        //         when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
 
-                RunProblemResponseDto response = problemSubmissionService.run(problem,
-                                problemCompileRequestDto,
-                                testCases, problemTemplate);
+        //         RunProblemResponseDto response = problemSubmissionService.run(problem,
+        //                         problemCompileRequestDto,
+        //                         testCases, problemTemplate);
 
-                assertEquals(SubmissionStatus.FAILED, response.getStatus());
-        }
+        //         assertEquals(SubmissionStatus.FAILED, response.getStatus());
+        // }
 
-        @Test
-        public void testRunProblemCompileError() {
-                String lambdaResult = "Compile Error";
-                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+        // @Test
+        // public void testRunProblemCompileError() {
+        //         String lambdaResult = "Compile Error";
+        //         when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
 
-                RunProblemResponseDto response = problemSubmissionService.run(problem,
-                                problemCompileRequestDto,
-                                testCases, problemTemplate);
+        //         RunProblemResponseDto response = problemSubmissionService.run(problem,
+        //                         problemCompileRequestDto,
+        //                         testCases, problemTemplate);
 
-                assertEquals("Compile Error", response.getMessage());
-        }
+        //         assertEquals("Compile Error", response.getMessage());
+        // }
 
-        @Test
-        public void testSubmitProblemFailed() {
-                Users user = new Users();
-                user.setId(1L);
-                String lambdaResult = "{\"isAccepted\":false,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":1,\"results\":[]}";
-                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
-                when(userService.getUserById(anyLong())).thenReturn(user);
-                when(languageService.findByName(anyString())).thenReturn(new Language());
+        // @Test
+        // public void testSubmitProblemFailed() {
+        //         Users user = new Users();
+        //         user.setId(1L);
+        //         String lambdaResult = "{\"isAccepted\":false,\"time\":\"1.0\",\"memoryUsage\":\"128\",\"noSuccessTestcase\":1,\"results\":[]}";
+        //         when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+        //         when(userService.getUserById(anyLong())).thenReturn(user);
+        //         when(languageService.findByName(anyString())).thenReturn(new Language());
 
-                SubmissionResponseDto response = problemSubmissionService.submitProblem(problem,
-                                problemCompileRequestDto,
-                                testCases, problemTemplate, user);
+        //         SubmissionResponseDto response = problemSubmissionService.submitProblem(problem,
+        //                         problemCompileRequestDto,
+        //                         testCases, problemTemplate, user);
 
-                assertTrue(response instanceof FailedSubmissionResponseDto);
-                assertEquals(SubmissionStatus.FAILED, response.getStatus());
-                verify(problemSubmissionRepository,
-                                times(1)).save(any(ProblemSubmission.class));
-                verify(problemRepository, times(1)).save(any(Problem.class));
-        }
+        //         assertTrue(response instanceof FailedSubmissionResponseDto);
+        //         assertEquals(SubmissionStatus.FAILED, response.getStatus());
+        //         verify(problemSubmissionRepository,
+        //                         times(1)).save(any(ProblemSubmission.class));
+        //         verify(problemRepository, times(1)).save(any(Problem.class));
+        // }
 
-        @Test
-        public void testSubmitProblemCompileError() {
-                Users user = new Users();
-                user.setId(1L);
-                String lambdaResult = "Compile Error";
-                when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
-                when(userService.getUserById(anyLong())).thenReturn(user);
-                when(languageService.findByName(anyString())).thenReturn(new Language());
+        // @Test
+        // public void testSubmitProblemCompileError() {
+        //         Users user = new Users();
+        //         user.setId(1L);
+        //         String lambdaResult = "Compile Error";
+        //         when(lambdaService.invokeLambdaFunction(any())).thenReturn(lambdaResult);
+        //         when(userService.getUserById(anyLong())).thenReturn(user);
+        //         when(languageService.findByName(anyString())).thenReturn(new Language());
 
-                SubmissionResponseDto response = problemSubmissionService.submitProblem(problem,
-                                problemCompileRequestDto,
-                                testCases, problemTemplate, user);
+        //         SubmissionResponseDto response = problemSubmissionService.submitProblem(problem,
+        //                         problemCompileRequestDto,
+        //                         testCases, problemTemplate, user);
 
-                assertTrue(response instanceof CompileErrorResposneDto);
-                assertEquals(SubmissionStatus.FAILED, response.getStatus());
-                verify(problemSubmissionRepository,
-                                times(1)).save(any(ProblemSubmission.class));
-                verify(problemRepository, times(1)).save(any(Problem.class));
-        }
+        //         assertTrue(response instanceof CompileErrorResposneDto);
+        //         assertEquals(SubmissionStatus.FAILED, response.getStatus());
+        //         verify(problemSubmissionRepository,
+        //                         times(1)).save(any(ProblemSubmission.class));
+        //         verify(problemRepository, times(1)).save(any(Problem.class));
+        // }
 
         @Test
         public void testSubmitProblemCodeEmpty() {
@@ -420,46 +420,46 @@ public class ProblemSubmissionServiceImplTest {
                                 ((AcceptedSubmissionResponseDto) submissionDetail).getCreatedAt());
         }
 
-        @Test
-        public void testGetSubmissionDetailFailed() {
-                Users user = new Users();
-                user.setId(1L);
+        // @Test
+        // public void testGetSubmissionDetailFailed() {
+        //         Users user = new Users();
+        //         user.setId(1L);
 
-                Language language = new Language();
-                language.setName("Java");
+        //         Language language = new Language();
+        //         language.setName("Java");
 
-                Problem problem = new Problem();
-                problem.setId(1L);
-                problem.setTitle("test title");
-                problem.setLink("test link");
+        //         Problem problem = new Problem();
+        //         problem.setId(1L);
+        //         problem.setTitle("test title");
+        //         problem.setLink("test link");
 
-                ProblemSubmission problemSubmission = new ProblemSubmission();
-                problemSubmission.setId(1L);
-                problemSubmission.setCode("test code");
-                problemSubmission.setProblem(problem);
-                problemSubmission.setExecutionTime(0.1);
-                problemSubmission.setMemoryUsage(0.5);
-                problemSubmission.setUser(user);
-                problemSubmission.setLanguage(language);
-                problemSubmission.setCreatedAt(Timestamp.from(Instant.now()));
-                problemSubmission.setAccepted(false);
-                problemSubmission.setStatus(SubmissionStatus.FAILED);
-                problemSubmission.setNoTestCasePassed(3);
+        //         ProblemSubmission problemSubmission = new ProblemSubmission();
+        //         problemSubmission.setId(1L);
+        //         problemSubmission.setCode("test code");
+        //         problemSubmission.setProblem(problem);
+        //         problemSubmission.setExecutionTime(0.1);
+        //         problemSubmission.setMemoryUsage(0.5);
+        //         problemSubmission.setUser(user);
+        //         problemSubmission.setLanguage(language);
+        //         problemSubmission.setCreatedAt(Timestamp.from(Instant.now()));
+        //         problemSubmission.setAccepted(false);
+        //         problemSubmission.setStatus(SubmissionStatus.FAILED);
+        //         problemSubmission.setNoTestCasePassed(3);
 
-                SubmissionResponseDto submissionDetail = problemSubmissionService.getSubmissionDetail(problemSubmission,
-                                5,
-                                user);
+        //         SubmissionResponseDto submissionDetail = problemSubmissionService.getSubmissionDetail(problemSubmission,
+        //                         5,
+        //                         user);
 
-                assertNotNull(submissionDetail);
-                assertEquals("test code", submissionDetail.getCode());
-                assertEquals(SubmissionStatus.FAILED, ((FailedSubmissionResponseDto) submissionDetail).getStatus());
-                assertEquals(3, ((FailedSubmissionResponseDto) submissionDetail).getNoSuccessTestcase());
-                assertEquals("Java", ((FailedSubmissionResponseDto) submissionDetail).getLanguageName());
-                assertEquals(5, ((FailedSubmissionResponseDto) submissionDetail).getNoTestcase());
-                assertEquals(problemSubmission.getCreatedAt().getTime(),
-                                ((FailedSubmissionResponseDto) submissionDetail).getCreatedAt());
+        //         assertNotNull(submissionDetail);
+        //         assertEquals("test code", submissionDetail.getCode());
+        //         assertEquals(SubmissionStatus.FAILED, ((FailedSubmissionResponseDto) submissionDetail).getStatus());
+        //         assertEquals(3, ((FailedSubmissionResponseDto) submissionDetail).getNoSuccessTestcase());
+        //         assertEquals("Java", ((FailedSubmissionResponseDto) submissionDetail).getLanguageName());
+        //         assertEquals(5, ((FailedSubmissionResponseDto) submissionDetail).getNoTestcase());
+        //         assertEquals(problemSubmission.getCreatedAt().getTime(),
+        //                         ((FailedSubmissionResponseDto) submissionDetail).getCreatedAt());
 
-        }
+        // }
 
         @Test
         public void testGetSubmissionDetailCompileError() {

@@ -42,6 +42,8 @@ import com.g44.kodeholik.model.entity.setting.Language;
 import com.g44.kodeholik.model.entity.setting.Skill;
 import com.g44.kodeholik.model.entity.user.Users;
 import com.g44.kodeholik.repository.problem.ProblemSolutionRepository;
+import com.g44.kodeholik.service.setting.TagService;
+import com.g44.kodeholik.service.setting.impl.TagServiceImpl;
 import com.g44.kodeholik.util.mapper.response.problem.ProblemSolutionMapper;
 import com.g44.kodeholik.util.mapper.response.problem.SolutionListResponseMapper;
 
@@ -58,6 +60,9 @@ class ProblemSolutionServiceImplTest {
 
     @InjectMocks
     private ProblemSolutionServiceImpl problemSolutionService;
+
+    @Mock
+    private TagService tagService;
 
     @BeforeEach
     void setUp() {
