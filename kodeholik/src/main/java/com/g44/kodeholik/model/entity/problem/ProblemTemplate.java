@@ -45,12 +45,11 @@ public class ProblemTemplate {
     @Column(name = "function_signature")
     private String functionSignature;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "return_type")
-    private InputType returnType;
+    private String returnType;
 
     public ProblemTemplate(Problem problem, Language language, String templateCode, String functionSignature,
-            InputType returnType) {
+    String returnType) {
         this.problem = problem;
         this.language = language;
         this.templateCode = templateCode;

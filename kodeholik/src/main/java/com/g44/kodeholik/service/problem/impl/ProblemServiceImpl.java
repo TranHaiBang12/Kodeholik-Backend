@@ -639,7 +639,7 @@ public class ProblemServiceImpl implements ProblemService {
         template.setLanguage(languageService.findByName(templateCode.getLanguage()));
         template.setTemplateCode(templateCode.getCode());
         template.setFunctionSignature(problemInputParameterDto.getFunctionSignature());
-        template.setReturnType(problemInputParameterDto.getReturnType());
+        template.setReturnType(problemInputParameterDto.getReturnType() == InputType.UNKNOWN ? problemInputParameterDto.getOtherReturnType() : problemInputParameterDto.getReturnType().toString());
 
         problemTemplateService.addTemplate(template);
 
@@ -683,6 +683,9 @@ public class ProblemServiceImpl implements ProblemService {
             addProblemTemplate(problemInputParameterDto.get(j), problemInputParameterDto.get(j).getTemplateCode(),
                     problem, languageSupports);
             for (int i = 0; i < inputParameters.size(); i++) {
+                if(inputParameters.get(i).getInputType() == InputType.UNKNOWN) {
+                    inputParameters.get(i).setInputType(null);
+                }
                 Language language = languageService.findByName(problemInputParameterDto.get(j).getLanguage());
                 ProblemInputParameter problemInputParameter = new ProblemInputParameter();
                 problemInputParameter.setProblem(problem);
@@ -697,7 +700,8 @@ public class ProblemServiceImpl implements ProblemService {
                 String parameterJson = gson.toJson(inputMap);
                 problemInputParameter.setParameters(parameterJson);
                 problemInputParameters.add(problemInputParameter);
-                // log.info(parameterJson);
+                log.info("sdada");
+                log.info(parameterJson);
             }
         }
         problemInputParameterService.addListInputParameters(problemInputParameters);
@@ -786,8 +790,10 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     private ProblemInputParameterDto generateTemplate(ProblemInputParameterDto problemInputParameterDto) {
-        log.info(problemInputParameterDto);
         TemplateCode templateCode = problemInputParameterDto.getTemplateCode();
+        if(problemInputParameterDto.getReturnType().equals(InputType.UNKNOWN)) {
+            problemInputParameterDto.setReturnType(null);
+        }
         StringBuilder templateBuilder;
         String template = "";
         templateBuilder = new StringBuilder();
@@ -955,6 +961,8 @@ public class ProblemServiceImpl implements ProblemService {
                     break;
                 }
             }
+        
+            String templateCode = problemInputParameterDto.getTemplateCode().getCode();
             List<InputParameterDto> inputDtos = problemInputParameterDto.getParameters();
             List<TestCase> testCases = new ArrayList<>();
             List<TestCaseDto> testCaseDtos = problemTestCaseDto.getTestCases();
@@ -968,7 +976,7 @@ public class ProblemServiceImpl implements ProblemService {
                     Object parsedValue = rawValue;
                     InputVariable input = new InputVariable(
                             inputDtos.get(j).getInputName(),
-                            inputDtos.get(j).getInputType().toString(),
+                            inputDtos.get(j).getInputType() != InputType.UNKNOWN ? inputDtos.get(j).getInputType().toString() : inputDtos.get(j).getOtherInputType(),
                             parsedValue,
                             inputDtos.get(j).getNoDimension());
 
@@ -997,19 +1005,19 @@ public class ProblemServiceImpl implements ProblemService {
                     solutionCodeDto = solutionCodes.get(j);
                 }
             }
-            log.info(solutionCodeDto.toString());
+            log.info(problemInputParameterDto);
             LambdaRequest lambdaRequest = new LambdaRequest();
-            lambdaRequest.setCode(solutionCodeDto.getSolutionCode());
+            lambdaRequest.setCode(templateCode + "\n" + solutionCodeDto.getSolutionCode());
             lambdaRequest.setLanguage(solutionCodeDto.getSolutionLanguage());
             lambdaRequest.setFunctionSignature(problemInputParameterDto.getFunctionSignature());
             if (solutionCodeDto.getSolutionLanguage().equals("C")) {
                 lambdaRequest.setReturnType(getCStringForReturnType(
-                        problemInputParameterDto.getReturnType() == null ? problemInputParameterDto.getOtherReturnType()
+                        problemInputParameterDto.getReturnType() == InputType.UNKNOWN ? problemInputParameterDto.getOtherReturnType()
                                 : problemInputParameterDto.getReturnType().toString(),
                         problemInputParameterDto.getNoDimension()));
             } else if (solutionCodeDto.getSolutionLanguage().equals("Java")) {
                 lambdaRequest.setReturnType(getJavaStringForReturnType(
-                        problemInputParameterDto.getReturnType() == null ? problemInputParameterDto.getOtherReturnType()
+                        problemInputParameterDto.getReturnType() == InputType.UNKNOWN ? problemInputParameterDto.getOtherReturnType()
                                 : problemInputParameterDto.getReturnType().toString(),
                         problemInputParameterDto.getNoDimension()));
             }
@@ -1383,7 +1391,7 @@ public class ProblemServiceImpl implements ProblemService {
 
             problemInputParameterResponseDto.setTemplateCodes(templateCode);
             problemInputParameterResponseDto.setFunctionSignature(problemTemplate.getFunctionSignature());
-            problemInputParameterResponseDto.setReturnType(problemTemplate.getReturnType());
+            problemInputParameterResponseDto.setReturnType(InputType.valueOf(problemTemplate.getReturnType()));
 
             List<InputParameterDto> inputParameterDtoList = new ArrayList();
 
@@ -1742,7 +1750,7 @@ public class ProblemServiceImpl implements ProblemService {
             problemInputParameterResponseDto.setLanguage(language.getName());
             problemInputParameterResponseDto.setTemplateCodes(templateCode);
             problemInputParameterResponseDto.setFunctionSignature(problemTemplate.getFunctionSignature());
-            problemInputParameterResponseDto.setReturnType(problemTemplate.getReturnType());
+            problemInputParameterResponseDto.setReturnType(InputType.valueOf(problemTemplate.getReturnType()));
 
             List<InputParameterDto> inputParameterDtoList = new ArrayList();
 
